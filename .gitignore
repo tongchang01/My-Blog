@@ -1,0 +1,65 @@
+#########################
+# OS
+#########################
+.DS_Store
+Thumbs.db
+
+#########################
+# Logs
+#########################
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+#########################
+# Env
+#########################
+.env
+.env.*
+!.env.example
+
+#########################
+# Node / Vue 前端
+#########################
+node_modules/
+dist/
+build/
+.cache/
+coverage/
+
+# Vite
+.vite/
+
+# Vue CLI
+.project
+.classpath
+
+#########################
+# VSCode
+#########################
+.vscode/
+!.vscode/extensions.json
+
+#########################
+# Java / Maven 后端
+#########################
+target/
+*.class
+*.jar
+*.war
+*.ear
+
+#########################
+# IDEA
+#########################
+.idea/
+*.iml
+
+#########################
+# Temporary files
+#########################
+*.swp
+*.swo
+*~

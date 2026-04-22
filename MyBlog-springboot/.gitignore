@@ -1,0 +1,57 @@
+# --- 1. Java 编译与运行产物 ---
+*.class
+*.log
+*.ctxt
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven 打包目录 (最核心，一定要忽略)
+target/
+
+# --- 2. 数据库与本地驱动 ---
+*.db
+*.sqlite
+
+# --- 3. IDE 配置文件 (全家桶：IDEA + Eclipse + VS Code) ---
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+gen/
+
+# Eclipse
+.metadata/
+.classpath
+.project
+.settings/
+*.launch
+
+# VS Code
+.vscode/
+
+# --- 4. 操作系统临时文件 ---
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+*.log
+
+# --- 5. 敏感信息与私密配置 (关键！) ---
+# 忽略生产环境的真实配置文件
+application-local.yml
+application-dev.yml
+*.env
+
+# 忽略本地可能生成的 SSL 证书
+*.pem
+*.p12
+*.jks
+*.crt
+*.key
