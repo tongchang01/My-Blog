@@ -51,9 +51,9 @@
       <el-form-item>
         <el-button type="primary" @click="login" size="large" class="mx-auto mt-3">{{ t('auth.login_button') }}</el-button>
       </el-form-item>
-      <el-form-item>
+      <!-- <el-form-item>
         <el-button type="button" class="mx-auto my-el-button" @click="qqLogin">{{ t('auth.qq_login') }}</el-button>
-      </el-form-item>
+      </el-form-item> -->
       <div class="mt-8">
         <span class="text" @click="openRegisterDialog">{{ t('auth.register_now') }}</span>
         <span class="text float-right" @click="openForgetPasswordDialog">{{ t('auth.forgot_password') }}</span>
