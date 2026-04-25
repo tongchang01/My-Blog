@@ -35,6 +35,15 @@ public class s3UploadStrategyImpl extends AbstractUploadStrategyImpl {
     @Override
     public void upload(String path, String fileName, InputStream inputStream) {
             ObjectMetadata metadata = new ObjectMetadata();
+        if (fileName.endsWith(".jpg") || fileName.endsWith(".jpeg")) {
+            metadata.setContentType("image/jpeg");
+        } else if (fileName.endsWith(".png")) {
+            metadata.setContentType("image/png");
+        } else if (fileName.endsWith(".gif")) {
+            metadata.setContentType("image/gif");
+        } else if (fileName.endsWith(".webp")) {
+            metadata.setContentType("image/webp");
+        }
             // 关键：直接传入 inputStream，并带上 metadata
             gets3Client().putObject(s3ConfigProperties.getBucketName(), path + fileName, inputStream, metadata);
     }

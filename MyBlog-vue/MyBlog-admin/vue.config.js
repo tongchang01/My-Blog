@@ -6,6 +6,7 @@ function resolve(dir) {
 module.exports = defineConfig({
   transpileDependencies: true,
   productionSourceMap: false,
+  publicPath: '/admin/',
   devServer: {
     proxy: {
       '/api': {

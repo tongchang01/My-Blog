@@ -1,6 +1,6 @@
 spring:
   application:
-    name: aurora-springboot
+    name: MyBlog-springboot
   profiles:
-   active: dev
-    #active: local
+    active: dev
+    # active: local

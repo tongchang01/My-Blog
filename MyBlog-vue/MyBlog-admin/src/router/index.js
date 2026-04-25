@@ -14,6 +14,7 @@ const routes = [
 const createRouter = () =>
   new VueRouter({
     mode: 'history',
+    base: '/admin/',//追加路由
     routes: routes
   })
 const router = createRouter()
