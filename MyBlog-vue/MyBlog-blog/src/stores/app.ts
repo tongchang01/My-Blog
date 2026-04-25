@@ -60,8 +60,6 @@ export const useAppStore = defineStore('appStore', {
       i18n.global.locale = locale
       // 同步更新 Dia 机器人的语言
       const diaStore = useDiaStore()
-      diaStore.aurora_bot.locale = locale
-      diaStore.dia.installSoftware({ locale })
       diaStore.updateBotLocale(locale)
     },
     initializeTheme(mode: string) {

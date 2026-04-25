@@ -21,10 +21,18 @@ export const useDiaStore = defineStore('diaStore', {
     updateBotLocale(locale: string): void {
       this.aurora_bot.locale = locale
       this.dia.configs.locale = locale
-      this.dia.software.config.locale = locale
-      this.dia.software.loadLocaleMessages()
-      this.dia.software.injectBotScripts()
-      this.dia.software.messages = this.dia.software.botTips.messages
+
+      const software = this.dia.software
+
+      software.config.locale = locale
+      software.loadLocaleMessages()
+      software.injectBotScripts()
+      software.messages = software.botTips.messages || []
+
+      sessionStorage.removeItem(software.messageCacheKey)
+      sessionStorage.removeItem(software.mouseoverEventCacheKey)
+
+      software.showWelcomeMessage()
     }
   }
 })
