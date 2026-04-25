@@ -40,75 +40,75 @@
       <ThemeToggle />
     </span>
   </div>
-  <el-dialog v-model="loginDialogVisible" width="30%" :fullscreen="isMobile">
+  <el-dialog v-model="loginDialogVisible" width="30%" :title="t('auth.login_title')" :fullscreen="isMobile">
     <el-form @keyup.enter.native="login">
       <el-form-item model="userInfo" class="mt-5">
-        <el-input v-model="loginInfo.username" placeholder="邮箱" />
+        <el-input v-model="loginInfo.username" :placeholder="t('auth.email')" />
       </el-form-item>
       <el-form-item model="userInfo" type="password" class="mt-8">
-        <el-input v-model="loginInfo.password" type="password" show-password placeholder="密码" />
+        <el-input v-model="loginInfo.password" type="password" show-password :placeholder="t('auth.password')" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="login" size="large" class="mx-auto mt-3">登录</el-button>
+        <el-button type="primary" @click="login" size="large" class="mx-auto mt-3">{{ t('auth.login_button') }}</el-button>
       </el-form-item>
       <el-form-item>
-        <el-button type="button" class="mx-auto my-el-button" @click="qqLogin">QQ登录</el-button>
+        <el-button type="button" class="mx-auto my-el-button" @click="qqLogin">{{ t('auth.qq_login') }}</el-button>
       </el-form-item>
       <div class="mt-8">
-        <span class="text" @click="openRegisterDialog">立即注册</span>
-        <span class="text float-right" @click="openForgetPasswordDialog">忘记密码?</span>
+        <span class="text" @click="openRegisterDialog">{{ t('auth.register_now') }}</span>
+        <span class="text float-right" @click="openForgetPasswordDialog">{{ t('auth.forgot_password') }}</span>
       </div>
     </el-form>
   </el-dialog>
-  <el-dialog v-model="registerDialogVisible" width="30%" :fullscreen="isMobile">
+  <el-dialog v-model="registerDialogVisible" width="30%" :title="t('auth.register_title')" :fullscreen="isMobile">
     <el-form>
       <el-form-item model="userInfo" class="mt-5">
-        <el-input v-model="loginInfo.username" placeholder="邮箱" />
+        <el-input v-model="loginInfo.username" :placeholder="t('auth.email')" />
       </el-form-item>
       <el-form-item model="userInfo" class="mt-8">
-        <el-input v-model="loginInfo.code" placeholder="验证码">
+        <el-input v-model="loginInfo.code" :placeholder="t('auth.verification_code')">
           <template #append>
-            <span class="text" @click="sendCode">发送</span>
+            <span class="text" @click="sendCode">{{ t('auth.send_code') }}</span>
           </template>
         </el-input>
       </el-form-item>
       <el-form-item model="userInfo" type="password" class="mt-8">
-        <el-input v-model="loginInfo.password" type="password" show-password placeholder="密码" />
+        <el-input v-model="loginInfo.password" type="password" show-password :placeholder="t('auth.password')" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="register" size="large" class="mx-auto mt-3">注册</el-button>
+        <el-button type="primary" @click="register" size="large" class="mx-auto mt-3">{{ t('auth.register_button') }}</el-button>
       </el-form-item>
-      <span class="text" @click="returnLoginDialog">已有帐号?登录</span>
+      <span class="text" @click="returnLoginDialog">{{ t('auth.already_have_account') }}</span>
     </el-form>
   </el-dialog>
-  <el-dialog v-model="forgetPasswordDialogVisible" width="30%" :fullscreen="isMobile">
+  <el-dialog v-model="forgetPasswordDialogVisible" width="30%" :title="t('auth.forget_password_title')" :fullscreen="isMobile">
     <el-form>
       <el-form-item model="userInfo" class="mt-5">
-        <el-input v-model="loginInfo.username" placeholder="邮箱" />
+        <el-input v-model="loginInfo.username" :placeholder="t('auth.email')" />
       </el-form-item>
       <el-form-item model="userInfo" class="mt-8">
-        <el-input v-model="loginInfo.code" placeholder="验证码">
+        <el-input v-model="loginInfo.code" :placeholder="t('auth.verification_code')">
           <template #append>
-            <span class="text" @click="sendCode">发送</span>
+            <span class="text" @click="sendCode">{{ t('auth.send_code') }}</span>
           </template>
         </el-input>
       </el-form-item>
       <el-form-item model="userInfo" type="password" class="mt-8">
-        <el-input v-model="loginInfo.password" type="password" show-password placeholder="新密码" />
+        <el-input v-model="loginInfo.password" type="password" show-password :placeholder="t('auth.new_password')" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="updatePassword" size="large" class="mx-auto mt-3">确定</el-button>
+        <el-button type="primary" @click="updatePassword" size="large" class="mx-auto mt-3">{{ t('auth.submit_button') }}</el-button>
       </el-form-item>
-      <span class="text" @click="returnLoginDialog">返回登录</span>
+      <span class="text" @click="returnLoginDialog">{{ t('auth.back_to_login') }}</span>
     </el-form>
   </el-dialog>
-  <el-dialog v-model="articlePasswordDialogVisible" width="30%" :fullscreen="isMobile">
+  <el-dialog v-model="articlePasswordDialogVisible" width="30%" :title="t('auth.article_password')" :fullscreen="isMobile">
     <el-form @submit.native.prevent @keyup.enter.native="accessArticle">
       <el-form-item model="userInfo" class="mt-5">
-        <el-input id="article-password-input" v-model="articlePassword" placeholder="文章受密码保护,请输入密码" />
+        <el-input id="article-password-input" v-model="articlePassword" :placeholder="t('auth.enter_article_password')" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="accessArticle" size="large" class="mx-auto mt-3">校验密码</el-button>
+        <el-button type="primary" @click="accessArticle" size="large" class="mx-auto mt-3">{{ t('auth.verify_password') }}</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -177,8 +177,8 @@ export default defineComponent({
     const login = () => {
       if (loginInfo.username.trim().length == 0 || loginInfo.password.trim().length == 0) {
         proxy.$notify({
-          title: 'Warning',
-          message: '账号或者密码不能为空',
+          title: t('notify.warning'),
+          message: t('notify.password_empty'),
           type: 'warning'
         })
         return
@@ -192,8 +192,8 @@ export default defineComponent({
           sessionStorage.setItem('token', data.data.token)
           userStore.token = data.data.token
           proxy.$notify({
-            title: 'Success',
-            message: '登录成功',
+            title: t('notify.success'),
+            message: t('notify.login_success'),
             type: 'success'
           })
           reactiveDate.loginDialogVisible = false
@@ -208,8 +208,8 @@ export default defineComponent({
           userStore.accessArticles = []
           sessionStorage.removeItem('token')
           proxy.$notify({
-            title: 'Success',
-            message: '登出成功',
+            title: t('notify.success'),
+            message: t('notify.logout_success'),
             type: 'success'
           })
         }
@@ -240,8 +240,8 @@ export default defineComponent({
       api.sendValidationCode(loginInfo.username).then(({ data }) => {
         if (data.flag) {
           proxy.$notify({
-            title: 'Success',
-            message: '验证码已发送',
+            title: t('notify.success'),
+            message: t('notify.code_sent'),
             type: 'success'
           })
         }
@@ -256,8 +256,8 @@ export default defineComponent({
       api.register(params).then(({ data }) => {
         if (data.flag) {
           proxy.$notify({
-            title: 'Success',
-            message: '注册成功',
+            title: t('notify.success'),
+            message: t('notify.login_success'),
             type: 'success'
           })
           reactiveDate.registerDialogVisible = false
@@ -292,8 +292,8 @@ export default defineComponent({
       api.updatePassword(loginInfo).then(({ data }) => {
         if (data.flag) {
           proxy.$notify({
-            title: 'Success',
-            message: '修改成功',
+            title: t('notify.success'),
+            message: t('notify.update_success'),
             type: 'success'
           })
           reactiveDate.forgetPasswordDialogVisible = false
@@ -304,8 +304,8 @@ export default defineComponent({
     const accessArticle = () => {
       if (reactiveDate.articlePassword.trim().length == 0) {
         proxy.$notify({
-          title: 'Warning',
-          message: '密码不能为空',
+          title: t('notify.warning'),
+          message: t('notify.password_empty'),
           type: 'warning'
         })
         return

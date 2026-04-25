@@ -9,7 +9,7 @@ module.exports = defineConfig({
   devServer: {
     proxy: {
       '/api': {
-        // target: 'https://www.linhaojun.top/api', 代理当前指向作者服务器
+        //target: 'http://13.113.30.160', //远程服务器测试
         target: 'http://localhost:8080',//本地启动测试
         changeOrigin: true,
         pathRewrite: {

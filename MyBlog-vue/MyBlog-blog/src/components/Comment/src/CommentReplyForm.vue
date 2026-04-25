@@ -13,13 +13,13 @@
           @click="saveReply"
           id="submit-button"
           class="mt-5 w-16 text-white p-2 rounded-lg shadow-lg transition transform hover:scale-105 flex float-right">
-          <span class="text-center flex-grow commit">Reply</span>
+          <span class="text-center flex-grow commit">{{ t('comment.reply') }}</span>
         </button>
         <button
           @click="CancelReply"
           id="submit-button"
           class="mt-5 mr-3 w-16 text-white p-2 rounded-lg shadow-lg transition transform hover:scale-105 flex float-right">
-          <span class="text-center flex-grow commit">Cancel</span>
+          <span class="text-center flex-grow commit">{{ t('comment.cancel') }}</span>
         </button>
       </div>
     </div>
@@ -35,6 +35,7 @@ import { useCommentStore } from '@/stores/comment'
 import { useAppStore } from '@/stores/app'
 import { useRoute } from 'vue-router'
 import api from '@/api/api'
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   components: {
@@ -42,6 +43,7 @@ export default defineComponent({
   },
   props: ['replyUserId', 'initialContent'],
   setup(props, { emit }) {
+    const { t } = useI18n()
     const proxy: any = getCurrentInstance()?.appContext.config.globalProperties
     const userStore = useUserStore()
     const commentStore = useCommentStore()
@@ -55,16 +57,16 @@ export default defineComponent({
     const saveReply = () => {
       if (userStore.userInfo === '') {
         proxy.$notify({
-          title: 'Warning',
-          message: '请登录后回复',
+          title: t('notify.warning'),
+          message: t('comment.login_to_reply'),
           type: 'warning'
         })
         return
       }
       if (reactiveData.commentContent.trim() == '') {
         proxy.$notify({
-          title: 'Warning',
-          message: '回复不能为空',
+          title: t('notify.warning'),
+          message: t('comment.reply_empty'),
           type: 'warning'
         })
         return
@@ -85,14 +87,14 @@ export default defineComponent({
           let isCommentReview = appStore.websiteConfig.isCommentReview
           if (isCommentReview) {
             proxy.$notify({
-              title: 'Warning',
-              message: '评论成功,正在审核中',
+              title: t('notify.warning'),
+              message: t('comment.comment_under_review'),
               type: 'warning'
             })
           } else {
             proxy.$notify({
-              title: 'Success',
-              message: '回复成功',
+              title: t('notify.success'),
+              message: t('comment.reply_success'),
               type: 'success'
             })
           }
@@ -125,7 +127,8 @@ export default defineComponent({
       ...toRefs(reactiveData),
       avatar: computed(() => userStore.userInfo.avatar),
       saveReply,
-      CancelReply
+      CancelReply,
+      t
     }
   }
 })

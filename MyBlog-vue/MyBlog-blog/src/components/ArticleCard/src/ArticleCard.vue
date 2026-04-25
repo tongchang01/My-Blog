@@ -109,8 +109,8 @@ export default defineComponent({
       if (props.data.status === 2 && isAccess == false) {
         if (userStore.userInfo === '') {
           proxy.$notify({
-            title: 'Warning',
-            message: '该文章受密码保护,请登录后访问',
+            title: t('notify.warning'),
+            message: t('notify.article_password_login'),
             type: 'warning'
           })
         } else {

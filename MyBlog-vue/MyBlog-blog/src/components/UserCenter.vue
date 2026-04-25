@@ -1,8 +1,8 @@
 <template>
   <el-drawer v-model="visible" direction="rtl" :with-header="false" :before-close="handleClose">
-    <span class="text font-semibold text-2xl">用户中心</span>
+    <span class="text font-semibold text-2xl">{{ t('user.title') }}</span>
     <template v-if="userInfo !== ''">
-      <span class="text font-medium">(该页面的信息,本网站将严格保密)</span>
+      <span class="text font-medium">({{ t('user.privacy_notice') }})</span>
       <div class="max-w-full mt-10">
         <button id="pick-avatar" @click="showCropper = true">
           <el-avatar :size="110" :src="userInfo.avatar" class="ml-40" />
@@ -14,26 +14,26 @@
           :request-options="options"
           upload-url="/api/users/avatar" />
         <el-form>
-          <el-form-item model="userInfo" label="昵称:" class="mt-5">
+          <el-form-item model="userInfo" :label="t('user.nickname') + ':'" class="mt-5">
             <el-input v-model="userInfo.nickname" />
           </el-form-item>
-          <el-form-item model="userInfo" label="网址:" class="mt-5">
-            <el-input v-model="userInfo.website" placeholder="Please add https:// or http://" />
+          <el-form-item model="userInfo" :label="t('user.website') + ':'" class="mt-5">
+            <el-input v-model="userInfo.website" :placeholder="t('user.website_placeholder')" />
           </el-form-item>
-          <el-form-item model="userInfo" label="描述:" class="mt-5">
-            <el-input v-model="userInfo.intro" placeholder="Introduce youself" />
+          <el-form-item model="userInfo" :label="t('user.description') + ':'" class="mt-5">
+            <el-input v-model="userInfo.intro" :placeholder="t('user.intro_placeholder')" />
           </el-form-item>
-          <el-form-item model="userInfo" label="邮箱:" class="mt-5">
+          <el-form-item model="userInfo" :label="t('user.email') + ':'" class="mt-5">
             <el-input disabled :placeholder="userInfo.email">
               <template #append v-if="userInfo.email === null">
-                <span class="text" @click="changeEmailDialogVisible">绑定</span>
+                <span class="text" @click="changeEmailDialogVisible">{{ t('user.bind') }}</span>
               </template>
               <template #append v-else>
-                <span class="text" @click="changeEmailDialogVisible">修改</span>
+                <span class="text" @click="changeEmailDialogVisible">{{ t('user.modify') }}</span>
               </template>
             </el-input>
           </el-form-item>
-          <el-form-item label="订阅:">
+          <el-form-item :label="t('user.subscribe') + ':'">
             <el-switch
               v-model="userInfo.isSubscribe"
               :loading="loading"
@@ -48,7 +48,7 @@
             type="button"
             id="submit-button"
             class="mt-5 w-20 text-white p-2 rounded-lg transition transform hover:scale-105 flex float-right">
-            <span class="text-center flex-grow commit">提交</span>
+            <span class="text-center flex-grow commit">{{ t('user.submit') }}</span>
           </button>
         </el-form>
       </div>
@@ -59,10 +59,10 @@
   <el-dialog v-model="emailDialogVisible" width="30%">
     <el-form>
       <el-form-item model="userInfo" class="mt-5">
-        <el-input v-model="email" placeholder="邮箱号" />
+        <el-input v-model="email" :placeholder="t('user.email_placeholder')" />
       </el-form-item>
       <el-form-item model="userInfo" type="password" class="mt-8">
-        <el-input v-model="VerificationCode" type="password" placeholder="验证码">
+        <el-input v-model="VerificationCode" type="password" :placeholder="t('user.code_placeholder')">
           <template #append>
             <button type="button" style="outline: none">
               <span class="text" @click="sendCode">{{ message }}</span>
@@ -71,7 +71,7 @@
         </el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="bingingEmail" size="large" class="mx-auto mt-3">绑定</el-button>
+        <el-button type="primary" @click="bingingEmail" size="large" class="mx-auto mt-3">{{ t('user.bind') }}</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -82,15 +82,17 @@ import { defineComponent, toRef, ref, reactive, toRefs, getCurrentInstance, comp
 import { useUserStore } from '@/stores/user'
 import AvatarCropper from 'vue-avatar-cropper'
 import api from '@/api/api'
+import { useI18n } from 'vue-i18n'
 
 export default defineComponent({
   name: 'UserCenter',
   components: { AvatarCropper },
   setup() {
+    const { t } = useI18n()
     const proxy: any = getCurrentInstance()?.appContext.config.globalProperties
     const userStore = useUserStore()
     const reactiveData = reactive({
-      message: '发送',
+      message: t('auth.send_code'),
       emailDialogVisible: false,
       email: '' as any,
       VerificationCode: '' as any,
@@ -112,8 +114,8 @@ export default defineComponent({
       api.bindingEmail(params).then(({ data }) => {
         if (data.flag) {
           proxy.$notify({
-            title: 'Success',
-            message: '绑定成功',
+            title: t('notify.success'),
+            message: t('notify.bind_success'),
             type: 'success'
           })
           userStore.userInfo.email = reactiveData.email
@@ -126,8 +128,8 @@ export default defineComponent({
         if (data.flag) {
           userStore.userInfo.avatar = data.data
           proxy.$notify({
-            title: 'Success',
-            message: '上传成功',
+            title: t('notify.success'),
+            message: t('notify.upload_success'),
             type: 'success'
           })
         }
@@ -142,8 +144,8 @@ export default defineComponent({
         api.updateUserSubscribe(params).then(({ data }) => {
           if (data.flag) {
             proxy.$notify({
-              title: 'Success',
-              message: '修改成功',
+              title: t('notify.success'),
+              message: t('notify.update_success'),
               type: 'success'
             })
           }
@@ -159,8 +161,8 @@ export default defineComponent({
       api.submitUserInfo(params).then(({ data }) => {
         if (data.flag) {
           proxy.$notify({
-            title: 'Success',
-            message: '修改成功',
+            title: t('notify.success'),
+            message: t('notify.update_success'),
             type: 'success'
           })
         }
@@ -170,8 +172,8 @@ export default defineComponent({
       api.sendValidationCode(reactiveData.email).then(({ data }) => {
         if (data.flag) {
           proxy.$notify({
-            title: 'Success',
-            message: '验证码已发送',
+            title: t('notify.success'),
+            message: t('notify.code_sent'),
             type: 'success'
           })
         }
@@ -184,8 +186,8 @@ export default defineComponent({
         if (userStore.userInfo.email === '' || userStore.userInfo.email === null) {
           reactiveData.loading = false
           proxy.$notify({
-            title: 'Warning',
-            message: '邮箱未绑定,尽快绑定哦',
+            title: t('notify.warning'),
+            message: t('notify.email_not_bound'),
             type: 'warning'
           })
           return reject(new Error('Error'))
@@ -208,6 +210,7 @@ export default defineComponent({
       sendCode,
       commit,
       beforeChange,
+      t,
       options: computed(() => {
         return {
           method: 'POST',

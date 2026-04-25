@@ -48,16 +48,16 @@ export default defineComponent({
     const saveComment = () => {
       if (userStore.userInfo === '') {
         proxy.$notify({
-          title: 'Warning',
-          message: '请登录后评论',
+          title: t('notify.warning'),
+          message: t('comment.login_to_comment'),
           type: 'warning'
         })
         return
       }
       if (reactiveData.commentContent.trim() == '') {
         proxy.$notify({
-          title: 'Warning',
-          message: '评论不能为空',
+          title: t('notify.warning'),
+          message: t('comment.comment_empty'),
           type: 'warning'
         })
         return
@@ -75,14 +75,14 @@ export default defineComponent({
           let isCommentReview = appStore.websiteConfig.isCommentReview
           if (isCommentReview) {
             proxy.$notify({
-              title: 'Warning',
-              message: '评论成功,正在审核中',
+              title: t('notify.warning'),
+              message: t('comment.comment_under_review'),
               type: 'warning'
             })
           } else {
             proxy.$notify({
-              title: 'Success',
-              message: '评论成功',
+              title: t('notify.success'),
+              message: t('comment.comment_success'),
               type: 'success'
             })
           }
