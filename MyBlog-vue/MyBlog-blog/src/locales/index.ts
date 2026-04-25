@@ -21,7 +21,7 @@ function loadLocaleMessages(): {
 
 export const i18n = createI18n({
   locale: cookies.get('locale') ? String(cookies.get('locale')) : 'en',
-  fallbackLocale: 'cn', // 固定回退语言，设为中文 'cn' 
+  fallbackLocale: 'jp', // 固定回退语言，设为中文 'cn' 
   messages: loadLocaleMessages()
 })
 

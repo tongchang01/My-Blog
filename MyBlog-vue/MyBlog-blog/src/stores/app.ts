@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { i18n } from '@/locales/index'
 import cookies from 'js-cookie'
 import nProgress from 'nprogress'
+import { useDiaStore } from './dia'
 import 'nprogress/nprogress.css'
 
 nProgress.configure({
@@ -57,6 +58,11 @@ export const useAppStore = defineStore('appStore', {
     changeLocale(locale: string) {
       cookies.set('locale', locale, { expires: 7 })
       i18n.global.locale = locale
+      // 同步更新 Dia 机器人的语言
+      const diaStore = useDiaStore()
+      diaStore.aurora_bot.locale = locale
+      diaStore.dia.installSoftware({ locale })
+      diaStore.updateBotLocale(locale)
     },
     initializeTheme(mode: string) {
       setTheme(mode)
