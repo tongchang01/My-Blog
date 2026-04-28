@@ -73,28 +73,80 @@ export default {
   bottom: 0;
   right: 0;
   left: 0;
-  background: url(https://static.linhaojun.top/aurora/photos/765664a8a75211296a9cd89671d6d660.png) center center / cover
-    no-repeat;
+
+  background: url(https://tyb-blog-s3.s3.ap-northeast-1.amazonaws.com/aurora/articles/010de3a4c3f8d2cc89d2468e5e5aeb41.jpg)
+    center center / cover no-repeat;
+
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding-left: 90px;
+  padding-bottom: 90px;
+  box-sizing: border-box;
 }
+
 .login-card {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  right: 0;
-  background: #fff;
-  padding: 170px 60px 180px;
-  width: 350px;
+  width: 380px;
+  padding: 42px 44px 46px;
+
+  background: rgba(25, 20, 18, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  box-sizing: border-box;
 }
+
 .login-title {
-  color: #303133;
+  color: #f5efe7;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 1.05rem;
+  letter-spacing: 1px;
 }
+
 .login-form {
-  margin-top: 1.2rem;
+  margin-top: 1.4rem;
 }
+
 .login-card button {
   margin-top: 1rem;
   width: 100%;
+  height: 42px;
+
+  background: linear-gradient(135deg, #c58b45, #9f6428);
+  border: none;
+  border-radius: 8px;
+
+  color: #fff;
+  font-weight: bold;
+}
+
+.login-card button:hover {
+  background: linear-gradient(135deg, #d89b52, #ad7130);
+}
+
+/* 输入框整体 */
+.login-card >>> .el-input__inner {
+  height: 42px;
+
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 8px;
+
+  color: #2c211b;
+}
+
+/* placeholder */
+.login-card >>> .el-input__inner::placeholder {
+  color: #8a7d72;
+}
+
+/* icon颜色 */
+.login-card >>> .el-input__prefix,
+.login-card >>> .el-input__suffix {
+  color: #8a6a4a;
 }
 </style>
