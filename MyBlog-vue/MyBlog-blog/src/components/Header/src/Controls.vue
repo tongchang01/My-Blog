@@ -269,25 +269,6 @@ export default defineComponent({
       searchStore.setOpenModal(status)
     }
 
-    const qqLogin = () => {
-      userStore.currentUrl = route.path
-      reactiveDate.loginDialogVisible = false
-      if (commonStore.isMobile) {
-        //@ts-ignore
-        QC.Login.showPopup({
-          appId: config.qqLogin.QQ_APP_ID,
-          redirectURI: config.qqLogin.QQ_REDIRECT_URI
-        })
-      } else {
-        window.open(
-          'https://graph.qq.com/oauth2.0/show?which=Login&display=pc&client_id=' +
-            +config.qqLogin.QQ_APP_ID +
-            '&response_type=token&scope=all&redirect_uri=' +
-            config.qqLogin.QQ_REDIRECT_URI,
-          '_self'
-        )
-      }
-    }
     const updatePassword = () => {
       api.updatePassword(loginInfo).then(({ data }) => {
         if (data.flag) {
@@ -330,7 +311,6 @@ export default defineComponent({
       userInfo: toRef(userStore.$state, 'userInfo'),
       isMobile: toRef(commonStore.$state, 'isMobile'),
       login,
-      qqLogin,
       logout,
       handleClick,
       openUserCenter,

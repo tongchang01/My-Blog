@@ -62,11 +62,6 @@ const routes = [
     component: () => import('../views/404.vue')
   },
   {
-    path: '/oauth/login/qq',
-    name: 'qqLogin',
-    component: () => import('../components/OauthLogin.vue')
-  },
-  {
     path: '/:catchAll(.*)',
     redirect: '/404',
     hidden: true
