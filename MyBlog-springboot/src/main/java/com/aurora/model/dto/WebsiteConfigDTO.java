@@ -70,6 +70,18 @@ public class WebsiteConfigDTO {
 
     private String favicon;
 
+    private Integer musicPlayerEnable;
+
+    private Integer musicPlayerAutoPlay;
+
+    private Integer musicPlayerFixed;
+
+    private String musicPlayerTheme;
+
+    private String musicPlayerLoop;
+
+    private String musicPlayerOrder;
+
     /**
      * 网页标题
      */

@@ -101,6 +101,24 @@ public class WebsiteConfigVO {
     @ApiModelProperty(name = "favicon", value = "favicon", required = true, dataType = "String")
     private String favicon;
 
+    @ApiModelProperty(name = "musicPlayerEnable", value = "鏄惁鍚敤闊充箰鎾斁鍣?", required = true, dataType = "Integer")
+    private Integer musicPlayerEnable;
+
+    @ApiModelProperty(name = "musicPlayerAutoPlay", value = "鏄惁鑷姩鎾斁", required = true, dataType = "Integer")
+    private Integer musicPlayerAutoPlay;
+
+    @ApiModelProperty(name = "musicPlayerFixed", value = "鏄惁鍥哄畾鏄剧ず", required = true, dataType = "Integer")
+    private Integer musicPlayerFixed;
+
+    @ApiModelProperty(name = "musicPlayerTheme", value = "鎾斁鍣ㄤ富棰滆壊", required = true, dataType = "String")
+    private String musicPlayerTheme;
+
+    @ApiModelProperty(name = "musicPlayerLoop", value = "寰幆妯″紡", required = true, dataType = "String")
+    private String musicPlayerLoop;
+
+    @ApiModelProperty(name = "musicPlayerOrder", value = "鎾斁椤哄簭", required = true, dataType = "String")
+    private String musicPlayerOrder;
+
     @ApiModelProperty(name = "websiteTitle", value = "网页标题", required = true, dataType = "String")
     private String websiteTitle;
 

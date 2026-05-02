@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aurora.mapper.MusicMapper">
+    <select id="listMusics" resultType="com.aurora.model.dto.MusicDTO">
+        SELECT id,
+               music_name,
+               artist,
+               album,
+               cover,
+               url,
+               lrc,
+               theme,
+               sort
+        FROM t_music
+        WHERE status = 1
+        ORDER BY sort ASC,
+                 id DESC
+    </select>
+
+    <select id="listBackMusics" resultType="com.aurora.model.dto.MusicAdminDTO">
+        SELECT id,
+               music_name,
+               artist,
+               album,
+               cover,
+               url,
+               lrc,
+               theme,
+               sort,
+               status,
+               remark,
+               create_time,
+               update_time
+        FROM t_music
+        <where>
+            <if test="conditionVO.keywords != null and conditionVO.keywords != ''">
+                (music_name LIKE CONCAT('%', #{conditionVO.keywords}, '%')
+                OR artist LIKE CONCAT('%', #{conditionVO.keywords}, '%'))
+            </if>
+            <if test="conditionVO.status != null">
+                AND status = #{conditionVO.status}
+            </if>
+        </where>
+        ORDER BY sort ASC,
+                 id DESC
+        LIMIT #{current}, #{size}
+    </select>
+
+    <select id="getBackMusicById" resultType="com.aurora.model.dto.MusicAdminDTO">
+        SELECT id,
+               music_name,
+               artist,
+               album,
+               cover,
+               url,
+               lrc,
+               theme,
+               sort,
+               status,
+               remark,
+               create_time,
+               update_time
+        FROM t_music
+        WHERE id = #{musicId}
+    </select>
+</mapper>
