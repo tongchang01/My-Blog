@@ -16,6 +16,7 @@ export default new Vuex.Store({
       tag: 1,
       comment: 1,
       talkList: 1,
+      music: 1,
       user: 1,
       online: 1,
       role: 1,
@@ -83,6 +84,9 @@ export default new Vuex.Store({
     },
     updateTalkListPageState(state, current) {
       state.pageState.talkList = current
+    },
+    updateMusicPageState(state, current) {
+      state.pageState.music = current
     },
     updateUserPageState(state, current) {
       state.pageState.user = current

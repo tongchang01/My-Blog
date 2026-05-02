@@ -91,6 +91,21 @@ SELECT 5553, 14, 1192
 WHERE NOT EXISTS (SELECT 1 FROM `t_role_resource` WHERE `id` = 5553);
 
 -- ----------------------------
+-- Menus for music management page
+-- ----------------------------
+INSERT INTO `t_menu` (`id`, `name`, `path`, `component`, `icon`, `create_time`, `update_time`, `order_num`, `parent_id`, `is_hidden`)
+SELECT 226, '音乐管理', '/musics', '/music/Music.vue', 'el-icon-myliebiao', '2026-05-02 14:00:00', NULL, 5, 4, 0
+WHERE NOT EXISTS (SELECT 1 FROM `t_menu` WHERE `id` = 226);
+
+INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`)
+SELECT 2886, 1, 226
+WHERE NOT EXISTS (SELECT 1 FROM `t_role_menu` WHERE `id` = 2886);
+
+INSERT INTO `t_role_menu` (`id`, `role_id`, `menu_id`)
+SELECT 2887, 14, 226
+WHERE NOT EXISTS (SELECT 1 FROM `t_role_menu` WHERE `id` = 2887);
+
+-- ----------------------------
 -- Extend website config JSON with player config
 -- ----------------------------
 UPDATE `t_website_config`
