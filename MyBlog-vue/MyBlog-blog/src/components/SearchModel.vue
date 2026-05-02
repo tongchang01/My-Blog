@@ -49,14 +49,14 @@
               v-show="keywords.length > 0"
               class="search-btn"
               type="reset"
-              title="Clear the query"
+              :title="t('settings.search_clear')"
               @click="handleResetInput"></button>
           </form>
         </header>
         <div id="Search-Dropdown" class="search-dropdown" v-if="searchResults !== null">
           <div>
             <section v-if="searchResults.length > 0">
-              <div class="search-hit-label">Found {{ searchResults.length }} records</div>
+              <div class="search-hit-label">{{ searchResultsCount }}</div>
               <ul id="search-menu">
                 <li
                   v-for="(result, index) in searchResults"
@@ -165,7 +165,7 @@
                 alt="ObsidianNext Logo"
                 height="20"
                 width="20" /> -->
-              <span class="text-ob">Search</span>
+              <span class="text-ob">{{ t('settings.search_brand') }}</span>
             </a>
           </div>
           <ul class="search-commands">

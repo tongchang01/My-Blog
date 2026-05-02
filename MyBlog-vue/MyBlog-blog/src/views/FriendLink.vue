@@ -28,9 +28,7 @@
           </div>
           <div
             class="post-html"
-            v-html="
-              `需要交换友链的可在下方留言💖<br><br>友链信息展示需要，你的信息格式要包含：名称、头像、链接、介绍`
-            " />
+            v-html="t('page.friend_link_intro')" />
           <Comment />
         </div>
         <div class="col-span-1">

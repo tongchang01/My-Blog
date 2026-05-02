@@ -48,10 +48,10 @@ export default defineComponent({
       let daysold = Math.floor(timeold / msPerDay)
       let str = ''
       let day = new Date()
-      str += daysold + '天'
-      str += day.getHours() + '时'
-      str += day.getMinutes() + '分'
-      str += day.getSeconds() + '秒'
+      str += `${daysold}${t('settings.time_units.day')}`
+      str += `${day.getHours()}${t('settings.time_units.hour')}`
+      str += `${day.getMinutes()}${t('settings.time_units.minute')}`
+      str += `${day.getSeconds()}${t('settings.time_units.second')}`
       websiteCreateTime.value = str
       viewCount.value = appStore.viewCount
     }

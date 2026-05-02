@@ -49,16 +49,16 @@ axios.interceptors.response.use(
     switch (response.data.code) {
       case 50000: {
         proxy.$notify({
-          title: 'Error',
-          message: '系统异常',
+          title: i18n.global.t('notify.error'),
+          message: i18n.global.t('notify.system_error'),
           type: 'error'
         })
         break
       }
       case 40001: {
         proxy.$notify({
-          title: 'Error',
-          message: '用户未登录',
+          title: i18n.global.t('notify.error'),
+          message: i18n.global.t('notify.unauthorized'),
           type: 'error'
         })
         if (userStore.userInfo !== '') {
@@ -71,7 +71,7 @@ axios.interceptors.response.use(
       }
       default: {
         proxy.$notify({
-          title: 'Error',
+          title: i18n.global.t('notify.error'),
           message: response.data.message,
           type: 'error'
         })

@@ -36,7 +36,7 @@
         data-menu="PhotoAlbums">
         <Dropdown hover class="nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase">
           <span class="relative z-50">
-            {{ t('menu.album') || '相册' }}
+            {{ t('menu.album') }}
           </span>
           <DropdownMenu>
             <template v-for="item in albums" :key="item.id">

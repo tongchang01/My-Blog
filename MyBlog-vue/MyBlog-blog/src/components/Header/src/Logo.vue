@@ -4,7 +4,7 @@
       <span class="flex text-3xl" v-if="websiteConfig.name">
         {{ websiteConfig.name }}
       </span>
-      <span v-else class="flex text-3xl animation-text">LOADING</span>
+      <span v-else class="flex text-3xl animation-text">{{ t('common.loading') }}</span>
       <span class="font-extrabold text-xs uppercase">
         {{ websiteConfig.englishName || 'BLOG' }}
       </span>
@@ -17,6 +17,7 @@
 import { useAppStore } from '@/stores/app'
 import { computed } from '@vue/reactivity'
 import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { useCommonStore } from '@/stores/common'
 import { useNavigatorStore } from '@/stores/navigator'
@@ -24,6 +25,7 @@ import { useNavigatorStore } from '@/stores/navigator'
 export default defineComponent({
   name: 'Logo',
   setup() {
+    const { t } = useI18n()
     const appStore = useAppStore()
     const commonStore = useCommonStore()
     const navigatorStore = useNavigatorStore()
@@ -38,7 +40,8 @@ export default defineComponent({
       websiteConfig: computed(() => {
         return appStore.websiteConfig
       }),
-      handleClick
+      handleClick,
+      t
     }
   }
 })

@@ -3,7 +3,7 @@
     <div v-show="showDia" id="bot-container">
       <div id="Aurora-Dia--body" :style="cssVariables">
         <div id="Aurora-Dia--tips-wrapper">
-          <div id="Aurora-Dia--tips" class="Aurora-Dia--tips">早上好呀～</div>
+          <div id="Aurora-Dia--tips" class="Aurora-Dia--tips">{{ t('dia.default_tip') }}</div>
         </div>
         <div id="Aurora-Dia" class="Aurora-Dia">
           <div id="Aurora-Dia--eyes" class="Aurora-Dia--eyes">
@@ -20,12 +20,14 @@
 <script lang="ts">
 // @ts-nocheck
 import { computed, defineComponent, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useDiaStore } from '@/stores/dia'
 import { useAppStore } from '@/stores/app'
 
 export default defineComponent({
   name: 'Dia',
   setup() {
+    const { t } = useI18n()
     const diaStore = useDiaStore()
     const appStore = useAppStore()
     const showDia = ref(false)
@@ -54,7 +56,8 @@ export default defineComponent({
           --aurora-dia--platform-light: ${appStore.themeConfig.gradient.color_3};
         `
       }),
-      showDia
+      showDia,
+      t
     }
   }
 })

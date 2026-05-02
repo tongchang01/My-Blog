@@ -7,7 +7,7 @@
       <div class="left-section">
         <div class="inner-content">
           <h1 class="heading">404</h1>
-          <p class="subheading">Looks like the page you were looking for is no longer here.</p>
+          <p class="subheading">{{ t('page.not_found_description') }}</p>
         </div>
       </div>
       <div class="right-section">
@@ -75,6 +75,19 @@
     </div>
   </div>
 </template>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+export default defineComponent({
+  name: 'NotFound',
+  setup() {
+    const { t } = useI18n()
+    return { t }
+  }
+})
+</script>
 
 <style lang="css" scoped>
 @import url('https://fonts.googleapis.com/css?family=Fira+Sans');

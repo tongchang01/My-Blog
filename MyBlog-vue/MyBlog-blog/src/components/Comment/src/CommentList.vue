@@ -6,13 +6,14 @@
   <button
     class="load-more-button mt-7 w-32 text-white p-2 rounded-lg shadow-lg transition transform hover:scale-105 flex mx-auto"
     v-if="haveMore">
-    <span class="text-center flex-grow" @click="loadMore">Load More</span>
+    <span class="text-center flex-grow" @click="loadMore">{{ t('settings.load_more') }}</span>
   </button>
 </template>
 
 <script lang="ts">
 // @ts-nocheck
 import { defineComponent, inject } from 'vue'
+import { useI18n } from 'vue-i18n'
 import CommentItem from './CommentItem.vue'
 import { useCommentStore } from '@/stores/comment'
 import emitter from '@/utils/mitt'
@@ -22,6 +23,7 @@ export default defineComponent({
     CommentItem
   },
   setup() {
+    const { t } = useI18n()
     const commentStore = useCommentStore()
     const loadMore = async () => {
       switch (commentStore.type) {
@@ -44,7 +46,8 @@ export default defineComponent({
     return {
       comments: inject('comments'),
       haveMore: inject('haveMore'),
-      loadMore
+      loadMore,
+      t
     }
   }
 })

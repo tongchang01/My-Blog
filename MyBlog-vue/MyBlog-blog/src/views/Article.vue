@@ -279,15 +279,15 @@ export default defineComponent({
       api.getArticeById(reactiveData.articleId).then(({ data }) => {
         if (data.code === 52003) {
           proxy.$notify({
-            title: 'Error',
-            message: '文章密码认证未通过',
+            title: t('notify.error'),
+            message: t('notify.article_password_error'),
             type: 'error'
           })
-          router.push({ path: '/出错啦' })
+          router.push({ path: '/404' })
           return
         }
         if (data.data === null) {
-          router.push({ path: '/出错啦' })
+          router.push({ path: '/404' })
           return
         }
         commonStore.setHeaderImage(data.data.articleCover)
@@ -296,8 +296,8 @@ export default defineComponent({
           resolve(data.data)
         }).then((article: any) => {
           reactiveData.article = article
-          reactiveData.wordNum = Math.round(deleteHTMLTag(article.articleContent).length / 100) / 10 + 'k'
-          reactiveData.readTime = Math.round(deleteHTMLTag(article.articleContent).length / 400) + 'mins'
+          reactiveData.wordNum = `${Math.round(deleteHTMLTag(article.articleContent).length / 100) / 10}${t('settings.word_count_unit')}`
+          reactiveData.readTime = `${Math.max(1, Math.round(deleteHTMLTag(article.articleContent).length / 400))}${t('settings.read_time_unit')}`
           loading.value = false
           nextTick(() => {
             Prism.highlightAll()

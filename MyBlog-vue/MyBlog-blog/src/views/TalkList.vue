@@ -23,7 +23,7 @@
                 {{ t(`settings.months[${new Date(item.createTime).getMonth()}]`) }}
                 {{ new Date(item.createTime).getDate() }}, {{ new Date(item.createTime).getFullYear() }}
                 <template v-if="item.isTop === 1">
-                  <svg-icon icon-class="top" class="top-svg" /><span style="color: #f21835">置顶</span>
+                  <svg-icon icon-class="top" class="top-svg" /><span style="color: #f21835">{{ t('settings.pinned') }}</span>
                 </template>
                 <svg-icon icon-class="message" class="message-svg" />{{
                   item.commentCount == null ? 0 : item.commentCount

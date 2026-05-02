@@ -7,7 +7,7 @@
       </div>
       <div class="main-grid">
         <div class="relative">
-          <div class="post-html" v-html="`这是一个留言版<br><br>欢迎大家前来留言💖`" />
+          <div class="post-html" v-html="t('page.message_intro')" />
           <Comment />
         </div>
         <div class="col-span-1">

@@ -6,14 +6,12 @@
     <Dropdown v-if="multiLanguage === 1" @command="handleClick">
       <span class="ob-drop-shadow" data-dia="language">
         <svg-icon icon-class="globe" />
-        <span v-if="$i18n.locale == 'cn'">中文</span>
-        <span v-if="$i18n.locale == 'en'">EN</span>
-        <span v-if="$i18n.locale == 'jp'">JP</span>
+        <span>{{ currentLocaleLabel }}</span>
       </span>
       <DropdownMenu>
-        <DropdownItem name="en">English</DropdownItem>
-        <DropdownItem name="cn">中文</DropdownItem>
-        <DropdownItem name="jp">日本語</DropdownItem>
+        <DropdownItem name="en">{{ t('settings.language_name.en') }}</DropdownItem>
+        <DropdownItem name="cn">{{ t('settings.language_name.cn') }}</DropdownItem>
+        <DropdownItem name="jp">{{ t('settings.language_name.jp') }}</DropdownItem>
       </DropdownMenu>
     </Dropdown>
     <template v-if="userInfo === ''">
@@ -142,7 +140,7 @@ export default defineComponent({
     SearchModel
   },
   setup() {
-    const { t } = useI18n()
+    const { t, locale } = useI18n()
     const proxy: any = getCurrentInstance()?.appContext.config.globalProperties
     const appStore = useAppStore()
     const commonStore = useCommonStore()
@@ -326,6 +324,7 @@ export default defineComponent({
         let websiteConfig: any = appStore.websiteConfig
         return websiteConfig.multiLanguage
       }),
+      currentLocaleLabel: computed(() => t(`settings.language_short.${locale.value || 'en'}`)),
       t
     }
   }

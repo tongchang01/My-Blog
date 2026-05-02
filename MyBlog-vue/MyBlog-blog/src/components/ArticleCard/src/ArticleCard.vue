@@ -110,7 +110,7 @@ export default defineComponent({
         if (userStore.userInfo === '') {
           proxy.$notify({
             title: t('notify.warning'),
-            message: t('notify.article_password_login'),
+            message: t('notify.article_password_required'),
             type: 'warning'
           })
         } else {

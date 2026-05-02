@@ -7,7 +7,7 @@
         <div class="flex justify-between mt-2 text-xs text-gray-400 space-x-3 md:space-x-16">
           <span> {{ reply.nickname }} | {{ time }}</span>
           <div>
-            <span @click="clickOnSonReply" class="cursor-pointer reply-button">Reply</span>
+            <span @click="clickOnSonReply" class="cursor-pointer reply-button">{{ t('comment.reply') }}</span>
           </div>
         </div>
       </div>
@@ -24,6 +24,7 @@
 
 <script lang="ts">
 import { computed, defineComponent, reactive, toRefs } from 'vue'
+import { useI18n } from 'vue-i18n'
 import Avatar from '@/components/Avatar.vue'
 import CommentReplyForm from './CommentReplyForm.vue'
 
@@ -34,6 +35,7 @@ export default defineComponent({
   },
   props: ['reply', 'commentUserId'],
   setup(props) {
+    const { t } = useI18n()
     const formatTime = (time: any): any => {
       let date = new Date(time)
       let year = date.getFullYear()
@@ -67,7 +69,8 @@ export default defineComponent({
       ...toRefs(reactiveData),
       commentContent,
       clickOnSonReply,
-      changeShow
+      changeShow,
+      t
     }
   }
 })

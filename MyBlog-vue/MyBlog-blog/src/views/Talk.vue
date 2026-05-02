@@ -111,7 +111,7 @@ export default defineComponent({
     const fetchTalk = () => {
       api.getTalkById(route.params.talkId).then(({ data }) => {
         if (data.data === null) {
-          router.push({ path: '/出错啦' })
+          router.push({ path: '/404' })
           return
         }
         reactiveData.talk = data.data

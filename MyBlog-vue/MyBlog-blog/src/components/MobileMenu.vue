@@ -45,34 +45,16 @@
         class="text-sm block px-1.5 py-0.5 rounded-md relative uppercase"
         @click="pushPage(route.path)"
         v-if="route.children && route.children.length === 0">
-        <span class="relative z-50" v-if="$i18n.locale === 'cn' && route.i18n.cn">
-          {{ route.i18n.cn }}
-        </span>
-        <span class="relative z-50" v-else-if="$i18n.locale === 'en' && route.i18n.en">
-          {{ route.i18n.en }}
-        </span>
-        <span class="relative z-50" v-else>{{ route.name }}</span>
+        <span class="relative z-50">{{ t(`menu.${route.i18n.key}`) || route.name }}</span>
       </div>
       <Dropdown
         @command="pushPage"
         v-else
         class="flex flex-col justify-center items-center nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase">
-        <span class="relative z-50" v-if="$i18n.locale === 'cn' && route.i18n.cn">
-          {{ route.i18n.cn }}
-        </span>
-        <span class="relative z-50" v-else-if="$i18n.locale === 'en' && route.i18n.en">
-          {{ route.i18n.en }}
-        </span>
-        <span class="relative z-50" v-else>{{ route.name }}</span>
+        <span class="relative z-50">{{ t(`menu.${route.i18n.key}`) || route.name }}</span>
         <DropdownMenu expand>
           <DropdownItem v-for="sub in route.children" :key="sub.path" :name="sub.path">
-            <span class="relative z-50" v-if="$i18n.locale === 'cn' && sub.i18n.cn">
-              {{ sub.i18n.cn }}
-            </span>
-            <span class="relative z-50" v-else-if="$i18n.locale === 'en' && sub.i18n.en">
-              {{ sub.i18n.en }}
-            </span>
-            <span class="relative z-50" v-else>{{ sub.name }}</span>
+            <span class="relative z-50">{{ t(`menu.${sub.i18n.key}`) || sub.name }}</span>
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -80,8 +62,7 @@
     <li>
       <Dropdown
         class="flex flex-col justify-center items-center nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase">
-        <span class="relative z-50" v-if="$i18n.locale === 'cn'"> 相册 </span>
-        <span class="relative z-50" v-else-if="$i18n.locale === 'en'"> PhotoAlbums </span>
+        <span class="relative z-50">{{ t('menu.album') }}</span>
         <DropdownMenu expand>
           <template v-for="item in albums" :key="item.id">
             <DropdownItem @click="pushPage(`/photos/${item.id}`)" :name="item.albumName">
