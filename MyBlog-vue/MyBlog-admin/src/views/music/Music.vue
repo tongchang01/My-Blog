@@ -106,7 +106,28 @@
           <el-input v-model="musicForm.album" />
         </el-form-item>
         <el-form-item label="封面地址">
-          <el-input v-model="musicForm.cover" />
+          <div class="upload-field">
+            <el-input v-model="musicForm.cover" />
+            <el-upload
+              action="/api/admin/config/images"
+              :headers="headers"
+              :show-file-list="false"
+              :before-upload="beforeCoverUpload"
+              :on-success="handleCoverUploadSuccess"
+              :on-error="handleCoverUploadError">
+              <el-button size="small" plain :loading="coverUploading">
+                {{ coverUploading ? '封面上传中...' : '上传封面' }}
+              </el-button>
+            </el-upload>
+          </div>
+          <div v-if="musicForm.cover" class="cover-preview">
+            <el-image
+              :src="musicForm.cover"
+              fit="cover"
+              :preview-src-list="[musicForm.cover]"
+              class="cover-preview-image" />
+            <span class="cover-preview-text">封面预览</span>
+          </div>
         </el-form-item>
         <el-form-item label="音频地址">
           <div class="upload-field">
@@ -115,8 +136,12 @@
               action="/api/admin/musics/upload"
               :headers="headers"
               :show-file-list="false"
-              :on-success="handleMusicUploadSuccess">
-              <el-button size="small" type="primary" plain>上传音频</el-button>
+              :before-upload="beforeMusicUpload"
+              :on-success="handleMusicUploadSuccess"
+              :on-error="handleMusicUploadError">
+              <el-button size="small" type="primary" plain :loading="musicUploading">
+                {{ musicUploading ? '音频上传中...' : '上传音频' }}
+              </el-button>
             </el-upload>
           </div>
         </el-form-item>
@@ -163,6 +188,8 @@ export default {
       musicIdList: [],
       musicList: [],
       headers: { Authorization: 'Bearer ' + sessionStorage.getItem('token') },
+      coverUploading: false,
+      musicUploading: false,
       musicForm: {
         id: null,
         musicName: '',
@@ -219,14 +246,46 @@ export default {
           this.loading = false
         })
     },
+    beforeCoverUpload() {
+      this.coverUploading = true
+      return true
+    },
+    beforeMusicUpload() {
+      this.musicUploading = true
+      return true
+    },
     handleMusicUploadSuccess(response) {
-      this.musicForm.url = response.data
+      this.musicUploading = false
+      if (response && response.flag) {
+        this.musicForm.url = response.data
+        this.$message.success('音频上传成功')
+        return
+      }
+      this.$message.error((response && response.message) || '音频上传失败')
+    },
+    handleMusicUploadError() {
+      this.musicUploading = false
+      this.$message.error('音频上传失败，请稍后重试')
+    },
+    handleCoverUploadSuccess(response) {
+      this.coverUploading = false
+      if (response && response.flag) {
+        this.musicForm.cover = response.data
+        this.$message.success('封面上传成功')
+        return
+      }
+      this.$message.error((response && response.message) || '封面上传失败')
+    },
+    handleCoverUploadError() {
+      this.coverUploading = false
+      this.$message.error('封面上传失败，请稍后重试')
     },
     openModel(music) {
       if (music != null) {
-        this.musicForm = JSON.parse(JSON.stringify(music))
-        this.musicForm.theme = this.musicForm.theme || '#409EFF'
-        delete this.musicForm.lrc
+        this.musicForm = {
+          ...JSON.parse(JSON.stringify(music)),
+          theme: music.theme || '#409EFF'
+        }
         this.$refs.musicTitle.innerHTML = '修改音乐'
       } else {
         this.musicForm = {
@@ -243,6 +302,8 @@ export default {
         }
         this.$refs.musicTitle.innerHTML = '新增音乐'
       }
+      this.coverUploading = false
+      this.musicUploading = false
       this.addOrEdit = true
     },
     saveOrUpdateMusic() {
@@ -337,5 +398,23 @@ export default {
   display: flex;
   align-items: center;
   gap: 12px;
+}
+.cover-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+.cover-preview-image {
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+}
+.cover-preview-text {
+  color: #6b7280;
+  font-size: 13px;
 }
 </style>

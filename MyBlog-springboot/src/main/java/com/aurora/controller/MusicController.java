@@ -2,6 +2,7 @@ package com.aurora.controller;
 
 import com.aurora.annotation.OptLog;
 import com.aurora.enums.FilePathEnum;
+import com.aurora.exception.BizException;
 import com.aurora.model.dto.MusicAdminDTO;
 import com.aurora.model.dto.MusicDTO;
 import com.aurora.model.dto.PageResultDTO;
@@ -66,7 +67,13 @@ public class MusicController {
     @ApiImplicitParam(name = "file", value = "音乐文件", required = true, dataType = "MultipartFile")
     @PostMapping("/admin/musics/upload")
     public ResultVO<String> uploadMusicFile(MultipartFile file) {
-        return ResultVO.ok(uploadStrategyContext.executeUploadStrategy(file, FilePathEnum.MUSIC.getPath()));
+        try {
+            return ResultVO.ok(uploadStrategyContext.executeUploadStrategy(file, FilePathEnum.MUSIC.getPath()));
+        } catch (BizException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new BizException("音乐上传失败");
+        }
     }
 
     @OptLog(optType = DELETE)
