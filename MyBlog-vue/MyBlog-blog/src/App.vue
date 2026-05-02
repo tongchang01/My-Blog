@@ -16,6 +16,7 @@
           </transition>
         </router-view>
       </div>
+      <MusicPlayer />
     </div>
     <div id="loading-bar-wrapper" :class="loadingBarClass"></div>
   </div>
@@ -44,6 +45,7 @@ import MobileMenu from '@/components/MobileMenu.vue'
 import Dia from '@/components/Dia.vue'
 import AuroraNavigator from '@/components/AuroraNavigator.vue'
 import UserCenter from '@/components/UserCenter.vue'
+import MusicPlayer from '@/components/MusicPlayer.vue'
 import api from './api/api'
 export default defineComponent({
   name: 'App',
@@ -53,7 +55,8 @@ export default defineComponent({
     Dia,
     AuroraNavigator,
     MobileMenu,
-    UserCenter
+    UserCenter,
+    MusicPlayer
   },
   setup() {
     const appStore = useAppStore()

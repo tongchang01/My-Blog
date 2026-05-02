@@ -162,7 +162,7 @@ public class AuroraInfoServiceImpl implements AuroraInfoService {
             websiteConfigDTO = JSON.parseObject(config, WebsiteConfigDTO.class);
             redisService.set(WEBSITE_CONFIG, config);
         }
-        return websiteConfigDTO;
+        return normalizeWebsiteConfig(websiteConfigDTO);
     }
 
     @Override
@@ -202,6 +202,38 @@ public class AuroraInfoServiceImpl implements AuroraInfoService {
                         .build())
                 .sorted(Comparator.comparingInt(ArticleRankDTO::getViewsCount).reversed())
                 .collect(Collectors.toList());
+    }
+
+    private WebsiteConfigDTO normalizeWebsiteConfig(WebsiteConfigDTO websiteConfigDTO) {
+        if (Objects.isNull(websiteConfigDTO)) {
+            return WebsiteConfigDTO.builder()
+                    .musicPlayerEnable(FALSE)
+                    .musicPlayerAutoPlay(FALSE)
+                    .musicPlayerFixed(TRUE)
+                    .musicPlayerTheme("#409EFF")
+                    .musicPlayerLoop("all")
+                    .musicPlayerOrder("list")
+                    .build();
+        }
+        if (Objects.isNull(websiteConfigDTO.getMusicPlayerEnable())) {
+            websiteConfigDTO.setMusicPlayerEnable(FALSE);
+        }
+        if (Objects.isNull(websiteConfigDTO.getMusicPlayerAutoPlay())) {
+            websiteConfigDTO.setMusicPlayerAutoPlay(FALSE);
+        }
+        if (Objects.isNull(websiteConfigDTO.getMusicPlayerFixed())) {
+            websiteConfigDTO.setMusicPlayerFixed(TRUE);
+        }
+        if (StringUtils.isBlank(websiteConfigDTO.getMusicPlayerTheme())) {
+            websiteConfigDTO.setMusicPlayerTheme("#409EFF");
+        }
+        if (StringUtils.isBlank(websiteConfigDTO.getMusicPlayerLoop())) {
+            websiteConfigDTO.setMusicPlayerLoop("all");
+        }
+        if (StringUtils.isBlank(websiteConfigDTO.getMusicPlayerOrder())) {
+            websiteConfigDTO.setMusicPlayerOrder("list");
+        }
+        return websiteConfigDTO;
     }
 
 }

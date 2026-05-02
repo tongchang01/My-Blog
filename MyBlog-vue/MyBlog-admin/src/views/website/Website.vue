@@ -181,6 +181,46 @@
               <el-radio :label="0">关闭</el-radio>
             </el-radio-group>
           </el-form-item>
+          <el-divider content-position="left">音乐播放器</el-divider>
+          <el-form-item label="播放器显示">
+            <el-radio-group v-model="websiteConfigForm.musicPlayerEnable">
+              <el-radio :label="1">开启</el-radio>
+              <el-radio :label="0">关闭</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="自动播放">
+            <el-radio-group v-model="websiteConfigForm.musicPlayerAutoPlay">
+              <el-radio :label="1">开启</el-radio>
+              <el-radio :label="0">关闭</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="固定定位">
+            <el-radio-group v-model="websiteConfigForm.musicPlayerFixed">
+              <el-radio :label="1">右下角</el-radio>
+              <el-radio :label="0">悬浮停靠</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="主题色">
+            <el-color-picker v-model="websiteConfigForm.musicPlayerTheme" />
+            <el-input
+              v-model="websiteConfigForm.musicPlayerTheme"
+              size="small"
+              style="width: 180px; margin-left: 12px"
+              placeholder="#409EFF" />
+          </el-form-item>
+          <el-form-item label="循环模式">
+            <el-radio-group v-model="websiteConfigForm.musicPlayerLoop">
+              <el-radio label="all">列表循环</el-radio>
+              <el-radio label="one">单曲循环</el-radio>
+              <el-radio label="none">不循环</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item label="播放顺序">
+            <el-radio-group v-model="websiteConfigForm.musicPlayerOrder">
+              <el-radio label="list">顺序播放</el-radio>
+              <el-radio label="random">随机播放</el-radio>
+            </el-radio-group>
+          </el-form-item>
           <el-row style="width: 600px" v-show="websiteConfigForm.isReward == 1">
             <el-col :md="12">
               <el-form-item label="微信收款码">
@@ -237,7 +277,15 @@ export default {
   methods: {
     getWebsiteConfig() {
       this.axios.get('/api/admin/website/config').then(({ data }) => {
-        this.websiteConfigForm = data.data
+        this.websiteConfigForm = {
+          musicPlayerEnable: 0,
+          musicPlayerAutoPlay: 0,
+          musicPlayerFixed: 1,
+          musicPlayerTheme: '#409EFF',
+          musicPlayerLoop: 'all',
+          musicPlayerOrder: 'list',
+          ...data.data
+        }
       })
     },
     handleAuthorAvatarSuccess(response) {

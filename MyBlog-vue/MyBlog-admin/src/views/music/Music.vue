@@ -1,13 +1,13 @@
 <template>
   <el-card class="main-card">
-    <div class="title">{{ this.$route.name }}</div>
+    <div class="title">{{ $route.name }}</div>
     <div class="operation-container">
-      <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)"> 新增 </el-button>
+      <el-button type="primary" size="small" icon="el-icon-plus" @click="openModel(null)">新增</el-button>
       <el-button
         type="danger"
         size="small"
         icon="el-icon-delete"
-        :disabled="musicIdList.length == 0"
+        :disabled="musicIdList.length === 0"
         @click="deleteFlag = true">
         批量删除
       </el-button>
@@ -23,7 +23,7 @@
           placeholder="请输入歌曲名或歌手"
           style="width: 220px"
           @keyup.enter.native="searchMusics" />
-        <el-button type="primary" size="small" icon="el-icon-search" @click="searchMusics"> 搜索 </el-button>
+        <el-button type="primary" size="small" icon="el-icon-search" @click="searchMusics">搜索</el-button>
       </div>
     </div>
     <el-table border :data="musicList" v-loading="loading" @selection-change="selectionChange">
@@ -51,8 +51,8 @@
       <el-table-column prop="sort" label="排序" width="80" align="center" />
       <el-table-column prop="status" label="状态" width="90" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.status == 1 ? 'success' : 'info'">
-            {{ scope.row.status == 1 ? '启用' : '关闭' }}
+          <el-tag :type="scope.row.status === 1 ? 'success' : 'info'">
+            {{ scope.row.status === 1 ? '启用' : '关闭' }}
           </el-tag>
         </template>
       </el-table-column>
@@ -64,9 +64,9 @@
       </el-table-column>
       <el-table-column label="操作" align="center" width="160">
         <template slot-scope="scope">
-          <el-button type="primary" size="mini" @click="openModel(scope.row)"> 编辑 </el-button>
+          <el-button type="primary" size="mini" @click="openModel(scope.row)">编辑</el-button>
           <el-popconfirm title="确定删除吗？" style="margin-left: 1rem" @confirm="deleteMusic(scope.row.id)">
-            <el-button size="mini" type="danger" slot="reference"> 删除 </el-button>
+            <el-button size="mini" type="danger" slot="reference">删除</el-button>
           </el-popconfirm>
         </template>
       </el-table-column>
@@ -83,11 +83,13 @@
       layout="total, sizes, prev, pager, next, jumper" />
 
     <el-dialog :visible.sync="deleteFlag" width="30%">
-      <div class="dialog-title-container" slot="title"><i class="el-icon-warning" style="color: #ff9900" />提示</div>
+      <div class="dialog-title-container" slot="title">
+        <i class="el-icon-warning" style="color: #ff9900" />提示
+      </div>
       <div style="font-size: 1rem">是否删除选中项？</div>
       <div slot="footer">
         <el-button @click="deleteFlag = false">取消</el-button>
-        <el-button type="primary" @click="deleteMusic(null)"> 确定</el-button>
+        <el-button type="primary" @click="deleteMusic(null)">确定</el-button>
       </div>
     </el-dialog>
 
@@ -107,10 +109,16 @@
           <el-input v-model="musicForm.cover" />
         </el-form-item>
         <el-form-item label="音频地址">
-          <el-input v-model="musicForm.url" />
-        </el-form-item>
-        <el-form-item label="歌词地址">
-          <el-input v-model="musicForm.lrc" />
+          <div class="upload-field">
+            <el-input v-model="musicForm.url" />
+            <el-upload
+              action="/api/admin/musics/upload"
+              :headers="headers"
+              :show-file-list="false"
+              :on-success="handleMusicUploadSuccess">
+              <el-button size="small" type="primary" plain>上传音频</el-button>
+            </el-upload>
+          </div>
         </el-form-item>
         <el-form-item label="主题色">
           <div class="theme-picker">
@@ -133,7 +141,7 @@
       </el-form>
       <div slot="footer">
         <el-button @click="addOrEdit = false">取消</el-button>
-        <el-button type="primary" @click="saveOrUpdateMusic"> 确定</el-button>
+        <el-button type="primary" @click="saveOrUpdateMusic">确定</el-button>
       </div>
     </el-dialog>
   </el-card>
@@ -154,6 +162,7 @@ export default {
       status: null,
       musicIdList: [],
       musicList: [],
+      headers: { Authorization: 'Bearer ' + sessionStorage.getItem('token') },
       musicForm: {
         id: null,
         musicName: '',
@@ -161,7 +170,6 @@ export default {
         album: '',
         cover: '',
         url: '',
-        lrc: '',
         theme: '#409EFF',
         sort: 1,
         status: 1,
@@ -173,6 +181,9 @@ export default {
     }
   },
   methods: {
+    normalizeText(value) {
+      return typeof value === 'string' ? value.trim() : ''
+    },
     selectionChange(musicList) {
       this.musicIdList = []
       musicList.forEach((item) => {
@@ -208,10 +219,14 @@ export default {
           this.loading = false
         })
     },
+    handleMusicUploadSuccess(response) {
+      this.musicForm.url = response.data
+    },
     openModel(music) {
       if (music != null) {
         this.musicForm = JSON.parse(JSON.stringify(music))
         this.musicForm.theme = this.musicForm.theme || '#409EFF'
+        delete this.musicForm.lrc
         this.$refs.musicTitle.innerHTML = '修改音乐'
       } else {
         this.musicForm = {
@@ -221,7 +236,6 @@ export default {
           album: '',
           cover: '',
           url: '',
-          lrc: '',
           theme: '#409EFF',
           sort: 1,
           status: 1,
@@ -232,19 +246,32 @@ export default {
       this.addOrEdit = true
     },
     saveOrUpdateMusic() {
-      if (this.musicForm.musicName.trim() == '') {
+      const musicName = this.normalizeText(this.musicForm.musicName)
+      const artist = this.normalizeText(this.musicForm.artist)
+      const url = this.normalizeText(this.musicForm.url)
+      if (musicName === '') {
         this.$message.error('歌曲名不能为空')
         return false
       }
-      if (this.musicForm.artist.trim() == '') {
+      if (artist === '') {
         this.$message.error('歌手不能为空')
         return false
       }
-      if (this.musicForm.url.trim() == '') {
+      if (url === '') {
         this.$message.error('音频地址不能为空')
         return false
       }
-      this.axios.post('/api/admin/musics', this.musicForm).then(({ data }) => {
+      const payload = {
+        ...this.musicForm,
+        musicName,
+        artist,
+        url,
+        album: this.normalizeText(this.musicForm.album) || null,
+        cover: this.normalizeText(this.musicForm.cover) || null,
+        remark: this.normalizeText(this.musicForm.remark) || null,
+        lrc: null
+      }
+      this.axios.post('/api/admin/musics', payload).then(({ data }) => {
         if (data.flag) {
           this.$notify.success({
             title: '成功',
@@ -305,5 +332,10 @@ export default {
 .theme-picker {
   display: flex;
   align-items: center;
+}
+.upload-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 </style>

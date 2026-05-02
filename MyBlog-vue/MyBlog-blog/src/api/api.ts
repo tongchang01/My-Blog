@@ -84,6 +84,9 @@ export default {
   getWebsiteConfig: () => {
     return axios.get('/api')
   },
+  getMusics: () => {
+    return axios.get('/api/musics')
+  },
   report: () => {
     axios.post('/api/report')
   },

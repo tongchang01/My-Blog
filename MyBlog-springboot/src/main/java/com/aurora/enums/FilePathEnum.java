@@ -13,13 +13,15 @@ public enum FilePathEnum {
 
     VOICE("aurora/voice/", "音频路径"),
 
+    MUSIC("aurora/music/", "音乐资源路径"),
+
     PHOTO("aurora/photos/", "相册路径"),
 
     CONFIG("aurora/config/", "配置图片路径"),
 
-    TALK("aurora/talks/", "配置图片路径"),
+    TALK("aurora/talks/", "说说资源路径"),
 
-    MD("aurora/markdown/", "md文件路径");
+    MD("aurora/markdown/", "Markdown 文件路径");
 
     private final String path;
 
