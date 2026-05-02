@@ -71,9 +71,17 @@ export default defineComponent({
     onBeforeMount(() => {
       initialApp()
     })
+    const handleWindowLoad = () => {
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0
+        })
+      }, 10)
+    }
     onUnmounted(() => {
       document.removeEventListener('copy', copyEventHandler)
       window.removeEventListener('resize', resizeHander)
+      window.removeEventListener('load', handleWindowLoad)
     })
     const initialApp = () => {
       initResizeEvent()
@@ -123,13 +131,7 @@ export default defineComponent({
       window.addEventListener('resize', resizeHander)
     }
     const initWindowOnload = () => {
-      window.onload = () => {
-        setTimeout(() => {
-          window.scrollTo({
-            top: 0
-          })
-        }, 10)
-      }
+      window.addEventListener('load', handleWindowLoad)
     }
     const initFavicon = (faviconUrl: string) => {
       if (!faviconUrl) {

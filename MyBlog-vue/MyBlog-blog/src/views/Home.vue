@@ -28,7 +28,7 @@
               </b>
             </li>
           </template>
-          <template v-else-if="(categories.length = 0)">
+          <template v-else-if="categories.length === 0">
             <li v-for="i in 6" :key="i" style="position: relative; top: -4px">
               <ob-skeleton tag="span" width="60px" height="33px" />
             </li>
