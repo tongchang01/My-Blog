@@ -42,7 +42,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, provide, computed, toRefs, onMounted } from 'vue'
+import { defineComponent, reactive, provide, computed, toRefs, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Sidebar, Profile } from '../components/Sidebar'
 import Breadcrumb from '@/components/Breadcrumb.vue'
@@ -72,6 +72,22 @@ export default defineComponent({
       fetchLinks()
       fetchComments()
     })
+    const handleFriendLinkFetchComment = () => {
+      pageInfo.current = 1
+      reactiveData.isReload = true
+      fetchComments()
+    }
+    const handleFriendLinkFetchReplies = (index: any) => {
+      fetchReplies(index)
+    }
+    const handleFriendLinkLoadMore = () => {
+      fetchComments()
+    }
+    onUnmounted(() => {
+      emitter.off('friendLinkFetchComment', handleFriendLinkFetchComment)
+      emitter.off('friendLinkFetchReplies', handleFriendLinkFetchReplies)
+      emitter.off('friendLinkLoadMore', handleFriendLinkLoadMore)
+    })
     provide(
       'comments',
       computed(() => reactiveData.comments)
@@ -80,17 +96,9 @@ export default defineComponent({
       'haveMore',
       computed(() => reactiveData.haveMore)
     )
-    emitter.on('friendLinkFetchComment', () => {
-      pageInfo.current = 1
-      reactiveData.isReload = true
-      fetchComments()
-    })
-    emitter.on('friendLinkFetchReplies', (index) => {
-      fetchReplies(index)
-    })
-    emitter.on('friendLinkLoadMore', () => {
-      fetchComments()
-    })
+    emitter.on('friendLinkFetchComment', handleFriendLinkFetchComment)
+    emitter.on('friendLinkFetchReplies', handleFriendLinkFetchReplies)
+    emitter.on('friendLinkLoadMore', handleFriendLinkLoadMore)
     const fetchLinks = () => {
       api.getFriendLink().then(({ data }) => {
         reactiveData.links = data.data

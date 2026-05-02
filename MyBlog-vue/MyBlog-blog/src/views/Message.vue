@@ -20,7 +20,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs, computed, provide } from 'vue'
+import { defineComponent, onMounted, onUnmounted, reactive, toRefs, computed, provide } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Sidebar, Profile } from '../components/Sidebar'
 import Breadcrumb from '@/components/Breadcrumb.vue'
@@ -48,6 +48,22 @@ export default defineComponent({
     onMounted(() => {
       fetchComments()
     })
+    const handleMessageFetchComment = () => {
+      pageInfo.current = 1
+      reactiveData.isReload = true
+      fetchComments()
+    }
+    const handleMessageFetchReplies = (index: any) => {
+      fetchReplies(index)
+    }
+    const handleMessageLoadMore = () => {
+      fetchComments()
+    }
+    onUnmounted(() => {
+      emitter.off('messageFetchComment', handleMessageFetchComment)
+      emitter.off('messageFetchReplies', handleMessageFetchReplies)
+      emitter.off('messageLoadMore', handleMessageLoadMore)
+    })
     provide(
       'comments',
       computed(() => reactiveData.comments)
@@ -57,17 +73,9 @@ export default defineComponent({
       'haveMore',
       computed(() => reactiveData.haveMore)
     )
-    emitter.on('messageFetchComment', () => {
-      pageInfo.current = 1
-      reactiveData.isReload = true
-      fetchComments()
-    })
-    emitter.on('messageFetchReplies', (index) => {
-      fetchReplies(index)
-    })
-    emitter.on('messageLoadMore', () => {
-      fetchComments()
-    })
+    emitter.on('messageFetchComment', handleMessageFetchComment)
+    emitter.on('messageFetchReplies', handleMessageFetchReplies)
+    emitter.on('messageLoadMore', handleMessageLoadMore)
     const fetchComments = () => {
       const params = {
         type: 2,

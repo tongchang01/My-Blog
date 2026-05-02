@@ -202,10 +202,24 @@ export default defineComponent({
       fetchArticle()
       fetchComments()
     })
+    const handleArticleFetchComment = () => {
+      pageInfo.current = 1
+      reactiveData.isReload = true
+      fetchComments()
+    }
+    const handleArticleFetchReplies = (index: any) => {
+      fetchReplies(index)
+    }
+    const handleArticleLoadMore = () => {
+      fetchComments()
+    }
     onUnmounted(() => {
       commonStore.resetHeaderImage()
       reactiveData.article = ''
       tocbot.destroy()
+      emitter.off('articleFetchComment', handleArticleFetchComment)
+      emitter.off('articleFetchReplies', handleArticleFetchReplies)
+      emitter.off('articleLoadMore', handleArticleLoadMore)
     })
     onBeforeRouteUpdate((to) => {
       reactiveData.article = ''
@@ -230,18 +244,9 @@ export default defineComponent({
       'haveMore',
       computed(() => reactiveData.haveMore)
     )
-    emitter.on('articleFetchComment', () => {
-      pageInfo.current = 1
-      reactiveData.isReload = true
-      fetchComments()
-    })
-    emitter.on('articleFetchReplies', (index) => {
-      fetchReplies(index)
-    })
-
-    emitter.on('articleLoadMore', () => {
-      fetchComments()
-    })
+    emitter.on('articleFetchComment', handleArticleFetchComment)
+    emitter.on('articleFetchReplies', handleArticleFetchReplies)
+    emitter.on('articleLoadMore', handleArticleLoadMore)
     const handlePreview = (index: any) => {
       v3ImgPreviewFn({ images: reactiveData.images, index: reactiveData.images.indexOf(index) })
     }

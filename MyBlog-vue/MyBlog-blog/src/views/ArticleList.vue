@@ -29,7 +29,7 @@ import { defineComponent, onMounted, reactive, toRefs } from 'vue'
 import Breadcrumb from '@/components/Breadcrumb.vue'
 import { ArticleCard } from '@/components/ArticleCard'
 import Paginator from '@/components/Paginator.vue'
-import { useRoute } from 'vue-router'
+import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import api from '@/api/api'
 import markdownToHtml from '@/utils/markdown'
 
@@ -49,14 +49,24 @@ export default defineComponent({
       haveArticles: false
     })
     onMounted(() => {
-      reactiveData.tagName = route.query.tagName
-      fetchArticles()
+      syncRouteState()
     })
-    const fetchArticles = () => {
+    onBeforeRouteUpdate((to) => {
+      reactiveData.articles = []
+      reactiveData.haveArticles = false
+      pagination.current = 1
+      reactiveData.tagName = String(to.query.tagName || '')
+      fetchArticles(String(to.params.tagId))
+    })
+    const syncRouteState = () => {
+      reactiveData.tagName = String(route.query.tagName || '')
+      fetchArticles(String(route.params.tagId))
+    }
+    const fetchArticles = (tagId = String(route.params.tagId)) => {
       reactiveData.haveArticles = false
       api
         .getArticlesByTagId({
-          tagId: route.params.tagId,
+          tagId,
           current: pagination.current,
           size: pagination.size
         })

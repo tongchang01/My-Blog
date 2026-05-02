@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs, provide, computed } from 'vue'
+import { defineComponent, onMounted, onUnmounted, reactive, toRefs, provide, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Breadcrumb from '@/components/Breadcrumb.vue'
@@ -86,6 +86,22 @@ export default defineComponent({
       fetchTalk()
       fetchComments()
     })
+    const handleTalkFetchComment = () => {
+      pageInfo.current = 1
+      reactiveData.isReload = true
+      fetchComments()
+    }
+    const handleTalkFetchReplies = (index: any) => {
+      fetchReplies(index)
+    }
+    const handleTalkLoadMore = () => {
+      fetchComments()
+    }
+    onUnmounted(() => {
+      emitter.off('talkFetchComment', handleTalkFetchComment)
+      emitter.off('talkFetchReplies', handleTalkFetchReplies)
+      emitter.off('talkLoadMore', handleTalkLoadMore)
+    })
     provide(
       'comments',
       computed(() => reactiveData.comments)
@@ -94,17 +110,9 @@ export default defineComponent({
       'haveMore',
       computed(() => reactiveData.haveMore)
     )
-    emitter.on('talkFetchComment', () => {
-      pageInfo.current = 1
-      reactiveData.isReload = true
-      fetchComments()
-    })
-    emitter.on('talkFetchReplies', (index) => {
-      fetchReplies(index)
-    })
-    emitter.on('talkLoadMore', () => {
-      fetchComments()
-    })
+    emitter.on('talkFetchComment', handleTalkFetchComment)
+    emitter.on('talkFetchReplies', handleTalkFetchReplies)
+    emitter.on('talkLoadMore', handleTalkLoadMore)
     const handlePreview = (index: any) => {
       v3ImgPreviewFn({ images: reactiveData.images, index: reactiveData.images.indexOf(index) })
     }

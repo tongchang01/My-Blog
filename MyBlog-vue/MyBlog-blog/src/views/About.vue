@@ -88,9 +88,23 @@ export default defineComponent({
       fetchComments()
       fetchAbout()
     })
+    const handleAboutFetchComment = () => {
+      pageInfo.current = 1
+      reactiveData.isReload = true
+      fetchComments()
+    }
+    const handleAboutFetchReplies = (index: any) => {
+      fetchReplies(index)
+    }
+    const handleAboutLoadMore = () => {
+      fetchComments()
+    }
     onUnmounted(() => {
       commonStore.resetHeaderImage()
       tocbot.destroy()
+      emitter.off('aboutFetchComment', handleAboutFetchComment)
+      emitter.off('aboutFetchReplies', handleAboutFetchReplies)
+      emitter.off('aboutLoadMore', handleAboutLoadMore)
     })
     provide(
       'comments',
@@ -100,17 +114,9 @@ export default defineComponent({
       'haveMore',
       computed(() => reactiveData.haveMore)
     )
-    emitter.on('aboutFetchComment', () => {
-      pageInfo.current = 1
-      reactiveData.isReload = true
-      fetchComments()
-    })
-    emitter.on('aboutFetchReplies', (index) => {
-      fetchReplies(index)
-    })
-    emitter.on('aboutLoadMore', () => {
-      fetchComments()
-    })
+    emitter.on('aboutFetchComment', handleAboutFetchComment)
+    emitter.on('aboutFetchReplies', handleAboutFetchReplies)
+    emitter.on('aboutLoadMore', handleAboutLoadMore)
     const handlePreview = (index: any) => {
       v3ImgPreviewFn({ images: reactiveData.images, index: reactiveData.images.indexOf(index) })
     }

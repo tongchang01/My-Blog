@@ -395,7 +395,7 @@ export default defineComponent({
       }
     }
     const reloadRecentResult = () => {
-      recentResults.value = localStore.recentSearch.reverse()
+      recentResults.value = [...localStore.recentSearch].reverse()
       resetIndex(recentResults.value.length)
     }
     const resetIndex = (max: number) => {
