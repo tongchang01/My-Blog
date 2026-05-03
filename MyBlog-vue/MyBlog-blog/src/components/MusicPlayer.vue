@@ -165,7 +165,7 @@ export default defineComponent({
 .music-player-host {
   position: fixed;
   right: 24px;
-  bottom: 96px;
+  top: 66vh;
   z-index: 1300;
   width: 360px;
   max-width: calc(100vw - 32px);
