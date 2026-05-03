@@ -1,12 +1,6 @@
 <template>
   <teleport to="body">
-    <div
-      v-if="shouldRender"
-      class="music-player-host"
-      :class="{
-        'music-player-host-fixed': isFixed,
-        'music-player-host-docked': !isFixed
-      }">
+    <div v-if="shouldRender" class="music-player-host music-player-host-docked">
       <div ref="playerRef" class="music-player-container"></div>
     </div>
   </teleport>
@@ -62,7 +56,6 @@ export default defineComponent({
 
     const websiteConfig = computed<Record<string, any>>(() => appStore.websiteConfig || {})
     const isEnabled = computed(() => getConfigFlag(websiteConfig.value, 'musicPlayerEnable', true))
-    const isFixed = computed(() => getConfigFlag(websiteConfig.value, 'musicPlayerFixed', true))
     const shouldAutoplay = computed(() => getConfigFlag(websiteConfig.value, 'musicPlayerAutoPlay', false))
     const shouldRender = computed(() => isEnabled.value && playlist.value.length > 0)
     const order = computed(() => (websiteConfig.value.musicPlayerOrder === 'random' ? 'random' : 'list'))
@@ -132,7 +125,6 @@ export default defineComponent({
     watch(
       () => [
         shouldRender.value,
-        isFixed.value,
         shouldAutoplay.value,
         order.value,
         loop.value,
@@ -163,8 +155,7 @@ export default defineComponent({
 
     return {
       playerRef,
-      shouldRender,
-      isFixed
+      shouldRender
     }
   }
 })
@@ -174,14 +165,10 @@ export default defineComponent({
 .music-player-host {
   position: fixed;
   right: 24px;
-  bottom: 24px;
+  bottom: 96px;
   z-index: 1300;
   width: 360px;
   max-width: calc(100vw - 32px);
-}
-
-.music-player-host-docked {
-  bottom: 96px;
   transform: translateX(calc(100% - 54px));
   transition: transform 0.25s ease;
 }
@@ -314,12 +301,8 @@ export default defineComponent({
 @media (max-width: 768px) {
   .music-player-host {
     right: 12px;
-    bottom: 12px;
-    width: calc(100vw - 24px);
-  }
-
-  .music-player-host-docked {
     bottom: 84px;
+    width: calc(100vw - 24px);
     transform: none;
   }
 }

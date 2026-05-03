@@ -194,12 +194,6 @@
               <el-radio :label="0">关闭</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="固定定位">
-            <el-radio-group v-model="websiteConfigForm.musicPlayerFixed">
-              <el-radio :label="1">右下角</el-radio>
-              <el-radio :label="0">悬浮停靠</el-radio>
-            </el-radio-group>
-          </el-form-item>
           <el-form-item label="主题色">
             <el-color-picker v-model="websiteConfigForm.musicPlayerTheme" />
             <el-input
@@ -280,7 +274,6 @@ export default {
         this.websiteConfigForm = {
           musicPlayerEnable: 0,
           musicPlayerAutoPlay: 0,
-          musicPlayerFixed: 1,
           musicPlayerTheme: '#409EFF',
           musicPlayerLoop: 'all',
           musicPlayerOrder: 'list',
