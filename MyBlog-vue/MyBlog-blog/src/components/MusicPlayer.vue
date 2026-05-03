@@ -56,7 +56,7 @@ export default defineComponent({
 
     const websiteConfig = computed<Record<string, any>>(() => appStore.websiteConfig || {})
     const isEnabled = computed(() => getConfigFlag(websiteConfig.value, 'musicPlayerEnable', true))
-    const shouldAutoplay = computed(() => getConfigFlag(websiteConfig.value, 'musicPlayerAutoPlay', false))
+    const shouldAutoplay = computed(() => getConfigFlag(websiteConfig.value, 'musicPlayerAutoPlay', true))
     const shouldRender = computed(() => isEnabled.value && playlist.value.length > 0)
     const order = computed(() => (websiteConfig.value.musicPlayerOrder === 'random' ? 'random' : 'list'))
     const loop = computed(() => {
