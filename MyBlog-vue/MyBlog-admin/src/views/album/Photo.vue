@@ -334,11 +334,12 @@ export default {
       return new Promise((resolve) => {
         if (file.size / 1024 < this.config.UPLOAD_SIZE) {
           resolve(file)
+        } else {
+          this.$message.warning('图片超过20MB，将自动压缩后上传')
+          imageConversion.compressAccurately(file, this.config.UPLOAD_SIZE).then((res) => {
+            resolve(res)
+          })
         }
-        this.$message.warning('图片超过20MB，将自动压缩后上传')
-        imageConversion.compressAccurately(file, this.config.UPLOAD_SIZE).then((res) => {
-          resolve(res)
-        })
       })
     },
     handleCheckAllChange(val) {
