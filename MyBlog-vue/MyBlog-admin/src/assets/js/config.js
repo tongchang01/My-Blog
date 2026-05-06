@@ -1,3 +1,3 @@
 export default {
-  UPLOAD_SIZE: 200
+  UPLOAD_SIZE: 20 * 1024
 }

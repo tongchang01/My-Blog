@@ -35,6 +35,7 @@ export default {
           this.$refs.md.$img2Url(pos, data.data)
         })
       } else {
+        this.$message.warning('图片超过20MB，将自动压缩后上传')
         imageConversion.compressAccurately(file, this.config.UPLOAD_SIZE).then((res) => {
           formdata.append('file', new window.File([res], file.name, { type: file.type }))
           this.axios.post('/api/admin/articles/images', formdata).then(({ data }) => {
