@@ -42,6 +42,8 @@ public class WebsiteConfigDTO {
 
     private String weChat;
 
+    private String email;
+
     private String weibo;
 
     private String csdn;

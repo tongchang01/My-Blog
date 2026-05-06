@@ -105,6 +105,9 @@
           <el-form-item label="WeChat">
             <el-input v-model="websiteConfigForm.weChat" size="small" style="width: 400px; margin-right: 1rem" />
           </el-form-item>
+          <el-form-item label="Email">
+            <el-input v-model="websiteConfigForm.email" size="small" style="width: 400px; margin-right: 1rem" />
+          </el-form-item>
           <el-form-item label="twitter">
             <el-input v-model="websiteConfigForm.twitter" size="small" style="width: 400px; margin-right: 1rem" />
           </el-form-item>

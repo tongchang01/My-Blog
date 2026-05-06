@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Envelope icon">
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ebe8e3"/>
+      <stop offset="100%" stop-color="#dedbd7"/>
+    </linearGradient>
+    <mask id="cuts">
+      <rect width="1024" height="1024" fill="black"/>
+      <rect x="34" y="122" width="956" height="780" rx="116" ry="116" fill="white"/>
+      <!-- top opening gap / diagonals -->
+      <path d="M34 265 L457 624 Q512 671 567 624 L990 265" fill="none" stroke="black" stroke-width="64" stroke-linecap="butt" stroke-linejoin="round"/>
+      <!-- bottom crossed folds -->
+      <path d="M37 867 L372 562" fill="none" stroke="black" stroke-width="58" stroke-linecap="butt"/>
+      <path d="M987 867 L652 562" fill="none" stroke="black" stroke-width="58" stroke-linecap="butt"/>
+    </mask>
+  </defs>
+
+  <g mask="url(#cuts)">
+    <rect x="34" y="122" width="956" height="780" rx="116" ry="116" fill="url(#paper)"/>
+  </g>
+</svg>

@@ -157,6 +157,8 @@
     "bind_success": "Bound successfully",
     "upload_success": "Uploaded successfully",
     "update_success": "Updated successfully",
+    "copy_email_success": "Email copied",
+    "copy_email_failed": "Unable to copy email on this device or browser",
     "code_sent": "Verification code sent",
     "email_not_bound": "No email is bound yet. Please bind one first.",
     "password_empty": "Username or password cannot be empty",

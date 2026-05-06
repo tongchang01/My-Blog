@@ -7,10 +7,10 @@
     "tags": "标签",
     "post": "文章",
     "talks": "说说",
-    "message": "留言",
+    "search": "搜索结果",
+    "message": "留言板",
     "friends": "友链",
     "album": "相册",
-    "search": "搜索结果",
     "not-found": "页面不存在"
   },
   "home": {
@@ -32,7 +32,7 @@
     "notice": "公告"
   },
   "settings": {
-    "months": ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
+    "months": ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
     "articles": "文章",
     "talks": "说说",
     "categories": "分类",
@@ -115,14 +115,14 @@
     "forgot_password": "忘记密码？",
     "back_to_login": "返回登录",
     "article_password": "文章密码",
-    "verify_password": "验证密码",
-    "enter_article_password": "这篇文章已加密，请输入访问密码"
+    "verify_password": "验证",
+    "enter_article_password": "这篇文章已加密，请输入访问密码。"
   },
   "user": {
     "title": "用户中心",
-    "privacy_notice": "此页面中的信息将被严格保密",
+    "privacy_notice": "你的信息将被严格保密",
     "nickname": "昵称",
-    "website": "网址",
+    "website": "网站",
     "description": "简介",
     "email": "邮箱",
     "subscribe": "订阅",
@@ -157,15 +157,17 @@
     "bind_success": "绑定成功",
     "upload_success": "上传成功",
     "update_success": "更新成功",
+    "copy_email_success": "邮箱已复制",
+    "copy_email_failed": "当前浏览器或设备不支持复制邮箱",
     "code_sent": "验证码已发送",
     "email_not_bound": "邮箱尚未绑定，请先绑定邮箱",
     "password_empty": "用户名或密码不能为空",
-    "article_password_error": "文章密码验证失败",
-    "article_password_required": "这篇文章已加密，请先登录后再访问"
+    "article_password_error": "文章密码错误",
+    "article_password_required": "这篇文章已加密，请先登录。"
   },
   "page": {
-    "message_intro": "这是留言板。<br><br>欢迎来这里留言交流 💖",
-    "friend_link_intro": "如果想交换友链，可以在下方留言 💖<br><br>为了方便展示，请附上名称、头像、链接和简介。",
+    "message_intro": "这是留言板。<br><br>欢迎在这里留言交流 💖",
+    "friend_link_intro": "如果你想交换友链，欢迎在下方留言 💖<br><br>请附上站点名称、头像、链接和简短介绍。",
     "not_found_description": "你访问的页面似乎已经不在这里了。"
   },
   "footer": {
@@ -175,6 +177,6 @@
     "loading": "加载中"
   },
   "dia": {
-    "default_tip": "早上好呀～"
+    "default_tip": "你好呀~"
   }
 }

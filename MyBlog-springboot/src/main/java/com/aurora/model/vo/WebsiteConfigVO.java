@@ -59,6 +59,9 @@ public class WebsiteConfigVO {
     @ApiModelProperty(name = "weChat", value = "微信", required = true, dataType = "String")
     private String weChat;
 
+    @ApiModelProperty(name = "email", value = "邮箱", required = true, dataType = "String")
+    private String email;
+
     @ApiModelProperty(name = "weibo", value = "微博", required = true, dataType = "String")
     private String weibo;
 

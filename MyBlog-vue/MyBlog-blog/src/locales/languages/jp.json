@@ -7,15 +7,15 @@
     "tags": "タグ",
     "post": "記事",
     "talks": "つぶやき",
+    "search": "検索結果",
     "message": "メッセージ",
     "friends": "リンク",
     "album": "アルバム",
-    "search": "検索結果",
     "not-found": "ページが見つかりません"
   },
   "home": {
     "recommended": "おすすめ記事",
-    "editor_pick": "Editor's Picks"
+    "editor_pick": "編集者のおすすめ"
   },
   "titles": {
     "articles": "記事一覧",
@@ -41,16 +41,16 @@
     "visitor_count": "訪問者数",
     "visit_count": "閲覧数",
     "button-all": "すべて",
-    "add_comment": "コメントを送信",
+    "add_comment": "コメントを投稿",
     "comment_placeholder": "コメントを入力してください...",
     "paginator": {
-      "newer": "新しい記事",
-      "older": "前の記事",
+      "newer": "新しい",
+      "older": "古い",
       "pre": "前の記事",
       "next": "次の記事"
     },
     "more-tags": "もっと見る",
-    "admin-user": "管理人",
+    "admin-user": "管理者",
     "shared-on": "投稿日",
     "recently-search": "最近の検索",
     "search-result": "[total] 件の結果が見つかりました",
@@ -68,15 +68,15 @@
     "tips-open-search": "検索を開く",
     "default-category": "記事",
     "default-tag": "未分類",
-    "empty-tag": "まだタグはありません。",
+    "empty-tag": "まだタグがありません。",
     "pinned": "固定表示",
     "featured": "おすすめ",
     "login": "ログイン",
     "logout": "ログアウト",
-    "personal-center": "マイページ",
+    "personal-center": "プロフィール",
     "running-time": "稼働時間",
     "view-count": "総閲覧数",
-    "load_more": "もっと見る",
+    "load_more": "もっと読む",
     "time_units": {
       "day": "日",
       "hour": "時間",
@@ -111,9 +111,9 @@
     "submit_button": "送信",
     "qq_login": "QQでログイン",
     "register_now": "今すぐ登録",
-    "already_have_account": "アカウントをお持ちですか？ログイン",
+    "already_have_account": "すでにアカウントをお持ちですか？ ログイン",
     "forgot_password": "パスワードをお忘れですか？",
-    "back_to_login": "ログインへ戻る",
+    "back_to_login": "ログインに戻る",
     "article_password": "記事パスワード",
     "verify_password": "確認",
     "enter_article_password": "この記事はパスワードで保護されています。閲覧するにはパスワードを入力してください。"
@@ -129,7 +129,7 @@
     "submit": "保存",
     "bind": "連携",
     "modify": "変更",
-    "website_placeholder": "https:// または http:// から始まるURLを入力してください",
+    "website_placeholder": "https:// または http:// で始まるURLを入力してください",
     "intro_placeholder": "簡単に自己紹介してください",
     "email_placeholder": "メールアドレス",
     "code_placeholder": "認証コード"
@@ -138,25 +138,27 @@
     "reply": "返信",
     "cancel": "キャンセル",
     "reply_placeholder": "返信を入力してください...",
-    "login_to_comment": "コメントするにはログインしてください",
-    "login_to_reply": "返信するにはログインしてください",
+    "login_to_comment": "コメントするには先にログインしてください",
+    "login_to_reply": "返信するには先にログインしてください",
     "comment_empty": "コメントを空にすることはできません",
     "reply_empty": "返信を空にすることはできません",
     "comment_success": "コメントを送信しました",
     "reply_success": "返信を送信しました",
-    "comment_under_review": "コメントを送信しました。現在確認中です"
+    "comment_under_review": "コメントを送信しました。現在審査中です"
   },
   "notify": {
     "success": "成功",
     "warning": "注意",
     "error": "エラー",
-    "system_error": "サーバーエラーが発生しました。しばらくしてからお試しください。",
+    "system_error": "サーバーで問題が発生しました。しばらくしてからお試しください。",
     "unauthorized": "ログインしていません",
     "login_success": "ログインしました",
     "logout_success": "ログアウトしました",
     "bind_success": "連携が完了しました",
     "upload_success": "アップロードしました",
     "update_success": "更新しました",
+    "copy_email_success": "メールアドレスをコピーしました",
+    "copy_email_failed": "このブラウザまたは端末ではメールアドレスをコピーできません",
     "code_sent": "認証コードを送信しました",
     "email_not_bound": "メールアドレスが未連携です。先に連携してください。",
     "password_empty": "ユーザー名またはパスワードを入力してください",
@@ -175,6 +177,6 @@
     "loading": "読み込み中"
   },
   "dia": {
-    "default_tip": "おはようございます～"
+    "default_tip": "こんにちは〜"
   }
 }
