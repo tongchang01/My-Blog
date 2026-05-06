@@ -99,32 +99,14 @@
           <el-form-item label="Github">
             <el-input v-model="websiteConfigForm.github" size="small" style="width: 400px; margin-right: 1rem" />
           </el-form-item>
-          <el-form-item label="Gitee">
-            <el-input v-model="websiteConfigForm.gitee" size="small" style="width: 400px; margin-right: 1rem" />
-          </el-form-item>
           <el-form-item label="QQ">
             <el-input v-model="websiteConfigForm.qq" size="small" style="width: 400px; margin-right: 1rem" />
           </el-form-item>
           <el-form-item label="WeChat">
             <el-input v-model="websiteConfigForm.weChat" size="small" style="width: 400px; margin-right: 1rem" />
           </el-form-item>
-          <el-form-item label="微博">
-            <el-input v-model="websiteConfigForm.weibo" size="small" style="width: 400px; margin-right: 1rem" />
-          </el-form-item>
-          <el-form-item label="CSDN">
-            <el-input v-model="websiteConfigForm.csdn" size="small" style="width: 400px; margin-right: 1rem" />
-          </el-form-item>
-          <el-form-item label="知乎">
-            <el-input v-model="websiteConfigForm.zhihu" size="small" style="width: 400px; margin-right: 1rem" />
-          </el-form-item>
-          <el-form-item label="掘金">
-            <el-input v-model="websiteConfigForm.juejin" size="small" style="width: 400px; margin-right: 1rem" />
-          </el-form-item>
           <el-form-item label="twitter">
             <el-input v-model="websiteConfigForm.twitter" size="small" style="width: 400px; margin-right: 1rem" />
-          </el-form-item>
-          <el-form-item label="stackoverflow">
-            <el-input v-model="websiteConfigForm.stackoverflow" size="small" style="width: 400px; margin-right: 1rem" />
           </el-form-item>
           <el-button type="primary" size="medium" style="margin-left: 4.375rem" @click="updateWebsiteConfig">
             修改
