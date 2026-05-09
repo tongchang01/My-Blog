@@ -305,24 +305,45 @@ class AuroraBotSoftware {
     return Array.isArray(obj) ? obj[Math.floor(Math.random() * obj.length)] : obj
   }
   showQuote() {
-    if (this.config.locale === 'cn') {
-      this.getHitokoto()
-    } else {
-      this.getTheySaidSo()
+    if (this.config.locale === 'cn' || this.config.locale === 'jp') {
+      this.getHitokoto().catch(() => {
+        this.showFallbackQuote()
+      })
+      return
     }
+    this.showFallbackQuote()
   }
-  getHitokoto() {
-    fetch('https://v1.hitokoto.cn')
-      .then((response) => response.json())
-      .then((result) => {
-        this.showMessage(result.hitokoto, 6000, 9)
-      })
+  async getHitokoto() {
+    const response = await fetch('https://v1.hitokoto.cn')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch hitokoto: ${response.status}`)
+    }
+    const result = await response.json()
+    if (result?.hitokoto) {
+      this.showMessage(result.hitokoto, 6000, 9)
+      return
+    }
+    throw new Error('Invalid hitokoto payload')
   }
-  getTheySaidSo() {
-    fetch('https://quotes.rest/qod?language=en')
-      .then((response) => response.json())
-      .then((result) => {
-        this.showMessage(result.contents.quotes[0].quote, 6000, 9)
-      })
+  showFallbackQuote() {
+    const fallbackMessages = this.messages.filter((message) => message !== 'showQuote')
+    if (fallbackMessages.length > 0) {
+      this.showMessage(this.randomSelection(fallbackMessages), 6000, 9)
+      return
+    }
+    this.showMessage(this.botTips.default_tip || 'Hi there~', 6000, 9)
+  }
+  async getTheySaidSo() {
+    const response = await fetch('https://quotes.rest/qod?language=en')
+    if (!response.ok) {
+      throw new Error(`Failed to fetch quote: ${response.status}`)
+    }
+    const result = await response.json()
+    const quote = result?.contents?.quotes?.[0]?.quote
+    if (quote) {
+      this.showMessage(quote, 6000, 9)
+      return
+    }
+    throw new Error('Invalid quote payload')
   }
 }

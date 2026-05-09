@@ -53,6 +53,8 @@ export default defineComponent({
     const playerRef = ref<HTMLElement | null>(null)
     const player = ref<PlayerInstance | null>(null)
     const playlist = ref<PlayerAudio[]>([])
+    const hasUserInteracted = ref(false)
+    let removeInteractionListeners: (() => void) | null = null
 
     const websiteConfig = computed<Record<string, any>>(() => appStore.websiteConfig || {})
     const isEnabled = computed(() => getConfigFlag(websiteConfig.value, 'musicPlayerEnable', true))
@@ -87,6 +89,35 @@ export default defineComponent({
       player.value = null
     }
 
+    const tryDeferredAutoplay = () => {
+      if (!player.value || !shouldAutoplay.value || !hasUserInteracted.value) {
+        return
+      }
+      const playerInstance = player.value as PlayerInstance & { play?: () => Promise<void> | void }
+      if (typeof playerInstance.play === 'function') {
+        Promise.resolve(playerInstance.play()).catch(() => {
+          // Ignore blocked playback retries after interaction.
+        })
+      }
+    }
+
+    const registerInteractionListeners = () => {
+      if (removeInteractionListeners) {
+        return
+      }
+      const handleInteraction = () => {
+        hasUserInteracted.value = true
+        tryDeferredAutoplay()
+      }
+      const options: AddEventListenerOptions = { passive: true }
+      window.addEventListener('pointerdown', handleInteraction, options)
+      window.addEventListener('keydown', handleInteraction, options)
+      removeInteractionListeners = () => {
+        window.removeEventListener('pointerdown', handleInteraction)
+        window.removeEventListener('keydown', handleInteraction)
+      }
+    }
+
     const createPlayer = async () => {
       destroyPlayer()
       if (!playerRef.value || !shouldRender.value) {
@@ -97,7 +128,7 @@ export default defineComponent({
         container: playerRef.value,
         // Keep APlayer in normal mode and let our wrapper control positioning.
         fixed: false,
-        autoplay: shouldAutoplay.value,
+        autoplay: false,
         theme: defaultTheme.value,
         loop: loop.value,
         order: order.value,
@@ -106,6 +137,7 @@ export default defineComponent({
         listMaxHeight: '180px',
         audio: playlist.value
       })
+      tryDeferredAutoplay()
     }
 
     const fetchMusics = async () => {
@@ -141,6 +173,7 @@ export default defineComponent({
     )
 
     onMounted(async () => {
+      registerInteractionListeners()
       try {
         await fetchMusics()
         await createPlayer()
@@ -150,6 +183,10 @@ export default defineComponent({
     })
 
     onBeforeUnmount(() => {
+      if (removeInteractionListeners) {
+        removeInteractionListeners()
+        removeInteractionListeners = null
+      }
       destroyPlayer()
     })
 
