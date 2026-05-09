@@ -1,7 +1,16 @@
 <template>
   <teleport to="body">
-    <div v-if="shouldRender" class="music-player-host music-player-host-docked">
-      <div ref="playerRef" class="music-player-container"></div>
+    <div
+      v-if="shouldRender"
+      class="music-player-host"
+      :class="{ 'music-player-host-expanded': isExpanded }"
+      @mouseenter="handlePlayerInteraction"
+      @mousemove="handlePlayerInteraction"
+      @mouseleave="scheduleCollapse"
+      @focusin="handlePlayerInteraction"
+      @focusout="scheduleCollapse"
+      @pointerdown="handlePlayerInteraction">
+      <div ref="playerRef" class="music-player-container" @click="handlePlayerInteraction"></div>
     </div>
   </teleport>
 </template>
@@ -53,12 +62,11 @@ export default defineComponent({
     const playerRef = ref<HTMLElement | null>(null)
     const player = ref<PlayerInstance | null>(null)
     const playlist = ref<PlayerAudio[]>([])
-    const hasUserInteracted = ref(false)
-    let removeInteractionListeners: (() => void) | null = null
+    const isExpanded = ref(true)
+    let collapseTimer: number | null = null
 
     const websiteConfig = computed<Record<string, any>>(() => appStore.websiteConfig || {})
     const isEnabled = computed(() => getConfigFlag(websiteConfig.value, 'musicPlayerEnable', true))
-    const shouldAutoplay = computed(() => getConfigFlag(websiteConfig.value, 'musicPlayerAutoPlay', true))
     const shouldRender = computed(() => isEnabled.value && playlist.value.length > 0)
     const order = computed(() => (websiteConfig.value.musicPlayerOrder === 'random' ? 'random' : 'list'))
     const loop = computed(() => {
@@ -89,33 +97,23 @@ export default defineComponent({
       player.value = null
     }
 
-    const tryDeferredAutoplay = () => {
-      if (!player.value || !shouldAutoplay.value || !hasUserInteracted.value) {
-        return
-      }
-      const playerInstance = player.value as PlayerInstance & { play?: () => Promise<void> | void }
-      if (typeof playerInstance.play === 'function') {
-        Promise.resolve(playerInstance.play()).catch(() => {
-          // Ignore blocked playback retries after interaction.
-        })
+    const clearCollapseTimer = () => {
+      if (collapseTimer !== null) {
+        clearTimeout(collapseTimer)
+        collapseTimer = null
       }
     }
 
-    const registerInteractionListeners = () => {
-      if (removeInteractionListeners) {
-        return
-      }
-      const handleInteraction = () => {
-        hasUserInteracted.value = true
-        tryDeferredAutoplay()
-      }
-      const options: AddEventListenerOptions = { passive: true }
-      window.addEventListener('pointerdown', handleInteraction, options)
-      window.addEventListener('keydown', handleInteraction, options)
-      removeInteractionListeners = () => {
-        window.removeEventListener('pointerdown', handleInteraction)
-        window.removeEventListener('keydown', handleInteraction)
-      }
+    const scheduleCollapse = () => {
+      clearCollapseTimer()
+      collapseTimer = <any>setTimeout(() => {
+        isExpanded.value = false
+      }, 1200)
+    }
+
+    const handlePlayerInteraction = () => {
+      isExpanded.value = true
+      scheduleCollapse()
     }
 
     const createPlayer = async () => {
@@ -137,7 +135,7 @@ export default defineComponent({
         listMaxHeight: '180px',
         audio: playlist.value
       })
-      tryDeferredAutoplay()
+      handlePlayerInteraction()
     }
 
     const fetchMusics = async () => {
@@ -157,7 +155,6 @@ export default defineComponent({
     watch(
       () => [
         shouldRender.value,
-        shouldAutoplay.value,
         order.value,
         loop.value,
         defaultTheme.value,
@@ -173,7 +170,6 @@ export default defineComponent({
     )
 
     onMounted(async () => {
-      registerInteractionListeners()
       try {
         await fetchMusics()
         await createPlayer()
@@ -183,16 +179,16 @@ export default defineComponent({
     })
 
     onBeforeUnmount(() => {
-      if (removeInteractionListeners) {
-        removeInteractionListeners()
-        removeInteractionListeners = null
-      }
+      clearCollapseTimer()
       destroyPlayer()
     })
 
     return {
       playerRef,
-      shouldRender
+      shouldRender,
+      isExpanded,
+      handlePlayerInteraction,
+      scheduleCollapse
     }
   }
 })
@@ -210,8 +206,8 @@ export default defineComponent({
   transition: transform 0.25s ease;
 }
 
-.music-player-host-docked:hover,
-.music-player-host-docked:focus-within {
+.music-player-host-expanded,
+.music-player-host:focus-within {
   transform: translateX(0);
 }
 
