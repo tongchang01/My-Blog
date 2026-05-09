@@ -68,7 +68,7 @@ export const useAppStore = defineStore('appStore', {
     },
     initializeTheme(mode: string) {
       setTheme(mode)
-      setDocumentLocale(cookies.get('locale') ? String(cookies.get('locale')) : 'en')
+      setDocumentLocale(cookies.get('locale') ? String(cookies.get('locale')) : 'jp')
     },
     toggleTheme(isDark?: boolean) {
       this.themeConfig.theme =

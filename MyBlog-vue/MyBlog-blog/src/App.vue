@@ -216,6 +216,10 @@ body {
   font-family: var(--font-ui);
 }
 
+html[lang='jp'] body {
+  font-synthesis: none;
+}
+
 *:focus {
   outline: none;
 }
@@ -264,6 +268,26 @@ body {
 .el-textarea__inner::placeholder,
 .el-input__inner::placeholder {
   font-family: var(--font-content);
+}
+
+html[lang='jp'] .site-header,
+html[lang='jp'] .site-header .nav-link,
+html[lang='jp'] .site-header .header-controls,
+html[lang='jp'] .site-header .header-controls > span,
+html[lang='jp'] .site-header .header-controls [data-dia='language'],
+html[lang='jp'] .site-header .header-controls [data-dia='language'] > span {
+  font-family: var(--font-ui-jp);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+html[lang='jp'] .site-header .nav-link {
+  text-transform: none;
+}
+
+html[lang='jp'] .site-header .header-controls > span,
+html[lang='jp'] .site-header .header-controls .mr-3 {
+  font-weight: 500;
 }
 
 .app-banner {

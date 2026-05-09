@@ -10,7 +10,7 @@ export class AuroraWaifu {
     Promise.all([this.injectResources('live2d.min.js')]).then(() => {
       new AuroraBotSoftware({
         apiPath: 'https://cdn.jsdelivr.net/gh/fghrsh/live2d_api/',
-        locale: 'en',
+        locale: 'jp',
         containerId: 'waifu-tips',
         messageId: 'waifu-tips'
       })
@@ -33,7 +33,7 @@ export interface DiaConfig {
 }
 export class AuroraDia {
   configs: DiaConfig = {
-    locale: 'en',
+    locale: 'jp',
     tips: {}
   }
   software = new AuroraBotSoftware()
@@ -92,7 +92,7 @@ class AuroraBotSoftware {
     containerId: '',
     messageId: '',
     botId: 'Aurora-Dia',
-    locale: 'en'
+    locale: 'jp'
   }
   messageCacheKey = '__AURORA_BOT_MESSAGE__'
   mouseoverEventCacheKey = '__AURORA_BOT_MOUSE_OVER__'
@@ -110,7 +110,7 @@ class AuroraBotSoftware {
         containerId: configs.containerId ? configs.containerId : '',
         messageId: configs.messageId ? configs.messageId : '',
         botId: 'Aurora-Dia',
-        locale: configs.locale ? configs.locale : 'en'
+        locale: configs.locale ? configs.locale : 'jp'
       }
     }
   }

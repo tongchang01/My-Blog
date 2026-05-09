@@ -20,7 +20,7 @@ function loadLocaleMessages(): {
 
 
 export const i18n = createI18n({
-  locale: cookies.get('locale') ? String(cookies.get('locale')) : 'en',
-  fallbackLocale: 'cn',
+  locale: cookies.get('locale') ? String(cookies.get('locale')) : 'jp',
+  fallbackLocale: 'jp',
   messages: loadLocaleMessages()
 })

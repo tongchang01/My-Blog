@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap');
 
 @import './theme-variables.scss';
 
@@ -33,6 +33,7 @@
   --font-ui: Rubik, Avenir, Helvetica, Arial, sans-serif;
   --font-content: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', 'Noto Sans JP',
     'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+  --font-ui-jp: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
 }
 
 html[lang='cn'] {
@@ -40,7 +41,7 @@ html[lang='cn'] {
 }
 
 html[lang='jp'] {
-  --font-ui: 'Hiragino Sans', 'Yu Gothic', 'Meiryo', 'Noto Sans JP', Rubik, Avenir, Helvetica, Arial, sans-serif;
+  --font-ui: var(--font-ui-jp);
 }
 
 html {
