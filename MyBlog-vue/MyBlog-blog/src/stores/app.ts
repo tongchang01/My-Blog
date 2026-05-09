@@ -11,6 +11,10 @@ nProgress.configure({
   parent: '#loading-bar-wrapper'
 })
 
+const setDocumentLocale = (locale: string) => {
+  document.documentElement.lang = locale
+}
+
 const setTheme = (theme: string) => {
   if (theme === 'theme-dark') {
     document.body.classList.remove('theme-light')
@@ -58,12 +62,13 @@ export const useAppStore = defineStore('appStore', {
     changeLocale(locale: string) {
       cookies.set('locale', locale, { expires: 7 })
       i18n.global.locale = locale
-      // 同步更新 Dia 机器人的语言
+      setDocumentLocale(locale)
       const diaStore = useDiaStore()
       diaStore.updateBotLocale(locale)
     },
     initializeTheme(mode: string) {
       setTheme(mode)
+      setDocumentLocale(cookies.get('locale') ? String(cookies.get('locale')) : 'en')
     },
     toggleTheme(isDark?: boolean) {
       this.themeConfig.theme =

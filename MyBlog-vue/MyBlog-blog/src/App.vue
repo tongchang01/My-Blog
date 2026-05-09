@@ -213,6 +213,7 @@ export default defineComponent({
 }
 body {
   background: var(--background-primary-alt);
+  font-family: var(--font-ui);
 }
 
 *:focus {
@@ -221,7 +222,7 @@ body {
 
 #app {
   @apply relative min-w-full min-h-screen h-full;
-  font-family: Rubik, Avenir, Helvetica, Arial, sans-serif;
+  font-family: var(--font-ui);
   .app-wrapper {
     @apply bg-ob-deep-900 min-w-full h-full pb-12;
     transition-property: transform, border-radius;
@@ -250,6 +251,19 @@ body {
     transform: translateY(-20%);
     width: 280px;
   }
+}
+
+.post-html,
+.markdown-body,
+.article-content,
+.feature-content,
+.talk-content,
+.commentContent,
+.el-input__inner,
+.el-textarea__inner,
+.el-textarea__inner::placeholder,
+.el-input__inner::placeholder {
+  font-family: var(--font-content);
 }
 
 .app-banner {
