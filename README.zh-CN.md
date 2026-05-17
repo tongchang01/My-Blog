@@ -1,12 +1,16 @@
 # MyBlog
 
-[English](./README.en.md) | [日本語](./README.ja.md) | [简体中文](./README.zh-CN.md)
+[中文](./README.zh-CN.md) | [English](./README.en.md) | [日本語](./README.ja.md)
 
-一个完整的博客项目，包含：
+## 项目简介
 
-- 前台博客：`MyBlog-blog`
+MyBlog 是一个完整的博客系统，包含：
+
+- 博客前台：`MyBlog-blog`
 - 后台管理端：`MyBlog-admin`
 - 后端服务：`MyBlog-springboot`
+
+当前仓库的目标不再只是“能运行”，而是逐步把三端整理成更容易维护、扩展和迭代的工程。
 
 ## 项目结构
 
@@ -15,10 +19,11 @@ E:\My-Blog
 ├─ MyBlog-vue
 │  ├─ MyBlog-blog
 │  └─ MyBlog-admin
-└─ MyBlog-springboot
+├─ MyBlog-springboot
+└─ docs
 ```
 
-## 技术栈
+## 当前技术栈
 
 ### 前台 `MyBlog-blog`
 
@@ -28,7 +33,7 @@ E:\My-Blog
 - Vue Router 4
 - Element Plus
 - Tailwind CSS
-- APlayer
+- markdown-it / Prism / tocbot
 
 ### 后台 `MyBlog-admin`
 
@@ -37,7 +42,7 @@ E:\My-Blog
 - Vue Router 3
 - Element UI
 - mavon-editor
-- ECharts
+- vue-echarts
 
 ### 后端 `MyBlog-springboot`
 
@@ -52,16 +57,46 @@ E:\My-Blog
 - Knife4j / Swagger 2
 - AWS S3 / SES
 
-## 主要功能
+## 当前项目现状
+
+### 业务能力
+
+项目已经具备以下核心能力：
 
 - 博客前台展示
 - 文章、分类、标签管理
-- 评论管理与审核
-- 说说、相册、友链管理
-- 用户、角色、资源、菜单权限管理
-- 定时任务与任务日志
-- 网站配置管理
-- 音乐播放器配置与曲库管理
+- 评论、留言、友链、说说、相册
+- 用户、角色、菜单、资源权限管理
+- 网站配置、音乐播放器配置
+- 定时任务与日志管理
+
+### 现阶段主要问题
+
+#### 前台
+
+- 已经使用 Vue 3，但仍保留较多旧写法和重复逻辑
+- 类型约束不足，`any` 和弱边界较多
+- 评论、文章列表、接口响应处理重复明显
+- 样式、国际化、主题逻辑有一定耦合
+
+#### 后台
+
+- 仍基于 Vue 2 + Vuex + Element UI
+- 技术栈相对老旧，后续插件兼容和升级成本会越来越高
+- 如果未来要做复杂交互、权限细化和数据可视化增强，当前架构的扩展性一般
+
+#### 后端
+
+- 基础功能完整，但依赖版本偏旧
+- 配置项较多，运行环境要求较高
+- 测试、模块边界和可观测性仍有提升空间
+
+## 文档导航
+
+- [项目重构执行计划（中文）](./docs/refactor-plan.zh-CN.md)
+- [项目展示文章（中文）](./docs/MyBlog-项目展示.md)
+- [English README](./README.en.md)
+- [日本語 README](./README.ja.md)
 
 ## 本地运行
 
@@ -96,26 +131,22 @@ mvn spring-boot:run
 
 默认后端端口：`8080`
 
-前后台开发代理默认都转发到：
-
-- `http://localhost:8080`
-
 ## 数据库初始化
 
 SQL 目录：`E:\My-Blog\MyBlog-springboot\sql`
 
-- [aurora.sql](./MyBlog-springboot/sql/aurora.sql)：基础结构与初始化数据
+- [aurora.sql](./MyBlog-springboot/sql/aurora.sql)：基础表结构和初始化数据
 - [music-player.sql](./MyBlog-springboot/sql/music-player.sql)：音乐播放器相关增量脚本
 
 推荐顺序：
 
 1. 创建数据库
 2. 导入 `aurora.sql`
-3. 如需音乐播放器相关功能，再导入 `music-player.sql`
+3. 如需音乐播放器能力，再导入 `music-player.sql`
 
 ## 后端配置
 
-配置文件目录：
+主要配置文件：
 
 - [application.yml](./MyBlog-springboot/src/main/resources/application.yml)
 - [application-dev.yml](./MyBlog-springboot/src/main/resources/application-dev.yml)
@@ -132,9 +163,9 @@ SQL 目录：`E:\My-Blog\MyBlog-springboot\sql`
 - 网站域名
 - QQ 登录
 
-## `.env` 变量说明
+## 环境变量说明
 
-建议使用本地 `.env` 或服务器环境变量，不要把真实密钥提交到仓库。
+建议使用本地 `.env` 或服务器环境变量，不要把真实密钥直接提交到仓库。
 
 ```env
 AWS_S3_KEY=your_s3_access_key
@@ -153,23 +184,20 @@ DBPASSWORD=your_database_password
 JWT_SECRET=your_jwt_secret
 ```
 
-变量用途：
+## 后续方向摘要
 
-- `AWS_S3_KEY` / `AWS_S3_SECRET`：S3 凭证
-- `AWS_S3_URL` / `AWS_S3_BUCKET` / `AWS_S3_REGION`：S3 存储配置
-- `AWS_SES_KEY` / `AWS_SES_SECRET`：SES 凭证
-- `AWS_SES_FROMEMAIL` / `AWS_SES_REGION` / `AWS_SES_DOMAIN`：SES 发信配置
-- `DBPASSWORD`：数据库与 Redis 密码变量
-- `JWT_SECRET`：JWT 签名密钥
+当前项目后续的核心方向不是“大规模推倒重来”，而是按优先级逐步治理：
 
-## 当前项目里的播放器定制
+1. 先解决三端的高频维护痛点
+2. 再推进基础设施和技术栈升级
+3. 最后再做体验层和功能层扩展
 
-- 只保留“悬浮停靠”
-- 已移除“右下角固定”切换项
-- 桌面端位置已上移，避免遮挡右下角区域
+重点原则：
 
-## 博客展示文章
+- 前台优先做类型、接口层、重复逻辑治理
+- 后台如果升级到 Vue 3，应作为一次完整工程迁移，而不是只改成语法糖
+- 后端优先补齐依赖升级、测试、配置治理和模块边界
 
-- [English Showcase](./docs/MyBlog-Project-Showcase.en.md)
-- [日本語 紹介記事](./docs/MyBlog-プロジェクト紹介.ja.md)
-- [中文项目展示](./docs/MyBlog-项目展示.md)
+详细方案见：
+
+- [项目重构执行计划（中文）](./docs/refactor-plan.zh-CN.md)
