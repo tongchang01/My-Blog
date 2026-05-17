@@ -212,11 +212,14 @@ export default defineComponent({
   background-color: var(--background-primary) !important;
 }
 html body,
-body,
+body {
+  background: var(--background-primary-alt);
+  font-family: var(--font-ui);
+}
+
 #app,
 #App-Wrapper,
 #App-Container {
-  background: var(--background-primary-alt);
   font-family: var(--font-ui);
 }
 

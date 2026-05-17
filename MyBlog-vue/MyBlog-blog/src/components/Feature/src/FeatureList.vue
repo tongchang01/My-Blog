@@ -1,11 +1,11 @@
 <template>
   <div class="inverted-main-grid py-8 gap-8 box-border">
-    <div class="relative overflow-hidden h-56 lg:h-auto rounded-2xl bg-ob-deep-800 shadow-lg">
+    <div class="feature-intro-card relative overflow-hidden rounded-2xl bg-ob-deep-800 shadow-lg">
       <div
-        class="ob-gradient-plate opacity-90 relative z-10 bg-ob-deep-900 rounded-2xl flex justify-start items-end px-8 pb-10 shadow-md">
-        <h2 class="text-3xl pb-8 lg:pb-16">
-          <p :style="gradientText">{{ t('home.editor_pick') }}</p>
-          <span class="relative text-2xl text-ob-bright font-semibold">
+        class="feature-intro-shell ob-gradient-plate opacity-90 relative z-10 bg-ob-deep-900 rounded-2xl shadow-md">
+        <h2 class="feature-intro-title locale-ui locale-sensitive-case">
+          <span class="feature-intro-kicker" :style="gradientText">{{ t('home.editor_pick') }}</span>
+          <span class="feature-intro-main relative text-ob-bright font-semibold">
             <svg-icon class="inline-block" icon-class="hot" />
             {{ t('home.recommended') }}
           </span>
@@ -59,6 +59,62 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
+.feature-intro-card {
+  min-height: 19rem;
+}
+
+.feature-intro-shell {
+  min-height: calc(100% - 0.5rem);
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.feature-intro-title {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  line-height: 1.15;
+}
+
+.feature-intro-kicker {
+  display: block;
+  font-size: clamp(2rem, 2.4vw, 2.7rem);
+  font-weight: 700;
+}
+
+.feature-intro-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: clamp(1.5rem, 2vw, 2rem);
+}
+
+html[lang='cn'] .feature-intro-title,
+html[lang='jp'] .feature-intro-title {
+  letter-spacing: 0;
+}
+
+@media (min-width: 1024px) {
+  .feature-intro-card {
+    min-height: 100%;
+  }
+
+  .feature-intro-shell {
+    justify-content: flex-start;
+    text-align: left;
+    padding: 2rem 2rem 2.5rem;
+  }
+
+  .feature-intro-title {
+    align-items: flex-start;
+  }
+}
+
 .home-featured-article {
   .article-content {
     p {
