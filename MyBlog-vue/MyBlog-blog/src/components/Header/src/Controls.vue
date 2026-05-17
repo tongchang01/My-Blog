@@ -1,10 +1,10 @@
 <template>
-  <div class="header-controls absolute top-10 right-0 flex flex-row" @keydown.k="handleOpenModel" tabindex="0">
+  <div class="header-controls locale-ui absolute top-10 right-0 flex flex-row" @keydown.k="handleOpenModel" tabindex="0">
     <span class="ob-drop-shadow" data-dia="search" @click="handleOpenModel">
       <svg-icon icon-class="search" />
     </span>
     <Dropdown v-if="multiLanguage === 1" @command="handleClick">
-      <span class="ob-drop-shadow" data-dia="language">
+      <span class="ob-drop-shadow locale-sensitive-case" data-dia="language">
         <svg-icon icon-class="globe" />
         <span>{{ currentLocaleLabel }}</span>
       </span>
@@ -15,7 +15,7 @@
       </DropdownMenu>
     </Dropdown>
     <template v-if="userInfo === ''">
-      <span class="mr-3" @click="openLoginDialog">{{ t('settings.login') }}</span>
+      <span class="mr-3 locale-sensitive-case" @click="openLoginDialog">{{ t('settings.login') }}</span>
     </template>
     <template v-if="userInfo !== ''">
       <Dropdown hover>

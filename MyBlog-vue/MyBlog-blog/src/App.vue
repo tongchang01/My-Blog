@@ -211,7 +211,11 @@ export default defineComponent({
 .el-dialog {
   background-color: var(--background-primary) !important;
 }
-body {
+html body,
+body,
+#app,
+#App-Wrapper,
+#App-Container {
   background: var(--background-primary-alt);
   font-family: var(--font-ui);
 }
@@ -267,7 +271,25 @@ html[lang='jp'] body {
 .el-textarea__inner,
 .el-textarea__inner::placeholder,
 .el-input__inner::placeholder {
-  font-family: var(--font-content);
+  font-family: var(--font-content-active);
+}
+
+html[lang='jp'] .locale-ui,
+html[lang='cn'] .locale-ui,
+html[lang='en'] .locale-ui {
+  font-family: var(--font-ui);
+}
+
+html[lang='jp'] .locale-content,
+html[lang='cn'] .locale-content,
+html[lang='en'] .locale-content {
+  font-family: var(--font-content-active);
+}
+
+html[lang='jp'] .locale-sensitive-case,
+html[lang='cn'] .locale-sensitive-case {
+  text-transform: none;
+  letter-spacing: 0;
 }
 
 html[lang='jp'] .site-header,
@@ -275,18 +297,27 @@ html[lang='jp'] .site-header .nav-link,
 html[lang='jp'] .site-header .header-controls,
 html[lang='jp'] .site-header .header-controls > span,
 html[lang='jp'] .site-header .header-controls [data-dia='language'],
-html[lang='jp'] .site-header .header-controls [data-dia='language'] > span {
-  font-family: var(--font-ui-jp);
+html[lang='jp'] .site-header .header-controls [data-dia='language'] > span,
+html[lang='cn'] .site-header,
+html[lang='cn'] .site-header .nav-link,
+html[lang='cn'] .site-header .header-controls,
+html[lang='cn'] .site-header .header-controls > span,
+html[lang='cn'] .site-header .header-controls [data-dia='language'],
+html[lang='cn'] .site-header .header-controls [data-dia='language'] > span {
+  font-family: var(--font-ui);
   font-weight: 500;
   letter-spacing: 0;
 }
 
-html[lang='jp'] .site-header .nav-link {
+html[lang='jp'] .site-header .nav-link,
+html[lang='cn'] .site-header .nav-link {
   text-transform: none;
 }
 
 html[lang='jp'] .site-header .header-controls > span,
-html[lang='jp'] .site-header .header-controls .mr-3 {
+html[lang='jp'] .site-header .header-controls .mr-3,
+html[lang='cn'] .site-header .header-controls > span,
+html[lang='cn'] .site-header .header-controls .mr-3 {
   font-weight: 500;
 }
 

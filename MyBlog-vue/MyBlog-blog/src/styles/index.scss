@@ -30,18 +30,28 @@
 }
 
 :root {
-  --font-ui: Rubik, Avenir, Helvetica, Arial, sans-serif;
+  --font-ui-en: 'Noto Sans', 'Segoe UI', Helvetica, Arial, sans-serif;
+  --font-ui-cn: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', sans-serif;
+  --font-ui-jp: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+  --font-ui: var(--font-ui-en);
   --font-content: 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', 'Hiragino Sans GB', 'Noto Sans JP',
     'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
-  --font-ui-jp: 'Noto Sans JP', 'Hiragino Sans', 'Yu Gothic', 'Meiryo', sans-serif;
+  --font-content-active: var(--font-content);
+}
+
+html[lang='en'] {
+  --font-ui: var(--font-ui-en);
+  --font-content-active: var(--font-ui-en);
 }
 
 html[lang='cn'] {
-  --font-ui: var(--font-content);
+  --font-ui: var(--font-ui-cn);
+  --font-content-active: var(--font-content);
 }
 
 html[lang='jp'] {
   --font-ui: var(--font-ui-jp);
+  --font-content-active: var(--font-ui-jp);
 }
 
 html {

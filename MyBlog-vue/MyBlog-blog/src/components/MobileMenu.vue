@@ -42,7 +42,7 @@
   <ul class="flex flex-col justify-center items-center mt-8 w-full list-none text-ob-bright">
     <li class="pb-2 cursor-pointer" v-for="route in routes" :key="route.path">
       <div
-        class="text-sm block px-1.5 py-0.5 rounded-md relative uppercase"
+        class="locale-ui locale-sensitive-case text-sm block px-1.5 py-0.5 rounded-md relative uppercase"
         @click="pushPage(route.path)"
         v-if="route.children && route.children.length === 0">
         <span class="relative z-50">{{ t(`menu.${route.i18n.key}`) || route.name }}</span>
@@ -50,7 +50,7 @@
       <Dropdown
         @command="pushPage"
         v-else
-        class="flex flex-col justify-center items-center nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase">
+        class="locale-ui locale-sensitive-case flex flex-col justify-center items-center nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase">
         <span class="relative z-50">{{ t(`menu.${route.i18n.key}`) || route.name }}</span>
         <DropdownMenu expand>
           <DropdownItem v-for="sub in route.children" :key="sub.path" :name="sub.path">
@@ -61,7 +61,7 @@
     </li>
     <li>
       <Dropdown
-        class="flex flex-col justify-center items-center nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase">
+        class="locale-ui locale-sensitive-case flex flex-col justify-center items-center nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase">
         <span class="relative z-50">{{ t('menu.album') }}</span>
         <DropdownMenu expand>
           <template v-for="item in albums" :key="item.id">
