@@ -82,6 +82,7 @@ import { useI18n } from 'vue-i18n'
 import Paginator from '@/components/Paginator.vue'
 import api from '@/api/api'
 import markdownToHtml from '@/utils/markdown'
+import { normalizeListData, normalizePageRecords } from '@/utils/pagination'
 
 export default defineComponent({
   name: 'Home',
@@ -160,14 +161,15 @@ export default defineComponent({
           })
           .then(({ data }) => {
             if (data.flag) {
-              data.data.records.forEach((item: any) => {
+              const page = normalizePageRecords(data)
+              page.records.forEach((item: any) => {
                 item.articleContent = markdownToHtml(item.articleContent)
                   .replace(/<\/?[^>]*>/g, '')
                   .replace(/[|]*\n/, '')
                   .replace(/&npsp;/gi, '')
               })
-              articleStore.articles = data.data.records
-              pagination.total = data.data.count
+              articleStore.articles = page.records
+              pagination.total = page.count
               reactiveData.haveArticles = true
             }
           })
@@ -184,21 +186,22 @@ export default defineComponent({
           categoryId: categoryId
         })
         .then(({ data }) => {
-          data.data.records.forEach((item: any) => {
+          const page = normalizePageRecords(data)
+          page.records.forEach((item: any) => {
             item.articleContent = markdownToHtml(item.articleContent)
               .replace(/<\/?[^>]*>/g, '')
               .replace(/[|]*\n/, '')
               .replace(/&npsp;/gi, '')
           })
-          articleStore.articles = data.data.records
-          pagination.total = data.data.count
+          articleStore.articles = page.records
+          pagination.total = page.count
           reactiveData.haveArticles = true
         })
     }
     const fetchCategories = () => {
       categoryStore.categories = []
       api.getAllCategories().then(({ data }) => {
-        categoryStore.categories.push(...data.data)
+        categoryStore.categories.push(...normalizeListData(data))
       })
     }
     const expandHandler = () => {

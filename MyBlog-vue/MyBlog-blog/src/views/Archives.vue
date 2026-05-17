@@ -59,6 +59,7 @@ import Paginator from '@/components/Paginator.vue'
 import api from '@/api/api'
 import markdownToHtml from '@/utils/markdown'
 import emitter from '@/utils/mitt'
+import { normalizePageRecords } from '@/utils/pagination'
 
 export default defineComponent({
   name: 'Archives',
@@ -90,7 +91,8 @@ export default defineComponent({
           size: pagination.size
         })
         .then(({ data }) => {
-          data.data.records.forEach((item: any) => {
+          const page = normalizePageRecords(data)
+          page.records.forEach((item: any) => {
             item.articles.forEach((article: any) => {
               article.articleContent = markdownToHtml(article.articleContent)
                 .replace(/<\/?[^>]*>/g, '')
@@ -98,8 +100,8 @@ export default defineComponent({
                 .replace(/&npsp;/gi, '')
             })
           })
-          articleStore.archives = data.data.records
-          pagination.total = data.data.count
+          articleStore.archives = page.records
+          pagination.total = page.count
         })
     }
     const pageChangeHanlder = (current: number) => {

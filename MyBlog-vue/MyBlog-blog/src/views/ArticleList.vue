@@ -32,6 +32,7 @@ import Paginator from '@/components/Paginator.vue'
 import { onBeforeRouteUpdate, useRoute } from 'vue-router'
 import api from '@/api/api'
 import markdownToHtml from '@/utils/markdown'
+import { normalizePageRecords } from '@/utils/pagination'
 
 export default defineComponent({
   name: 'ArticleList',
@@ -71,14 +72,15 @@ export default defineComponent({
           size: pagination.size
         })
         .then(({ data }) => {
-          data.data.records.forEach((item: any) => {
+          const page = normalizePageRecords(data)
+          page.records.forEach((item: any) => {
             item.articleContent = markdownToHtml(item.articleContent)
               .replace(/<\/?[^>]*>/g, '')
               .replace(/[|]*\n/, '')
               .replace(/&npsp;/gi, '')
           })
-          reactiveData.articles = data.data.records
-          pagination.total = data.data.count
+          reactiveData.articles = page.records
+          pagination.total = page.count
           reactiveData.haveArticles = true
         })
     }

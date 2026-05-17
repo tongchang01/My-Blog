@@ -166,6 +166,7 @@ import emitter from '@/utils/mitt'
 import { v3ImgPreviewFn } from 'v3-img-preview'
 import api from '@/api/api'
 import markdownToHtml from '@/utils/markdown'
+import { normalizePageRecords } from '@/utils/pagination'
 
 export default defineComponent({
   name: 'Article',
@@ -337,13 +338,14 @@ export default defineComponent({
         size: pageInfo.size
       }
       api.getComments(params).then(({ data }) => {
+        const page = normalizePageRecords(data)
         if (reactiveData.isReload) {
-          reactiveData.comments = data.data.records
+          reactiveData.comments = page.records
           reactiveData.isReload = false
         } else {
-          reactiveData.comments.push(...data.data.records)
+          reactiveData.comments.push(...page.records)
         }
-        if (data.data.count <= reactiveData.comments.length) {
+        if (page.count <= reactiveData.comments.length) {
           reactiveData.haveMore = false
         } else {
           reactiveData.haveMore = true

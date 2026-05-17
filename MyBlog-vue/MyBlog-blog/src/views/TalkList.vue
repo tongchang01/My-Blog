@@ -68,6 +68,7 @@ import Avatar from '../components/Avatar.vue'
 import { v3ImgPreviewFn } from 'v3-img-preview'
 import { useRouter } from 'vue-router'
 import api from '@/api/api'
+import { normalizePageRecords } from '@/utils/pagination'
 
 export default defineComponent({
   name: 'talkList',
@@ -96,8 +97,9 @@ export default defineComponent({
         size: pagination.size
       }
       api.getTalks(params).then(({ data }) => {
-        reactiveData.talks = data.data.records
-        pagination.total = data.data.count
+        const page = normalizePageRecords(data)
+        reactiveData.talks = page.records
+        pagination.total = page.count
         reactiveData.talks.forEach((item: any) => {
           if (item.imgs) {
             reactiveData.images.push(...item.imgs)

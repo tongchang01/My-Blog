@@ -28,6 +28,7 @@ import { Comment } from '../components/Comment'
 import { useCommentStore } from '@/stores/comment'
 import api from '@/api/api'
 import emitter from '@/utils/mitt'
+import { normalizePageRecords } from '@/utils/pagination'
 
 export default defineComponent({
   name: 'Message',
@@ -84,13 +85,14 @@ export default defineComponent({
         size: pageInfo.size
       }
       api.getComments(params).then(({ data }) => {
+        const page = normalizePageRecords(data)
         if (reactiveData.isReload) {
-          reactiveData.comments = data.data.records
+          reactiveData.comments = page.records
           reactiveData.isReload = false
         } else {
-          reactiveData.comments.push(...data.data.records)
+          reactiveData.comments.push(...page.records)
         }
-        if (data.data.count <= reactiveData.comments.length) {
+        if (page.count <= reactiveData.comments.length) {
           reactiveData.haveMore = false
         } else {
           reactiveData.haveMore = true
