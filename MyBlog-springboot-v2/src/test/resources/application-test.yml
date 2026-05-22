@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:myblog_v2_test;MODE=MySQL;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+  flyway:
+    enabled: true
+
+myblog:
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+  security:
+    public-endpoints:
+      - /actuator/health
+      - /api/public/security-probe

@@ -1,0 +1,9 @@
+myblog:
+  cors:
+    allowed-origins:
+      - http://localhost:5173
+      - http://localhost:5174
+  security:
+    public-endpoints:
+      - /actuator/health
+      - /api/public/security-probe
