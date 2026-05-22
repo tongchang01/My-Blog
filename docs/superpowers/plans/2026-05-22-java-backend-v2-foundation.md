@@ -82,11 +82,17 @@ MyBlog-springboot-v2
 ### Task 1: Scaffold the Spring Boot V2 Module
 
 **Files:**
+
 - Create: `MyBlog-springboot-v2/pom.xml`
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/MyBlogV2Application.java`
+
 - Create: `MyBlog-springboot-v2/src/main/resources/application.yml`
+
 - Create: `MyBlog-springboot-v2/src/main/resources/application-local.yml`
+
 - Create: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/MyBlogV2ApplicationTest.java`
+
 - Create: `MyBlog-springboot-v2/src/test/resources/application-test.yml`
 
 - [ ] **Step 1: Write the first context smoke test**
@@ -297,10 +303,15 @@ git commit -m "build: scaffold backend v2 module"
 ### Task 2: Add the API Response and Error Baseline
 
 **Files:**
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/web/ApiResponse.java`
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/error/ApiErrorCode.java`
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/error/ApiException.java`
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/error/GlobalExceptionHandler.java`
+
 - Create: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/error/GlobalExceptionHandlerTest.java`
 
 - [ ] **Step 1: Write failing API error tests**
@@ -518,8 +529,11 @@ git commit -m "feat: add backend v2 api error baseline"
 ### Task 3: Add Typed CORS and Public Endpoint Configuration
 
 **Files:**
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/config/ApiCorsProperties.java`
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/config/SecurityPublicEndpointProperties.java`
+
 - Create: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/config/BackendPropertiesTest.java`
 
 - [ ] **Step 1: Write failing configuration binding tests**
@@ -619,8 +633,11 @@ git commit -m "feat: add backend v2 typed security config"
 ### Task 4: Enforce Default-Deny HTTP Security
 
 **Files:**
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/SecurityConfig.java`
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/SecurityProbeController.java`
+
 - Create: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/SecurityConfigTest.java`
 
 - [ ] **Step 1: Write failing security policy tests**
@@ -776,7 +793,9 @@ git commit -m "feat: default deny backend v2 endpoints"
 ### Task 5: Add Flyway Migration Smoke Coverage
 
 **Files:**
+
 - Create: `MyBlog-springboot-v2/src/main/resources/db/migration/V1__create_v2_schema_marker.sql`
+
 - Create: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/infrastructure/persistence/FlywayMigrationTest.java`
 
 - [ ] **Step 1: Write the failing migration test**
@@ -856,8 +875,11 @@ git commit -m "feat: add backend v2 migration baseline"
 ### Task 6: Add Modular Monolith Architecture Rules
 
 **Files:**
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/package-info.java`
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/infrastructure/persistence/package-info.java`
+
 - Create: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/ArchitectureRulesTest.java`
 
 - [ ] **Step 1: Add package markers for the first architecture boundaries**
@@ -931,6 +953,7 @@ git commit -m "test: guard backend v2 module boundaries"
 ### Task 7: Verify the Foundation as One Unit
 
 **Files:**
+
 - Verify: `MyBlog-springboot-v2/**`
 
 - [ ] **Step 1: Run the full V2 backend test suite**
@@ -958,11 +981,17 @@ Expected: PASS and a backend artifact under `MyBlog-springboot-v2/target/`.
 Create `docs/superpowers/plans/2026-05-22-java-backend-v2-security-capabilities.md` only in the next planning session. That next plan should cover:
 
 - authentication model and JWT/session decision,
+
 - identity module migration,
+
 - security error JSON integration,
+
 - upload validation,
+
 - log redaction,
+
 - XSS sanitization,
+
 - rate-limit failure policy.
 
 - [ ] **Step 4: Commit only if verification or handoff docs changed**
