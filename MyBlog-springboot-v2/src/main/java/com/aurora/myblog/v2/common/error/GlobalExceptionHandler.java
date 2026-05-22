@@ -4,6 +4,7 @@ import com.aurora.myblog.v2.common.web.ApiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -15,8 +16,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ApiException.class)
     ResponseEntity<ApiResponse<Void>> handleApiException(ApiException exception) {
+        String message = exception.code().status().is5xxServerError()
+                ? "internal server error"
+                : exception.getMessage();
         return ResponseEntity.status(exception.code().status())
-                .body(ApiResponse.fail(exception.code().name(), exception.getMessage()));
+                .body(ApiResponse.fail(exception.code().name(), message));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -27,6 +31,12 @@ public class GlobalExceptionHandler {
                 .orElse("request validation failed");
         return ResponseEntity.badRequest()
                 .body(ApiResponse.fail(ApiErrorCode.VALIDATION_ERROR.name(), message));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<ApiResponse<Void>> handleUnreadableMessageException(HttpMessageNotReadableException exception) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail(ApiErrorCode.VALIDATION_ERROR.name(), "malformed request body"));
     }
 
     @ExceptionHandler(Exception.class)

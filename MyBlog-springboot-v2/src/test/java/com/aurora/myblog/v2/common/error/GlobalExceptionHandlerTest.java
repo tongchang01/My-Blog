@@ -43,12 +43,34 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void keepsMalformedJsonAsBadRequestEnvelope() throws Exception {
+        mockMvc.perform(post("/api/test/errors/validation")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"title":
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.message").value("malformed request body"));
+    }
+
+    @Test
     void returnsBusinessEnvelope() throws Exception {
         mockMvc.perform(post("/api/test/errors/business"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("CONFLICT"))
                 .andExpect(jsonPath("$.message").value("duplicate title"));
+    }
+
+    @Test
+    void hidesInternalApiExceptionMessage() throws Exception {
+        mockMvc.perform(post("/api/test/errors/internal"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
+                .andExpect(jsonPath("$.message").value("internal server error"));
     }
 
     @RestController
@@ -61,6 +83,11 @@ class GlobalExceptionHandlerTest {
         @PostMapping("/api/test/errors/business")
         void conflict() {
             throw new ApiException(ApiErrorCode.CONFLICT, "duplicate title");
+        }
+
+        @PostMapping("/api/test/errors/internal")
+        void internal() {
+            throw new ApiException(ApiErrorCode.INTERNAL_ERROR, "database password leaked");
         }
     }
 
