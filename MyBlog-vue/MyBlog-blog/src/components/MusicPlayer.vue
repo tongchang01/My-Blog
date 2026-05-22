@@ -132,7 +132,7 @@ export default defineComponent({
         order: order.value,
         preload: 'metadata',
         listFolded: true,
-        listMaxHeight: '180px',
+        listMaxHeight: '132px',//控制整个元素的高度，超过这个高度就会出现滚动条
         audio: playlist.value
       })
       handlePlayerInteraction()
