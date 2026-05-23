@@ -92,7 +92,7 @@ MyBlog-springboot-v2
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/config/SecurityJwtProperties.java`
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtPropertiesTest.java`
 
-- [ ] **步骤 1：先写会失败的 JWT 配置绑定测试**
+- [x] **步骤 1：先写会失败的 JWT 配置绑定测试**
 
 创建 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtPropertiesTest.java`：
 
@@ -104,6 +104,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -117,13 +119,13 @@ class JwtPropertiesTest {
     @Test
     void bindsJwtSettings() {
         assertThat(jwtProperties.issuer()).isEqualTo("myblog-v2-test");
-        assertThat(jwtProperties.accessTokenTtl()).isEqualToSeconds(900);
+        assertThat(jwtProperties.accessTokenTtl()).isEqualTo(Duration.ofSeconds(900));
         assertThat(jwtProperties.secret()).hasSizeGreaterThanOrEqualTo(32);
     }
 }
 ```
 
-- [ ] **步骤 2：运行测试，确认它先失败**
+- [x] **步骤 2：运行测试，确认它先失败**
 
 运行：
 
@@ -134,7 +136,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=JwtPropertiesTest
 
 预期：失败，因为 `SecurityJwtProperties` 还不存在。
 
-- [ ] **步骤 3：增加 Spring Security JOSE 依赖**
+- [x] **步骤 3：增加 Spring Security JOSE 依赖**
 
 修改 `MyBlog-springboot-v2/pom.xml`，在 `spring-boot-starter-security` 后加入：
 
@@ -145,7 +147,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=JwtPropertiesTest
 </dependency>
 ```
 
-- [ ] **步骤 4：创建 JWT 配置 record**
+- [x] **步骤 4：创建 JWT 配置 record**
 
 创建 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/config/SecurityJwtProperties.java`：
 
@@ -165,7 +167,7 @@ public record SecurityJwtProperties(
 }
 ```
 
-- [ ] **步骤 5：注册配置类并增加配置项**
+- [x] **步骤 5：注册配置类并增加配置项**
 
 修改 `SecurityConfig.java`，把 `SecurityJwtProperties` 加入配置绑定：
 
@@ -201,7 +203,7 @@ myblog:
       access-token-ttl: 15m
 ```
 
-- [ ] **步骤 6：重新运行配置测试**
+- [x] **步骤 6：重新运行配置测试**
 
 运行：
 
@@ -212,7 +214,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=JwtPropertiesTest
 
 预期：通过。
 
-- [ ] **步骤 7：提交 JWT 配置基线**
+- [x] **步骤 7：提交 JWT 配置基线**
 
 ```powershell
 git add MyBlog-springboot-v2/pom.xml MyBlog-springboot-v2/src/main/resources/application.yml MyBlog-springboot-v2/src/test/resources/application-test.yml MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/config/SecurityJwtProperties.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtPropertiesTest.java

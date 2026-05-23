@@ -1,6 +1,7 @@
 package com.aurora.myblog.v2.common.security;
 
 import com.aurora.myblog.v2.common.config.ApiCorsProperties;
+import com.aurora.myblog.v2.common.config.SecurityJwtProperties;
 import com.aurora.myblog.v2.common.config.SecurityPublicEndpointProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -17,7 +18,11 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import java.util.List;
 
 @Configuration
-@EnableConfigurationProperties({ApiCorsProperties.class, SecurityPublicEndpointProperties.class})
+@EnableConfigurationProperties({
+        ApiCorsProperties.class,
+        SecurityPublicEndpointProperties.class,
+        SecurityJwtProperties.class
+})
 public class SecurityConfig {
 
     @Bean

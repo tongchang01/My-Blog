@@ -11,6 +11,10 @@ myblog:
     allowed-origins:
       - http://localhost:5173
   security:
+    jwt:
+      issuer: myblog-v2-test
+      secret: test-secret-test-secret-test-secret-123456
+      access-token-ttl: 15m
     public-endpoints:
       - /actuator/health
       - /api/public/security-probe

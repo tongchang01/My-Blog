@@ -9,3 +9,10 @@ management:
     web:
       exposure:
         include: health
+
+myblog:
+  security:
+    jwt:
+      issuer: myblog-v2
+      secret: ${MYBLOG_JWT_SECRET:change-me-change-me-change-me-change-me}
+      access-token-ttl: 15m
