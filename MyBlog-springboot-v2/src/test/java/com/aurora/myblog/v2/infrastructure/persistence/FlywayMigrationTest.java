@@ -1,4 +1,4 @@
-package com.aurora.myblog.v2.common.database;
+package com.aurora.myblog.v2.infrastructure.persistence;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
