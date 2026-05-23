@@ -87,9 +87,13 @@ MyBlog-springboot-v2
 **文件：**
 
 - 修改：`MyBlog-springboot-v2/pom.xml`
+
 - 修改：`MyBlog-springboot-v2/src/main/resources/application.yml`
+
 - 修改：`MyBlog-springboot-v2/src/test/resources/application-test.yml`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/config/SecurityJwtProperties.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtPropertiesTest.java`
 
 - [x] **步骤 1：先写会失败的 JWT 配置绑定测试**
@@ -226,11 +230,17 @@ git commit -m "新增后端V2 JWT配置基线"
 **文件：**
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/AuthRole.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/AuthenticatedUser.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/LoginCommand.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/UserCredentialReader.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/ConfiguredIdentityProperties.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/ConfiguredUserCredentialReader.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/ConfiguredUserCredentialReaderTest.java`
 
 - [x] **步骤 1：先写会失败的本地账号适配器测试**
@@ -438,13 +448,18 @@ git commit -m "新增后端V2身份模型基线"
 **文件：**
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/TokenClaims.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/TokenPair.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/TokenRevocationStore.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/support/InMemoryTokenRevocationStore.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/JwtTokenService.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtTokenServiceTest.java`
 
-- [ ] **步骤 1：先写会失败的 token 服务测试**
+- [x] **步骤 1：先写会失败的 token 服务测试**
 
 创建 `JwtTokenServiceTest.java`：
 
@@ -454,12 +469,10 @@ package com.aurora.myblog.v2.common.security;
 import com.aurora.myblog.v2.common.config.SecurityJwtProperties;
 import com.aurora.myblog.v2.common.security.auth.JwtTokenService;
 import com.aurora.myblog.v2.common.security.support.InMemoryTokenRevocationStore;
-import com.aurora.myblog.v2.modules.identity.domain.AuthRole;
-import com.aurora.myblog.v2.modules.identity.domain.AuthenticatedUser;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.util.Set;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -471,21 +484,17 @@ class JwtTokenServiceTest {
 
     @Test
     void issuesAndParsesAccessToken() {
-        AuthenticatedUser user = new AuthenticatedUser("user-1", "admin@example.com", Set.of(AuthRole.ADMIN));
-
-        var token = tokenService.issueAccessToken(user);
+        var token = tokenService.issueAccessToken("user-1", "admin@example.com", List.of("ADMIN"));
         var claims = tokenService.parse(token.accessToken()).orElseThrow();
 
         assertThat(claims.userId()).isEqualTo("user-1");
         assertThat(claims.username()).isEqualTo("admin@example.com");
-        assertThat(claims.roles()).containsExactly(AuthRole.ADMIN);
+        assertThat(claims.roles()).containsExactly("ADMIN");
     }
 
     @Test
     void revokedTokenCannotBeParsed() {
-        AuthenticatedUser user = new AuthenticatedUser("user-1", "admin@example.com", Set.of(AuthRole.ADMIN));
-
-        var token = tokenService.issueAccessToken(user);
+        var token = tokenService.issueAccessToken("user-1", "admin@example.com", List.of("ADMIN"));
         tokenService.revoke(token.accessToken());
 
         assertThat(tokenService.parse(token.accessToken())).isEmpty();
@@ -493,7 +502,7 @@ class JwtTokenServiceTest {
 }
 ```
 
-- [ ] **步骤 2：运行测试，确认它先失败**
+- [x] **步骤 2：运行测试，确认它先失败**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -502,14 +511,12 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=JwtTokenServiceTest
 
 预期：失败，因为 token 类型和服务还不存在。
 
-- [ ] **步骤 3：创建 token 数据类型与撤销接口**
+- [x] **步骤 3：创建 token 数据类型与撤销接口**
 
 创建 `TokenClaims.java`：
 
 ```java
 package com.aurora.myblog.v2.common.security.auth;
-
-import com.aurora.myblog.v2.modules.identity.domain.AuthRole;
 
 import java.time.Instant;
 import java.util.List;
@@ -518,7 +525,7 @@ public record TokenClaims(
         String tokenId,
         String userId,
         String username,
-        List<AuthRole> roles,
+        List<String> roles,
         Instant expiresAt
 ) {
 }
@@ -586,7 +593,7 @@ public class InMemoryTokenRevocationStore implements TokenRevocationStore {
 }
 ```
 
-- [ ] **步骤 4：实现 JWT token 服务**
+- [x] **步骤 4：实现 JWT token 服务**
 
 创建 `JwtTokenService.java`：
 
@@ -594,19 +601,21 @@ public class InMemoryTokenRevocationStore implements TokenRevocationStore {
 package com.aurora.myblog.v2.common.security.auth;
 
 import com.aurora.myblog.v2.common.config.SecurityJwtProperties;
-import com.aurora.myblog.v2.modules.identity.domain.AuthRole;
-import com.aurora.myblog.v2.modules.identity.domain.AuthenticatedUser;
+import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -624,12 +633,14 @@ public class JwtTokenService {
     public JwtTokenService(SecurityJwtProperties properties, TokenRevocationStore revocationStore) {
         this.properties = properties;
         this.revocationStore = revocationStore;
-        SecretKey secretKey = new SecretKeySpec(properties.secret().getBytes(), HMAC_ALGORITHM);
-        this.jwtEncoder = new NimbusJwtEncoder(new com.nimbusds.jose.jwk.source.ImmutableSecret<>(secretKey));
-        this.jwtDecoder = NimbusJwtDecoder.withSecretKey(secretKey).build();
+        SecretKey secretKey = new SecretKeySpec(properties.secret().getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM);
+        this.jwtEncoder = new NimbusJwtEncoder(new ImmutableSecret<>(secretKey));
+        this.jwtDecoder = NimbusJwtDecoder.withSecretKey(secretKey)
+                .macAlgorithm(MacAlgorithm.HS256)
+                .build();
     }
 
-    public TokenPair issueAccessToken(AuthenticatedUser user) {
+    public TokenPair issueAccessToken(String userId, String username, List<String> roles) {
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(properties.accessTokenTtl());
         String tokenId = UUID.randomUUID().toString();
@@ -638,12 +649,13 @@ public class JwtTokenService {
                 .issuedAt(issuedAt)
                 .expiresAt(expiresAt)
                 .id(tokenId)
-                .subject(user.id())
-                .claim("username", user.username())
-                .claim("roles", user.roles().stream().map(AuthRole::name).toList())
+                .subject(userId)
+                .claim("username", username)
+                .claim("roles", roles)
                 .build();
-        String token = jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
-        return new TokenPair(token, expiresAt);
+        JwsHeader header = JwsHeader.with(MacAlgorithm.HS256).build();
+        String accessToken = jwtEncoder.encode(JwtEncoderParameters.from(header, claims)).getTokenValue();
+        return new TokenPair(accessToken, expiresAt);
     }
 
     public Optional<TokenClaims> parse(String token) {
@@ -652,14 +664,11 @@ public class JwtTokenService {
             if (revocationStore.isRevoked(jwt.getId())) {
                 return Optional.empty();
             }
-            List<AuthRole> roles = jwt.getClaimAsStringList("roles").stream()
-                    .map(AuthRole::valueOf)
-                    .toList();
             return Optional.of(new TokenClaims(
                     jwt.getId(),
                     jwt.getSubject(),
                     jwt.getClaimAsString("username"),
-                    roles,
+                    readRoles(jwt),
                     jwt.getExpiresAt()));
         } catch (RuntimeException ex) {
             return Optional.empty();
@@ -669,10 +678,18 @@ public class JwtTokenService {
     public void revoke(String token) {
         parse(token).ifPresent(claims -> revocationStore.revoke(claims.tokenId(), claims.expiresAt()));
     }
+
+    private List<String> readRoles(Jwt jwt) {
+        List<String> roleNames = jwt.getClaimAsStringList("roles");
+        if (roleNames == null) {
+            return List.of();
+        }
+        return List.copyOf(roleNames);
+    }
 }
 ```
 
-- [ ] **步骤 5：重新运行 token 服务测试**
+- [x] **步骤 5：重新运行 token 服务测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -681,7 +698,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=JwtTokenServiceTest
 
 预期：通过。
 
-- [ ] **步骤 6：提交 token 服务**
+- [x] **步骤 6：提交 token 服务**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/support MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtTokenServiceTest.java
@@ -693,11 +710,17 @@ git commit -m "新增后端V2 JWT令牌服务"
 **文件：**
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/AuthService.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/LoginRequest.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/LoginResponse.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/MeResponse.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/AuthController.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthServiceTest.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`
 
 - [ ] **步骤 1：先写会失败的登录服务测试**
@@ -981,10 +1004,15 @@ git commit -m "新增后端V2登录用例"
 **文件：**
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/CurrentUser.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/CurrentUserArgumentResolver.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/JwtAuthenticationFilter.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/SecurityProblemSupport.java`
+
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/SecurityConfig.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtAuthenticationFilterTest.java`
 
 - [ ] **步骤 1：先写会失败的鉴权链路测试**
@@ -1269,7 +1297,9 @@ git commit -m "接入后端V2 Bearer认证链路"
 **文件：**
 
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/SecurityProbeController.java`
+
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/SecurityConfigTest.java`
+
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`
 
 - [ ] **步骤 1：先写角色授权失败测试**
@@ -1399,6 +1429,7 @@ git commit -m "补齐后端V2认证授权回归"
 **文件：**
 
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/ArchitectureRulesTest.java`
+
 - 验证：`MyBlog-springboot-v2/**`
 
 - [ ] **步骤 1：增加认证边界架构规则**
