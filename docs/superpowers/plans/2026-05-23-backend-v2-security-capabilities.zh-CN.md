@@ -233,7 +233,7 @@ git commit -m "新增后端V2 JWT配置基线"
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/ConfiguredUserCredentialReader.java`
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/ConfiguredUserCredentialReaderTest.java`
 
-- [ ] **步骤 1：先写会失败的本地账号适配器测试**
+- [x] **步骤 1：先写会失败的本地账号适配器测试**
 
 创建 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/ConfiguredUserCredentialReaderTest.java`：
 
@@ -269,7 +269,7 @@ class ConfiguredUserCredentialReaderTest {
 }
 ```
 
-- [ ] **步骤 2：运行测试，确认它先失败**
+- [x] **步骤 2：运行测试，确认它先失败**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -278,7 +278,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=ConfiguredUserCredentialReaderTe
 
 预期：失败，因为身份领域模型和本地账号适配器还不存在。
 
-- [ ] **步骤 3：创建身份领域类型**
+- [x] **步骤 3：创建身份领域类型**
 
 创建 `AuthRole.java`：
 
@@ -334,7 +334,7 @@ public interface UserCredentialReader {
 }
 ```
 
-- [ ] **步骤 4：创建配置账号适配器**
+- [x] **步骤 4：创建配置账号适配器**
 
 创建 `ConfiguredIdentityProperties.java`：
 
@@ -349,7 +349,14 @@ import java.util.List;
 @ConfigurationProperties("myblog.identity")
 public record ConfiguredIdentityProperties(List<User> users) {
 
+    public ConfiguredIdentityProperties {
+        users = users == null ? List.of() : List.copyOf(users);
+    }
+
     public record User(String id, String username, String passwordHash, List<AuthRole> roles) {
+        public User {
+            roles = roles == null ? List.of() : List.copyOf(roles);
+        }
     }
 }
 ```
@@ -393,7 +400,7 @@ public class ConfiguredUserCredentialReader implements UserCredentialReader {
 }
 ```
 
-- [ ] **步骤 5：增加测试账号配置**
+- [x] **步骤 5：增加测试账号配置**
 
 在 `application-test.yml` 中增加：
 
@@ -410,7 +417,7 @@ myblog:
 
 该 hash 对应明文密码 `password123`，只允许用于测试 profile。
 
-- [ ] **步骤 6：重新运行本地账号测试**
+- [x] **步骤 6：重新运行本地账号测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -419,7 +426,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=ConfiguredUserCredentialReaderTe
 
 预期：通过。
 
-- [ ] **步骤 7：提交身份模型基线**
+- [x] **步骤 7：提交身份模型基线**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity MyBlog-springboot-v2/src/test/resources/application-test.yml

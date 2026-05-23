@@ -10,6 +10,13 @@ myblog:
   cors:
     allowed-origins:
       - http://localhost:5173
+  identity:
+    users:
+      - id: test-admin
+        username: admin@example.com
+        password-hash: $2a$10$djjHOm86X5nKsIY0Zv0lO.iLoVuEO5J6mkBGdf1G.i/8qHL7IaOxy
+        roles:
+          - ADMIN
   security:
     jwt:
       issuer: myblog-v2-test
