@@ -11,8 +11,14 @@ management:
         include: health
 
 myblog:
+  cors:
+    allowed-origins:
+      - http://localhost:5173
   security:
     jwt:
       issuer: myblog-v2
       secret: ${MYBLOG_JWT_SECRET:change-me-change-me-change-me-change-me}
       access-token-ttl: 15m
+    public-endpoints:
+      - /actuator/health
+      - /api/auth/login

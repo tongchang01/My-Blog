@@ -25,3 +25,4 @@ myblog:
     public-endpoints:
       - /actuator/health
       - /api/public/security-probe
+      - /api/auth/login

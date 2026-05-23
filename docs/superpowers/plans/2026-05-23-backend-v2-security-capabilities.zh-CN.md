@@ -711,6 +711,10 @@ git commit -m "新增后端V2 JWT令牌服务"
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/AuthService.java`
 
+- 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/AuthTokenService.java`
+
+- 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/infrastructure/security/JwtAuthTokenServiceAdapter.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/LoginRequest.java`
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/LoginResponse.java`
@@ -723,7 +727,13 @@ git commit -m "新增后端V2 JWT令牌服务"
 
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`
 
-- [ ] **步骤 1：先写会失败的登录服务测试**
+实施调整：
+
+- `common.security` 是安全实现包，`modules.identity` 不能直接依赖它；实际实现中通过 identity 自己的 `AuthTokenService` 端口和 `infrastructure.security.JwtAuthTokenServiceAdapter` 连接 JWT 服务。
+- `/api/auth/me` 依赖任务 5 的 Bearer 过滤器与 `@CurrentUser` 参数解析器，本任务先保留 `MeResponse` DTO，不提前实现 `/me`。
+- 登录接口必须公开访问，因此本任务同步关闭 stateless API 的 CSRF，并把 `/api/auth/login` 加入公开端点。
+
+- [x] **步骤 1：先写会失败的登录服务测试**
 
 创建 `AuthServiceTest.java`：
 
@@ -780,7 +790,7 @@ class AuthServiceTest {
 }
 ```
 
-- [ ] **步骤 2：运行服务测试，确认它先失败**
+- [x] **步骤 2：运行服务测试，确认它先失败**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -789,7 +799,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=AuthServiceTest
 
 预期：失败，因为 `AuthService` 和 API 类型还不存在。
 
-- [ ] **步骤 3：实现登录服务和密码编码器**
+- [x] **步骤 3：实现登录服务和密码编码器**
 
 修改 `SecurityConfig.java`，增加密码编码器 Bean：
 
@@ -814,8 +824,6 @@ package com.aurora.myblog.v2.modules.identity.application;
 
 import com.aurora.myblog.v2.common.error.ApiErrorCode;
 import com.aurora.myblog.v2.common.error.ApiException;
-import com.aurora.myblog.v2.common.security.auth.JwtTokenService;
-import com.aurora.myblog.v2.common.security.auth.TokenPair;
 import com.aurora.myblog.v2.modules.identity.domain.AuthenticatedUser;
 import com.aurora.myblog.v2.modules.identity.domain.LoginCommand;
 import com.aurora.myblog.v2.modules.identity.domain.UserCredentialReader;
@@ -829,9 +837,9 @@ public class AuthService {
 
     private final UserCredentialReader credentialReader;
     private final PasswordEncoder passwordEncoder;
-    private final JwtTokenService tokenService;
+    private final AuthTokenService tokenService;
 
-    public AuthService(UserCredentialReader credentialReader, PasswordEncoder passwordEncoder, JwtTokenService tokenService) {
+    public AuthService(UserCredentialReader credentialReader, PasswordEncoder passwordEncoder, AuthTokenService tokenService) {
         this.credentialReader = credentialReader;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
@@ -845,7 +853,7 @@ public class AuthService {
                 credential.id(),
                 credential.username(),
                 Set.copyOf(credential.roles()));
-        TokenPair token = tokenService.issueAccessToken(user);
+        AuthTokenService.TokenIssueResult token = tokenService.issueAccessToken(user);
         return new LoginResult(user, token);
     }
 
@@ -853,7 +861,7 @@ public class AuthService {
         tokenService.revoke(accessToken);
     }
 
-    public record LoginResult(AuthenticatedUser user, TokenPair token) {
+    public record LoginResult(AuthenticatedUser user, AuthTokenService.TokenIssueResult token) {
     }
 }
 ```
@@ -882,7 +890,7 @@ ResponseEntity<ApiResponse<Void>> handleApiException(ApiException ex) {
 }
 ```
 
-- [ ] **步骤 4：创建 API DTO 与 Controller**
+- [x] **步骤 4：创建 API DTO 与 Controller**
 
 创建 `LoginRequest.java`：
 
@@ -936,14 +944,11 @@ public record MeResponse(String id, String username, Set<AuthRole> roles) {
 ```java
 package com.aurora.myblog.v2.modules.identity.api;
 
-import com.aurora.myblog.v2.common.security.auth.CurrentUser;
 import com.aurora.myblog.v2.common.web.ApiResponse;
 import com.aurora.myblog.v2.modules.identity.application.AuthService;
-import com.aurora.myblog.v2.modules.identity.domain.AuthenticatedUser;
 import com.aurora.myblog.v2.modules.identity.domain.LoginCommand;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -970,11 +975,6 @@ public class AuthController {
         return ApiResponse.ok(new LoginResponse(result.token().accessToken(), result.token().expiresAt(), user));
     }
 
-    @GetMapping("/me")
-    ApiResponse<MeResponse> me(@CurrentUser AuthenticatedUser user) {
-        return ApiResponse.ok(new MeResponse(user.id(), user.username(), user.roles()));
-    }
-
     @PostMapping("/logout")
     ApiResponse<Void> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         authService.logout(authorization.replaceFirst("Bearer ", ""));
@@ -983,7 +983,7 @@ public class AuthController {
 }
 ```
 
-- [ ] **步骤 5：重新运行登录服务测试**
+- [x] **步骤 5：重新运行登录服务测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -992,7 +992,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=AuthServiceTest
 
 预期：通过。
 
-- [ ] **步骤 6：提交登录用例**
+- [x] **步骤 6：提交登录用例**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/error/ApiErrorCode.java
