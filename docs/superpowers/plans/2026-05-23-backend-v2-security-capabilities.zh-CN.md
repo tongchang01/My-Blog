@@ -1003,9 +1003,11 @@ git commit -m "新增后端V2登录用例"
 
 **文件：**
 
-- 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/CurrentUser.java`
+- 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/auth/AuthenticatedPrincipal.java`
 
-- 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/CurrentUserArgumentResolver.java`
+- 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/auth/CurrentUser.java`
+
+- 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/auth/CurrentUserArgumentResolver.java`
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/auth/JwtAuthenticationFilter.java`
 
@@ -1013,9 +1015,17 @@ git commit -m "新增后端V2登录用例"
 
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security/SecurityConfig.java`
 
+- 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/AuthController.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtAuthenticationFilterTest.java`
 
-- [ ] **步骤 1：先写会失败的鉴权链路测试**
+实施调整：
+
+- 为遵守架构规则，`common.security` 不直接依赖 `modules.identity`；过滤器解析出的当前用户使用 `common.auth.AuthenticatedPrincipal` 表达。
+- `modules.identity` 不依赖 `common.security`，控制器只依赖 `common.auth.CurrentUser` 和公共认证主体。
+- `JwtAuthenticationFilter` 与 `SecurityProblemSupport` 由 `SecurityConfig` 显式创建，避免 `@WebMvcTest` 切片测试被完整 JWT 实现拖入。
+
+- [x] **步骤 1：先写会失败的鉴权链路测试**
 
 创建 `JwtAuthenticationFilterTest.java`：
 
@@ -1067,7 +1077,7 @@ class JwtAuthenticationFilterTest {
 }
 ```
 
-- [ ] **步骤 2：运行测试，确认它先失败**
+- [x] **步骤 2：运行测试，确认它先失败**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -1076,7 +1086,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=JwtAuthenticationFilterTest
 
 预期：失败，因为 Bearer 过滤器和 `@CurrentUser` 解析器还不存在。
 
-- [ ] **步骤 3：实现当前用户注解和解析器**
+- [x] **步骤 3：实现当前用户注解和解析器**
 
 创建 `CurrentUser.java`：
 
@@ -1140,7 +1150,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
 }
 ```
 
-- [ ] **步骤 4：实现 Bearer JWT 过滤器**
+- [x] **步骤 4：实现 Bearer JWT 过滤器**
 
 创建 `JwtAuthenticationFilter.java`：
 
@@ -1194,7 +1204,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 }
 ```
 
-- [ ] **步骤 5：实现统一安全错误响应并接入安全配置**
+- [x] **步骤 5：实现统一安全错误响应并接入安全配置**
 
 创建 `SecurityProblemSupport.java`：
 
@@ -1276,7 +1286,7 @@ myblog:
       - /api/auth/login
 ```
 
-- [ ] **步骤 6：重新运行鉴权链路测试**
+- [x] **步骤 6：重新运行鉴权链路测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -1285,7 +1295,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=JwtAuthenticationFilterTest
 
 预期：通过。
 
-- [ ] **步骤 7：提交 Bearer 安全链路**
+- [x] **步骤 7：提交 Bearer 安全链路**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/security MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security MyBlog-springboot-v2/src/test/resources/application-test.yml

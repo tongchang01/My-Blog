@@ -1,10 +1,14 @@
 package com.aurora.myblog.v2.modules.identity.api;
 
+import com.aurora.myblog.v2.common.auth.AuthenticatedPrincipal;
+import com.aurora.myblog.v2.common.auth.CurrentUser;
 import com.aurora.myblog.v2.common.web.ApiResponse;
 import com.aurora.myblog.v2.modules.identity.application.AuthService;
+import com.aurora.myblog.v2.modules.identity.domain.AuthRole;
 import com.aurora.myblog.v2.modules.identity.domain.LoginCommand;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -29,6 +33,14 @@ public class AuthController {
                 result.user().username(),
                 result.user().roles());
         return ApiResponse.ok(new LoginResponse(result.token().accessToken(), result.token().expiresAt(), user));
+    }
+
+    @GetMapping("/me")
+    ApiResponse<MeResponse> me(@CurrentUser AuthenticatedPrincipal user) {
+        return ApiResponse.ok(new MeResponse(
+                user.id(),
+                user.username(),
+                user.roles().stream().map(AuthRole::valueOf).collect(java.util.stream.Collectors.toSet())));
     }
 
     @PostMapping("/logout")
