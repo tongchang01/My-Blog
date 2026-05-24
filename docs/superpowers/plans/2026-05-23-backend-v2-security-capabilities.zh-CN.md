@@ -730,7 +730,9 @@ git commit -m "新增后端V2 JWT令牌服务"
 实施调整：
 
 - `common.security` 是安全实现包，`modules.identity` 不能直接依赖它；实际实现中通过 identity 自己的 `AuthTokenService` 端口和 `infrastructure.security.JwtAuthTokenServiceAdapter` 连接 JWT 服务。
+
 - `/api/auth/me` 依赖任务 5 的 Bearer 过滤器与 `@CurrentUser` 参数解析器，本任务先保留 `MeResponse` DTO，不提前实现 `/me`。
+
 - 登录接口必须公开访问，因此本任务同步关闭 stateless API 的 CSRF，并把 `/api/auth/login` 加入公开端点。
 
 - [x] **步骤 1：先写会失败的登录服务测试**
@@ -1022,7 +1024,9 @@ git commit -m "新增后端V2登录用例"
 实施调整：
 
 - 为遵守架构规则，`common.security` 不直接依赖 `modules.identity`；过滤器解析出的当前用户使用 `common.auth.AuthenticatedPrincipal` 表达。
+
 - `modules.identity` 不依赖 `common.security`，控制器只依赖 `common.auth.CurrentUser` 和公共认证主体。
+
 - `JwtAuthenticationFilter` 与 `SecurityProblemSupport` 由 `SecurityConfig` 显式创建，避免 `@WebMvcTest` 切片测试被完整 JWT 实现拖入。
 
 - [x] **步骤 1：先写会失败的鉴权链路测试**
@@ -1312,7 +1316,7 @@ git commit -m "接入后端V2 Bearer认证链路"
 
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`
 
-- [ ] **步骤 1：先写角色授权失败测试**
+- [x] **步骤 1：先写角色授权失败测试**
 
 修改 `SecurityConfigTest.java`，增加：
 
@@ -1330,11 +1334,11 @@ void returnsForbiddenWhenRoleIsInsufficient() throws Exception {
 
     mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
             .andExpect(status().isForbidden())
-            .andExpect(jsonPath("$.code").value("AUTH_003"));
+            .andExpect(jsonPath("$.code").value("FORBIDDEN"));
 }
 ```
 
-- [ ] **步骤 2：运行测试，确认它先失败**
+- [x] **步骤 2：运行测试，确认它先失败**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -1343,7 +1347,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=SecurityConfigTest
 
 预期：失败，因为测试 profile 还没有普通用户账号，或后台探针授权规则还没覆盖该路径。
 
-- [ ] **步骤 3：补测试用户和后台探针断言**
+- [x] **步骤 3：补测试用户和后台探针断言**
 
 在 `application-test.yml` 中增加普通用户：
 
@@ -1360,7 +1364,7 @@ myblog:
 
 保留已有 `admin@example.com`，不要删除。
 
-- [ ] **步骤 4：补认证 API 测试**
+- [x] **步骤 4：补认证 API 测试**
 
 创建或完善 `AuthControllerTest.java`：
 
@@ -1403,9 +1407,9 @@ class AuthControllerTest {
     void loginFailureDoesNotRevealAccountExistence() throws Exception {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"missing@example.com\",\"password\":\"wrong\"}"))
+                .content("{\"username\":\"missing@example.com\",\"password\":\"wrong\"}"))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code").value("AUTH_001"))
+                .andExpect(jsonPath("$.code").value("BAD_CREDENTIALS"))
                 .andExpect(jsonPath("$.message").value("用户名或密码错误"));
     }
 
@@ -1413,12 +1417,12 @@ class AuthControllerTest {
     void meRequiresBearerToken() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.code").value("AUTH_002"));
+                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
     }
 }
 ```
 
-- [ ] **步骤 5：重新运行认证与授权测试**
+- [x] **步骤 5：重新运行认证与授权测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -1427,7 +1431,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=AuthControllerTest,SecurityConfi
 
 预期：通过。
 
-- [ ] **步骤 6：提交认证 API 回归测试**
+- [x] **步骤 6：提交认证 API 回归测试**
 
 ```powershell
 git add MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/SecurityConfigTest.java MyBlog-springboot-v2/src/test/resources/application-test.yml

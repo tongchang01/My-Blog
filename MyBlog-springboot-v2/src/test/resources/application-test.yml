@@ -17,6 +17,11 @@ myblog:
         password-hash: $2a$10$djjHOm86X5nKsIY0Zv0lO.iLoVuEO5J6mkBGdf1G.i/8qHL7IaOxy
         roles:
           - ADMIN
+      - id: test-user
+        username: user@example.com
+        password-hash: $2a$10$djjHOm86X5nKsIY0Zv0lO.iLoVuEO5J6mkBGdf1G.i/8qHL7IaOxy
+        roles:
+          - USER
   security:
     jwt:
       issuer: myblog-v2-test
