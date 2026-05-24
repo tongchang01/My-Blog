@@ -217,7 +217,7 @@ git commit -m "配置后端V2本地数据库连接"
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/RoleNameMapper.java`
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/RoleNameMapperTest.java`
 
-- [ ] **步骤 1：先写角色映射失败测试**
+- [x] **步骤 1：先写角色映射失败测试**
 
 创建 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/RoleNameMapperTest.java`：
 
@@ -250,7 +250,7 @@ class RoleNameMapperTest {
 }
 ```
 
-- [ ] **步骤 2：运行测试，确认先失败**
+- [x] **步骤 2：运行测试，确认先失败**
 
 运行：
 
@@ -261,7 +261,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=RoleNameMapperTest
 
 预期：编译失败，因为 `RoleNameMapper` 还不存在。
 
-- [ ] **步骤 3：实现角色映射器**
+- [x] **步骤 3：实现角色映射器**
 
 创建 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/RoleNameMapper.java`：
 
@@ -303,7 +303,7 @@ public final class RoleNameMapper {
 }
 ```
 
-- [ ] **步骤 4：新增 H2 测试迁移，模拟旧身份表**
+- [x] **步骤 4：新增 H2 测试迁移，模拟旧身份表**
 
 创建 `MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql`：
 
@@ -376,7 +376,7 @@ values
 
 说明：`$2a$10$djjHOm86X5nKsIY0Zv0lO.iLoVuEO5J6mkBGdf1G.i/8qHL7IaOxy` 对应明文密码 `password123`，只用于测试。
 
-- [ ] **步骤 5：运行角色映射测试**
+- [x] **步骤 5：运行角色映射测试**
 
 运行：
 
@@ -387,18 +387,18 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=RoleNameMapperTest
 
 预期：通过。
 
-- [ ] **步骤 6：运行 Flyway 测试，确认测试迁移可执行**
+- [x] **步骤 6：运行 Flyway 测试，确认测试迁移可执行**
 
 运行：
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
-mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=FlywayMigrationTest,MyBlogV2ApplicationTest
+mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=FlywayMigrationTest,MyBlogV2ApplicationTest'
 ```
 
 预期：通过。
 
-- [ ] **步骤 7：提交测试身份表和角色映射**
+- [x] **步骤 7：提交测试身份表和角色映射**
 
 ```powershell
 git add MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/RoleNameMapper.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/RoleNameMapperTest.java
