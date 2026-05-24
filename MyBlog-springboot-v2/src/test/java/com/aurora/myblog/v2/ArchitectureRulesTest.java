@@ -24,6 +24,18 @@ class ArchitectureRulesTest {
                     .that().resideInAPackage("..common..")
                     .should().dependOnClassesThat().resideInAPackage("..modules..");
 
+    @ArchTest
+    static final ArchRule identity_domain_does_not_depend_on_spring_security =
+            noClasses()
+                    .that().resideInAPackage("..modules.identity.domain..")
+                    .should().dependOnClassesThat().resideInAPackage("org.springframework.security..");
+
+    @ArchTest
+    static final ArchRule common_security_does_not_depend_on_identity_infrastructure =
+            noClasses()
+                    .that().resideInAPackage("..common.security..")
+                    .should().dependOnClassesThat().resideInAPackage("..modules.identity.infrastructure..");
+
     @Test
     void declaresInitialArchitectureBoundaryPackages() {
         assertThatCode(() -> Class.forName("com.aurora.myblog.v2.modules.package-info"))

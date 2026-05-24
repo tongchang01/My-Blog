@@ -1446,7 +1446,7 @@ git commit -m "补齐后端V2认证授权回归"
 
 - 验证：`MyBlog-springboot-v2/**`
 
-- [ ] **步骤 1：增加认证边界架构规则**
+- [x] **步骤 1：增加认证边界架构规则**
 
 修改 `ArchitectureRulesTest.java`，增加：
 
@@ -1464,7 +1464,7 @@ static final ArchRule common_security_does_not_depend_on_identity_infrastructure
                 .should().dependOnClassesThat().resideInAPackage("..modules.identity.infrastructure..");
 ```
 
-- [ ] **步骤 2：运行架构测试**
+- [x] **步骤 2：运行架构测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -1473,7 +1473,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=ArchitectureRulesTest
 
 预期：通过。身份领域模型不依赖 Spring Security，公共安全层不反向依赖 identity 的基础设施适配器。
 
-- [ ] **步骤 3：运行完整测试**
+- [x] **步骤 3：运行完整测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -1482,7 +1482,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test
 
 预期：全部测试通过。
 
-- [ ] **步骤 4：运行打包验证**
+- [x] **步骤 4：运行打包验证**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -1491,7 +1491,7 @@ mvn -f MyBlog-springboot-v2/pom.xml clean package
 
 预期：构建通过，生成 `MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar`。
 
-- [ ] **步骤 5：提交架构规则和验证交接**
+- [x] **步骤 5：提交架构规则和验证交接**
 
 如果只新增架构规则：
 
