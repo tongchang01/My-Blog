@@ -126,7 +126,7 @@ MyBlog-springboot-v2
 - 修改：`MyBlog-springboot-v2/src/main/resources/application-local.yml`
 - 修改：`MyBlog-springboot-v2/src/test/resources/application-test.yml`
 
-- [ ] **步骤 1：先确认当前测试仍通过**
+- [x] **步骤 1：先确认当前测试仍通过**
 
 运行：
 
@@ -137,7 +137,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test
 
 预期：通过。若失败，先停下排查，因为本任务不应该建立在红灯测试上。
 
-- [ ] **步骤 2：增加 MySQL JDBC 驱动**
+- [x] **步骤 2：增加 MySQL JDBC 驱动**
 
 修改 `MyBlog-springboot-v2/pom.xml`，在 `spring-boot-starter-jdbc` 后加入：
 
@@ -149,7 +149,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test
 </dependency>
 ```
 
-- [ ] **步骤 3：配置本地 MySQL datasource，并关闭本地 Flyway**
+- [x] **步骤 3：配置本地 MySQL datasource，并关闭本地 Flyway**
 
 修改 `MyBlog-springboot-v2/src/main/resources/application-local.yml`：
 
@@ -177,7 +177,7 @@ myblog:
 
 说明：密码先放在本地 profile 默认值里是为了配合当前开发机验证。后续提交前如果你希望更严格，可以改成只允许环境变量。
 
-- [ ] **步骤 4：确认测试 profile 仍然使用 H2 和 Flyway**
+- [x] **步骤 4：确认测试 profile 仍然使用 H2 和 Flyway**
 
 检查 `MyBlog-springboot-v2/src/test/resources/application-test.yml` 保持如下 datasource 和 Flyway 配置：
 
@@ -191,7 +191,7 @@ spring:
     enabled: true
 ```
 
-- [ ] **步骤 5：运行测试确认配置没有破坏测试环境**
+- [x] **步骤 5：运行测试确认配置没有破坏测试环境**
 
 运行：
 
@@ -202,7 +202,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test
 
 预期：通过。
 
-- [ ] **步骤 6：提交数据库连接配置**
+- [x] **步骤 6：提交数据库连接配置**
 
 ```powershell
 git add MyBlog-springboot-v2/pom.xml MyBlog-springboot-v2/src/main/resources/application-local.yml MyBlog-springboot-v2/src/test/resources/application-test.yml
