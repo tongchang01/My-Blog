@@ -412,7 +412,7 @@ git commit -m "新增后端V2旧角色映射规则"
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseUserCredentialReader.java`
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseUserCredentialReaderTest.java`
 
-- [ ] **步骤 1：先写数据库读取失败测试**
+- [x] **步骤 1：先写数据库读取失败测试**
 
 创建 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseUserCredentialReaderTest.java`：
 
@@ -468,7 +468,7 @@ class DatabaseUserCredentialReaderTest {
 }
 ```
 
-- [ ] **步骤 2：运行测试，确认先失败**
+- [x] **步骤 2：运行测试，确认先失败**
 
 运行：
 
@@ -479,7 +479,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=DatabaseUserCredentialReaderTest
 
 预期：编译失败，因为 `DatabaseUserCredentialReader` 还不存在。
 
-- [ ] **步骤 3：实现数据库身份读取适配器**
+- [x] **步骤 3：实现数据库身份读取适配器**
 
 创建 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseUserCredentialReader.java`：
 
@@ -488,15 +488,11 @@ package com.aurora.myblog.v2.modules.identity.infrastructure;
 
 import com.aurora.myblog.v2.modules.identity.domain.AuthRole;
 import com.aurora.myblog.v2.modules.identity.domain.UserCredentialReader;
-import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
-@Primary
-@Component
 public class DatabaseUserCredentialReader implements UserCredentialReader {
 
     private final JdbcTemplate jdbcTemplate;
@@ -553,9 +549,9 @@ public class DatabaseUserCredentialReader implements UserCredentialReader {
 }
 ```
 
-说明：这里返回的 `id` 使用旧表 `t_user_auth.id`，与旧 JWT subject 语义一致；角色关系通过 `user_info_id` 连接 `t_user_role.user_id`。
+说明：这里返回的 `id` 使用旧表 `t_user_auth.id`，与旧 JWT subject 语义一致；角色关系通过 `user_info_id` 连接 `t_user_role.user_id`。本任务只实现适配器并通过测试导入，不把它注册成默认 `UserCredentialReader` Bean；默认登录来源切换留到任务 4 完成，避免任务 3 结束时破坏现有配置账号回归测试。
 
-- [ ] **步骤 4：运行数据库读取测试**
+- [x] **步骤 4：运行数据库读取测试**
 
 运行：
 
@@ -566,7 +562,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=DatabaseUserCredentialReaderTest
 
 预期：通过。
 
-- [ ] **步骤 5：提交数据库身份读取适配器**
+- [x] **步骤 5：提交数据库身份读取适配器**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseUserCredentialReader.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseUserCredentialReaderTest.java
