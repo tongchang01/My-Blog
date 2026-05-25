@@ -741,7 +741,7 @@ git commit -m "切换后端V2登录为数据库账号"
 - 验证：`MyBlog-springboot-v2/**`
 - 可选修改：`docs/superpowers/plans/2026-05-24-backend-v2-database-identity-login.zh-CN.md`
 
-- [ ] **步骤 1：运行全量测试**
+- [x] **步骤 1：运行全量测试**
 
 运行：
 
@@ -752,7 +752,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test
 
 预期：通过。
 
-- [ ] **步骤 2：运行打包验证**
+- [x] **步骤 2：运行打包验证**
 
 运行：
 
@@ -767,7 +767,7 @@ mvn -f MyBlog-springboot-v2/pom.xml clean package
 MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar
 ```
 
-- [ ] **步骤 3：只读确认本地 MySQL 旧账号存在**
+- [x] **步骤 3：只读确认本地 MySQL 旧账号存在**
 
 运行：
 
@@ -778,7 +778,7 @@ mysql -h 127.0.0.1 -P 3306 -u root --default-character-set=utf8mb4 -N aurora -e 
 
 预期：至少看到 `admin@163.com` 或当前本地导入库中的真实管理员账号，且 `is_disable = 0`，角色包含 `admin`。
 
-- [ ] **步骤 4：本地启动 V2 服务**
+- [x] **步骤 4：本地启动 V2 服务**
 
 运行：
 
@@ -790,7 +790,7 @@ mvn -f MyBlog-springboot-v2/pom.xml spring-boot:run -Dspring-boot.run.profiles=l
 
 预期：应用启动成功，Flyway 不会对本地 `aurora` 库执行迁移。
 
-- [ ] **步骤 5：调用本地登录接口**
+- [x] **步骤 5：调用本地登录接口**
 
 另开一个终端运行：
 
@@ -809,11 +809,11 @@ data    : 包含 accessToken，user.username 为 admin@163.com
 
 如果本地导入库的管理员密码不是 `password123`，这一步允许失败，但必须在最终说明中明确：代码验证已通过，本地真实数据密码未知或不匹配，不能用该账号完成接口登录。
 
-- [ ] **步骤 6：更新计划完成状态**
+- [x] **步骤 6：更新计划完成状态**
 
 如果实施者按本计划逐项完成，可以把本文件对应任务步骤勾选为 `[x]`。只勾选实际完成的步骤，不要一次性全部勾选。
 
-- [ ] **步骤 7：提交阶段验证状态**
+- [x] **步骤 7：提交阶段验证状态**
 
 如果只更新计划勾选状态：
 
@@ -823,6 +823,14 @@ git commit -m "同步后端V2数据库登录计划状态"
 ```
 
 如果没有修改计划文档，则不用提交。
+
+### 任务 5 实施记录
+
+- 全量测试：`mvn -f MyBlog-springboot-v2/pom.xml test` 通过，34 个测试，0 失败，0 错误。
+- 打包验证：`mvn -f MyBlog-springboot-v2/pom.xml clean package` 通过，已生成 `MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar`。
+- 本地 MySQL：`127.0.0.1:3306` 可连接，`aurora` 库中确认真实管理员账号 `tongyibin1@gmail.com`，`is_disable = 0`，角色为 `admin`。
+- 本地服务：`local` profile 启动成功，`/actuator/health` 返回 `UP`，启动日志未出现 Flyway 迁移本地库的记录。
+- 登录接口：使用 `tongyibin1@gmail.com` 和计划示例密码 `password123` 调用 `/api/auth/login`，返回 `BAD_CREDENTIALS`。结论是代码链路已接入本地真实库，但本地真实管理员密码与示例密码不一致，不能用该示例密码完成接口登录。
 
 ## 自检记录
 
