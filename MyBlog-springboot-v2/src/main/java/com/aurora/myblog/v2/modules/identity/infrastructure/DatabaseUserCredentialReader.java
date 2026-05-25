@@ -3,10 +3,12 @@ package com.aurora.myblog.v2.modules.identity.infrastructure;
 import com.aurora.myblog.v2.modules.identity.domain.AuthRole;
 import com.aurora.myblog.v2.modules.identity.domain.UserCredentialReader;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
+@Component
 public class DatabaseUserCredentialReader implements UserCredentialReader {
 
     private final JdbcTemplate jdbcTemplate;

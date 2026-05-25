@@ -3,11 +3,13 @@ package com.aurora.myblog.v2.modules.identity.infrastructure;
 import com.aurora.myblog.v2.modules.identity.domain.AuthRole;
 import com.aurora.myblog.v2.modules.identity.domain.UserCredentialReader;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
+@Profile("configured-identity")
 @Component
 @EnableConfigurationProperties(ConfiguredIdentityProperties.class)
 public class ConfiguredUserCredentialReader implements UserCredentialReader {

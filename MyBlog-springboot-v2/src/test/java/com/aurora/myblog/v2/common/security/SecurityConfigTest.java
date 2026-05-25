@@ -38,7 +38,7 @@ class SecurityConfigTest {
         String response = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"username":"user@example.com","password":"password123"}
+                                {"username":"user@163.com","password":"password123"}
                                 """))
                 .andExpect(status().isOk())
                 .andReturn()

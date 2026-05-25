@@ -22,16 +22,16 @@ class AuthControllerTest {
     private MockMvc mockMvc;
 
     @Test
-    void logsInWithConfiguredCredentialWithoutExistingAuthentication() throws Exception {
+    void logsInWithDatabaseCredentialWithoutExistingAuthentication() throws Exception {
         mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"username":"admin@example.com","password":"password123"}
+                                {"username":"admin@163.com","password":"password123"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
-                .andExpect(jsonPath("$.data.user.username").value("admin@example.com"))
+                .andExpect(jsonPath("$.data.user.username").value("admin@163.com"))
                 .andExpect(jsonPath("$.data.user.roles[0]").value("ADMIN"));
     }
 
@@ -54,6 +54,19 @@ class AuthControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"username":"missing@example.com","password":"wrong"}
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.code").value("BAD_CREDENTIALS"))
+                .andExpect(jsonPath("$.message").value("用户名或密码错误"));
+    }
+
+    @Test
+    void rejectsDisabledUserWithSameBadCredentialResponse() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"disabled@163.com","password":"password123"}
                                 """))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))

@@ -27,7 +27,7 @@ class JwtAuthenticationFilterTest {
         String response = mockMvc.perform(post("/api/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"username":"admin@example.com","password":"password123"}
+                                {"username":"admin@163.com","password":"password123"}
                                 """))
                 .andExpect(status().isOk())
                 .andReturn()
@@ -37,7 +37,7 @@ class JwtAuthenticationFilterTest {
 
         mockMvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.username").value("admin@example.com"))
+                .andExpect(jsonPath("$.data.username").value("admin@163.com"))
                 .andExpect(jsonPath("$.data.roles[0]").value("ADMIN"));
 
         mockMvc.perform(post("/api/auth/logout").header("Authorization", "Bearer " + token))

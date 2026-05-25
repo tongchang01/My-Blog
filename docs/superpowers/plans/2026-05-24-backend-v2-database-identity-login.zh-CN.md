@@ -574,11 +574,13 @@ git commit -m "新增后端V2数据库身份读取"
 **文件：**
 
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/ConfiguredUserCredentialReader.java`
+- 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseUserCredentialReader.java`
 - 修改：`MyBlog-springboot-v2/src/test/resources/application-test.yml`
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/SecurityConfigTest.java`
+- 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtAuthenticationFilterTest.java`
 
-- [ ] **步骤 1：让配置账号适配器只在专用 profile 启用**
+- [x] **步骤 1：让配置账号适配器只在专用 profile 启用**
 
 修改 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/ConfiguredUserCredentialReader.java`，增加 `@Profile("configured-identity")`：
 
@@ -621,7 +623,15 @@ public class ConfiguredUserCredentialReader implements UserCredentialReader {
 }
 ```
 
-- [ ] **步骤 2：删除测试 profile 中不再使用的配置账号**
+同时把 `DatabaseUserCredentialReader` 注册为默认 `UserCredentialReader` Bean：
+
+```java
+@Component
+public class DatabaseUserCredentialReader implements UserCredentialReader {
+}
+```
+
+- [x] **步骤 2：删除测试 profile 中不再使用的配置账号**
 
 修改 `MyBlog-springboot-v2/src/test/resources/application-test.yml`，删除 `myblog.identity.users` 整段，只保留 CORS、安全 JWT、公开端点等配置。
 
@@ -651,7 +661,7 @@ myblog:
       - /api/auth/login
 ```
 
-- [ ] **步骤 3：修改登录 Controller 测试使用数据库账号**
+- [x] **步骤 3：修改登录 Controller 测试使用数据库账号**
 
 修改 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`，把成功登录账号从 `admin@example.com` 改成 `admin@163.com`：
 
@@ -688,7 +698,7 @@ void rejectsDisabledUserWithSameBadCredentialResponse() throws Exception {
 }
 ```
 
-- [ ] **步骤 4：修改后台授权测试使用数据库普通用户**
+- [x] **步骤 4：修改后台授权测试使用数据库普通用户**
 
 修改 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/SecurityConfigTest.java` 中普通用户登录账号：
 
@@ -704,23 +714,23 @@ String response = mockMvc.perform(post("/api/auth/login")
         .getContentAsString();
 ```
 
-如果测试里还有 `admin@example.com` 或 `user@example.com`，分别改成 `admin@163.com` 和 `user@163.com`。
+同步修改 `JwtAuthenticationFilterTest` 中的登录账号和 `/api/auth/me` 用户名断言，避免 Bearer 链路仍依赖旧配置账号。
 
-- [ ] **步骤 5：运行认证和授权回归测试**
+- [x] **步骤 5：运行认证和授权回归测试**
 
 运行：
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
-mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=AuthControllerTest,SecurityConfigTest,JwtAuthenticationFilterTest
+mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=AuthControllerTest,SecurityConfigTest,JwtAuthenticationFilterTest'
 ```
 
 预期：通过。
 
-- [ ] **步骤 6：提交数据库账号登录回归**
+- [x] **步骤 6：提交数据库账号登录回归**
 
 ```powershell
-git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/ConfiguredUserCredentialReader.java MyBlog-springboot-v2/src/test/resources/application-test.yml MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/SecurityConfigTest.java
+git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/ConfiguredUserCredentialReader.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseUserCredentialReader.java MyBlog-springboot-v2/src/test/resources/application-test.yml MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/SecurityConfigTest.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/security/JwtAuthenticationFilterTest.java docs/superpowers/plans/2026-05-24-backend-v2-database-identity-login.zh-CN.md
 git commit -m "切换后端V2登录为数据库账号"
 ```
 
