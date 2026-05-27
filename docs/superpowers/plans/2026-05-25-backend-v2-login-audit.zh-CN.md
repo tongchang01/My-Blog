@@ -61,7 +61,7 @@
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/AuthService.java`
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthServiceTest.java`
 
-- [ ] **步骤 1：先改 AuthServiceTest，写出成功登录调用审计的期望**
+- [x] **步骤 1：先改 AuthServiceTest，写出成功登录调用审计的期望**
 
 修改 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthServiceTest.java`，把测试类调整成下面结构：
 
@@ -156,7 +156,7 @@ class AuthServiceTest {
 }
 ```
 
-- [ ] **步骤 2：运行 AuthServiceTest，确认先失败**
+- [x] **步骤 2：运行 AuthServiceTest，确认先失败**
 
 运行：
 
@@ -167,7 +167,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=AuthServiceTest'
 
 预期：编译失败，错误应指向 `LoginAuditRecorder` 不存在、`LoginCommand` 缺少三参数构造或 `AuthService` 构造器参数不匹配。
 
-- [ ] **步骤 3：新增 LoginAuditRecorder 领域端口**
+- [x] **步骤 3：新增 LoginAuditRecorder 领域端口**
 
 创建 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/LoginAuditRecorder.java`：
 
@@ -179,7 +179,7 @@ public interface LoginAuditRecorder {
 }
 ```
 
-- [ ] **步骤 4：扩展 LoginCommand，保留旧调用兼容**
+- [x] **步骤 4：扩展 LoginCommand，保留旧调用兼容**
 
 修改 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/LoginCommand.java`：
 
@@ -193,7 +193,7 @@ public record LoginCommand(String username, String password, String clientIp) {
 }
 ```
 
-- [ ] **步骤 5：AuthService 注入并调用登录审计端口**
+- [x] **步骤 5：AuthService 注入并调用登录审计端口**
 
 修改 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/AuthService.java`：
 
@@ -207,6 +207,7 @@ import com.aurora.myblog.v2.modules.identity.domain.LoginAuditRecorder;
 import com.aurora.myblog.v2.modules.identity.domain.LoginCommand;
 import com.aurora.myblog.v2.modules.identity.domain.UserCredentialReader;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -223,6 +224,7 @@ public class AuthService {
             UserCredentialReader credentialReader,
             PasswordEncoder passwordEncoder,
             AuthTokenService tokenService,
+            @Nullable
             LoginAuditRecorder auditRecorder) {
         this.credentialReader = credentialReader;
         this.passwordEncoder = passwordEncoder;
@@ -238,7 +240,9 @@ public class AuthService {
                 credential.id(),
                 credential.username(),
                 Set.copyOf(credential.roles()));
-        auditRecorder.recordSuccessfulLogin(credential.id(), command.clientIp());
+        if (auditRecorder != null) {
+            auditRecorder.recordSuccessfulLogin(credential.id(), command.clientIp());
+        }
         AuthTokenService.TokenIssueResult token = tokenService.issueAccessToken(user);
         return new LoginResult(user, token);
     }
@@ -252,7 +256,9 @@ public class AuthService {
 }
 ```
 
-- [ ] **步骤 6：运行 AuthServiceTest，确认通过**
+实施说明：任务 1 结束时 `DatabaseLoginAuditRecorder` 还未创建。为了避免任务 1 的中间提交破坏 Spring 上下文，`AuthService` 对 `LoginAuditRecorder` 使用 `@Nullable` 临时兼容；任务 2 新增数据库实现 Bean 后，登录审计会进入真实回写路径。
+
+- [x] **步骤 6：运行 AuthServiceTest，确认通过**
 
 运行：
 
@@ -263,7 +269,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=AuthServiceTest'
 
 预期：通过，2 个测试，0 失败。
 
-- [ ] **步骤 7：提交领域端口与应用层接入**
+- [x] **步骤 7：提交领域端口与应用层接入**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/LoginAuditRecorder.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/LoginCommand.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/AuthService.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthServiceTest.java

@@ -3,9 +3,11 @@ package com.aurora.myblog.v2.modules.identity.application;
 import com.aurora.myblog.v2.common.error.ApiErrorCode;
 import com.aurora.myblog.v2.common.error.ApiException;
 import com.aurora.myblog.v2.modules.identity.domain.AuthenticatedUser;
+import com.aurora.myblog.v2.modules.identity.domain.LoginAuditRecorder;
 import com.aurora.myblog.v2.modules.identity.domain.LoginCommand;
 import com.aurora.myblog.v2.modules.identity.domain.UserCredentialReader;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -16,11 +18,18 @@ public class AuthService {
     private final UserCredentialReader credentialReader;
     private final PasswordEncoder passwordEncoder;
     private final AuthTokenService tokenService;
+    private final LoginAuditRecorder auditRecorder;
 
-    public AuthService(UserCredentialReader credentialReader, PasswordEncoder passwordEncoder, AuthTokenService tokenService) {
+    public AuthService(
+            UserCredentialReader credentialReader,
+            PasswordEncoder passwordEncoder,
+            AuthTokenService tokenService,
+            @Nullable
+            LoginAuditRecorder auditRecorder) {
         this.credentialReader = credentialReader;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
+        this.auditRecorder = auditRecorder;
     }
 
     public LoginResult login(LoginCommand command) {
@@ -31,6 +40,9 @@ public class AuthService {
                 credential.id(),
                 credential.username(),
                 Set.copyOf(credential.roles()));
+        if (auditRecorder != null) {
+            auditRecorder.recordSuccessfulLogin(credential.id(), command.clientIp());
+        }
         AuthTokenService.TokenIssueResult token = tokenService.issueAccessToken(user);
         return new LoginResult(user, token);
     }
