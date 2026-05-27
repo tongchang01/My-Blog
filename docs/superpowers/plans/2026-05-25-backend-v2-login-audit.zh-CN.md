@@ -283,7 +283,7 @@ git commit -m "接入后端V2登录审计端口"
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseLoginAuditRecorder.java`
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseLoginAuditRecorderTest.java`
 
-- [ ] **步骤 1：先写数据库审计记录器测试**
+- [x] **步骤 1：先写数据库审计记录器测试**
 
 创建 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseLoginAuditRecorderTest.java`：
 
@@ -351,7 +351,7 @@ class DatabaseLoginAuditRecorderTest {
 }
 ```
 
-- [ ] **步骤 2：运行测试，确认先失败**
+- [x] **步骤 2：运行测试，确认先失败**
 
 运行：
 
@@ -362,7 +362,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=DatabaseLoginAuditRecorderTest'
 
 预期：编译失败，错误应指向 `DatabaseLoginAuditRecorder` 不存在。
 
-- [ ] **步骤 3：实现 DatabaseLoginAuditRecorder**
+- [x] **步骤 3：实现 DatabaseLoginAuditRecorder**
 
 创建 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseLoginAuditRecorder.java`：
 
@@ -396,7 +396,7 @@ public class DatabaseLoginAuditRecorder implements LoginAuditRecorder {
 }
 ```
 
-- [ ] **步骤 4：运行数据库审计测试，确认通过**
+- [x] **步骤 4：运行数据库审计测试，确认通过**
 
 运行：
 
@@ -407,7 +407,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=DatabaseLoginAuditRecorderTest'
 
 预期：通过，2 个测试，0 失败。
 
-- [ ] **步骤 5：提交数据库审计适配器**
+- [x] **步骤 5：提交数据库审计适配器**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseLoginAuditRecorder.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseLoginAuditRecorderTest.java
