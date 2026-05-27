@@ -6,6 +6,7 @@ import com.aurora.myblog.v2.common.web.ApiResponse;
 import com.aurora.myblog.v2.modules.identity.application.AuthService;
 import com.aurora.myblog.v2.modules.identity.domain.AuthRole;
 import com.aurora.myblog.v2.modules.identity.domain.LoginCommand;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +27,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        var result = authService.login(new LoginCommand(request.username(), request.password()));
+    ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest servletRequest) {
+        var result = authService.login(new LoginCommand(
+                request.username(),
+                request.password(),
+                ClientIpResolver.resolve(servletRequest)));
         LoginResponse.User user = new LoginResponse.User(
                 result.user().id(),
                 result.user().username(),

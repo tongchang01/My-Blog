@@ -57,8 +57,11 @@
 **文件：**
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/LoginAuditRecorder.java`
+
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/LoginCommand.java`
+
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/AuthService.java`
+
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthServiceTest.java`
 
 - [x] **步骤 1：先改 AuthServiceTest，写出成功登录调用审计的期望**
@@ -281,6 +284,7 @@ git commit -m "接入后端V2登录审计端口"
 **文件：**
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseLoginAuditRecorder.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseLoginAuditRecorderTest.java`
 
 - [x] **步骤 1：先写数据库审计记录器测试**
@@ -419,11 +423,14 @@ git commit -m "新增后端V2数据库登录审计"
 **文件：**
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/ClientIpResolver.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/ClientIpResolverTest.java`
+
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/AuthController.java`
+
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`
 
-- [ ] **步骤 1：写 ClientIpResolver 单元测试**
+- [x] **步骤 1：写 ClientIpResolver 单元测试**
 
 创建 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/ClientIpResolverTest.java`：
 
@@ -477,7 +484,7 @@ class ClientIpResolverTest {
 }
 ```
 
-- [ ] **步骤 2：运行测试，确认先失败**
+- [x] **步骤 2：运行测试，确认先失败**
 
 运行：
 
@@ -488,7 +495,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=ClientIpResolverTest'
 
 预期：编译失败，错误应指向 `ClientIpResolver` 不存在。
 
-- [ ] **步骤 3：实现 ClientIpResolver**
+- [x] **步骤 3：实现 ClientIpResolver**
 
 创建 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/ClientIpResolver.java`：
 
@@ -536,7 +543,7 @@ public final class ClientIpResolver {
 }
 ```
 
-- [ ] **步骤 4：运行 ClientIpResolverTest，确认通过**
+- [x] **步骤 4：运行 ClientIpResolverTest，确认通过**
 
 运行：
 
@@ -547,7 +554,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=ClientIpResolverTest'
 
 预期：通过，4 个测试，0 失败。
 
-- [ ] **步骤 5：修改 AuthController 传入客户端 IP**
+- [x] **步骤 5：修改 AuthController 传入客户端 IP**
 
 修改 `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/AuthController.java`：
 
@@ -609,7 +616,7 @@ public class AuthController {
 }
 ```
 
-- [ ] **步骤 6：修改 AuthControllerTest，验证登录审计回写和失败不回写**
+- [x] **步骤 6：修改 AuthControllerTest，验证登录审计回写和失败不回写**
 
 修改 `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`：
 
@@ -738,7 +745,7 @@ class AuthControllerTest {
 }
 ```
 
-- [ ] **步骤 7：运行 Controller 与 IP 回归测试**
+- [x] **步骤 7：运行 Controller 与 IP 回归测试**
 
 运行：
 
@@ -749,7 +756,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=ClientIpResolverTest,AuthContro
 
 预期：通过，9 个测试，0 失败。
 
-- [ ] **步骤 8：提交 Controller 登录审计接入**
+- [x] **步骤 8：提交 Controller 登录审计接入**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/ClientIpResolver.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/ClientIpResolverTest.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/AuthController.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java
@@ -761,6 +768,7 @@ git commit -m "接入后端V2登录IP审计"
 **文件：**
 
 - 验证：`MyBlog-springboot-v2/**`
+
 - 可选修改：`docs/superpowers/plans/2026-05-25-backend-v2-login-audit.zh-CN.md`
 
 - [ ] **步骤 1：运行登录审计相关测试**
@@ -853,7 +861,9 @@ mysql -h 127.0.0.1 -P 3306 -u root --default-character-set=utf8mb4 -N aurora -e 
 预期：
 
 - `last_login_time` 不为空，并晚于步骤 4 读取到的值。
+
 - `ip_address` 为 `203.0.113.10`。
+
 - `ip_source` 保持原值，不因本任务被主动覆盖。
 
 - [ ] **步骤 8：更新本计划完成状态**
