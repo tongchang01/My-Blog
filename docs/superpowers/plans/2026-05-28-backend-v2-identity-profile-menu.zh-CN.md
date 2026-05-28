@@ -918,7 +918,7 @@ git commit -m "新增后端V2当前用户菜单接口"
 
 - 可选修改：`docs/superpowers/plans/2026-05-28-backend-v2-identity-profile-menu.zh-CN.md`
 
-- [ ] **步骤 1：运行身份资料与菜单相关测试**
+- [x] **步骤 1：运行身份资料与菜单相关测试**
 
 运行：
 
@@ -929,7 +929,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=DatabaseCurrentUserProfileReade
 
 预期：全部通过。
 
-- [ ] **步骤 2：运行全量测试**
+- [x] **步骤 2：运行全量测试**
 
 运行：
 
@@ -940,7 +940,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test
 
 预期：全部通过。
 
-- [ ] **步骤 3：运行打包验证**
+- [x] **步骤 3：运行打包验证**
 
 运行：
 
@@ -955,7 +955,7 @@ mvn -f MyBlog-springboot-v2/pom.xml clean package
 MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar
 ```
 
-- [ ] **步骤 4：只读确认本地 MySQL 菜单数据**
+- [x] **步骤 4：只读确认本地 MySQL 菜单数据**
 
 运行：
 
@@ -972,7 +972,7 @@ mysql -h 127.0.0.1 -P 3306 -u root --default-character-set=utf8mb4 -N aurora -e 
 
 - 不修改本地库结构，不写入测试数据。
 
-- [ ] **步骤 5：本地启动 V2 服务**
+- [x] **步骤 5：本地启动 V2 服务**
 
 运行：
 
@@ -984,7 +984,7 @@ mvn -f MyBlog-springboot-v2/pom.xml spring-boot:run -Dspring-boot.run.profiles=l
 
 预期：应用启动成功，监听 `8080`。
 
-- [ ] **步骤 6：调用真实账号登录、当前用户和菜单接口**
+- [x] **步骤 6：调用真实账号登录、当前用户和菜单接口**
 
 另开一个终端运行。密码只保存在当前 PowerShell 变量里，不写入任何文件：
 
@@ -1005,7 +1005,7 @@ Invoke-RestMethod -Method Get -Uri http://localhost:8080/api/admin/user/menus -H
 
 - `/api/admin/user/menus` 返回菜单数组。
 
-- [ ] **步骤 7：停止本地 V2 服务并确认端口释放**
+- [x] **步骤 7：停止本地 V2 服务并确认端口释放**
 
 运行：
 
@@ -1021,11 +1021,11 @@ Get-NetTCPConnection -LocalPort 8080 -ErrorAction SilentlyContinue
 
 预期：`8080` 不再监听。
 
-- [ ] **步骤 8：更新本计划完成状态和执行记录**
+- [x] **步骤 8：更新本计划完成状态和执行记录**
 
 如果实施者按本计划逐项完成，可以把本文件对应任务步骤勾选为 `[x]`，并在文末追加执行记录。只记录验证事实，不记录真实密码。
 
-- [ ] **步骤 9：提交阶段验证状态**
+- [x] **步骤 9：提交阶段验证状态**
 
 ```powershell
 git add docs/superpowers/plans/2026-05-28-backend-v2-identity-profile-menu.zh-CN.md
@@ -1042,3 +1042,13 @@ git commit -m "同步后端V2身份菜单计划状态"
 - 明确排除：菜单管理 CRUD、角色管理、动态资源权限运行时拦截、Redis 在线用户、前端联调。
 - 类型一致性：JWT 中仍只保存认证必要信息；用户资料和菜单通过数据库查询端口读取，不把旧 Redis 登录态模型带入 V2。
 - 风险控制：本阶段只读取旧表，不修改本地 MySQL 表结构；测试环境菜单表只存在于 H2 test migration。
+
+## 任务 4 执行记录
+
+- 身份资料与菜单相关测试：`DatabaseCurrentUserProfileReaderTest,DatabaseUserMenuReaderTest,AuthControllerTest,AdminIdentityControllerTest,SecurityConfigTest` 通过，17 个测试，0 失败，0 错误。
+- 全量测试：`mvn -f MyBlog-springboot-v2/pom.xml test` 通过，49 个测试，0 失败，0 错误。
+- 打包验证：`mvn -f MyBlog-springboot-v2/pom.xml clean package` 通过，生成 `MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar`。
+- 本地 MySQL 只读检查：`t_menu=35`，`t_role_menu=70`，未修改本地库结构，未写入测试数据。
+- 本地 V2 服务：使用 `local` profile 启动成功，监听 `8080`。
+- 真实账号接口冒烟：登录返回 `success=true`、`code=OK`，`accessToken` 存在；`/api/auth/me` 返回 `username=tongyibin1@gmail.com`，并包含 `userInfoId`、`nickname`、`email` 等用户资料字段；`/api/admin/user/menus` 返回菜单数组，数量为 10。
+- 清理：本轮启动的 V2 Maven/Java 进程已停止，`8080` 已释放。
