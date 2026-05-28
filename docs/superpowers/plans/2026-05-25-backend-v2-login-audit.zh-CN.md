@@ -771,7 +771,7 @@ git commit -m "接入后端V2登录IP审计"
 
 - 可选修改：`docs/superpowers/plans/2026-05-25-backend-v2-login-audit.zh-CN.md`
 
-- [ ] **步骤 1：运行登录审计相关测试**
+- [x] **步骤 1：运行登录审计相关测试**
 
 运行：
 
@@ -782,7 +782,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=AuthServiceTest,DatabaseLoginAu
 
 预期：全部通过。
 
-- [ ] **步骤 2：运行全量测试**
+- [x] **步骤 2：运行全量测试**
 
 运行：
 
@@ -793,7 +793,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test
 
 预期：全部通过。
 
-- [ ] **步骤 3：运行打包验证**
+- [x] **步骤 3：运行打包验证**
 
 运行：
 
@@ -808,7 +808,7 @@ mvn -f MyBlog-springboot-v2/pom.xml clean package
 MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar
 ```
 
-- [ ] **步骤 4：本地 MySQL 冒烟前记录当前审计字段**
+- [x] **步骤 4：本地 MySQL 冒烟前记录当前审计字段**
 
 运行：
 
@@ -819,7 +819,7 @@ mysql -h 127.0.0.1 -P 3306 -u root --default-character-set=utf8mb4 -N aurora -e 
 
 预期：能看到真实账号当前审计字段。不要在文档或提交中记录真实密码。
 
-- [ ] **步骤 5：启动本地 V2 服务**
+- [x] **步骤 5：启动本地 V2 服务**
 
 运行：
 
@@ -831,7 +831,7 @@ mvn -f MyBlog-springboot-v2/pom.xml spring-boot:run -Dspring-boot.run.profiles=l
 
 预期：应用启动成功，监听 `8080`，local profile 下 Flyway 不会迁移本地 `aurora` 库。
 
-- [ ] **步骤 6：调用真实账号登录接口**
+- [x] **步骤 6：调用真实账号登录接口**
 
 另开一个终端运行。命令会在终端提示输入本地真实密码，密码只保存在当前 PowerShell 变量里，不写入任何文件：
 
@@ -849,7 +849,7 @@ code    : OK
 data    : 包含 accessToken，user.username 为 tongyibin1@gmail.com
 ```
 
-- [ ] **步骤 7：只读确认本地 MySQL 审计字段已更新**
+- [x] **步骤 7：只读确认本地 MySQL 审计字段已更新**
 
 运行：
 
@@ -866,11 +866,11 @@ mysql -h 127.0.0.1 -P 3306 -u root --default-character-set=utf8mb4 -N aurora -e 
 
 - `ip_source` 保持原值，不因本任务被主动覆盖。
 
-- [ ] **步骤 8：更新本计划完成状态**
+- [x] **步骤 8：更新本计划完成状态**
 
 如果实施者按本计划逐项完成，可以把本文件对应任务步骤勾选为 `[x]`。只勾选实际完成的步骤。
 
-- [ ] **步骤 9：提交阶段验证状态**
+- [x] **步骤 9：提交阶段验证状态**
 
 如果只更新计划勾选状态或实施记录：
 
@@ -887,3 +887,14 @@ git commit -m "同步后端V2登录审计计划状态"
 - 明确排除：`ip_source` 归属地解析、Redis 在线用户、动态资源权限、菜单接口、前端联调。
 - 类型一致性：`LoginCommand.clientIp` 只从 Controller 传入，`AuthService` 只依赖 `LoginAuditRecorder` 端口，数据库更新只在 infrastructure 层完成。
 - 风险控制：真实密码只用于本地手动验证，不写入计划、不进入 Git；测试环境继续使用 H2 和 test migration。
+
+## 任务 4 执行记录
+
+- 登录审计相关测试：`AuthServiceTest,DatabaseLoginAuditRecorderTest,ClientIpResolverTest,AuthControllerTest` 通过，13 个测试，0 失败，0 错误。
+- 全量测试：`mvn -f MyBlog-springboot-v2/pom.xml test` 通过，40 个测试，0 失败，0 错误。
+- 打包验证：`mvn -f MyBlog-springboot-v2/pom.xml clean package` 通过，生成 `MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar`。
+- 本地 MySQL 冒烟前审计字段：`last_login_time=2026-05-23 16:07:30`，`ip_address=153.228.182.167`，`ip_source=日本|茨城县|日本电信电话`。
+- 本地 V2 服务：使用 `local` profile 启动成功，监听 `8080`。
+- 真实账号登录冒烟：接口返回 `success=true`、`code=OK`，`data.accessToken` 存在，`data.user.username=tongyibin1@gmail.com`。
+- 本地 MySQL 冒烟后审计字段：`last_login_time=2026-05-28 20:05:33`，`ip_address=203.0.113.10`，`ip_source` 保持为 `日本|茨城县|日本电信电话`。
+- 清理：本轮启动的 V2 Java/Maven 进程已停止，`8080` 已释放。
