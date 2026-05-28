@@ -22,3 +22,6 @@ myblog:
     public-endpoints:
       - /actuator/health
       - /api/auth/login
+      - /api/categories
+      - /api/tags
+      - /api/tags/top

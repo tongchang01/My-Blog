@@ -19,3 +19,6 @@ myblog:
       - /actuator/health
       - /api/public/security-probe
       - /api/auth/login
+      - /api/categories
+      - /api/tags
+      - /api/tags/top
