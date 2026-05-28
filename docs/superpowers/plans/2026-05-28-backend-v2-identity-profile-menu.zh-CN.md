@@ -88,9 +88,10 @@
 **文件：**
 
 - 修改：`MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql`
+
 - 验证：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/infrastructure/persistence/FlywayMigrationTest.java`
 
-- [ ] **步骤 1：给测试迁移增加菜单与角色菜单表**
+- [x] **步骤 1：给测试迁移增加菜单与角色菜单表**
 
 在 `V2__create_legacy_identity_tables_for_tests.sql` 的 `t_user_role` 表之后增加：
 
@@ -115,7 +116,7 @@ create table t_role_menu (
 );
 ```
 
-- [ ] **步骤 2：给测试库插入菜单数据**
+- [x] **步骤 2：给测试库插入菜单数据**
 
 在现有 `insert into t_user_role` 之后增加：
 
@@ -143,10 +144,12 @@ values
 说明：
 
 - 管理员角色拥有完整菜单。
+
 - 普通用户只拥有个人中心菜单，用于验证 `/api/admin/**` 仍会拒绝普通用户访问后台接口。
+
 - `草稿箱` 设置为隐藏菜单，用于验证 `hidden=true`。
 
-- [ ] **步骤 3：运行 Flyway 测试**
+- [x] **步骤 3：运行 Flyway 测试**
 
 运行：
 
@@ -157,7 +160,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=FlywayMigrationTest'
 
 预期：通过，确认 H2 测试迁移仍可执行。
 
-- [ ] **步骤 4：提交测试表基线**
+- [x] **步骤 4：提交测试表基线**
 
 ```powershell
 git add MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql
@@ -171,12 +174,19 @@ git commit -m "补齐后端V2身份菜单测试表"
 **文件：**
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/CurrentUserProfile.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/CurrentUserProfileReader.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/IdentityQueryService.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseCurrentUserProfileReader.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseCurrentUserProfileReaderTest.java`
+
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/AuthController.java`
+
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/MeResponse.java`
+
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`
 
 - [ ] **步骤 1：先写数据库资料读取测试**
@@ -476,12 +486,19 @@ git commit -m "增强后端V2当前用户资料"
 **文件：**
 
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/UserMenu.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/UserMenuReader.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseUserMenuReader.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/UserMenuResponse.java`
+
 - 新建：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/AdminIdentityController.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseUserMenuReaderTest.java`
+
 - 新建：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AdminIdentityControllerTest.java`
+
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/IdentityQueryService.java`
 
 - [ ] **步骤 1：先写菜单读取数据库测试**
@@ -898,6 +915,7 @@ git commit -m "新增后端V2当前用户菜单接口"
 **文件：**
 
 - 验证：`MyBlog-springboot-v2/**`
+
 - 可选修改：`docs/superpowers/plans/2026-05-28-backend-v2-identity-profile-menu.zh-CN.md`
 
 - [ ] **步骤 1：运行身份资料与菜单相关测试**
@@ -949,7 +967,9 @@ mysql -h 127.0.0.1 -P 3306 -u root --default-character-set=utf8mb4 -N aurora -e 
 预期：
 
 - `t_menu` 数量大于 0。
+
 - `t_role_menu` 数量大于 0。
+
 - 不修改本地库结构，不写入测试数据。
 
 - [ ] **步骤 5：本地启动 V2 服务**
@@ -980,7 +1000,9 @@ Invoke-RestMethod -Method Get -Uri http://localhost:8080/api/admin/user/menus -H
 预期：
 
 - 登录返回 `success=true`。
+
 - `/api/auth/me` 返回 `username=tongyibin1@gmail.com`，并包含用户资料字段。
+
 - `/api/admin/user/menus` 返回菜单数组。
 
 - [ ] **步骤 7：停止本地 V2 服务并确认端口释放**
