@@ -189,7 +189,7 @@ git commit -m "补齐后端V2身份菜单测试表"
 
 - 修改：`MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java`
 
-- [ ] **步骤 1：先写数据库资料读取测试**
+- [x] **步骤 1：先写数据库资料读取测试**
 
 新建 `DatabaseCurrentUserProfileReaderTest.java`：
 
@@ -233,7 +233,7 @@ class DatabaseCurrentUserProfileReaderTest {
 }
 ```
 
-- [ ] **步骤 2：运行测试确认失败**
+- [x] **步骤 2：运行测试确认失败**
 
 运行：
 
@@ -244,7 +244,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=DatabaseCurrentUserProfileReade
 
 预期：编译失败，提示 `DatabaseCurrentUserProfileReader` 或 `CurrentUserProfile` 不存在。
 
-- [ ] **步骤 3：新增当前用户资料领域模型和端口**
+- [x] **步骤 3：新增当前用户资料领域模型和端口**
 
 新建 `CurrentUserProfile.java`：
 
@@ -275,7 +275,7 @@ public interface CurrentUserProfileReader {
 }
 ```
 
-- [ ] **步骤 4：实现数据库资料读取适配器**
+- [x] **步骤 4：实现数据库资料读取适配器**
 
 新建 `DatabaseCurrentUserProfileReader.java`：
 
@@ -331,7 +331,7 @@ public class DatabaseCurrentUserProfileReader implements CurrentUserProfileReade
 }
 ```
 
-- [ ] **步骤 5：运行数据库资料读取测试**
+- [x] **步骤 5：运行数据库资料读取测试**
 
 运行：
 
@@ -342,7 +342,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=DatabaseCurrentUserProfileReade
 
 预期：通过，2 个测试，0 失败。
 
-- [ ] **步骤 6：新增 IdentityQueryService**
+- [x] **步骤 6：新增 IdentityQueryService**
 
 新建 `IdentityQueryService.java`：
 
@@ -372,7 +372,7 @@ public class IdentityQueryService {
 }
 ```
 
-- [ ] **步骤 7：增强 MeResponse 和 AuthController**
+- [x] **步骤 7：增强 MeResponse 和 AuthController**
 
 把 `MeResponse.java` 修改为：
 
@@ -430,7 +430,7 @@ ApiResponse<MeResponse> me(@CurrentUser AuthenticatedPrincipal user) {
 import com.aurora.myblog.v2.modules.identity.application.IdentityQueryService;
 ```
 
-- [ ] **步骤 8：补充 `/api/auth/me` 资料响应测试**
+- [x] **步骤 8：补充 `/api/auth/me` 资料响应测试**
 
 在 `AuthControllerTest` 增加测试：
 
@@ -461,7 +461,7 @@ void meReturnsCurrentDatabaseUserProfile() throws Exception {
 }
 ```
 
-- [ ] **步骤 9：运行资料相关测试**
+- [x] **步骤 9：运行资料相关测试**
 
 运行：
 
@@ -472,7 +472,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=DatabaseCurrentUserProfileReade
 
 预期：通过。
 
-- [ ] **步骤 10：提交当前用户资料能力**
+- [x] **步骤 10：提交当前用户资料能力**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/CurrentUserProfile.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/CurrentUserProfileReader.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/IdentityQueryService.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseCurrentUserProfileReader.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/AuthController.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/MeResponse.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseCurrentUserProfileReaderTest.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AuthControllerTest.java

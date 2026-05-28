@@ -104,6 +104,31 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
     }
 
+    @Test
+    void meReturnsCurrentDatabaseUserProfile() throws Exception {
+        String response = mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"admin@163.com","password":"password123"}
+                                """))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        String token = com.jayway.jsonpath.JsonPath.read(response, "$.data.accessToken");
+
+        mockMvc.perform(get("/api/auth/me").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value("1"))
+                .andExpect(jsonPath("$.data.userInfoId").value("1"))
+                .andExpect(jsonPath("$.data.username").value("admin@163.com"))
+                .andExpect(jsonPath("$.data.nickname").value("管理员"))
+                .andExpect(jsonPath("$.data.avatar").value(""))
+                .andExpect(jsonPath("$.data.email").value("admin@163.com"))
+                .andExpect(jsonPath("$.data.roles[0]").value("ADMIN"));
+    }
+
     private AuditRow loadAuditRow(String authId) {
         return jdbcTemplate.queryForObject("""
                         select last_login_time, ip_address, ip_source
