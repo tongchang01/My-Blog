@@ -100,3 +100,74 @@ values
     (5, 1, 5),
     (6, 1, 6),
     (7, 2, 6);
+
+create table t_category (
+    id int auto_increment primary key,
+    category_name varchar(50) not null,
+    create_time timestamp not null,
+    update_time timestamp
+);
+
+create table t_tag (
+    id int auto_increment primary key,
+    tag_name varchar(50) not null,
+    create_time timestamp not null,
+    update_time timestamp
+);
+
+create table t_article (
+    id int auto_increment primary key,
+    user_id int not null,
+    category_id int not null,
+    article_cover varchar(1024),
+    article_title varchar(100) not null,
+    article_abstract varchar(255),
+    article_content clob,
+    is_top tinyint not null default 0,
+    is_featured tinyint not null default 0,
+    is_delete tinyint not null default 0,
+    status tinyint not null,
+    type tinyint,
+    password varchar(255),
+    original_url varchar(1024),
+    create_time timestamp not null,
+    update_time timestamp
+);
+
+create table t_article_tag (
+    id int auto_increment primary key,
+    article_id int not null,
+    tag_id int not null
+);
+
+insert into t_category (id, category_name, create_time)
+values
+    (1, 'Java', current_timestamp),
+    (2, '生活', current_timestamp);
+
+insert into t_tag (id, tag_name, create_time)
+values
+    (1, 'Spring', current_timestamp),
+    (2, 'Vue', current_timestamp),
+    (3, '重构', current_timestamp);
+
+insert into t_article (
+    id, user_id, category_id, article_cover, article_title, article_abstract,
+    article_content, is_top, is_featured, is_delete, status, type, create_time, update_time
+)
+values
+    (1, 1, 1, '/cover/java-1.png', '后端V2第一篇', '摘要一', '正文一', 1, 1, 0, 1, 1, timestamp '2026-05-28 10:00:00', timestamp '2026-05-28 10:00:00'),
+    (2, 1, 2, '/cover/life-1.png', '生活记录第一篇', '摘要二', '正文二', 0, 0, 0, 1, 1, timestamp '2026-05-28 11:00:00', timestamp '2026-05-28 11:00:00'),
+    (3, 1, 1, '/cover/protected.png', '密码文章', '不应出现在第一阶段', '密码正文', 0, 0, 0, 2, 1, timestamp '2026-05-28 12:00:00', timestamp '2026-05-28 12:00:00'),
+    (4, 1, 1, '/cover/draft.png', '草稿文章', '不应出现在第一阶段', '草稿正文', 0, 0, 0, 3, 1, timestamp '2026-05-28 13:00:00', timestamp '2026-05-28 13:00:00'),
+    (5, 1, 2, '/cover/deleted.png', '已删除文章', '不应出现在第一阶段', '删除正文', 0, 0, 1, 1, 1, timestamp '2026-05-28 14:00:00', timestamp '2026-05-28 14:00:00');
+
+insert into t_article_tag (id, article_id, tag_id)
+values
+    (1, 1, 1),
+    (2, 1, 3),
+    (3, 2, 2),
+    (4, 2, 3),
+    (5, 3, 1),
+    (6, 4, 1),
+    (7, 5, 2);
