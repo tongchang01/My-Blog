@@ -501,7 +501,7 @@ git commit -m "增强后端V2当前用户资料"
 
 - 修改：`MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/IdentityQueryService.java`
 
-- [ ] **步骤 1：先写菜单读取数据库测试**
+- [x] **步骤 1：先写菜单读取数据库测试**
 
 新建 `DatabaseUserMenuReaderTest.java`：
 
@@ -554,7 +554,7 @@ class DatabaseUserMenuReaderTest {
 }
 ```
 
-- [ ] **步骤 2：运行测试确认失败**
+- [x] **步骤 2：运行测试确认失败**
 
 运行：
 
@@ -565,7 +565,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=DatabaseUserMenuReaderTest'
 
 预期：编译失败，提示 `DatabaseUserMenuReader` 或 `UserMenu` 不存在。
 
-- [ ] **步骤 3：新增菜单领域模型和端口**
+- [x] **步骤 3：新增菜单领域模型和端口**
 
 新建 `UserMenu.java`：
 
@@ -601,7 +601,7 @@ public interface UserMenuReader {
 }
 ```
 
-- [ ] **步骤 4：实现数据库菜单读取适配器**
+- [x] **步骤 4：实现数据库菜单读取适配器**
 
 新建 `DatabaseUserMenuReader.java`：
 
@@ -709,7 +709,7 @@ public class DatabaseUserMenuReader implements UserMenuReader {
 
 注意：这里保留旧后台路由兼容逻辑。根菜单没有子菜单时，返回一个 `path=""` 的子节点，外层组件固定为 `Layout`，和旧 `MenuServiceImpl.convertUserMenuList(...)` 的语义一致。
 
-- [ ] **步骤 5：运行菜单读取测试**
+- [x] **步骤 5：运行菜单读取测试**
 
 运行：
 
@@ -720,7 +720,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=DatabaseUserMenuReaderTest'
 
 预期：通过，3 个测试，0 失败。
 
-- [ ] **步骤 6：把菜单查询接入 IdentityQueryService**
+- [x] **步骤 6：把菜单查询接入 IdentityQueryService**
 
 修改 `IdentityQueryService.java`：
 
@@ -749,7 +749,7 @@ import com.aurora.myblog.v2.modules.identity.domain.UserMenu;
 import com.aurora.myblog.v2.modules.identity.domain.UserMenuReader;
 ```
 
-- [ ] **步骤 7：新增菜单响应 DTO 和 Controller**
+- [x] **步骤 7：新增菜单响应 DTO 和 Controller**
 
 新建 `UserMenuResponse.java`：
 
@@ -816,7 +816,7 @@ public class AdminIdentityController {
 }
 ```
 
-- [ ] **步骤 8：写后台菜单接口测试**
+- [x] **步骤 8：写后台菜单接口测试**
 
 新建 `AdminIdentityControllerTest.java`：
 
@@ -890,7 +890,7 @@ class AdminIdentityControllerTest {
 }
 ```
 
-- [ ] **步骤 9：运行菜单接口测试**
+- [x] **步骤 9：运行菜单接口测试**
 
 运行：
 
@@ -901,7 +901,7 @@ mvn -f MyBlog-springboot-v2/pom.xml test '-Dtest=DatabaseUserMenuReaderTest,Admi
 
 预期：通过。
 
-- [ ] **步骤 10：提交当前用户菜单能力**
+- [x] **步骤 10：提交当前用户菜单能力**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/UserMenu.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/domain/UserMenuReader.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/infrastructure/DatabaseUserMenuReader.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/UserMenuResponse.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/api/AdminIdentityController.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/identity/application/IdentityQueryService.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/DatabaseUserMenuReaderTest.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/AdminIdentityControllerTest.java
