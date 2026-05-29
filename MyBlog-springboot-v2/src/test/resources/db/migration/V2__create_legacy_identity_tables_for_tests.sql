@@ -153,14 +153,14 @@ values
 
 insert into t_article (
     id, user_id, category_id, article_cover, article_title, article_abstract,
-    article_content, is_top, is_featured, is_delete, status, type, create_time, update_time
+    article_content, is_top, is_featured, is_delete, status, type, password, create_time, update_time
 )
 values
-    (1, 1, 1, '/cover/java-1.png', '后端V2第一篇', '摘要一', '正文一', 1, 1, 0, 1, 1, timestamp '2026-05-28 10:00:00', timestamp '2026-05-28 10:00:00'),
-    (2, 1, 2, '/cover/life-1.png', '生活记录第一篇', '摘要二', '正文二', 0, 1, 0, 1, 1, timestamp '2026-04-20 11:00:00', timestamp '2026-04-20 11:00:00'),
-    (3, 1, 1, '/cover/protected.png', '密码文章', '不应出现在第一阶段', '密码正文', 1, 1, 0, 2, 1, timestamp '2026-03-18 12:00:00', timestamp '2026-03-18 12:00:00'),
-    (4, 1, 1, '/cover/draft.png', '草稿文章', '不应出现在第一阶段', '草稿正文', 1, 1, 0, 3, 1, timestamp '2026-02-16 13:00:00', timestamp '2026-02-16 13:00:00'),
-    (5, 1, 2, '/cover/deleted.png', '已删除文章', '不应出现在第一阶段', '删除正文', 1, 1, 1, 1, 1, timestamp '2026-01-14 14:00:00', timestamp '2026-01-14 14:00:00');
+    (1, 1, 1, '/cover/java-1.png', '后端V2第一篇', '摘要一', '正文一', 1, 1, 0, 1, 1, null, timestamp '2026-05-28 10:00:00', timestamp '2026-05-28 10:00:00'),
+    (2, 1, 2, '/cover/life-1.png', '生活记录第一篇', '摘要二', '正文二', 0, 1, 0, 1, 1, null, timestamp '2026-04-20 11:00:00', timestamp '2026-04-20 11:00:00'),
+    (3, 1, 1, '/cover/protected.png', '密码文章', '不应出现在公开列表', '密码正文', 1, 1, 0, 2, 1, 'open-sesame', timestamp '2026-03-18 12:00:00', timestamp '2026-03-18 12:00:00'),
+    (4, 1, 1, '/cover/draft.png', '草稿文章', '不应出现在第一阶段', '草稿正文', 1, 1, 0, 3, 1, null, timestamp '2026-02-16 13:00:00', timestamp '2026-02-16 13:00:00'),
+    (5, 1, 2, '/cover/deleted.png', '已删除文章', '不应出现在第一阶段', '删除正文', 1, 1, 1, 1, 1, null, timestamp '2026-01-14 14:00:00', timestamp '2026-01-14 14:00:00');
 
 insert into t_article_tag (id, article_id, tag_id)
 values
