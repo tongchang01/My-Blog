@@ -1,4 +1,4 @@
-# 后端 V2 文章归档与置顶推荐读取实施计划
+﻿# 后端 V2 文章归档与置顶推荐读取实施计划
 
 > **给执行该计划的代理：** 必须使用 `superpowers:subagent-driven-development`（推荐）或 `superpowers:executing-plans`，按任务逐个实现。步骤使用 checkbox（`- [ ]`）语法跟踪状态。
 
@@ -91,10 +91,12 @@ and a.status = 1
 ## Task 1: 补强 H2 内容测试数据
 
 **Files:**
+
 - Modify: `MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql`
+
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/DatabaseArticleReaderTest.java`
 
-- [ ] **Step 1: 调整测试文章时间和推荐字段**
+- [x] **Step 1: 调整测试文章时间和推荐字段**
 
 把测试文章数据调整为：
 
@@ -114,13 +116,18 @@ values
 说明：
 
 - `id=1` 是公开置顶文章。
+
 - `id=2` 是公开推荐文章。
+
 - `id=3` 是密码文章，即使置顶推荐字段为 1，也不能出现在 V2 本阶段接口。
+
 - `id=4` 是草稿，即使置顶推荐字段为 1，也不能出现在 V2 本阶段接口。
+
 - `id=5` 是删除文章，即使置顶推荐字段为 1，也不能出现在 V2 本阶段接口。
+
 - 公开文章跨 2026-05 和 2026-04 两个月，归档测试能验证分组排序。
 
-- [ ] **Step 2: 运行现有迁移测试确认数据可加载**
+- [x] **Step 2: 运行现有迁移测试确认数据可加载**
 
 Run:
 
@@ -136,7 +143,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 3: 运行现有内容测试确认调整不破坏旧能力**
+- [x] **Step 3: 运行现有内容测试确认调整不破坏旧能力**
 
 Run:
 
@@ -152,7 +159,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql
@@ -162,19 +169,30 @@ git commit -m "调整后端V2内容归档测试数据"
 ## Task 2: 新增置顶推荐读取
 
 **Files:**
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/domain/FeaturedArticles.java`
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/api/FeaturedArticlesResponse.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/domain/ArticleReader.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/infrastructure/DatabaseArticleReader.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/application/ContentQueryService.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/api/ContentArticleController.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/resources/application.yml`
+
 - Modify: `MyBlog-springboot-v2/src/main/resources/application-local.yml`
+
 - Modify: `MyBlog-springboot-v2/src/test/resources/application-test.yml`
+
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/DatabaseArticleReaderTest.java`
+
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/ContentArticleControllerTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 在 `DatabaseArticleReaderTest` 追加：
 
@@ -203,7 +221,7 @@ void returnsFeaturedArticlesWithoutToken() throws Exception {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -218,7 +236,7 @@ Expected:
 Compilation failure: cannot find symbol findFeaturedArticles
 ```
 
-- [ ] **Step 3: 新增领域模型**
+- [x] **Step 3: 新增领域模型**
 
 Create `FeaturedArticles.java`:
 
@@ -243,7 +261,7 @@ Modify `ArticleReader.java`:
 FeaturedArticles findFeaturedArticles();
 ```
 
-- [ ] **Step 4: 实现数据库读取**
+- [x] **Step 4: 实现数据库读取**
 
 在 `DatabaseArticleReader` 新增：
 
@@ -304,7 +322,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 ```
 
-- [ ] **Step 5: 扩展应用服务**
+- [x] **Step 5: 扩展应用服务**
 
 在 `ContentQueryService` 新增：
 
@@ -320,7 +338,7 @@ public FeaturedArticles getFeaturedArticles() {
 import com.aurora.myblog.v2.modules.content.domain.FeaturedArticles;
 ```
 
-- [ ] **Step 6: 新增 API DTO 和 Controller**
+- [x] **Step 6: 新增 API DTO 和 Controller**
 
 Create `FeaturedArticlesResponse.java`:
 
@@ -355,7 +373,7 @@ public ApiResponse<FeaturedArticlesResponse> getFeaturedArticles() {
 }
 ```
 
-- [ ] **Step 7: 新增公开端点配置**
+- [x] **Step 7: 新增公开端点配置**
 
 在三个配置文件都加入：
 
@@ -371,7 +389,7 @@ MyBlog-springboot-v2/src/main/resources/application-local.yml
 MyBlog-springboot-v2/src/test/resources/application-test.yml
 ```
 
-- [ ] **Step 8: 运行测试确认通过**
+- [x] **Step 8: 运行测试确认通过**
 
 Run:
 
@@ -387,7 +405,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 9: 提交**
+- [x] **Step 9: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content MyBlog-springboot-v2/src/main/resources/application.yml MyBlog-springboot-v2/src/main/resources/application-local.yml MyBlog-springboot-v2/src/test/resources/application-test.yml
@@ -397,19 +415,30 @@ git commit -m "新增后端V2置顶推荐读取接口"
 ## Task 3: 新增文章归档读取
 
 **Files:**
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/domain/ArchiveMonth.java`
+
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/api/ArchiveMonthResponse.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/domain/ArticleReader.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/infrastructure/DatabaseArticleReader.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/application/ContentQueryService.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/api/ContentArticleController.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/resources/application.yml`
+
 - Modify: `MyBlog-springboot-v2/src/main/resources/application-local.yml`
+
 - Modify: `MyBlog-springboot-v2/src/test/resources/application-test.yml`
+
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/DatabaseArticleReaderTest.java`
+
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/ContentArticleControllerTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 在 `DatabaseArticleReaderTest` 追加：
 
@@ -441,7 +470,7 @@ void returnsArticleArchivesWithoutToken() throws Exception {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -456,7 +485,7 @@ Expected:
 Compilation failure: cannot find symbol ArchiveMonth
 ```
 
-- [ ] **Step 3: 新增领域模型和端口**
+- [x] **Step 3: 新增领域模型和端口**
 
 Create `ArchiveMonth.java`:
 
@@ -479,7 +508,7 @@ Modify `ArticleReader.java`:
 PageResponse<ArchiveMonth> listPublishedArchives(ArticlePageQuery query);
 ```
 
-- [ ] **Step 4: 实现数据库读取**
+- [x] **Step 4: 实现数据库读取**
 
 在 `DatabaseArticleReader` 新增：
 
@@ -560,7 +589,7 @@ private List<ArticleSummary> loadArchiveArticles() {
 
 这个方案对当前个人博客体量足够，避免为了归档先引入数据库方言分支。后续文章量大时再把归档月份分页下推到 SQL。
 
-- [ ] **Step 5: 扩展应用服务**
+- [x] **Step 5: 扩展应用服务**
 
 在 `ContentQueryService` 新增：
 
@@ -576,7 +605,7 @@ public PageResponse<ArchiveMonth> listArchives(Integer page, Integer size) {
 import com.aurora.myblog.v2.modules.content.domain.ArchiveMonth;
 ```
 
-- [ ] **Step 6: 新增 API DTO 和 Controller**
+- [x] **Step 6: 新增 API DTO 和 Controller**
 
 Create `ArchiveMonthResponse.java`:
 
@@ -621,7 +650,7 @@ public ApiResponse<PageResponse<ArchiveMonthResponse>> listArchives(
 import com.aurora.myblog.v2.modules.content.domain.ArchiveMonth;
 ```
 
-- [ ] **Step 7: 新增公开端点配置**
+- [x] **Step 7: 新增公开端点配置**
 
 在三个配置文件都加入：
 
@@ -637,7 +666,7 @@ MyBlog-springboot-v2/src/main/resources/application-local.yml
 MyBlog-springboot-v2/src/test/resources/application-test.yml
 ```
 
-- [ ] **Step 8: 运行测试确认通过**
+- [x] **Step 8: 运行测试确认通过**
 
 Run:
 
@@ -653,7 +682,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 9: 提交**
+- [x] **Step 9: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content MyBlog-springboot-v2/src/main/resources/application.yml MyBlog-springboot-v2/src/main/resources/application-local.yml MyBlog-springboot-v2/src/test/resources/application-test.yml
@@ -663,9 +692,10 @@ git commit -m "新增后端V2文章归档读取接口"
 ## Task 4: 全量验证和计划状态同步
 
 **Files:**
+
 - Modify: `docs/superpowers/plans/2026-05-29-backend-v2-article-archive-featured.zh-CN.md`
 
-- [ ] **Step 1: 全量测试**
+- [x] **Step 1: 全量测试**
 
 Run:
 
@@ -681,7 +711,7 @@ Tests run: 72 或更多, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 2: 打包**
+- [x] **Step 2: 打包**
 
 Run:
 
@@ -696,7 +726,7 @@ Expected:
 BUILD SUCCESS
 ```
 
-- [ ] **Step 3: 本地 MySQL 只读检查**
+- [x] **Step 3: 本地 MySQL 只读检查**
 
 不要把本地密码写进文件。先在当前 PowerShell 会话中设置 `MYSQL_PWD`，命令只读取环境变量：
 
@@ -712,7 +742,7 @@ Expected:
 第二行是公开置顶推荐候选数量，可以为 0，但 SQL 必须执行成功。
 ```
 
-- [ ] **Step 4: 本地 API 冒烟**
+- [x] **Step 4: 本地 API 冒烟**
 
 启动服务时通过环境变量注入数据库密码：
 
@@ -735,7 +765,7 @@ Expected:
 两个接口都返回 success=true。
 ```
 
-- [ ] **Step 5: 更新本计划的执行结果**
+- [x] **Step 5: 更新本计划的执行结果**
 
 先读取实际提交记录：
 
@@ -743,36 +773,9 @@ Expected:
 git log --oneline -4
 ```
 
-再在本文档末尾追加执行结果。提交记录必须从上面的命令复制实际短 SHA 和提交信息，不手写占位内容：
+已在本文档末尾追加真实执行结果。提交记录使用实际短 SHA 和提交信息，不手写占位内容。
 
-```markdown
-## 执行结果
-
-执行日期：2026-05-29。
-
-### 任务提交记录
-
-- 任务 1：复制 `git log --oneline -4` 中对应的实际提交行。
-- 任务 2：复制 `git log --oneline -4` 中对应的实际提交行。
-- 任务 3：复制 `git log --oneline -4` 中对应的实际提交行。
-- 任务 4：复制 `git log --oneline -4` 中对应的实际提交行。
-
-### 验证结果
-
-- `mvn test`：通过。
-- `mvn clean package`：通过。
-- 本地 MySQL 只读检查：通过。
-- 本地 API 冒烟：通过。
-
-### 未迁移能力
-
-- 密码文章访问流程。
-- 搜索接口。
-- Redis 浏览量统计。
-- 后台文章管理和写操作。
-```
-
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add docs/superpowers/plans/2026-05-29-backend-v2-article-archive-featured.zh-CN.md
@@ -785,3 +788,29 @@ git commit -m "同步后端V2归档推荐计划状态"
 - 边界控制：不做密码文章、搜索、浏览量、后台 CRUD、真实表结构调整。
 - 类型一致性：计划中新增的 `FeaturedArticles`、`ArchiveMonth`、`ArticleReader` 方法、DTO 和 Controller 方法名称一致。
 - 占位扫描：文档没有待实现占位词；本地密码只通过环境变量读取，不能写入代码、文档或 Git。
+
+## 执行结果
+
+执行日期：2026-05-29。
+
+### 任务提交记录
+
+- 计划文档：`279bc85 新增后端V2归档推荐实施计划`
+- 任务 1：`a1a7836 调整后端V2内容归档测试数据`
+- 任务 2：`51c973b 新增后端V2置顶推荐读取接口`
+- 任务 3：`3f4865a 新增后端V2文章归档读取接口`
+- 任务 4：本次提交同步计划状态。
+
+### 验证结果
+
+- `mvn -f MyBlog-springboot-v2/pom.xml test`：通过，76 个测试，0 失败，0 错误，0 跳过。
+- `mvn -f MyBlog-springboot-v2/pom.xml clean package`：通过，76 个测试，0 失败，0 错误，0 跳过，并成功生成 Spring Boot jar。
+- 本地 MySQL 只读检查：通过，公开文章 19 条，公开置顶推荐候选 1 条。
+- 本地 API 冒烟：通过，`GET /api/articles/featured` 返回 `success=true`，`GET /api/articles/archives?page=1&size=10` 返回 `success=true` 且归档总数为 2。
+
+### 未迁移能力
+
+- 密码文章访问流程。
+- 搜索接口。
+- Redis 浏览量统计。
+- 后台文章管理和写操作。
