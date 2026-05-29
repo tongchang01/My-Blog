@@ -64,4 +64,23 @@ class DatabaseArticleReaderTest {
         assertThat(page.total()).isEqualTo(2);
         assertThat(page.records()).extracting("id").containsExactly(2, 1);
     }
+
+    @Test
+    void findsPublishedArticleDetail() {
+        var article = reader.findPublishedArticleById(1);
+
+        assertThat(article).isPresent();
+        assertThat(article.get().id()).isEqualTo(1);
+        assertThat(article.get().content()).isNotBlank();
+        assertThat(article.get().category().name()).isEqualTo("Java");
+        assertThat(article.get().tags()).extracting("id").containsExactly(1, 3);
+    }
+
+    @Test
+    void doesNotFindNonPublicArticleDetails() {
+        assertThat(reader.findPublishedArticleById(3)).isEmpty();
+        assertThat(reader.findPublishedArticleById(4)).isEmpty();
+        assertThat(reader.findPublishedArticleById(5)).isEmpty();
+        assertThat(reader.findPublishedArticleById(999)).isEmpty();
+    }
 }

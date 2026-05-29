@@ -1,6 +1,9 @@
 package com.aurora.myblog.v2.modules.content.application;
 
+import com.aurora.myblog.v2.common.error.ApiErrorCode;
+import com.aurora.myblog.v2.common.error.ApiException;
 import com.aurora.myblog.v2.common.web.PageResponse;
+import com.aurora.myblog.v2.modules.content.domain.ArticleDetail;
 import com.aurora.myblog.v2.modules.content.domain.ArticlePageQuery;
 import com.aurora.myblog.v2.modules.content.domain.ArticleReader;
 import com.aurora.myblog.v2.modules.content.domain.ArticleSummary;
@@ -47,6 +50,11 @@ public class ContentQueryService {
 
     public PageResponse<ArticleSummary> listArticlesByTag(int tagId, Integer page, Integer size) {
         return articleReader.listPublishedArticlesByTag(tagId, ArticlePageQuery.of(page, size));
+    }
+
+    public ArticleDetail getArticleDetail(int articleId) {
+        return articleReader.findPublishedArticleById(articleId)
+                .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "文章不存在"));
     }
 
     private int normalizeTopTagLimit(Integer limit) {

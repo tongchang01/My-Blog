@@ -25,6 +25,11 @@ public class ContentArticleController {
         return ApiResponse.ok(mapArticlePage(contentQueryService.listArticles(page, size)));
     }
 
+    @GetMapping("/api/articles/{articleId}")
+    public ApiResponse<ArticleDetailResponse> getArticleDetail(@PathVariable int articleId) {
+        return ApiResponse.ok(ArticleDetailResponse.from(contentQueryService.getArticleDetail(articleId)));
+    }
+
     @GetMapping("/api/categories/{categoryId}/articles")
     public ApiResponse<PageResponse<ArticleSummaryResponse>> listArticlesByCategory(
             @PathVariable int categoryId,

@@ -62,4 +62,28 @@ class ContentArticleControllerTest {
                 .andExpect(jsonPath("$.data.records[0].id").value(2))
                 .andExpect(jsonPath("$.data.records[1].id").value(1));
     }
+
+    @Test
+    void returnsPublishedArticleDetailWithoutToken() throws Exception {
+        mockMvc.perform(get("/api/articles/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(1))
+                .andExpect(jsonPath("$.data.content").isNotEmpty())
+                .andExpect(jsonPath("$.data.category.name").value("Java"))
+                .andExpect(jsonPath("$.data.tags.length()").value(2));
+    }
+
+    @Test
+    void returnsNotFoundForNonPublicArticleDetail() throws Exception {
+        mockMvc.perform(get("/api/articles/3"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.code").value("NOT_FOUND"));
+
+        mockMvc.perform(get("/api/articles/999"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.code").value("NOT_FOUND"));
+    }
 }

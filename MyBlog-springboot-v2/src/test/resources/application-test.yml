@@ -23,5 +23,6 @@ myblog:
       - /api/tags
       - /api/tags/top
       - /api/articles
+      - /api/articles/*
       - /api/categories/*/articles
       - /api/tags/*/articles

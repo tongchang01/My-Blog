@@ -1,6 +1,7 @@
 package com.aurora.myblog.v2.modules.content.infrastructure;
 
 import com.aurora.myblog.v2.common.web.PageResponse;
+import com.aurora.myblog.v2.modules.content.domain.ArticleDetail;
 import com.aurora.myblog.v2.modules.content.domain.ArticlePageQuery;
 import com.aurora.myblog.v2.modules.content.domain.ArticleReader;
 import com.aurora.myblog.v2.modules.content.domain.ArticleSummary;
@@ -16,6 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 @Component
@@ -90,6 +92,56 @@ public class DatabaseArticleReader implements ArticleReader {
         return toPage(query, total, () -> loadArticleSummaries(ids));
     }
 
+    @Override
+    public Optional<ArticleDetail> findPublishedArticleById(int articleId) {
+        List<ArticleDetailRow> rows = jdbcTemplate.query("""
+                        select a.id,
+                               a.article_title,
+                               a.article_abstract,
+                               a.article_content,
+                               a.article_cover,
+                               a.is_top,
+                               a.is_featured,
+                               a.create_time,
+                               a.update_time,
+                               c.id as category_id,
+                               c.category_name,
+                               u.id as author_id,
+                               u.nickname,
+                               u.avatar,
+                               t.id as tag_id,
+                               t.tag_name
+                        from t_article a
+                        join t_category c on c.id = a.category_id
+                        join t_user_info u on u.id = a.user_id
+                        left join t_article_tag at on at.article_id = a.id
+                        left join t_tag t on t.id = at.tag_id
+                        where a.id = ?
+                          and a.is_delete = 0
+                          and a.status = 1
+                        order by t.id asc
+                        """,
+                (rs, rowNum) -> new ArticleDetailRow(
+                        rs.getInt("id"),
+                        rs.getString("article_title"),
+                        rs.getString("article_abstract"),
+                        rs.getString("article_content"),
+                        rs.getString("article_cover"),
+                        rs.getInt("is_top") == 1,
+                        rs.getInt("is_featured") == 1,
+                        toLocalDateTime(rs.getTimestamp("create_time")),
+                        toLocalDateTime(rs.getTimestamp("update_time")),
+                        rs.getInt("category_id"),
+                        rs.getString("category_name"),
+                        rs.getInt("author_id"),
+                        rs.getString("nickname"),
+                        rs.getString("avatar"),
+                        (Integer) rs.getObject("tag_id"),
+                        rs.getString("tag_name")),
+                articleId);
+        return toArticleDetail(rows);
+    }
+
     private PageResponse<ArticleSummary> toPage(ArticlePageQuery query,
                                                 Long total,
                                                 Supplier<List<ArticleSummary>> recordsSupplier) {
@@ -158,6 +210,30 @@ public class DatabaseArticleReader implements ArticleReader {
                 .toList();
     }
 
+    private Optional<ArticleDetail> toArticleDetail(List<ArticleDetailRow> rows) {
+        if (rows.isEmpty()) {
+            return Optional.empty();
+        }
+        ArticleDetailRow first = rows.get(0);
+        List<ArticleTagSummary> tags = rows.stream()
+                .filter(row -> row.tagId() != null)
+                .map(row -> new ArticleTagSummary(row.tagId(), row.tagName()))
+                .toList();
+        return Optional.of(new ArticleDetail(
+                first.id(),
+                first.title(),
+                first.summary(),
+                first.content(),
+                first.cover(),
+                new CategorySummary(first.categoryId(), first.categoryName(), 0),
+                new AuthorSummary(first.authorId(), first.nickname(), first.avatar()),
+                tags,
+                first.top(),
+                first.featured(),
+                first.createdAt(),
+                first.updatedAt()));
+    }
+
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp == null ? null : timestamp.toLocalDateTime();
     }
@@ -170,6 +246,26 @@ public class DatabaseArticleReader implements ArticleReader {
             boolean top,
             boolean featured,
             LocalDateTime createdAt,
+            int categoryId,
+            String categoryName,
+            int authorId,
+            String nickname,
+            String avatar,
+            Integer tagId,
+            String tagName
+    ) {
+    }
+
+    private record ArticleDetailRow(
+            int id,
+            String title,
+            String summary,
+            String content,
+            String cover,
+            boolean top,
+            boolean featured,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt,
             int categoryId,
             String categoryName,
             int authorId,
