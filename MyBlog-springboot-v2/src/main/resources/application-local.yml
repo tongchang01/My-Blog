@@ -2,7 +2,7 @@ spring:
   datasource:
     url: ${MYBLOG_DATASOURCE_URL:jdbc:mysql://localhost:3306/aurora?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Tokyo}
     username: ${MYBLOG_DATASOURCE_USERNAME:root}
-    password: ${MYBLOG_DATASOURCE_PASSWORD:2423137093}
+    password: ${MYBLOG_DATASOURCE_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
     enabled: false
@@ -17,3 +17,10 @@ myblog:
       - /actuator/health
       - /api/public/security-probe
       - /api/auth/login
+      - /api/categories
+      - /api/tags
+      - /api/tags/top
+      - /api/articles
+      - /api/articles/*
+      - /api/categories/*/articles
+      - /api/tags/*/articles

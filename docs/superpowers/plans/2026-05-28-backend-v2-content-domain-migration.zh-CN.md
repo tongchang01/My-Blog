@@ -1353,3 +1353,120 @@ git commit -m "同步后端V2内容迁移计划状态"
 8. 内容相关真实表结构治理。
 
 原因是读者端能力稳定后，前台 Vue3 可以先接入 V2；后台写操作再跟着真实编辑流程逐步迁移，风险更低。
+
+## 执行结果
+
+执行日期：2026-05-29。
+
+### 任务提交记录
+
+- 任务 1：`6865acf 补齐后端V2内容测试表`
+- 任务 2：`16eb85a 新增后端V2分页响应`
+- 任务 3：`84938cd 迁移后端V2分类标签只读接口`
+- 任务 4：`d81801d 迁移后端V2文章列表接口`
+- 任务 5：`891b9e3 迁移后端V2文章详情接口`
+- 任务 6：本次提交同步计划状态和本地 profile 公开内容接口。
+
+### 全量测试结果
+
+```powershell
+$env:JAVA_HOME='C:\Program Files\Java\jdk-17'
+mvn -f MyBlog-springboot-v2/pom.xml test
+```
+
+结果：
+
+```text
+Tests run: 72, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+```
+
+### 打包结果
+
+```powershell
+$env:JAVA_HOME='C:\Program Files\Java\jdk-17'
+mvn -f MyBlog-springboot-v2/pom.xml clean package
+```
+
+结果：
+
+```text
+Tests run: 72, Failures: 0, Errors: 0, Skipped: 0
+BUILD SUCCESS
+```
+
+生成产物：
+
+```text
+MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar
+```
+
+### 本地 MySQL 只读结果
+
+本地库名：`aurora`。
+
+只读计数结果：
+
+```text
+t_article       20
+t_category      4
+t_tag           14
+t_article_tag   24
+published_articles 19
+```
+
+### 本地 V2 API 冒烟结果
+
+启动本地 V2 服务后，以下接口全部返回 `success=true`：
+
+```text
+GET /api/categories
+GET /api/tags
+GET /api/tags/top?limit=10
+GET /api/articles?page=1&size=5
+GET /api/articles/{articleId}
+```
+
+真实库冒烟返回摘要：
+
+```text
+categoryCount   4
+tagCount        14
+topTagCount     10
+articleTotal    19
+articleReturned 5
+detailSuccess   true
+```
+
+### 额外同步项
+
+任务 6 发现 `application-local.yml` 覆盖了 `myblog.security.public-endpoints` 列表。如果只改 `application.yml` 和 `application-test.yml`，本地默认 `local` profile 下内容读者接口仍会被安全链拦截。
+
+因此本次同步了 `application-local.yml` 的公开端点：
+
+```text
+/api/categories
+/api/tags
+/api/tags/top
+/api/articles
+/api/articles/*
+/api/categories/*/articles
+/api/tags/*/articles
+```
+
+同时移除了 `application-local.yml` 中数据库密码的硬编码默认值。本地启动需要通过环境变量 `MYBLOG_DATASOURCE_PASSWORD` 注入密码，避免把个人本地密码继续提交到 Git。
+
+### 未迁移能力清单
+
+本计划已经完成第一批内容只读能力。以下能力仍然按计划留到后续阶段：
+
+- 置顶和推荐文章组合接口。
+- 文章归档接口。
+- 密码文章访问流程。
+- 搜索接口。
+- Redis 浏览量统计。
+- 后台文章管理列表。
+- 后台文章新增、编辑、删除、上下架。
+- 分类和标签后台管理。
+- 图片上传、Markdown 导入导出。
+- 内容相关真实表结构治理。
