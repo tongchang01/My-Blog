@@ -6,6 +6,7 @@ import com.aurora.myblog.v2.modules.content.domain.ArticlePageQuery;
 import com.aurora.myblog.v2.modules.content.domain.ArticleReader;
 import com.aurora.myblog.v2.modules.content.domain.ArticleSummary;
 import com.aurora.myblog.v2.modules.content.domain.ArticleTagSummary;
+import com.aurora.myblog.v2.modules.content.domain.ArchiveMonth;
 import com.aurora.myblog.v2.modules.content.domain.AuthorSummary;
 import com.aurora.myblog.v2.modules.content.domain.CategorySummary;
 import com.aurora.myblog.v2.modules.content.domain.FeaturedArticles;
@@ -119,6 +120,22 @@ public class DatabaseArticleReader implements ArticleReader {
     }
 
     @Override
+    public PageResponse<ArchiveMonth> listPublishedArchives(ArticlePageQuery query) {
+        List<ArticleSummary> articles = loadArchiveArticles();
+        Map<String, List<ArticleSummary>> articlesByMonth = articles.stream()
+                .collect(Collectors.groupingBy(
+                        this::toArchiveMonth,
+                        LinkedHashMap::new,
+                        Collectors.toList()));
+        List<ArchiveMonth> allMonths = articlesByMonth.entrySet().stream()
+                .map(entry -> new ArchiveMonth(entry.getKey(), entry.getValue()))
+                .toList();
+        int fromIndex = Math.min(query.offset(), allMonths.size());
+        int toIndex = Math.min(fromIndex + query.size(), allMonths.size());
+        return new PageResponse<>(allMonths.subList(fromIndex, toIndex), allMonths.size(), query.page(), query.size());
+    }
+
+    @Override
     public Optional<ArticleDetail> findPublishedArticleById(int articleId) {
         List<ArticleDetailRow> rows = jdbcTemplate.query("""
                         select a.id,
@@ -226,6 +243,21 @@ public class DatabaseArticleReader implements ArticleReader {
                 .map(articlesById::get)
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    private List<ArticleSummary> loadArchiveArticles() {
+        List<Integer> ids = jdbcTemplate.queryForList("""
+                select a.id
+                from t_article a
+                where a.is_delete = 0
+                  and a.status = 1
+                order by a.create_time desc, a.id desc
+                """, Integer.class);
+        return loadArticleSummaries(ids);
+    }
+
+    private String toArchiveMonth(ArticleSummary article) {
+        return "%04d-%02d".formatted(article.createdAt().getYear(), article.createdAt().getMonthValue());
     }
 
     private List<ArticleSummary> groupRows(List<ArticleSummaryRow> rows) {

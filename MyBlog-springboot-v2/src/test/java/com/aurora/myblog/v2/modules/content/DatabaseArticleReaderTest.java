@@ -59,6 +59,16 @@ class DatabaseArticleReaderTest {
     }
 
     @Test
+    void listsPublishedArchivesGroupedByMonth() {
+        var page = reader.listPublishedArchives(new ArticlePageQuery(1, 10));
+
+        assertThat(page.total()).isEqualTo(2);
+        assertThat(page.records()).extracting("month").containsExactly("2026-05", "2026-04");
+        assertThat(page.records().get(0).articles()).extracting("id").containsExactly(1);
+        assertThat(page.records().get(1).articles()).extracting("id").containsExactly(2);
+    }
+
+    @Test
     void listsPublishedArticlesByCategory() {
         var page = reader.listPublishedArticlesByCategory(1, new ArticlePageQuery(1, 10));
 

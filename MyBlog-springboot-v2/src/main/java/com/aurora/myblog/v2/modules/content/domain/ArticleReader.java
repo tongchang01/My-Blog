@@ -14,5 +14,7 @@ public interface ArticleReader {
 
     FeaturedArticles findFeaturedArticles();
 
+    PageResponse<ArchiveMonth> listPublishedArchives(ArticlePageQuery query);
+
     Optional<ArticleDetail> findPublishedArticleById(int articleId);
 }

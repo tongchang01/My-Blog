@@ -46,6 +46,18 @@ class ContentArticleControllerTest {
     }
 
     @Test
+    void returnsArticleArchivesWithoutToken() throws Exception {
+        mockMvc.perform(get("/api/articles/archives?page=1&size=10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.total").value(2))
+                .andExpect(jsonPath("$.data.records[0].month").value("2026-05"))
+                .andExpect(jsonPath("$.data.records[0].articles[0].id").value(1))
+                .andExpect(jsonPath("$.data.records[1].month").value("2026-04"))
+                .andExpect(jsonPath("$.data.records[1].articles[0].id").value(2));
+    }
+
+    @Test
     void normalizesInvalidPageParameters() throws Exception {
         mockMvc.perform(get("/api/articles?page=0&size=999"))
                 .andExpect(status().isOk())

@@ -7,6 +7,7 @@ import com.aurora.myblog.v2.modules.content.domain.ArticleDetail;
 import com.aurora.myblog.v2.modules.content.domain.ArticlePageQuery;
 import com.aurora.myblog.v2.modules.content.domain.ArticleReader;
 import com.aurora.myblog.v2.modules.content.domain.ArticleSummary;
+import com.aurora.myblog.v2.modules.content.domain.ArchiveMonth;
 import com.aurora.myblog.v2.modules.content.domain.CategorySummary;
 import com.aurora.myblog.v2.modules.content.domain.ContentCatalogReader;
 import com.aurora.myblog.v2.modules.content.domain.FeaturedArticles;
@@ -55,6 +56,10 @@ public class ContentQueryService {
 
     public FeaturedArticles getFeaturedArticles() {
         return articleReader.findFeaturedArticles();
+    }
+
+    public PageResponse<ArchiveMonth> listArchives(Integer page, Integer size) {
+        return articleReader.listPublishedArchives(ArticlePageQuery.of(page, size));
     }
 
     public ArticleDetail getArticleDetail(int articleId) {

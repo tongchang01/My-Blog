@@ -3,6 +3,7 @@ package com.aurora.myblog.v2.modules.content.api;
 import com.aurora.myblog.v2.common.web.ApiResponse;
 import com.aurora.myblog.v2.common.web.PageResponse;
 import com.aurora.myblog.v2.modules.content.domain.ArticleSummary;
+import com.aurora.myblog.v2.modules.content.domain.ArchiveMonth;
 import com.aurora.myblog.v2.modules.content.application.ContentQueryService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,6 +31,13 @@ public class ContentArticleController {
         return ApiResponse.ok(FeaturedArticlesResponse.from(contentQueryService.getFeaturedArticles()));
     }
 
+    @GetMapping("/api/articles/archives")
+    public ApiResponse<PageResponse<ArchiveMonthResponse>> listArchives(
+            @RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size) {
+        return ApiResponse.ok(mapArchivePage(contentQueryService.listArchives(page, size)));
+    }
+
     @GetMapping("/api/articles/{articleId}")
     public ApiResponse<ArticleDetailResponse> getArticleDetail(@PathVariable int articleId) {
         return ApiResponse.ok(ArticleDetailResponse.from(contentQueryService.getArticleDetail(articleId)));
@@ -54,6 +62,14 @@ public class ContentArticleController {
     private PageResponse<ArticleSummaryResponse> mapArticlePage(PageResponse<ArticleSummary> page) {
         return new PageResponse<>(
                 page.records().stream().map(ArticleSummaryResponse::from).toList(),
+                page.total(),
+                page.page(),
+                page.size());
+    }
+
+    private PageResponse<ArchiveMonthResponse> mapArchivePage(PageResponse<ArchiveMonth> page) {
+        return new PageResponse<>(
+                page.records().stream().map(ArchiveMonthResponse::from).toList(),
                 page.total(),
                 page.page(),
                 page.size());
