@@ -8,6 +8,7 @@ import com.aurora.myblog.v2.modules.content.domain.ArticleSummary;
 import com.aurora.myblog.v2.modules.content.domain.ArticleTagSummary;
 import com.aurora.myblog.v2.modules.content.domain.AuthorSummary;
 import com.aurora.myblog.v2.modules.content.domain.CategorySummary;
+import com.aurora.myblog.v2.modules.content.domain.FeaturedArticles;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -17,8 +18,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 @Component
 public class DatabaseArticleReader implements ArticleReader {
@@ -90,6 +93,29 @@ public class DatabaseArticleReader implements ArticleReader {
                 limit ? offset ?
                 """, Integer.class, tagId, query.size(), query.offset());
         return toPage(query, total, () -> loadArticleSummaries(ids));
+    }
+
+    @Override
+    public FeaturedArticles findFeaturedArticles() {
+        List<Integer> ids = jdbcTemplate.queryForList("""
+                select a.id
+                from t_article a
+                where a.is_delete = 0
+                  and a.status = 1
+                  and (a.is_top = 1 or a.is_featured = 1)
+                order by a.is_top desc, a.is_featured desc, a.id desc
+                limit 3
+                """, Integer.class);
+        List<ArticleSummary> articles = loadArticleSummaries(ids);
+        Optional<ArticleSummary> topArticle = articles.stream()
+                .filter(ArticleSummary::top)
+                .findFirst();
+        List<ArticleSummary> featuredArticles = articles.stream()
+                .filter(article -> topArticle.map(top -> top.id() != article.id()).orElse(true))
+                .filter(ArticleSummary::featured)
+                .limit(2)
+                .toList();
+        return new FeaturedArticles(topArticle, featuredArticles);
     }
 
     @Override
@@ -194,7 +220,12 @@ public class DatabaseArticleReader implements ArticleReader {
                         (Integer) rs.getObject("tag_id"),
                         rs.getString("tag_name")),
                 ids.toArray());
-        return groupRows(rows);
+        Map<Integer, ArticleSummary> articlesById = groupRows(rows).stream()
+                .collect(Collectors.toMap(ArticleSummary::id, article -> article));
+        return ids.stream()
+                .map(articlesById::get)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
     private List<ArticleSummary> groupRows(List<ArticleSummaryRow> rows) {

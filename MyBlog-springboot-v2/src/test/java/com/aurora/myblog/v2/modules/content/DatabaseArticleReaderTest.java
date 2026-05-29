@@ -50,6 +50,15 @@ class DatabaseArticleReaderTest {
     }
 
     @Test
+    void findsPublishedFeaturedArticlesOnly() {
+        var featured = reader.findFeaturedArticles();
+
+        assertThat(featured.topArticle()).isPresent();
+        assertThat(featured.topArticle().get().id()).isEqualTo(1);
+        assertThat(featured.featuredArticles()).extracting("id").containsExactly(2);
+    }
+
+    @Test
     void listsPublishedArticlesByCategory() {
         var page = reader.listPublishedArticlesByCategory(1, new ArticlePageQuery(1, 10));
 

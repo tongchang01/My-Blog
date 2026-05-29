@@ -36,6 +36,16 @@ class ContentArticleControllerTest {
     }
 
     @Test
+    void returnsFeaturedArticlesWithoutToken() throws Exception {
+        mockMvc.perform(get("/api/articles/featured"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.topArticle.id").value(1))
+                .andExpect(jsonPath("$.data.featuredArticles.length()").value(1))
+                .andExpect(jsonPath("$.data.featuredArticles[0].id").value(2));
+    }
+
+    @Test
     void normalizesInvalidPageParameters() throws Exception {
         mockMvc.perform(get("/api/articles?page=0&size=999"))
                 .andExpect(status().isOk())

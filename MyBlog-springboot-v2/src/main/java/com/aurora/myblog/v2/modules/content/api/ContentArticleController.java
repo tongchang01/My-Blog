@@ -25,6 +25,11 @@ public class ContentArticleController {
         return ApiResponse.ok(mapArticlePage(contentQueryService.listArticles(page, size)));
     }
 
+    @GetMapping("/api/articles/featured")
+    public ApiResponse<FeaturedArticlesResponse> getFeaturedArticles() {
+        return ApiResponse.ok(FeaturedArticlesResponse.from(contentQueryService.getFeaturedArticles()));
+    }
+
     @GetMapping("/api/articles/{articleId}")
     public ApiResponse<ArticleDetailResponse> getArticleDetail(@PathVariable int articleId) {
         return ApiResponse.ok(ArticleDetailResponse.from(contentQueryService.getArticleDetail(articleId)));

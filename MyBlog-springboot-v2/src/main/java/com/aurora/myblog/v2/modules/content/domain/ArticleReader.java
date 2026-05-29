@@ -12,5 +12,7 @@ public interface ArticleReader {
 
     PageResponse<ArticleSummary> listPublishedArticlesByTag(int tagId, ArticlePageQuery query);
 
+    FeaturedArticles findFeaturedArticles();
+
     Optional<ArticleDetail> findPublishedArticleById(int articleId);
 }
