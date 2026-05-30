@@ -973,7 +973,7 @@ git commit -m "新增后端V2后台评论管理接口"
 
 - Modify: `docs/superpowers/plans/2026-05-30-backend-v2-comment-admin-review.zh-CN.md`
 
-- [ ] **Step 1: 全量测试**
+- [x] **Step 1: 全量测试**
 
 Run:
 
@@ -990,7 +990,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 2: 打包**
+- [x] **Step 2: 打包**
 
 Run:
 
@@ -1006,7 +1006,7 @@ Expected:
 BUILD SUCCESS
 ```
 
-- [ ] **Step 3: 本地 MySQL 只读检查**
+- [x] **Step 3: 本地 MySQL 只读检查**
 
 不要把本地密码写进文件。命令只读取当前 PowerShell 会话环境变量：
 
@@ -1022,7 +1022,7 @@ Expected:
 SQL 执行成功；如果本地库有评论，应看到未删除评论总数和审核状态分布。
 ```
 
-- [ ] **Step 4: 本地 API 冒烟**
+- [x] **Step 4: 本地 API 冒烟**
 
 启动服务时通过环境变量注入数据库密码：
 
@@ -1051,7 +1051,7 @@ Expected:
 后台列表返回 200；审核接口返回 200 和 affected 数量。没有管理员账号时跳过真实后台接口冒烟，并说明原因。
 ```
 
-- [ ] **Step 5: 更新本计划的执行结果**
+- [x] **Step 5: 更新本计划的执行结果**
 
 先读取实际提交记录：
 
@@ -1061,7 +1061,7 @@ git log --oneline -8
 
 再在本文档末尾追加真实执行结果。提交记录必须复制实际短 SHA 和提交信息。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add docs/superpowers/plans/2026-05-30-backend-v2-comment-admin-review.zh-CN.md
@@ -1078,3 +1078,14 @@ git commit -m "同步后端V2评论审核计划状态"
 - 安全控制：接口全部位于 `/api/admin/comments`，由现有 `/api/admin/**` 规则保护；未登录为 `401`，非管理员为 `403`。
 - 数据控制：删除只更新 `is_delete = 1`；审核只更新 `is_review`；单次批量最多 100 条，避免一次请求更新过多数据。
 - 占位扫描：文档没有待替换占位词；本地数据库密码只通过环境变量读取，不能写入代码、文档或 Git。
+
+## 执行结果
+
+- 计划提交：`39ff985 新增后端V2评论审核管理计划`。
+- 任务 1 和任务 2 提交：`52f3d46 实现后端V2后台评论查询`，已补齐后台评论查询领域模型、读取端口、数据库适配器和查询测试。
+- 任务 3 提交：`bc601b1 新增后端V2后台评论审核写入能力`，已补齐批量审核、取消审核、软删除领域端口、数据库适配器和写入测试。
+- 任务 4 提交：`eab9447 新增后端V2后台评论管理接口`，已补齐后台评论应用服务、请求响应 DTO、Controller 和接口鉴权测试。
+- 全量测试：`mvn -f MyBlog-springboot-v2/pom.xml test` 通过，结果为 `Tests run: 111, Failures: 0, Errors: 0, Skipped: 0`。
+- 打包验证：`mvn -f MyBlog-springboot-v2/pom.xml clean package` 通过，生成 `MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar`。
+- 本地 MySQL 只读检查：`aurora.t_comment` 未删除评论数为 `0`，审核状态分布无返回行；本地库当前没有可用于后台评论列表和审核写入的真实评论数据。
+- 本地 API 冒烟：应用以 `local` profile 启动成功，`GET /actuator/health` 返回 `200`；使用候选管理员账号登录返回 `401`，因此跳过真实后台接口登录态冒烟，没有伪造后台接口通过结果。
