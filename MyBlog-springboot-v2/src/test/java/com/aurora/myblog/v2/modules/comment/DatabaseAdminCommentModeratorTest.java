@@ -3,6 +3,7 @@ package com.aurora.myblog.v2.modules.comment;
 import com.aurora.myblog.v2.common.error.ApiException;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentDeletionCommand;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentModerationCommand;
+import com.aurora.myblog.v2.modules.comment.domain.AdminCommentRestoreCommand;
 import com.aurora.myblog.v2.modules.comment.infrastructure.DatabaseAdminCommentModerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,15 @@ class DatabaseAdminCommentModeratorTest {
         Integer second = jdbcTemplate.queryForObject("select is_delete from t_comment where id = 2", Integer.class);
         assertThat(first).isEqualTo(1);
         assertThat(second).isEqualTo(1);
+    }
+
+    @Test
+    void restoresDeletedCommentsInBatch() {
+        int affected = moderator.restore(new AdminCommentRestoreCommand(List.of(4)));
+
+        Integer deleted = jdbcTemplate.queryForObject("select is_delete from t_comment where id = 4", Integer.class);
+        assertThat(affected).isEqualTo(1);
+        assertThat(deleted).isZero();
     }
 
     @Test

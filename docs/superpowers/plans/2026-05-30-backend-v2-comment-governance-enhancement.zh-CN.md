@@ -368,7 +368,7 @@ git commit -m "实现后端V2后台评论详情查询"
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/application/AdminCommentCommandService.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentModeratorTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 在 `DatabaseAdminCommentModeratorTest` 增加：
 
@@ -383,7 +383,7 @@ void restoresDeletedCommentsInBatch() {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -398,7 +398,7 @@ cannot find symbol: class AdminCommentRestoreCommand
 cannot find symbol: method restore(AdminCommentRestoreCommand)
 ```
 
-- [ ] **Step 3: 新增恢复命令和端口**
+- [x] **Step 3: 新增恢复命令和端口**
 
 新增 `AdminCommentRestoreCommand.java`：
 
@@ -435,7 +435,7 @@ public interface AdminCommentModerator {
 }
 ```
 
-- [ ] **Step 4: 实现数据库恢复**
+- [x] **Step 4: 实现数据库恢复**
 
 在 `DatabaseAdminCommentModerator` 增加：
 
@@ -452,7 +452,7 @@ public int restore(AdminCommentRestoreCommand command) {
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentRestoreCommand;
 ```
 
-- [ ] **Step 5: 暴露应用服务方法**
+- [x] **Step 5: 暴露应用服务方法**
 
 在 `AdminCommentCommandService` 增加：
 
@@ -468,7 +468,7 @@ public Result restore(AdminCommentRestoreCommand command) {
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentRestoreCommand;
 ```
 
-- [ ] **Step 6: 运行恢复测试**
+- [x] **Step 6: 运行恢复测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -483,7 +483,7 @@ Tests run: 5, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentRestoreCommand.java `

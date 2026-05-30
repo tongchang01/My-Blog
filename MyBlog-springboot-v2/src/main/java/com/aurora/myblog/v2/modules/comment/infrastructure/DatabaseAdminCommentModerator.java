@@ -5,6 +5,7 @@ import com.aurora.myblog.v2.common.error.ApiException;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentDeletionCommand;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentModerationCommand;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentModerator;
+import com.aurora.myblog.v2.modules.comment.domain.AdminCommentRestoreCommand;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -31,6 +32,12 @@ public class DatabaseAdminCommentModerator implements AdminCommentModerator {
     public int delete(AdminCommentDeletionCommand command) {
         List<Integer> ids = normalizeIds(command.ids());
         return update(ids, "is_delete", 1);
+    }
+
+    @Override
+    public int restore(AdminCommentRestoreCommand command) {
+        List<Integer> ids = normalizeIds(command.ids());
+        return update(ids, "is_delete", 0);
     }
 
     private int update(List<Integer> ids, String column, int value) {

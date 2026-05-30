@@ -5,4 +5,6 @@ public interface AdminCommentModerator {
     int review(AdminCommentModerationCommand command);
 
     int delete(AdminCommentDeletionCommand command);
+
+    int restore(AdminCommentRestoreCommand command);
 }
