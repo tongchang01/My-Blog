@@ -16,5 +16,7 @@ public interface ArticleReader {
 
     PageResponse<ArchiveMonth> listPublishedArchives(ArticlePageQuery query);
 
+    Optional<ArticleAccessCheck> findArticleAccessCheckById(int articleId);
+
     Optional<ArticleDetail> findPublishedArticleById(int articleId);
 }

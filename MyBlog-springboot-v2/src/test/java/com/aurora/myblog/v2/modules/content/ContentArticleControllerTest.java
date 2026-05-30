@@ -4,10 +4,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -55,6 +57,20 @@ class ContentArticleControllerTest {
                 .andExpect(jsonPath("$.data.records[0].articles[0].id").value(1))
                 .andExpect(jsonPath("$.data.records[1].month").value("2026-04"))
                 .andExpect(jsonPath("$.data.records[1].articles[0].id").value(2));
+    }
+
+    @Test
+    void returnsAccessTokenForCorrectProtectedArticlePassword() throws Exception {
+        mockMvc.perform(post("/api/articles/3/access")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"password":"open-sesame"}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.articleId").value(3))
+                .andExpect(jsonPath("$.data.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.data.expiresAt").isNotEmpty());
     }
 
     @Test

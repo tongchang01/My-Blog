@@ -69,6 +69,16 @@ class DatabaseArticleReaderTest {
     }
 
     @Test
+    void findsArticleAccessCheckForProtectedArticle() {
+        var check = reader.findArticleAccessCheckById(3);
+
+        assertThat(check).isPresent();
+        assertThat(check.get().id()).isEqualTo(3);
+        assertThat(check.get().protectedArticle()).isTrue();
+        assertThat(check.get().password()).isEqualTo("open-sesame");
+    }
+
+    @Test
     void listsPublishedArticlesByCategory() {
         var page = reader.listPublishedArticlesByCategory(1, new ArticlePageQuery(1, 10));
 

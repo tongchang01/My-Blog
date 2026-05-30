@@ -1,6 +1,7 @@
 package com.aurora.myblog.v2.modules.content.infrastructure;
 
 import com.aurora.myblog.v2.common.web.PageResponse;
+import com.aurora.myblog.v2.modules.content.domain.ArticleAccessCheck;
 import com.aurora.myblog.v2.modules.content.domain.ArticleDetail;
 import com.aurora.myblog.v2.modules.content.domain.ArticlePageQuery;
 import com.aurora.myblog.v2.modules.content.domain.ArticleReader;
@@ -133,6 +134,25 @@ public class DatabaseArticleReader implements ArticleReader {
         int fromIndex = Math.min(query.offset(), allMonths.size());
         int toIndex = Math.min(fromIndex + query.size(), allMonths.size());
         return new PageResponse<>(allMonths.subList(fromIndex, toIndex), allMonths.size(), query.page(), query.size());
+    }
+
+    @Override
+    public Optional<ArticleAccessCheck> findArticleAccessCheckById(int articleId) {
+        List<ArticleAccessCheck> checks = jdbcTemplate.query("""
+                        select a.id,
+                               a.status,
+                               a.is_delete,
+                               a.password
+                        from t_article a
+                        where a.id = ?
+                        """,
+                (rs, rowNum) -> new ArticleAccessCheck(
+                        rs.getInt("id"),
+                        rs.getInt("status"),
+                        rs.getInt("is_delete") == 1,
+                        rs.getString("password")),
+                articleId);
+        return checks.stream().findFirst();
     }
 
     @Override

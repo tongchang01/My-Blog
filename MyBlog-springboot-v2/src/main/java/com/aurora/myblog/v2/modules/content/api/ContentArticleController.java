@@ -2,11 +2,14 @@ package com.aurora.myblog.v2.modules.content.api;
 
 import com.aurora.myblog.v2.common.web.ApiResponse;
 import com.aurora.myblog.v2.common.web.PageResponse;
+import com.aurora.myblog.v2.modules.content.application.ContentQueryService;
 import com.aurora.myblog.v2.modules.content.domain.ArticleSummary;
 import com.aurora.myblog.v2.modules.content.domain.ArchiveMonth;
-import com.aurora.myblog.v2.modules.content.application.ContentQueryService;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,6 +39,15 @@ public class ContentArticleController {
             @RequestParam(required = false) Integer page,
             @RequestParam(required = false) Integer size) {
         return ApiResponse.ok(mapArchivePage(contentQueryService.listArchives(page, size)));
+    }
+
+    @PostMapping("/api/articles/{articleId}/access")
+    public ApiResponse<ArticleAccessResponse> accessArticle(
+            @PathVariable int articleId,
+            @Valid @RequestBody ArticleAccessRequest request) {
+        return ApiResponse.ok(ArticleAccessResponse.from(
+                articleId,
+                contentQueryService.accessProtectedArticle(articleId, request.password())));
     }
 
     @GetMapping("/api/articles/{articleId}")

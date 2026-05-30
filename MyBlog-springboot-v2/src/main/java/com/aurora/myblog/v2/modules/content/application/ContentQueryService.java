@@ -3,6 +3,8 @@ package com.aurora.myblog.v2.modules.content.application;
 import com.aurora.myblog.v2.common.error.ApiErrorCode;
 import com.aurora.myblog.v2.common.error.ApiException;
 import com.aurora.myblog.v2.common.web.PageResponse;
+import com.aurora.myblog.v2.modules.content.domain.ArticleAccessToken;
+import com.aurora.myblog.v2.modules.content.domain.ArticleAccessTokenService;
 import com.aurora.myblog.v2.modules.content.domain.ArticleDetail;
 import com.aurora.myblog.v2.modules.content.domain.ArticlePageQuery;
 import com.aurora.myblog.v2.modules.content.domain.ArticleReader;
@@ -15,6 +17,7 @@ import com.aurora.myblog.v2.modules.content.domain.TagSummary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ContentQueryService {
@@ -24,10 +27,14 @@ public class ContentQueryService {
 
     private final ContentCatalogReader catalogReader;
     private final ArticleReader articleReader;
+    private final ArticleAccessTokenService articleAccessTokenService;
 
-    public ContentQueryService(ContentCatalogReader catalogReader, ArticleReader articleReader) {
+    public ContentQueryService(ContentCatalogReader catalogReader,
+                               ArticleReader articleReader,
+                               ArticleAccessTokenService articleAccessTokenService) {
         this.catalogReader = catalogReader;
         this.articleReader = articleReader;
+        this.articleAccessTokenService = articleAccessTokenService;
     }
 
     public List<CategorySummary> listCategories() {
@@ -60,6 +67,18 @@ public class ContentQueryService {
 
     public PageResponse<ArchiveMonth> listArchives(Integer page, Integer size) {
         return articleReader.listPublishedArchives(ArticlePageQuery.of(page, size));
+    }
+
+    public ArticleAccessToken accessProtectedArticle(int articleId, String password) {
+        var check = articleReader.findArticleAccessCheckById(articleId)
+                .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "文章不存在"));
+        if (!check.protectedArticle()) {
+            throw new ApiException(ApiErrorCode.NOT_FOUND, "文章不存在");
+        }
+        if (!Objects.equals(check.password(), password)) {
+            throw new ApiException(ApiErrorCode.FORBIDDEN, "文章访问密码错误");
+        }
+        return articleAccessTokenService.issue(articleId);
     }
 
     public ArticleDetail getArticleDetail(int articleId) {
