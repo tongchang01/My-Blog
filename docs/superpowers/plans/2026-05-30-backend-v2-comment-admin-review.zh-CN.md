@@ -85,12 +85,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest
 @AutoConfigureTestDatabase
+@Sql(statements = "update t_comment set is_review = case when id in (1, 2, 5, 6) then 1 when id = 3 then 0 else is_review end, is_delete = case when id = 4 then 1 when id in (1, 2, 3, 5, 6) then 0 else is_delete end where id in (1, 2, 3, 4, 5, 6)")
 class DatabaseAdminCommentReaderTest {
 
     @Autowired
@@ -606,7 +608,7 @@ git commit -m "新增后端V2后台评论审核写入能力"
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/api/AdminCommentDeleteRequest.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/AdminCommentControllerTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 Create `AdminCommentControllerTest.java`:
 
@@ -621,6 +623,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -634,6 +637,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@Sql(statements = "update t_comment set is_review = case when id in (1, 2, 5, 6) then 1 when id = 3 then 0 else is_review end, is_delete = case when id = 4 then 1 when id in (1, 2, 3, 5, 6) then 0 else is_delete end where id in (1, 2, 3, 4, 5, 6)")
 class AdminCommentControllerTest {
 
     @Autowired
@@ -712,7 +716,7 @@ class AdminCommentControllerTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -728,7 +732,7 @@ Expected:
 Status expected:<200> but was:<404>
 ```
 
-- [ ] **Step 3: 新增应用服务**
+- [x] **Step 3: 新增应用服务**
 
 Create `AdminCommentQueryService.java`:
 
@@ -788,7 +792,7 @@ public class AdminCommentCommandService {
 }
 ```
 
-- [ ] **Step 4: 新增请求和响应 DTO**
+- [x] **Step 4: 新增请求和响应 DTO**
 
 Create `AdminCommentResponse.java`:
 
@@ -871,7 +875,7 @@ public record AdminCommentDeleteRequest(
 }
 ```
 
-- [ ] **Step 5: 新增 Controller**
+- [x] **Step 5: 新增 Controller**
 
 Create `AdminCommentController.java`:
 
@@ -937,7 +941,7 @@ public class AdminCommentController {
 }
 ```
 
-- [ ] **Step 6: 运行接口测试确认通过**
+- [x] **Step 6: 运行接口测试确认通过**
 
 Run:
 
@@ -954,7 +958,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/application/AdminCommentQueryService.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/application/AdminCommentCommandService.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/api/AdminCommentController.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/api/AdminCommentResponse.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/api/AdminCommentReviewRequest.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/api/AdminCommentDeleteRequest.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/AdminCommentControllerTest.java
