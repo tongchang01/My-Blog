@@ -79,6 +79,15 @@ class DatabaseArticleReaderTest {
     }
 
     @Test
+    void findsAccessibleProtectedArticleDetail() {
+        var article = reader.findAccessibleArticleById(3);
+
+        assertThat(article).isPresent();
+        assertThat(article.get().id()).isEqualTo(3);
+        assertThat(article.get().content()).isEqualTo("密码正文");
+    }
+
+    @Test
     void listsPublishedArticlesByCategory() {
         var page = reader.listPublishedArticlesByCategory(1, new ArticlePageQuery(1, 10));
 

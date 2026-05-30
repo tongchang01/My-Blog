@@ -157,6 +157,19 @@ public class DatabaseArticleReader implements ArticleReader {
 
     @Override
     public Optional<ArticleDetail> findPublishedArticleById(int articleId) {
+        return findArticleByIdAndStatuses(articleId, List.of(1));
+    }
+
+    @Override
+    public Optional<ArticleDetail> findAccessibleArticleById(int articleId) {
+        return findArticleByIdAndStatuses(articleId, List.of(1, 2));
+    }
+
+    private Optional<ArticleDetail> findArticleByIdAndStatuses(int articleId, List<Integer> statuses) {
+        String statusPlaceholders = String.join(",", statuses.stream().map(status -> "?").toList());
+        List<Object> args = new ArrayList<>();
+        args.add(articleId);
+        args.addAll(statuses);
         List<ArticleDetailRow> rows = jdbcTemplate.query("""
                         select a.id,
                                a.article_title,
@@ -181,9 +194,9 @@ public class DatabaseArticleReader implements ArticleReader {
                         left join t_tag t on t.id = at.tag_id
                         where a.id = ?
                           and a.is_delete = 0
-                          and a.status = 1
+                          and a.status in (%s)
                         order by t.id asc
-                        """,
+                        """.formatted(statusPlaceholders),
                 (rs, rowNum) -> new ArticleDetailRow(
                         rs.getInt("id"),
                         rs.getString("article_title"),
@@ -201,7 +214,7 @@ public class DatabaseArticleReader implements ArticleReader {
                         rs.getString("avatar"),
                         (Integer) rs.getObject("tag_id"),
                         rs.getString("tag_name")),
-                articleId);
+                args.toArray());
         return toArticleDetail(rows);
     }
 

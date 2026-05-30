@@ -81,8 +81,20 @@ public class ContentQueryService {
         return articleAccessTokenService.issue(articleId);
     }
 
-    public ArticleDetail getArticleDetail(int articleId) {
-        return articleReader.findPublishedArticleById(articleId)
+    public ArticleDetail getArticleDetail(int articleId, String accessToken) {
+        var check = articleReader.findArticleAccessCheckById(articleId)
+                .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "文章不存在"));
+        if (check.publicArticle()) {
+            return articleReader.findPublishedArticleById(articleId)
+                    .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "文章不存在"));
+        }
+        if (!check.protectedArticle()) {
+            throw new ApiException(ApiErrorCode.NOT_FOUND, "文章不存在");
+        }
+        if (!articleAccessTokenService.verify(articleId, accessToken)) {
+            throw new ApiException(ApiErrorCode.FORBIDDEN, "文章访问令牌无效");
+        }
+        return articleReader.findAccessibleArticleById(articleId)
                 .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "文章不存在"));
     }
 

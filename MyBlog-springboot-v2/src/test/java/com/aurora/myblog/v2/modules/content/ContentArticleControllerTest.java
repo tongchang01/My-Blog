@@ -1,5 +1,6 @@
 package com.aurora.myblog.v2.modules.content;
 
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -74,6 +75,33 @@ class ContentArticleControllerTest {
     }
 
     @Test
+    void rejectsProtectedArticleDetailWithoutAccessToken() throws Exception {
+        mockMvc.perform(get("/api/articles/3"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.success").value(false))
+                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+    }
+
+    @Test
+    void returnsProtectedArticleDetailWithAccessToken() throws Exception {
+        String response = mockMvc.perform(post("/api/articles/3/access")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"password":"open-sesame"}
+                                """))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        String accessToken = JsonPath.read(response, "$.data.accessToken");
+
+        mockMvc.perform(get("/api/articles/3").header("X-Article-Access-Token", accessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.success").value(true))
+                .andExpect(jsonPath("$.data.id").value(3))
+                .andExpect(jsonPath("$.data.content").value("密码正文"));
+    }
+
+    @Test
     void normalizesInvalidPageParameters() throws Exception {
         mockMvc.perform(get("/api/articles?page=0&size=999"))
                 .andExpect(status().isOk())
@@ -114,11 +142,6 @@ class ContentArticleControllerTest {
 
     @Test
     void returnsNotFoundForNonPublicArticleDetail() throws Exception {
-        mockMvc.perform(get("/api/articles/3"))
-                .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.code").value("NOT_FOUND"));
-
         mockMvc.perform(get("/api/articles/999"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.success").value(false))

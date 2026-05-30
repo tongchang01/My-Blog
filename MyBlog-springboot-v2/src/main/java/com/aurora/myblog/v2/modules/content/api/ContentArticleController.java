@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -51,8 +52,10 @@ public class ContentArticleController {
     }
 
     @GetMapping("/api/articles/{articleId}")
-    public ApiResponse<ArticleDetailResponse> getArticleDetail(@PathVariable int articleId) {
-        return ApiResponse.ok(ArticleDetailResponse.from(contentQueryService.getArticleDetail(articleId)));
+    public ApiResponse<ArticleDetailResponse> getArticleDetail(
+            @PathVariable int articleId,
+            @RequestHeader(value = "X-Article-Access-Token", required = false) String accessToken) {
+        return ApiResponse.ok(ArticleDetailResponse.from(contentQueryService.getArticleDetail(articleId, accessToken)));
     }
 
     @GetMapping("/api/categories/{categoryId}/articles")

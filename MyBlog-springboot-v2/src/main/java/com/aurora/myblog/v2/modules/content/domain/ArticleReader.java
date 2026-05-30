@@ -19,4 +19,6 @@ public interface ArticleReader {
     Optional<ArticleAccessCheck> findArticleAccessCheckById(int articleId);
 
     Optional<ArticleDetail> findPublishedArticleById(int articleId);
+
+    Optional<ArticleDetail> findAccessibleArticleById(int articleId);
 }
