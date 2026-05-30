@@ -506,7 +506,7 @@ git commit -m "新增后端V2后台评论恢复能力"
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/api/AdminCommentController.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/AdminCommentControllerTest.java`
 
-- [ ] **Step 1: 写失败接口测试**
+- [x] **Step 1: 写失败接口测试**
 
 在 `AdminCommentControllerTest` 增加：
 
@@ -545,7 +545,7 @@ void restoresCommentsForAdmin() throws Exception {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -559,7 +559,7 @@ Expected:
 Status expected:<200> but was:<404>
 ```
 
-- [ ] **Step 3: 新增详情响应 DTO**
+- [x] **Step 3: 新增详情响应 DTO**
 
 新增 `AdminCommentDetailResponse.java`：
 
@@ -610,7 +610,7 @@ public record AdminCommentDetailResponse(
 }
 ```
 
-- [ ] **Step 4: 新增恢复请求 DTO**
+- [x] **Step 4: 新增恢复请求 DTO**
 
 新增 `AdminCommentRestoreRequest.java`：
 
@@ -630,7 +630,7 @@ public record AdminCommentRestoreRequest(
 }
 ```
 
-- [ ] **Step 5: 暴露详情应用服务**
+- [x] **Step 5: 暴露详情应用服务**
 
 在 `AdminCommentQueryService` 增加：
 
@@ -648,7 +648,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 ```
 
-- [ ] **Step 6: 修改 Controller**
+- [x] **Step 6: 修改 Controller**
 
 把列表构造查询改为：
 
@@ -686,7 +686,7 @@ import com.aurora.myblog.v2.modules.comment.domain.AdminCommentRestoreCommand;
 import org.springframework.web.bind.annotation.PathVariable;
 ```
 
-- [ ] **Step 7: 运行接口测试**
+- [x] **Step 7: 运行接口测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -700,7 +700,7 @@ Expected:
 BUILD SUCCESS
 ```
 
-- [ ] **Step 8: 提交**
+- [x] **Step 8: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/api/AdminCommentDetailResponse.java `

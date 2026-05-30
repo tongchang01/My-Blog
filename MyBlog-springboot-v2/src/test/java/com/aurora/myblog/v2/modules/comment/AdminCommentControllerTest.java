@@ -59,6 +59,31 @@ class AdminCommentControllerTest {
     }
 
     @Test
+    void getsCommentDetailForAdmin() throws Exception {
+        String token = loginAndToken("admin@163.com");
+
+        mockMvc.perform(get("/api/admin/comments/{id}", 4)
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(4))
+                .andExpect(jsonPath("$.data.content").value("已删除评论"))
+                .andExpect(jsonPath("$.data.deleted").value(true));
+    }
+
+    @Test
+    void listsDeletedCommentsForAdmin() throws Exception {
+        String token = loginAndToken("admin@163.com");
+
+        mockMvc.perform(get("/api/admin/comments")
+                        .param("deleted", "true")
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.records[0].id").value(4))
+                .andExpect(jsonPath("$.data.records[0].deleted").value(true));
+    }
+
+    @Test
     void reviewsCommentsForAdmin() throws Exception {
         String token = loginAndToken("admin@163.com");
 
@@ -81,6 +106,20 @@ class AdminCommentControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"ids":[5]}
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.affected").value(1));
+    }
+
+    @Test
+    void restoresCommentsForAdmin() throws Exception {
+        String token = loginAndToken("admin@163.com");
+
+        mockMvc.perform(put("/api/admin/comments/restore")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"ids":[4]}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.affected").value(1));

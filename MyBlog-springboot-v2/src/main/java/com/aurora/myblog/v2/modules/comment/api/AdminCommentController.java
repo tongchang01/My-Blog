@@ -8,10 +8,12 @@ import com.aurora.myblog.v2.modules.comment.domain.AdminCommentDeletionCommand;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentItem;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentModerationCommand;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentQuery;
+import com.aurora.myblog.v2.modules.comment.domain.AdminCommentRestoreCommand;
 import com.aurora.myblog.v2.modules.comment.domain.CommentType;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,6 +38,7 @@ public class AdminCommentController {
                                                          @RequestParam(required = false) Integer topicId,
                                                          @RequestParam(required = false) Boolean reviewed,
                                                          @RequestParam(required = false) String keyword,
+                                                         @RequestParam(required = false) Boolean deleted,
                                                          @RequestParam(defaultValue = "1") int page,
                                                          @RequestParam(defaultValue = "10") int size) {
         CommentType commentType = type == null ? null : CommentType.fromCode(type);
@@ -44,6 +47,7 @@ public class AdminCommentController {
                 topicId,
                 reviewed,
                 keyword,
+                deleted,
                 page,
                 size));
         return ApiResponse.ok(new PageResponse<>(
@@ -51,6 +55,11 @@ public class AdminCommentController {
                 result.total(),
                 result.page(),
                 result.size()));
+    }
+
+    @GetMapping("/{id}")
+    ApiResponse<AdminCommentDetailResponse> detail(@PathVariable int id) {
+        return ApiResponse.ok(AdminCommentDetailResponse.from(queryService.detail(id)));
     }
 
     @PutMapping("/review")
@@ -61,5 +70,10 @@ public class AdminCommentController {
     @DeleteMapping
     ApiResponse<AdminCommentCommandService.Result> delete(@Valid @RequestBody AdminCommentDeleteRequest request) {
         return ApiResponse.ok(commandService.delete(new AdminCommentDeletionCommand(request.ids())));
+    }
+
+    @PutMapping("/restore")
+    ApiResponse<AdminCommentCommandService.Result> restore(@Valid @RequestBody AdminCommentRestoreRequest request) {
+        return ApiResponse.ok(commandService.restore(new AdminCommentRestoreCommand(request.ids())));
     }
 }
