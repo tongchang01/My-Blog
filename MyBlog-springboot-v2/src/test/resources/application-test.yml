@@ -27,3 +27,6 @@ myblog:
       - /api/articles/*/access
       - /api/categories/*/articles
       - /api/tags/*/articles
+      - /api/comments
+      - /api/comments/*/replies
+      - /api/comments/top
