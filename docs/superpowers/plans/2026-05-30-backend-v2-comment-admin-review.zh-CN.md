@@ -368,7 +368,7 @@ git commit -m "实现后端V2后台评论查询"
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/infrastructure/DatabaseAdminCommentModerator.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentModeratorTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 Create `DatabaseAdminCommentModeratorTest.java`:
 
@@ -441,7 +441,7 @@ class DatabaseAdminCommentModeratorTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -457,7 +457,7 @@ Expected:
 Compilation failure: cannot find symbol AdminCommentModerationCommand
 ```
 
-- [ ] **Step 3: 新增写入领域端口**
+- [x] **Step 3: 新增写入领域端口**
 
 Create `AdminCommentModerationCommand.java`:
 
@@ -494,7 +494,7 @@ public interface AdminCommentModerator {
 }
 ```
 
-- [ ] **Step 4: 实现数据库写入**
+- [x] **Step 4: 实现数据库写入**
 
 Create `DatabaseAdminCommentModerator.java`:
 
@@ -568,7 +568,7 @@ public class DatabaseAdminCommentModerator implements AdminCommentModerator {
 }
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 Run:
 
@@ -585,7 +585,7 @@ Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentModerationCommand.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentDeletionCommand.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentModerator.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/infrastructure/DatabaseAdminCommentModerator.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentModeratorTest.java
