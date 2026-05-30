@@ -1,6 +1,7 @@
 package com.aurora.myblog.v2.modules.comment;
 
 import com.aurora.myblog.v2.common.web.PageResponse;
+import com.aurora.myblog.v2.modules.comment.domain.AdminCommentDetail;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentItem;
 import com.aurora.myblog.v2.modules.comment.domain.AdminCommentQuery;
 import com.aurora.myblog.v2.modules.comment.domain.CommentType;
@@ -11,6 +12,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,5 +56,33 @@ class DatabaseAdminCommentReaderTest {
 
         assertThat(byContent.records()).extracting(AdminCommentItem::id).containsExactly(3);
         assertThat(byAuthor.total()).isGreaterThanOrEqualTo(1);
+    }
+
+    @Test
+    void listsDeletedCommentsWhenDeletedFilterIsTrue() {
+        PageResponse<AdminCommentItem> page = reader.list(new AdminCommentQuery(null, null, null, null, true, 1, 10));
+
+        assertThat(page.total()).isEqualTo(1);
+        assertThat(page.records()).extracting(AdminCommentItem::id).containsExactly(4);
+        assertThat(page.records().get(0).deleted()).isTrue();
+    }
+
+    @Test
+    void findsCommentDetailIncludingDeletedComment() {
+        Optional<AdminCommentDetail> detail = reader.findDetail(4);
+
+        assertThat(detail).isPresent();
+        assertThat(detail.get().id()).isEqualTo(4);
+        assertThat(detail.get().content()).isEqualTo("已删除评论");
+        assertThat(detail.get().type()).isEqualTo(CommentType.ARTICLE);
+        assertThat(detail.get().topicId()).isEqualTo(1);
+        assertThat(detail.get().topicTitle()).isEqualTo("后端V2第一篇");
+        assertThat(detail.get().deleted()).isTrue();
+        assertThat(detail.get().reviewed()).isTrue();
+    }
+
+    @Test
+    void returnsEmptyWhenCommentDetailDoesNotExist() {
+        assertThat(reader.findDetail(9999)).isEmpty();
     }
 }

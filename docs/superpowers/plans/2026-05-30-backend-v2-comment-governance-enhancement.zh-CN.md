@@ -93,7 +93,7 @@ create table t_comment (
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentReader.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentReaderTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 在 `DatabaseAdminCommentReaderTest` 增加测试：
 
@@ -127,7 +127,7 @@ void returnsEmptyWhenCommentDetailDoesNotExist() {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -144,7 +144,7 @@ cannot find symbol: class AdminCommentDetail
 cannot find symbol: method findDetail(int)
 ```
 
-- [ ] **Step 3: 新增领域模型和端口**
+- [x] **Step 3: 新增领域模型和端口**
 
 把 `AdminCommentQuery` 改成：
 
@@ -221,7 +221,7 @@ public interface AdminCommentReader {
 }
 ```
 
-- [ ] **Step 4: 补齐测试 import**
+- [x] **Step 4: 补齐测试 import**
 
 在 `DatabaseAdminCommentReaderTest` 增加：
 
@@ -231,7 +231,7 @@ import java.util.Optional;
 
 如果测试文件还没有静态导入 `assertThat`，保持现有 `org.assertj.core.api.Assertions.assertThat` 静态导入不变。
 
-- [ ] **Step 5: 运行测试确认仍失败到数据库实现**
+- [x] **Step 5: 运行测试确认仍失败到数据库实现**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -245,7 +245,7 @@ Expected:
 DatabaseAdminCommentReader is not abstract and does not override abstract method findDetail(int)
 ```
 
-- [ ] **Step 6: 不提交失败状态**
+- [x] **Step 6: 不提交失败状态**
 
 当前状态是有意制造的红灯测试，不提交。继续执行 Task 2，把数据库实现补齐并在测试通过后一起提交。
 
@@ -258,7 +258,7 @@ DatabaseAdminCommentReader is not abstract and does not override abstract method
 - Modify: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/infrastructure/DatabaseAdminCommentReader.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentReaderTest.java`
 
-- [ ] **Step 1: 实现 deleted 筛选**
+- [x] **Step 1: 实现 deleted 筛选**
 
 把 `buildWhere` 中固定的：
 
@@ -273,7 +273,7 @@ clauses.add("c.is_delete = ?");
 args.add(query.deleted() ? 1 : 0);
 ```
 
-- [ ] **Step 2: 实现详情查询**
+- [x] **Step 2: 实现详情查询**
 
 在 `DatabaseAdminCommentReader` 增加：
 
@@ -330,7 +330,7 @@ import com.aurora.myblog.v2.modules.comment.domain.AdminCommentDetail;
 import java.util.Optional;
 ```
 
-- [ ] **Step 3: 运行数据库查询测试**
+- [x] **Step 3: 运行数据库查询测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -345,7 +345,7 @@ Tests run: 6, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentQuery.java `
