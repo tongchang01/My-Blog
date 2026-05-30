@@ -132,7 +132,7 @@ V2 当前支持提交目标：
 - Modify: `MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/infrastructure/persistence/FlywayMigrationTest.java`
 
-- [ ] **Step 1: 新增失败检查**
+- [x] **Step 1: 新增失败检查**
 
 在 `FlywayMigrationTest` 增加一个测试，确认测试库包含评论表和评论数据：
 
@@ -146,7 +146,7 @@ void migratesLegacyCommentTablesForTests() {
 }
 ```
 
-- [ ] **Step 2: 运行迁移测试确认失败**
+- [x] **Step 2: 运行迁移测试确认失败**
 
 Run:
 
@@ -161,7 +161,7 @@ Expected:
 Table "T_COMMENT" not found
 ```
 
-- [ ] **Step 3: 新增 H2 测试表**
+- [x] **Step 3: 新增 H2 测试表**
 
 在 `V2__create_legacy_identity_tables_for_tests.sql` 的 `t_article_tag` 建表后追加：
 
@@ -181,7 +181,7 @@ create table t_comment (
 );
 ```
 
-- [ ] **Step 4: 新增 H2 评论数据**
+- [x] **Step 4: 新增 H2 评论数据**
 
 在 `t_article_tag` 测试数据后追加：
 
@@ -199,7 +199,7 @@ values
     (6, 1, 2, null, '留言板回复', 5, 2, 0, 1, timestamp '2026-05-29 11:05:00', timestamp '2026-05-29 11:05:00');
 ```
 
-- [ ] **Step 5: 运行迁移测试确认通过**
+- [x] **Step 5: 运行迁移测试确认通过**
 
 Run:
 
@@ -215,7 +215,7 @@ Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/infrastructure/persistence/FlywayMigrationTest.java
@@ -235,7 +235,7 @@ git commit -m "补充后端V2评论测试数据"
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/infrastructure/DatabaseCommentReader.java`
 - Create: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseCommentReaderTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 Create `DatabaseCommentReaderTest.java`:
 
@@ -299,7 +299,7 @@ class DatabaseCommentReaderTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -314,7 +314,7 @@ Expected:
 Compilation failure: package com.aurora.myblog.v2.modules.comment does not exist
 ```
 
-- [ ] **Step 3: 新增领域类型**
+- [x] **Step 3: 新增领域类型**
 
 Create `CommentType.java`:
 
@@ -455,7 +455,7 @@ public interface CommentReader {
 }
 ```
 
-- [ ] **Step 4: 实现数据库读取**
+- [x] **Step 4: 实现数据库读取**
 
 Create `DatabaseCommentReader.java`:
 
@@ -670,7 +670,7 @@ public class DatabaseCommentReader implements CommentReader {
 }
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 Run:
 
@@ -686,7 +686,7 @@ Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseCommentReaderTest.java
@@ -706,7 +706,7 @@ git commit -m "新增后端V2评论读取能力"
 - Modify: `MyBlog-springboot-v2/src/test/resources/application-test.yml`
 - Create: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/CommentControllerTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 Create `CommentControllerTest.java`:
 
@@ -779,7 +779,7 @@ class CommentControllerTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -794,7 +794,7 @@ Expected:
 Status expected:<200> but was:<404>
 ```
 
-- [ ] **Step 3: 新增应用查询服务**
+- [x] **Step 3: 新增应用查询服务**
 
 Create `CommentQueryService.java`:
 
@@ -835,7 +835,7 @@ public class CommentQueryService {
 }
 ```
 
-- [ ] **Step 4: 新增响应 DTO**
+- [x] **Step 4: 新增响应 DTO**
 
 Create `CommentReplyResponse.java`:
 
@@ -912,7 +912,7 @@ public record CommentResponse(
 }
 ```
 
-- [ ] **Step 5: 新增 Controller**
+- [x] **Step 5: 新增 Controller**
 
 Create `CommentController.java`:
 
@@ -972,7 +972,7 @@ public class CommentController {
 }
 ```
 
-- [ ] **Step 6: 新增公开端点配置**
+- [x] **Step 6: 新增公开端点配置**
 
 在三个配置文件的 `myblog.security.public-endpoints` 中追加：
 
@@ -982,7 +982,7 @@ public class CommentController {
       - /api/comments/top
 ```
 
-- [ ] **Step 7: 运行测试确认通过**
+- [x] **Step 7: 运行测试确认通过**
 
 Run:
 
@@ -998,7 +998,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 8: 提交**
+- [x] **Step 8: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment MyBlog-springboot-v2/src/main/resources/application.yml MyBlog-springboot-v2/src/main/resources/application-local.yml MyBlog-springboot-v2/src/test/resources/application-test.yml MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/CommentControllerTest.java
@@ -1018,7 +1018,7 @@ git commit -m "新增后端V2评论公开读取接口"
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseCommentWriterTest.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/CommentControllerTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 Create `DatabaseCommentWriterTest.java`:
 
@@ -1144,7 +1144,7 @@ import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -1159,7 +1159,7 @@ Expected:
 Compilation failure: cannot find symbol CommentCreateCommand
 ```
 
-- [ ] **Step 3: 新增写入领域端口**
+- [x] **Step 3: 新增写入领域端口**
 
 Create `CommentCreateCommand.java`:
 
@@ -1188,7 +1188,7 @@ public interface CommentWriter {
 }
 ```
 
-- [ ] **Step 4: 实现数据库写入**
+- [x] **Step 4: 实现数据库写入**
 
 Create `DatabaseCommentWriter.java`:
 
@@ -1340,7 +1340,7 @@ public class DatabaseCommentWriter implements CommentWriter {
 }
 ```
 
-- [ ] **Step 5: 新增应用服务和请求 DTO**
+- [x] **Step 5: 新增应用服务和请求 DTO**
 
 Create `CommentCommandService.java`:
 
@@ -1402,7 +1402,7 @@ public record CommentCreateRequest(
 }
 ```
 
-- [ ] **Step 6: 修改 Controller 支持提交**
+- [x] **Step 6: 修改 Controller 支持提交**
 
 修改 `CommentController` 构造参数和字段：
 
@@ -1445,7 +1445,7 @@ public ApiResponse<CommentCommandService.CommentCreateResult> saveComment(
 }
 ```
 
-- [ ] **Step 7: 运行测试确认通过**
+- [x] **Step 7: 运行测试确认通过**
 
 Run:
 
@@ -1461,7 +1461,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 8: 提交**
+- [x] **Step 8: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment
@@ -1474,7 +1474,7 @@ git commit -m "支持后端V2登录用户提交评论"
 
 - Modify: `docs/superpowers/plans/2026-05-30-backend-v2-comments-basic.zh-CN.md`
 
-- [ ] **Step 1: 全量测试**
+- [x] **Step 1: 全量测试**
 
 Run:
 
@@ -1490,7 +1490,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 2: 打包**
+- [x] **Step 2: 打包**
 
 Run:
 
@@ -1505,7 +1505,7 @@ Expected:
 BUILD SUCCESS
 ```
 
-- [ ] **Step 3: 本地 MySQL 只读检查**
+- [x] **Step 3: 本地 MySQL 只读检查**
 
 不要把本地密码写进文件。命令只读取当前 PowerShell 会话环境变量：
 
@@ -1521,7 +1521,7 @@ Expected:
 SQL 执行成功；如果本地库已有评论，应看到评论总数和最近评论行。
 ```
 
-- [ ] **Step 4: 本地 API 冒烟**
+- [x] **Step 4: 本地 API 冒烟**
 
 启动服务时通过环境变量注入数据库密码：
 
@@ -1547,7 +1547,7 @@ health 返回 200；评论读取接口返回 200 或空分页，不能返回 401
 
 提交评论接口需要真实可登录账号；如果本地库密码哈希和测试账号不一致，API 冒烟只记录“本地库登录账号不确定，跳过真实提交冒烟”，不能伪造通过。
 
-- [ ] **Step 5: 更新本计划的执行结果**
+- [x] **Step 5: 更新本计划的执行结果**
 
 先读取实际提交记录：
 
@@ -1557,7 +1557,7 @@ git log --oneline -8
 
 再在本文档末尾追加真实执行结果。提交记录必须复制实际短 SHA 和提交信息。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add docs/superpowers/plans/2026-05-30-backend-v2-comments-basic.zh-CN.md
@@ -1571,3 +1571,15 @@ git commit -m "同步后端V2评论计划状态"
 - 类型一致性：`CommentType`、`CommentThread`、`CommentReply`、`CommentReader`、`CommentWriter`、DTO 和 Controller 方法命名一致。
 - 安全控制：公开读取接口加入 public endpoints；提交接口不加入 public endpoints，必须依赖 `@CurrentUser`。
 - 占位扫描：文档没有待替换占位词；本地数据库密码只通过环境变量读取，不能写入代码、文档或 Git。
+
+## 执行结果
+
+- Task 1：已完成。提交 `33fe938 补充后端V2评论测试数据`，补充 `t_comment` 测试表、评论测试数据和 Flyway 迁移验证。
+- Task 2：已完成。提交 `7308db0 新增后端V2评论读取能力`，新增评论领域模型、读取接口和数据库实现。
+- Task 3：已完成。提交 `e4914a2 新增后端V2评论公开读取接口`，新增评论公开读取 Controller、DTO 和接口测试。
+- Task 4：已完成。提交 `8960b0d 支持后端V2登录用户提交评论`，新增登录用户提交评论能力和写入校验。
+- Task 5：已完成。`mvn -f MyBlog-springboot-v2/pom.xml test` 通过，结果为 `Tests run: 99, Failures: 0, Errors: 0, Skipped: 0`。
+- Task 5：已完成。`mvn -f MyBlog-springboot-v2/pom.xml clean package` 通过，已生成 `MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar`。
+- Task 5：已完成。本地 MySQL 只读检查通过，`aurora.t_comment` 当前为 `0` 行；最近评论查询因表为空没有返回行。
+- Task 5：已完成。本地 API 冒烟通过：`/actuator/health`、`/api/comments/top`、`/api/comments?type=2&page=1&size=10` 均返回 `200`；评论接口因本地表为空返回空数组/空分页。
+- Task 5：真实提交评论 API 冒烟未执行。本地库没有可确认的真实登录账号和评论业务数据，避免伪造通过；该能力已由 `CommentControllerTest` 和 `DatabaseCommentWriterTest` 覆盖。
