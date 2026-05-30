@@ -720,7 +720,7 @@ git commit -m "新增后端V2后台评论详情和恢复接口"
 - Modify: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseCommentReaderTest.java`
 - Modify: `docs/superpowers/plans/2026-05-30-backend-v2-comment-governance-enhancement.zh-CN.md`
 
-- [ ] **Step 1: 写前台可见性回归测试**
+- [x] **Step 1: 写前台可见性回归测试**
 
 在 `DatabaseCommentReaderTest` 增加：
 
@@ -734,7 +734,7 @@ void publicCommentReaderHidesPendingAndDeletedComments() {
 }
 ```
 
-- [ ] **Step 2: 运行前台可见性测试**
+- [x] **Step 2: 运行前台可见性测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -748,7 +748,7 @@ Expected:
 BUILD SUCCESS
 ```
 
-- [ ] **Step 3: 运行评论模块测试**
+- [x] **Step 3: 运行评论模块测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -762,7 +762,7 @@ Expected:
 BUILD SUCCESS
 ```
 
-- [ ] **Step 4: 运行全量测试**
+- [x] **Step 4: 运行全量测试**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -777,7 +777,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 5: 打包**
+- [x] **Step 5: 打包**
 
 ```powershell
 $env:JAVA_HOME='C:\Program Files\Java\jdk-17'
@@ -791,7 +791,7 @@ Expected:
 BUILD SUCCESS
 ```
 
-- [ ] **Step 6: 本地 MySQL 只读检查**
+- [x] **Step 6: 本地 MySQL 只读检查**
 
 不要把本地密码写进文件。命令只读取当前 PowerShell 会话环境变量：
 
@@ -807,7 +807,7 @@ Expected:
 SQL 执行成功；如果本地库没有评论，也要如实记录为 0，不伪造数据。
 ```
 
-- [ ] **Step 7: 更新本计划执行结果**
+- [x] **Step 7: 更新本计划执行结果**
 
 读取实际提交记录：
 
@@ -817,7 +817,7 @@ git log --oneline -8
 
 在本文档末尾追加真实执行结果，必须包含测试数量、打包结果、本地 MySQL 只读结果和 API 冒烟结果。
 
-- [ ] **Step 8: 提交**
+- [x] **Step 8: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseCommentReaderTest.java `
@@ -835,3 +835,16 @@ git commit -m "同步后端V2评论治理增强计划状态"
 - 类型一致性：`AdminCommentDetail`、`AdminCommentRestoreCommand`、`findDetail`、`restore`、`deleted` 在领域、基础设施、应用服务和接口层命名一致。
 - 风险控制：后台恢复只把 `is_delete` 改回 `0`；前台读取规则继续要求 `is_delete = 0` 且 `is_review = 1`。
 - 占位扫描：本文档没有待替换占位内容。
+
+## 执行结果
+
+- 计划提交：`1730d66 新增后端V2评论治理增强计划`。
+- 任务 1 和任务 2 提交：`291559c 实现后端V2后台评论详情查询`，已补齐 `deleted` 筛选、后台评论详情领域模型、读取端口和数据库详情查询。
+- 任务 3 提交：`a71ae28 新增后端V2后台评论恢复能力`，已补齐软删除恢复命令、领域端口、数据库更新和应用服务。
+- 任务 4 提交：`1f28246 新增后端V2后台评论详情和恢复接口`，已补齐后台详情接口、已删除筛选参数和恢复接口。
+- 前台可见性回归：`mvn -f MyBlog-springboot-v2/pom.xml -Dtest=DatabaseCommentReaderTest test` 通过，结果为 `Tests run: 5, Failures: 0, Errors: 0, Skipped: 0`。
+- 评论模块测试：`mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=DatabaseCommentReaderTest,DatabaseCommentWriterTest,DatabaseAdminCommentReaderTest,DatabaseAdminCommentModeratorTest,CommentControllerTest,AdminCommentControllerTest" test` 通过，结果为 `Tests run: 34, Failures: 0, Errors: 0, Skipped: 0`。第一次未加引号运行时被 PowerShell 解析逗号参数失败，随后用引号修正并通过。
+- 全量测试：`mvn -f MyBlog-springboot-v2/pom.xml test` 通过，结果为 `Tests run: 119, Failures: 0, Errors: 0, Skipped: 0`。
+- 打包验证：`mvn -f MyBlog-springboot-v2/pom.xml clean package` 通过，结果为 `Tests run: 119, Failures: 0, Errors: 0, Skipped: 0`，生成 `MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar`。
+- 本地 MySQL 只读检查：`aurora.t_comment` 总数为 `0`，按 `is_delete, is_review` 分组无返回行；本地库当前没有可用于真实评论治理冒烟的数据。
+- 本地 API 冒烟：应用以 `local` profile 启动成功，`GET /actuator/health` 返回 `200`；候选管理员账号登录返回 `401`，因此跳过真实后台登录态接口冒烟，没有伪造后台接口通过结果。

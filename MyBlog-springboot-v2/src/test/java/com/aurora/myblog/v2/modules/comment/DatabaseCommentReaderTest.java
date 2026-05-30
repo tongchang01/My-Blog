@@ -32,6 +32,14 @@ class DatabaseCommentReaderTest {
     }
 
     @Test
+    void publicCommentReaderHidesPendingAndDeletedComments() {
+        var page = reader.listComments(CommentType.ARTICLE, 1, new CommentPageQuery(1, 20));
+
+        assertThat(page.records()).extracting("id").contains(1);
+        assertThat(page.records()).extracting("id").doesNotContain(3, 4);
+    }
+
+    @Test
     void listsMessageCommentsWithoutTopicId() {
         var page = reader.listComments(CommentType.MESSAGE, null, new CommentPageQuery(1, 10));
 
