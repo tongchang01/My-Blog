@@ -1,11 +1,17 @@
 package com.aurora.myblog.v2.modules.comment.api;
 
+import com.aurora.myblog.v2.common.auth.AuthenticatedPrincipal;
+import com.aurora.myblog.v2.common.auth.CurrentUser;
 import com.aurora.myblog.v2.common.web.ApiResponse;
 import com.aurora.myblog.v2.common.web.PageResponse;
+import com.aurora.myblog.v2.modules.comment.application.CommentCommandService;
 import com.aurora.myblog.v2.modules.comment.application.CommentQueryService;
 import com.aurora.myblog.v2.modules.comment.domain.CommentThread;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -15,9 +21,12 @@ import java.util.List;
 public class CommentController {
 
     private final CommentQueryService commentQueryService;
+    private final CommentCommandService commentCommandService;
 
-    public CommentController(CommentQueryService commentQueryService) {
+    public CommentController(CommentQueryService commentQueryService,
+                             CommentCommandService commentCommandService) {
         this.commentQueryService = commentQueryService;
+        this.commentCommandService = commentCommandService;
     }
 
     @GetMapping("/api/comments")
@@ -41,6 +50,19 @@ public class CommentController {
         return ApiResponse.ok(commentQueryService.listTopComments().stream()
                 .map(CommentResponse::from)
                 .toList());
+    }
+
+    @PostMapping("/api/comments")
+    public ApiResponse<CommentCommandService.CommentCreateResult> saveComment(
+            @CurrentUser AuthenticatedPrincipal currentUser,
+            @Valid @RequestBody CommentCreateRequest request) {
+        return ApiResponse.ok(commentCommandService.createComment(
+                currentUser.id(),
+                request.type(),
+                request.topicId(),
+                request.parentId(),
+                request.replyUserId(),
+                request.content()));
     }
 
     private PageResponse<CommentResponse> mapPage(PageResponse<CommentThread> page) {

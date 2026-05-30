@@ -197,3 +197,5 @@ values
     (4, 2, null, 1, '已删除评论', null, 1, 1, 1, timestamp '2026-05-29 10:15:00', timestamp '2026-05-29 10:15:00'),
     (5, 2, null, null, '留言板第一条', null, 2, 0, 1, timestamp '2026-05-29 11:00:00', timestamp '2026-05-29 11:00:00'),
     (6, 1, 2, null, '留言板回复', 5, 2, 0, 1, timestamp '2026-05-29 11:05:00', timestamp '2026-05-29 11:05:00');
+
+alter table t_comment alter column id restart with 7;
