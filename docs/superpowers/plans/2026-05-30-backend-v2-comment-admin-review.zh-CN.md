@@ -68,7 +68,7 @@
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentReader.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentReaderTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 Create `DatabaseAdminCommentReaderTest.java`:
 
@@ -115,7 +115,7 @@ class DatabaseAdminCommentReaderTest {
         assertThat(item.id()).isEqualTo(3);
         assertThat(item.type()).isEqualTo(CommentType.ARTICLE);
         assertThat(item.topicId()).isEqualTo(1);
-        assertThat(item.topicTitle()).isEqualTo("公开文章");
+        assertThat(item.topicTitle()).isEqualTo("后端V2第一篇");
         assertThat(item.reviewed()).isFalse();
     }
 
@@ -130,7 +130,7 @@ class DatabaseAdminCommentReaderTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -146,7 +146,7 @@ Expected:
 Compilation failure: cannot find symbol AdminCommentItem
 ```
 
-- [ ] **Step 3: 新增后台查询领域类型**
+- [x] **Step 3: 新增后台查询领域类型**
 
 Create `AdminCommentQuery.java`:
 
@@ -221,7 +221,7 @@ public interface AdminCommentReader {
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/infrastructure/DatabaseAdminCommentReader.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentReaderTest.java`
 
-- [ ] **Step 1: 实现数据库查询**
+- [x] **Step 1: 实现数据库查询**
 
 Create `DatabaseAdminCommentReader.java`:
 
@@ -332,7 +332,7 @@ public class DatabaseAdminCommentReader implements AdminCommentReader {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认通过**
+- [x] **Step 2: 运行测试确认通过**
 
 Run:
 
@@ -349,7 +349,7 @@ Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentQuery.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentItem.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentReader.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/infrastructure/DatabaseAdminCommentReader.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentReaderTest.java
