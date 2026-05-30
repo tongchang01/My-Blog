@@ -94,7 +94,7 @@ GET /api/articles/{articleId}
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/DatabaseArticleReaderTest.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/ContentArticleControllerTest.java`
 
-- [ ] **Step 1: 给 H2 密码文章写入测试密码**
+- [x] **Step 1: 给 H2 密码文章写入测试密码**
 
 把 `t_article` 插入语句的字段从：
 
@@ -119,7 +119,7 @@ values
     (5, 1, 2, '/cover/deleted.png', '已删除文章', '不应出现在第一阶段', '删除正文', 1, 1, 1, 1, 1, null, timestamp '2026-01-14 14:00:00', timestamp '2026-01-14 14:00:00');
 ```
 
-- [ ] **Step 2: 运行迁移测试**
+- [x] **Step 2: 运行迁移测试**
 
 Run:
 
@@ -135,7 +135,7 @@ Tests run: 1, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 3: 运行现有内容测试**
+- [x] **Step 3: 运行现有内容测试**
 
 Run:
 
@@ -151,7 +151,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql
@@ -167,7 +167,7 @@ git commit -m "补充后端V2密码文章测试数据"
 - Create: `MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/infrastructure/SignedArticleAccessTokenService.java`
 - Create: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/SignedArticleAccessTokenServiceTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 Create `SignedArticleAccessTokenServiceTest.java`:
 
@@ -212,7 +212,7 @@ class SignedArticleAccessTokenServiceTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -227,7 +227,7 @@ Expected:
 Compilation failure: cannot find symbol SignedArticleAccessTokenService
 ```
 
-- [ ] **Step 3: 新增领域模型和端口**
+- [x] **Step 3: 新增领域模型和端口**
 
 Create `ArticleAccessToken.java`:
 
@@ -253,7 +253,7 @@ public interface ArticleAccessTokenService {
 }
 ```
 
-- [ ] **Step 4: 实现签名访问令牌服务**
+- [x] **Step 4: 实现签名访问令牌服务**
 
 Create `SignedArticleAccessTokenService.java`:
 
@@ -357,7 +357,7 @@ public class SignedArticleAccessTokenService implements ArticleAccessTokenServic
 }
 ```
 
-- [ ] **Step 5: 运行测试确认通过**
+- [x] **Step 5: 运行测试确认通过**
 
 Run:
 
@@ -373,7 +373,7 @@ Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/domain/ArticleAccessToken.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/domain/ArticleAccessTokenService.java MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content/infrastructure/SignedArticleAccessTokenService.java MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/SignedArticleAccessTokenServiceTest.java
@@ -397,7 +397,7 @@ git commit -m "新增后端V2文章访问令牌服务"
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/DatabaseArticleReaderTest.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/ContentArticleControllerTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 在 `DatabaseArticleReaderTest` 追加：
 
@@ -439,7 +439,7 @@ import org.springframework.http.MediaType;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -454,7 +454,7 @@ Expected:
 Compilation failure: cannot find symbol findArticleAccessCheckById
 ```
 
-- [ ] **Step 3: 新增访问检查模型和 reader 端口**
+- [x] **Step 3: 新增访问检查模型和 reader 端口**
 
 Create `ArticleAccessCheck.java`:
 
@@ -479,7 +479,7 @@ Modify `ArticleReader.java`:
 Optional<ArticleAccessCheck> findArticleAccessCheckById(int articleId);
 ```
 
-- [ ] **Step 4: 实现数据库访问检查**
+- [x] **Step 4: 实现数据库访问检查**
 
 在 `DatabaseArticleReader` 新增 import：
 
@@ -510,7 +510,7 @@ public Optional<ArticleAccessCheck> findArticleAccessCheckById(int articleId) {
 }
 ```
 
-- [ ] **Step 5: 新增 API 请求和响应 DTO**
+- [x] **Step 5: 新增 API 请求和响应 DTO**
 
 Create `ArticleAccessRequest.java`:
 
@@ -540,7 +540,7 @@ public record ArticleAccessResponse(int articleId, String accessToken, Instant e
 }
 ```
 
-- [ ] **Step 6: 实现应用服务密码校验**
+- [x] **Step 6: 实现应用服务密码校验**
 
 在 `ContentQueryService` 新增字段和构造参数：
 
@@ -585,7 +585,7 @@ public ArticleAccessToken accessProtectedArticle(int articleId, String password)
 import java.util.Objects;
 ```
 
-- [ ] **Step 7: 新增 Controller 接口**
+- [x] **Step 7: 新增 Controller 接口**
 
 在 `ContentArticleController` 新增 import：
 
@@ -608,7 +608,7 @@ public ApiResponse<ArticleAccessResponse> accessArticle(
 }
 ```
 
-- [ ] **Step 8: 新增公开端点配置**
+- [x] **Step 8: 新增公开端点配置**
 
 三个配置文件都加入：
 
@@ -624,7 +624,7 @@ MyBlog-springboot-v2/src/main/resources/application-local.yml
 MyBlog-springboot-v2/src/test/resources/application-test.yml
 ```
 
-- [ ] **Step 9: 运行测试确认通过**
+- [x] **Step 9: 运行测试确认通过**
 
 Run:
 
@@ -640,7 +640,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 10: 提交**
+- [x] **Step 10: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content MyBlog-springboot-v2/src/main/resources/application.yml MyBlog-springboot-v2/src/main/resources/application-local.yml MyBlog-springboot-v2/src/test/resources/application-test.yml
@@ -658,7 +658,7 @@ git commit -m "新增后端V2密码文章访问校验"
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/DatabaseArticleReaderTest.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content/ContentArticleControllerTest.java`
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
 
 在 `DatabaseArticleReaderTest` 追加：
 
@@ -710,7 +710,7 @@ void returnsProtectedArticleDetailWithAccessToken() throws Exception {
 import com.jayway.jsonpath.JsonPath;
 ```
 
-- [ ] **Step 2: 运行测试确认失败**
+- [x] **Step 2: 运行测试确认失败**
 
 Run:
 
@@ -725,7 +725,7 @@ Expected:
 Compilation failure: cannot find symbol findAccessibleArticleById
 ```
 
-- [ ] **Step 3: 扩展 reader 端口**
+- [x] **Step 3: 扩展 reader 端口**
 
 Modify `ArticleReader.java`:
 
@@ -733,7 +733,7 @@ Modify `ArticleReader.java`:
 Optional<ArticleDetail> findAccessibleArticleById(int articleId);
 ```
 
-- [ ] **Step 4: 实现受保护详情读取**
+- [x] **Step 4: 实现受保护详情读取**
 
 把 `DatabaseArticleReader.findPublishedArticleById` 中的 SQL 提取为私有方法：
 
@@ -806,7 +806,7 @@ public Optional<ArticleDetail> findAccessibleArticleById(int articleId) {
 }
 ```
 
-- [ ] **Step 5: 修改应用服务读取流程**
+- [x] **Step 5: 修改应用服务读取流程**
 
 把 `ContentQueryService.getArticleDetail` 改为：
 
@@ -829,7 +829,7 @@ public ArticleDetail getArticleDetail(int articleId, String accessToken) {
 }
 ```
 
-- [ ] **Step 6: 修改 Controller 读取请求头**
+- [x] **Step 6: 修改 Controller 读取请求头**
 
 把 `getArticleDetail` 改为：
 
@@ -848,7 +848,7 @@ public ApiResponse<ArticleDetailResponse> getArticleDetail(
 import org.springframework.web.bind.annotation.RequestHeader;
 ```
 
-- [ ] **Step 7: 运行测试确认通过**
+- [x] **Step 7: 运行测试确认通过**
 
 Run:
 
@@ -864,7 +864,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 8: 提交**
+- [x] **Step 8: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/content MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/content
@@ -877,7 +877,7 @@ git commit -m "支持后端V2密码文章详情读取"
 
 - Modify: `docs/superpowers/plans/2026-05-29-backend-v2-protected-article-access.zh-CN.md`
 
-- [ ] **Step 1: 全量测试**
+- [x] **Step 1: 全量测试**
 
 Run:
 
@@ -893,7 +893,7 @@ Failures: 0, Errors: 0
 BUILD SUCCESS
 ```
 
-- [ ] **Step 2: 打包**
+- [x] **Step 2: 打包**
 
 Run:
 
@@ -908,7 +908,7 @@ Expected:
 BUILD SUCCESS
 ```
 
-- [ ] **Step 3: 本地 MySQL 只读检查**
+- [x] **Step 3: 本地 MySQL 只读检查**
 
 不要把本地密码写进文件。先在当前 PowerShell 会话中设置 `MYSQL_PWD`，命令只读取环境变量：
 
@@ -923,7 +923,7 @@ Expected:
 SQL 执行成功；如果本地库存在密码文章，应至少看到一行 status = 2。
 ```
 
-- [ ] **Step 4: 本地 API 冒烟**
+- [x] **Step 4: 本地 API 冒烟**
 
 启动服务时通过环境变量注入数据库密码：
 
@@ -949,7 +949,7 @@ Expected:
 
 真实 MySQL 数据不一定存在 `id = 3` 且密码为 `open-sesame` 的文章；如果没有，API 冒烟只记录“本地库缺少测试密码文章，跳过真实密码校验冒烟”，不能伪造通过。
 
-- [ ] **Step 5: 更新本计划的执行结果**
+- [x] **Step 5: 更新本计划的执行结果**
 
 先读取实际提交记录：
 
@@ -959,7 +959,7 @@ git log --oneline -5
 
 再在本文档末尾追加真实执行结果。提交记录必须复制实际短 SHA 和提交信息。
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add docs/superpowers/plans/2026-05-29-backend-v2-protected-article-access.zh-CN.md
@@ -972,3 +972,17 @@ git commit -m "同步后端V2密码文章计划状态"
 - 边界控制：不引入 Redis，不改真实表结构，不把密码文章加入列表、归档、推荐，不做浏览量统计。
 - 类型一致性：`ArticleAccessToken`、`ArticleAccessCheck`、`ArticleAccessTokenService`、`ArticleReader` 方法、DTO 和 Controller 方法命名一致。
 - 占位扫描：文档没有待替换占位词；本地数据库密码只通过环境变量读取，不能写入代码、文档或 Git。
+
+## 实际执行结果
+
+- 计划提交：`3837b79 新增后端V2密码文章访问计划`
+- 任务 1 提交：`042058e 补充后端V2密码文章测试数据`
+- 任务 2 提交：`a97796a 新增后端V2文章访问令牌服务`
+- 任务 3 提交：`974e941 新增后端V2密码文章访问校验`
+- 任务 4 提交：`a3d478f 支持后端V2密码文章详情读取`
+- 全量测试：`mvn -f MyBlog-springboot-v2/pom.xml test`，结果 `Tests run: 84, Failures: 0, Errors: 0, Skipped: 0`，`BUILD SUCCESS`。
+- 打包验证：`mvn -f MyBlog-springboot-v2/pom.xml clean package`，结果 `BUILD SUCCESS`，产物 `MyBlog-springboot-v2/target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar`。
+- 本地 MySQL 只读检查：查询 `aurora.t_article` 的 `status = 2` 文章成功，查到真实密码文章 `id = 153`。
+- 本地 API 冒烟：服务以 `local` profile 连接本地 MySQL 启动成功；`GET /actuator/health` 返回 `200`；`GET /api/articles/153` 不带 `X-Article-Access-Token` 返回 `403`；`POST /api/articles/153/access` 使用错误密码返回 `403`。
+- 正向密码解锁：真实 MySQL 没有使用测试夹具 `id = 3/open-sesame`，未伪造通过；正向路径由 H2 自动化测试覆盖。
+- 敏感信息控制：本地数据库密码只通过当前 PowerShell 环境变量传入命令和服务进程，没有写入代码、配置或本文档。
