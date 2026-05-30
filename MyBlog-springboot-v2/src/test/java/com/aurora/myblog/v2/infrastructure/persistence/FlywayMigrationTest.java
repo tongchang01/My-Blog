@@ -23,4 +23,12 @@ class FlywayMigrationTest {
 
         assertThat(markerCount).isEqualTo(1);
     }
+
+    @Test
+    void migratesLegacyCommentTablesForTests() {
+        Integer count = jdbcTemplate.queryForObject("select count(*) from t_comment", Integer.class);
+
+        assertThat(count).isNotNull();
+        assertThat(count).isGreaterThanOrEqualTo(6);
+    }
 }
