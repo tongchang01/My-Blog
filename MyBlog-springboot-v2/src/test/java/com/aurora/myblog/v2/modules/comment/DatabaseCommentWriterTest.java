@@ -33,13 +33,19 @@ class DatabaseCommentWriterTest {
                 1,
                 null,
                 null,
-                "新的文章评论"));
+                "新的文章评论",
+                "203.0.113.77",
+                "JUnit Browser"));
 
         Integer isReview = jdbcTemplate.queryForObject("select is_review from t_comment where id = ?", Integer.class, id);
         String content = jdbcTemplate.queryForObject("select comment_content from t_comment where id = ?", String.class, id);
+        String createIp = jdbcTemplate.queryForObject("select create_ip from t_comment where id = ?", String.class, id);
+        String userAgent = jdbcTemplate.queryForObject("select user_agent from t_comment where id = ?", String.class, id);
 
         assertThat(isReview).isZero();
         assertThat(content).isEqualTo("新的文章评论");
+        assertThat(createIp).isEqualTo("203.0.113.77");
+        assertThat(userAgent).isEqualTo("JUnit Browser");
     }
 
     @Test
@@ -50,7 +56,9 @@ class DatabaseCommentWriterTest {
                 null,
                 null,
                 null,
-                "缺少文章")))
+                "缺少文章",
+                "203.0.113.77",
+                "JUnit Browser")))
                 .isInstanceOf(ApiException.class)
                 .hasMessage("文章评论必须指定文章");
     }
@@ -63,7 +71,9 @@ class DatabaseCommentWriterTest {
                 1,
                 2,
                 1,
-                "不能回复回复")))
+                "不能回复回复",
+                "203.0.113.77",
+                "JUnit Browser")))
                 .isInstanceOf(ApiException.class)
                 .hasMessage("只能回复根评论");
     }

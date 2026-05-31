@@ -6,6 +6,8 @@ public record CommentCreateCommand(
         Integer topicId,
         Integer parentId,
         Integer replyUserId,
-        String content
+        String content,
+        String clientIp,
+        String userAgent
 ) {
 }

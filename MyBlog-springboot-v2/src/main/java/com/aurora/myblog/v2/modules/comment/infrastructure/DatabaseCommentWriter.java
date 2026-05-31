@@ -35,9 +35,11 @@ public class DatabaseCommentWriter implements CommentWriter {
             PreparedStatement ps = connection.prepareStatement("""
                     insert into t_comment (
                         user_id, reply_user_id, topic_id, comment_content,
-                        parent_id, type, is_delete, is_review, create_time, update_time
+                        parent_id, type, is_delete, is_review,
+                        create_ip, user_agent,
+                        create_time, update_time
                     )
-                    values (?, ?, ?, ?, ?, ?, 0, 0, ?, ?)
+                    values (?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?)
                     """, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, command.userId());
             setNullableInt(ps, 2, command.replyUserId());
@@ -45,8 +47,10 @@ public class DatabaseCommentWriter implements CommentWriter {
             ps.setString(4, command.content().trim());
             setNullableInt(ps, 5, command.parentId());
             ps.setInt(6, command.type().code());
-            ps.setTimestamp(7, Timestamp.valueOf(now));
-            ps.setTimestamp(8, Timestamp.valueOf(now));
+            ps.setString(7, command.clientIp());
+            ps.setString(8, command.userAgent());
+            ps.setTimestamp(9, Timestamp.valueOf(now));
+            ps.setTimestamp(10, Timestamp.valueOf(now));
             return ps;
         }, keyHolder);
         Number key = keyHolder.getKey();

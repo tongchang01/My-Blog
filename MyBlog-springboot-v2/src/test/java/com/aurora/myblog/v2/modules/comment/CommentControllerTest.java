@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,6 +23,9 @@ class CommentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Test
     void returnsArticleCommentsWithoutToken() throws Exception {
@@ -93,6 +98,8 @@ class CommentControllerTest {
 
         mockMvc.perform(post("/api/comments")
                         .header("Authorization", "Bearer " + token)
+                        .header("X-Forwarded-For", "203.0.113.77")
+                        .header("User-Agent", "JUnit Browser")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
                                 {"type":1,"topicId":1,"content":"新的文章评论"}
@@ -101,5 +108,19 @@ class CommentControllerTest {
                 .andExpect(jsonPath("$.success").value(true))
                 .andExpect(jsonPath("$.data.id").isNumber())
                 .andExpect(jsonPath("$.data.review").value(false));
+
+        String createIp = jdbcTemplate.queryForObject("""
+                select create_ip
+                from t_comment
+                where comment_content = '新的文章评论'
+                """, String.class);
+        String userAgent = jdbcTemplate.queryForObject("""
+                select user_agent
+                from t_comment
+                where comment_content = '新的文章评论'
+                """, String.class);
+
+        assertThat(createIp).isEqualTo("203.0.113.77");
+        assertThat(userAgent).isEqualTo("JUnit Browser");
     }
 }

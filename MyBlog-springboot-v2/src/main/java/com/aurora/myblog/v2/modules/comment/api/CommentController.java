@@ -3,10 +3,13 @@ package com.aurora.myblog.v2.modules.comment.api;
 import com.aurora.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.aurora.myblog.v2.common.auth.CurrentUser;
 import com.aurora.myblog.v2.common.web.ApiResponse;
+import com.aurora.myblog.v2.common.web.ClientIpResolver;
 import com.aurora.myblog.v2.common.web.PageResponse;
+import com.aurora.myblog.v2.common.web.UserAgentResolver;
 import com.aurora.myblog.v2.modules.comment.application.CommentCommandService;
 import com.aurora.myblog.v2.modules.comment.application.CommentQueryService;
 import com.aurora.myblog.v2.modules.comment.domain.CommentThread;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,14 +58,17 @@ public class CommentController {
     @PostMapping("/api/comments")
     public ApiResponse<CommentCommandService.CommentCreateResult> saveComment(
             @CurrentUser AuthenticatedPrincipal currentUser,
-            @Valid @RequestBody CommentCreateRequest request) {
+            @Valid @RequestBody CommentCreateRequest request,
+            HttpServletRequest servletRequest) {
         return ApiResponse.ok(commentCommandService.createComment(
                 currentUser.id(),
                 request.type(),
                 request.topicId(),
                 request.parentId(),
                 request.replyUserId(),
-                request.content()));
+                request.content(),
+                ClientIpResolver.resolve(servletRequest),
+                UserAgentResolver.resolve(servletRequest)));
     }
 
     private PageResponse<CommentResponse> mapPage(PageResponse<CommentThread> page) {

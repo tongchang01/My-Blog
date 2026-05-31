@@ -418,7 +418,7 @@ git commit -m "抽取后端V2客户端信息解析能力"
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/CommentControllerTest.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseCommentWriterTest.java`
 
-- [ ] **Step 1: 更新领域命令**
+- [x] **Step 1: 更新领域命令**
 
 `CommentCreateCommand` 改为包含：
 
@@ -436,7 +436,7 @@ public record CommentCreateCommand(
 }
 ```
 
-- [ ] **Step 2: 控制器采集客户端信息**
+- [x] **Step 2: 控制器采集客户端信息**
 
 `CommentController.saveComment` 增加 `HttpServletRequest servletRequest` 参数，并传入：
 
@@ -445,7 +445,7 @@ ClientIpResolver.resolve(servletRequest),
 UserAgentResolver.resolve(servletRequest)
 ```
 
-- [ ] **Step 3: 应用服务传递审计字段**
+- [x] **Step 3: 应用服务传递审计字段**
 
 `CommentCommandService.createComment` 增加 `String clientIp, String userAgent` 参数，并构造：
 
@@ -461,7 +461,7 @@ new CommentCreateCommand(
         userAgent)
 ```
 
-- [ ] **Step 4: 数据库写入审计字段**
+- [x] **Step 4: 数据库写入审计字段**
 
 `DatabaseCommentWriter` 的 insert 改为：
 
@@ -484,7 +484,7 @@ ps.setTimestamp(9, Timestamp.valueOf(now));
 ps.setTimestamp(10, Timestamp.valueOf(now));
 ```
 
-- [ ] **Step 5: 新增写入层测试**
+- [x] **Step 5: 新增写入层测试**
 
 在 `DatabaseCommentWriterTest` 增加：
 
@@ -510,7 +510,7 @@ void savesClientIpAndUserAgentWhenCreatingComment() {
 }
 ```
 
-- [ ] **Step 6: 新增控制器测试**
+- [x] **Step 6: 新增控制器测试**
 
 在 `CommentControllerTest` 的提交评论测试中追加：
 
@@ -521,7 +521,7 @@ void savesClientIpAndUserAgentWhenCreatingComment() {
 
 并在请求后用 `JdbcTemplate` 查询新评论的 `create_ip`、`user_agent`。
 
-- [ ] **Step 7: 运行测试**
+- [x] **Step 7: 运行测试**
 
 Run:
 
@@ -531,7 +531,7 @@ mvn -pl MyBlog-springboot-v2 "-Dtest=CommentControllerTest,DatabaseCommentWriter
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 8: 提交**
+- [x] **Step 8: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/CommentCreateCommand.java `

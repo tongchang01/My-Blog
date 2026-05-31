@@ -19,14 +19,18 @@ public class CommentCommandService {
                                              Integer topicId,
                                              Integer parentId,
                                              Integer replyUserId,
-                                             String content) {
+                                             String content,
+                                             String clientIp,
+                                             String userAgent) {
         int id = commentWriter.save(new CommentCreateCommand(
                 Integer.parseInt(userId),
                 CommentType.fromCode(type),
                 topicId,
                 parentId,
                 replyUserId,
-                content));
+                content,
+                clientIp,
+                userAgent));
         return new CommentCreateResult(id, false);
     }
 
