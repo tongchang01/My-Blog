@@ -1,0 +1,124 @@
+package com.tyb.myblog.v2.content;
+
+import com.tyb.myblog.v2.content.domain.ArticlePageQuery;
+import com.tyb.myblog.v2.content.infrastructure.DatabaseArticleReader;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@ActiveProfiles("test")
+@JdbcTest
+@Import(DatabaseArticleReader.class)
+class DatabaseArticleReaderTest {
+
+    @Autowired
+    private DatabaseArticleReader reader;
+
+    @Test
+    void listsPublishedArticlesOnly() {
+        var page = reader.listPublishedArticles(new ArticlePageQuery(1, 10));
+
+        assertThat(page.total()).isEqualTo(2);
+        assertThat(page.records()).extracting("id").containsExactly(2, 1);
+        assertThat(page.records()).extracting("title").containsExactly("生活记录第一篇", "后端V2第一篇");
+    }
+
+    @Test
+    void paginatesPublishedArticles() {
+        var page = reader.listPublishedArticles(new ArticlePageQuery(1, 1));
+
+        assertThat(page.total()).isEqualTo(2);
+        assertThat(page.page()).isEqualTo(1);
+        assertThat(page.size()).isEqualTo(1);
+        assertThat(page.records()).extracting("id").containsExactly(2);
+    }
+
+    @Test
+    void loadsArticleCardAssociationsWithoutDuplicatingArticle() {
+        var page = reader.listPublishedArticles(new ArticlePageQuery(1, 10));
+
+        var javaArticle = page.records().get(1);
+        assertThat(javaArticle.category().name()).isEqualTo("Java");
+        assertThat(javaArticle.author().id()).isEqualTo(1);
+        assertThat(javaArticle.tags()).extracting("name").containsExactly("Spring", "重构");
+        assertThat(javaArticle.top()).isTrue();
+        assertThat(javaArticle.featured()).isTrue();
+    }
+
+    @Test
+    void findsPublishedFeaturedArticlesOnly() {
+        var featured = reader.findFeaturedArticles();
+
+        assertThat(featured.topArticle()).isPresent();
+        assertThat(featured.topArticle().get().id()).isEqualTo(1);
+        assertThat(featured.featuredArticles()).extracting("id").containsExactly(2);
+    }
+
+    @Test
+    void listsPublishedArchivesGroupedByMonth() {
+        var page = reader.listPublishedArchives(new ArticlePageQuery(1, 10));
+
+        assertThat(page.total()).isEqualTo(2);
+        assertThat(page.records()).extracting("month").containsExactly("2026-05", "2026-04");
+        assertThat(page.records().get(0).articles()).extracting("id").containsExactly(1);
+        assertThat(page.records().get(1).articles()).extracting("id").containsExactly(2);
+    }
+
+    @Test
+    void findsArticleAccessCheckForProtectedArticle() {
+        var check = reader.findArticleAccessCheckById(3);
+
+        assertThat(check).isPresent();
+        assertThat(check.get().id()).isEqualTo(3);
+        assertThat(check.get().protectedArticle()).isTrue();
+        assertThat(check.get().password()).isEqualTo("open-sesame");
+    }
+
+    @Test
+    void findsAccessibleProtectedArticleDetail() {
+        var article = reader.findAccessibleArticleById(3);
+
+        assertThat(article).isPresent();
+        assertThat(article.get().id()).isEqualTo(3);
+        assertThat(article.get().content()).isEqualTo("密码正文");
+    }
+
+    @Test
+    void listsPublishedArticlesByCategory() {
+        var page = reader.listPublishedArticlesByCategory(1, new ArticlePageQuery(1, 10));
+
+        assertThat(page.total()).isEqualTo(1);
+        assertThat(page.records()).extracting("id").containsExactly(1);
+    }
+
+    @Test
+    void listsPublishedArticlesByTag() {
+        var page = reader.listPublishedArticlesByTag(3, new ArticlePageQuery(1, 10));
+
+        assertThat(page.total()).isEqualTo(2);
+        assertThat(page.records()).extracting("id").containsExactly(2, 1);
+    }
+
+    @Test
+    void findsPublishedArticleDetail() {
+        var article = reader.findPublishedArticleById(1);
+
+        assertThat(article).isPresent();
+        assertThat(article.get().id()).isEqualTo(1);
+        assertThat(article.get().content()).isNotBlank();
+        assertThat(article.get().category().name()).isEqualTo("Java");
+        assertThat(article.get().tags()).extracting("id").containsExactly(1, 3);
+    }
+
+    @Test
+    void doesNotFindNonPublicArticleDetails() {
+        assertThat(reader.findPublishedArticleById(3)).isEmpty();
+        assertThat(reader.findPublishedArticleById(4)).isEmpty();
+        assertThat(reader.findPublishedArticleById(5)).isEmpty();
+        assertThat(reader.findPublishedArticleById(999)).isEmpty();
+    }
+}
