@@ -19,6 +19,14 @@ public record AdminCommentDetailResponse(
         String content,
         boolean reviewed,
         boolean deleted,
+        String createIp,
+        String userAgent,
+        Integer reviewedBy,
+        LocalDateTime reviewTime,
+        Integer deletedBy,
+        LocalDateTime deleteTime,
+        Integer restoredBy,
+        LocalDateTime restoreTime,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
@@ -38,6 +46,14 @@ public record AdminCommentDetailResponse(
                 detail.content(),
                 detail.reviewed(),
                 detail.deleted(),
+                detail.createIp(),
+                detail.userAgent(),
+                detail.reviewedBy(),
+                detail.reviewTime(),
+                detail.deletedBy(),
+                detail.deleteTime(),
+                detail.restoredBy(),
+                detail.restoreTime(),
                 detail.createdAt(),
                 detail.updatedAt());
     }

@@ -683,7 +683,7 @@ git commit -m "记录后端V2评论后台操作审计"
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentReaderTest.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/AdminCommentControllerTest.java`
 
-- [ ] **Step 1: 扩展详情领域模型**
+- [x] **Step 1: 扩展详情领域模型**
 
 `AdminCommentDetail` 追加：
 
@@ -698,11 +698,11 @@ Integer restoredBy,
 LocalDateTime restoreTime
 ```
 
-- [ ] **Step 2: 扩展详情响应 DTO**
+- [x] **Step 2: 扩展详情响应 DTO**
 
 `AdminCommentDetailResponse` 追加同名字段，并在 `from` 方法中映射。
 
-- [ ] **Step 3: 扩展详情 SQL**
+- [x] **Step 3: 扩展详情 SQL**
 
 `DatabaseAdminCommentReader.findDetail` 查询增加：
 
@@ -717,7 +717,7 @@ c.restored_by,
 c.restore_time
 ```
 
-- [ ] **Step 4: 读取层测试**
+- [x] **Step 4: 读取层测试**
 
 在 `DatabaseAdminCommentReaderTest` 增加断言：
 
@@ -728,7 +728,7 @@ assertThat(detail.get().reviewedBy()).isEqualTo(1);
 assertThat(detail.get().reviewTime()).isNotNull();
 ```
 
-- [ ] **Step 5: 控制器响应测试**
+- [x] **Step 5: 控制器响应测试**
 
 在 `AdminCommentControllerTest` 的详情接口测试中追加：
 
@@ -739,7 +739,7 @@ assertThat(detail.get().reviewTime()).isNotNull();
 .andExpect(jsonPath("$.data.reviewTime").exists());
 ```
 
-- [ ] **Step 6: 运行测试**
+- [x] **Step 6: 运行测试**
 
 Run:
 
@@ -749,7 +749,7 @@ mvn -pl MyBlog-springboot-v2 "-Dtest=DatabaseAdminCommentReaderTest,AdminComment
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentDetail.java `

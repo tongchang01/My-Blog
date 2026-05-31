@@ -79,6 +79,12 @@ class DatabaseAdminCommentReaderTest {
         assertThat(detail.get().topicTitle()).isEqualTo("后端V2第一篇");
         assertThat(detail.get().deleted()).isTrue();
         assertThat(detail.get().reviewed()).isTrue();
+        assertThat(detail.get().createIp()).isEqualTo("203.0.113.4");
+        assertThat(detail.get().userAgent()).isEqualTo("JUnit Browser");
+        assertThat(detail.get().reviewedBy()).isEqualTo(1);
+        assertThat(detail.get().reviewTime()).isNotNull();
+        assertThat(detail.get().deletedBy()).isEqualTo(1);
+        assertThat(detail.get().deleteTime()).isNotNull();
     }
 
     @Test

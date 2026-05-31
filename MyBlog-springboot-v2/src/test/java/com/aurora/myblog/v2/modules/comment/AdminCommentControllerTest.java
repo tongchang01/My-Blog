@@ -72,7 +72,13 @@ class AdminCommentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(4))
                 .andExpect(jsonPath("$.data.content").value("已删除评论"))
-                .andExpect(jsonPath("$.data.deleted").value(true));
+                .andExpect(jsonPath("$.data.deleted").value(true))
+                .andExpect(jsonPath("$.data.createIp").value("203.0.113.4"))
+                .andExpect(jsonPath("$.data.userAgent").value("JUnit Browser"))
+                .andExpect(jsonPath("$.data.reviewedBy").value(1))
+                .andExpect(jsonPath("$.data.reviewTime").exists())
+                .andExpect(jsonPath("$.data.deletedBy").value(1))
+                .andExpect(jsonPath("$.data.deleteTime").exists());
     }
 
     @Test

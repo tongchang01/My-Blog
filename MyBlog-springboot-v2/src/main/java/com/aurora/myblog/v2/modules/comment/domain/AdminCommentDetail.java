@@ -16,6 +16,14 @@ public record AdminCommentDetail(
         String content,
         boolean reviewed,
         boolean deleted,
+        String createIp,
+        String userAgent,
+        Integer reviewedBy,
+        LocalDateTime reviewTime,
+        Integer deletedBy,
+        LocalDateTime deleteTime,
+        Integer restoredBy,
+        LocalDateTime restoreTime,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
 ) {
