@@ -1,6 +1,5 @@
-package com.aurora.myblog.v2.modules.identity;
+package com.aurora.myblog.v2.common.web;
 
-import com.aurora.myblog.v2.modules.identity.api.ClientIpResolver;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 

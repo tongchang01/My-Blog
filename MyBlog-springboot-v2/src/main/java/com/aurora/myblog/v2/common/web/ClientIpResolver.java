@@ -1,4 +1,4 @@
-package com.aurora.myblog.v2.modules.identity.api;
+package com.aurora.myblog.v2.common.web;
 
 import jakarta.servlet.http.HttpServletRequest;
 

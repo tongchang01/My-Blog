@@ -3,6 +3,7 @@ package com.aurora.myblog.v2.modules.identity.api;
 import com.aurora.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.aurora.myblog.v2.common.auth.CurrentUser;
 import com.aurora.myblog.v2.common.web.ApiResponse;
+import com.aurora.myblog.v2.common.web.ClientIpResolver;
 import com.aurora.myblog.v2.modules.identity.application.AuthService;
 import com.aurora.myblog.v2.modules.identity.application.IdentityQueryService;
 import com.aurora.myblog.v2.modules.identity.domain.AuthRole;

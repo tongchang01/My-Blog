@@ -260,7 +260,7 @@ git commit -m "新增后端V2评论审计表结构计划"
 - Move: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/identity/ClientIpResolverTest.java` -> `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/web/ClientIpResolverTest.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/common/web/UserAgentResolverTest.java`
 
-- [ ] **Step 1: 移动 `ClientIpResolver` 到 common web 包**
+- [x] **Step 1: 移动 `ClientIpResolver` 到 common web 包**
 
 新文件内容：
 
@@ -308,7 +308,7 @@ public final class ClientIpResolver {
 }
 ```
 
-- [ ] **Step 2: 新增 `UserAgentResolver`**
+- [x] **Step 2: 新增 `UserAgentResolver`**
 
 ```java
 package com.aurora.myblog.v2.common.web;
@@ -336,7 +336,7 @@ public final class UserAgentResolver {
 }
 ```
 
-- [ ] **Step 3: 更新登录接口 import**
+- [x] **Step 3: 更新登录接口 import**
 
 `AuthController` 改用：
 
@@ -344,7 +344,7 @@ public final class UserAgentResolver {
 import com.aurora.myblog.v2.common.web.ClientIpResolver;
 ```
 
-- [ ] **Step 4: 移动并调整 IP 测试包名**
+- [x] **Step 4: 移动并调整 IP 测试包名**
 
 `ClientIpResolverTest` 的包名改为：
 
@@ -352,7 +352,7 @@ import com.aurora.myblog.v2.common.web.ClientIpResolver;
 package com.aurora.myblog.v2.common.web;
 ```
 
-- [ ] **Step 5: 新增 UA 截断测试**
+- [x] **Step 5: 新增 UA 截断测试**
 
 ```java
 package com.aurora.myblog.v2.common.web;
@@ -382,7 +382,7 @@ class UserAgentResolverTest {
 }
 ```
 
-- [ ] **Step 6: 运行测试**
+- [x] **Step 6: 运行测试**
 
 Run:
 
@@ -392,7 +392,7 @@ mvn -pl MyBlog-springboot-v2 "-Dtest=ClientIpResolverTest,UserAgentResolverTest,
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 7: 提交**
+- [x] **Step 7: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/common/web/ClientIpResolver.java `
