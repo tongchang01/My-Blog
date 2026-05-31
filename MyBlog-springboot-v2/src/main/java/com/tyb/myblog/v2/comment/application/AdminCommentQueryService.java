@@ -10,6 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
+/**
+ * 后台评论查询应用服务。
+ *
+ * <p>负责后台评论列表和详情查询，支持审核状态、删除状态、类型、主题和关键词筛选。</p>
+ */
 public class AdminCommentQueryService {
 
     private final AdminCommentReader reader;
@@ -18,10 +23,16 @@ public class AdminCommentQueryService {
         this.reader = reader;
     }
 
+    /**
+     * 查询后台评论分页列表。
+     */
     public PageResponse<AdminCommentItem> list(AdminCommentQuery query) {
         return reader.list(query);
     }
 
+    /**
+     * 查询后台评论详情。
+     */
     public AdminCommentDetail detail(int id) {
         return reader.findDetail(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "comment not found"));

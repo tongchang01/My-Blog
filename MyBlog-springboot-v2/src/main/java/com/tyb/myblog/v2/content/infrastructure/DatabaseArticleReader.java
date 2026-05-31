@@ -26,6 +26,12 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Component
+/**
+ * 基于旧库文章表的文章读取器。
+ *
+ * <p>负责把 {@code t_article}、分类、作者、标签等旧库表转换为 V2 领域对象。
+ * 前台查询必须过滤 {@code is_delete = 0}，并按业务场景控制 {@code status} 可见范围。</p>
+ */
 public class DatabaseArticleReader implements ArticleReader {
 
     private final JdbcTemplate jdbcTemplate;
@@ -34,6 +40,9 @@ public class DatabaseArticleReader implements ArticleReader {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * 查询前台公开文章列表。
+     */
     @Override
     public PageResponse<ArticleSummary> listPublishedArticles(ArticlePageQuery query) {
         Long total = jdbcTemplate.queryForObject("""
@@ -53,6 +62,9 @@ public class DatabaseArticleReader implements ArticleReader {
         return toPage(query, total, () -> loadArticleSummaries(ids));
     }
 
+    /**
+     * 按分类查询前台公开文章列表。
+     */
     @Override
     public PageResponse<ArticleSummary> listPublishedArticlesByCategory(int categoryId, ArticlePageQuery query) {
         Long total = jdbcTemplate.queryForObject("""
@@ -74,6 +86,9 @@ public class DatabaseArticleReader implements ArticleReader {
         return toPage(query, total, () -> loadArticleSummaries(ids));
     }
 
+    /**
+     * 按标签查询前台公开文章列表。
+     */
     @Override
     public PageResponse<ArticleSummary> listPublishedArticlesByTag(int tagId, ArticlePageQuery query) {
         Long total = jdbcTemplate.queryForObject("""
@@ -97,6 +112,9 @@ public class DatabaseArticleReader implements ArticleReader {
         return toPage(query, total, () -> loadArticleSummaries(ids));
     }
 
+    /**
+     * 查询首页置顶和推荐文章。
+     */
     @Override
     public FeaturedArticles findFeaturedArticles() {
         List<Integer> ids = jdbcTemplate.queryForList("""
@@ -120,6 +138,9 @@ public class DatabaseArticleReader implements ArticleReader {
         return new FeaturedArticles(topArticle, featuredArticles);
     }
 
+    /**
+     * 查询前台文章归档。
+     */
     @Override
     public PageResponse<ArchiveMonth> listPublishedArchives(ArticlePageQuery query) {
         List<ArticleSummary> articles = loadArchiveArticles();
@@ -136,6 +157,9 @@ public class DatabaseArticleReader implements ArticleReader {
         return new PageResponse<>(allMonths.subList(fromIndex, toIndex), allMonths.size(), query.page(), query.size());
     }
 
+    /**
+     * 查询文章访问状态，不过滤发布状态，供应用层判断是否可见。
+     */
     @Override
     public Optional<ArticleAccessCheck> findArticleAccessCheckById(int articleId) {
         List<ArticleAccessCheck> checks = jdbcTemplate.query("""
@@ -155,16 +179,25 @@ public class DatabaseArticleReader implements ArticleReader {
         return checks.stream().findFirst();
     }
 
+    /**
+     * 查询公开发布文章详情。
+     */
     @Override
     public Optional<ArticleDetail> findPublishedArticleById(int articleId) {
         return findArticleByIdAndStatuses(articleId, List.of(1));
     }
 
+    /**
+     * 查询已经通过访问校验的文章详情。
+     */
     @Override
     public Optional<ArticleDetail> findAccessibleArticleById(int articleId) {
         return findArticleByIdAndStatuses(articleId, List.of(1, 2));
     }
 
+    /**
+     * 按指定旧库状态查询文章详情。
+     */
     private Optional<ArticleDetail> findArticleByIdAndStatuses(int articleId, List<Integer> statuses) {
         String statusPlaceholders = String.join(",", statuses.stream().map(status -> "?").toList());
         List<Object> args = new ArrayList<>();
@@ -193,6 +226,7 @@ public class DatabaseArticleReader implements ArticleReader {
                         left join t_article_tag at on at.article_id = a.id
                         left join t_tag t on t.id = at.tag_id
                         where a.id = ?
+                          -- 旧库 is_delete = 0 表示文章未软删除。
                           and a.is_delete = 0
                           and a.status in (%s)
                         order by t.id asc
@@ -226,6 +260,9 @@ public class DatabaseArticleReader implements ArticleReader {
         return new PageResponse<>(records, safeTotal, query.page(), query.size());
     }
 
+    /**
+     * 加载文章摘要列表。
+     */
     private List<ArticleSummary> loadArticleSummaries(List<Integer> ids) {
         if (ids.isEmpty()) {
             return List.of();
@@ -278,6 +315,9 @@ public class DatabaseArticleReader implements ArticleReader {
                 .toList();
     }
 
+    /**
+     * 加载归档使用的全部公开文章摘要。
+     */
     private List<ArticleSummary> loadArchiveArticles() {
         List<Integer> ids = jdbcTemplate.queryForList("""
                 select a.id
@@ -289,10 +329,16 @@ public class DatabaseArticleReader implements ArticleReader {
         return loadArticleSummaries(ids);
     }
 
+    /**
+     * 将创建时间转换为归档月份。
+     */
     private String toArchiveMonth(ArticleSummary article) {
         return "%04d-%02d".formatted(article.createdAt().getYear(), article.createdAt().getMonthValue());
     }
 
+    /**
+     * 将摘要行按文章聚合，避免文章有多个标签时重复返回。
+     */
     private List<ArticleSummary> groupRows(List<ArticleSummaryRow> rows) {
         Map<Integer, ArticleAccumulator> articles = new LinkedHashMap<>();
         for (ArticleSummaryRow row : rows) {
@@ -306,6 +352,9 @@ public class DatabaseArticleReader implements ArticleReader {
                 .toList();
     }
 
+    /**
+     * 将明细行聚合为文章详情。
+     */
     private Optional<ArticleDetail> toArticleDetail(List<ArticleDetailRow> rows) {
         if (rows.isEmpty()) {
             return Optional.empty();
@@ -330,6 +379,9 @@ public class DatabaseArticleReader implements ArticleReader {
                 first.updatedAt()));
     }
 
+    /**
+     * 读取可为空的时间字段。
+     */
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp == null ? null : timestamp.toLocalDateTime();
     }

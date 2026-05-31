@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+/**
+ * 基于旧库用户表的当前用户资料读取器。
+ *
+ * <p>从 {@code t_user_auth} 和 {@code t_user_info} 联表读取当前用户资料，
+ * 并过滤 {@code t_user_info.is_disable = 0} 的启用用户。</p>
+ */
 public class DatabaseCurrentUserProfileReader implements CurrentUserProfileReader {
 
     private final JdbcTemplate jdbcTemplate;
@@ -17,6 +23,9 @@ public class DatabaseCurrentUserProfileReader implements CurrentUserProfileReade
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * 根据认证账号 ID 查询当前用户资料。
+     */
     @Override
     public Optional<CurrentUserProfile> findByAuthId(String authId) {
         if (authId == null || authId.isBlank()) {
@@ -33,6 +42,7 @@ public class DatabaseCurrentUserProfileReader implements CurrentUserProfileReade
                         from t_user_auth ua
                         join t_user_info ui on ua.user_info_id = ui.id
                         where ua.id = ?
+                          -- 旧库使用 is_disable = 0 表示用户资料可用。
                           and ui.is_disable = 0
                         limit 1
                         """,

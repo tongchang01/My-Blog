@@ -18,6 +18,12 @@ import java.util.List;
 import java.util.Objects;
 
 @Component
+/**
+ * 基于旧库评论表的前台评论写入器。
+ *
+ * <p>写入 {@code t_comment} 时会记录评论人、主题、父评论、回复用户、客户端 IP 和 User-Agent。
+ * 当前新评论默认写入未审核状态，前台展示由读取端过滤审核状态。</p>
+ */
 public class DatabaseCommentWriter implements CommentWriter {
 
     private final JdbcTemplate jdbcTemplate;
@@ -26,6 +32,9 @@ public class DatabaseCommentWriter implements CommentWriter {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * 校验并保存评论。
+     */
     @Override
     public int save(CommentCreateCommand command) {
         validate(command);
@@ -39,6 +48,7 @@ public class DatabaseCommentWriter implements CommentWriter {
                         create_ip, user_agent,
                         create_time, update_time
                     )
+                    -- is_delete = 0 表示未删除，is_review = 0 表示待审核。
                     values (?, ?, ?, ?, ?, ?, 0, 0, ?, ?, ?, ?)
                     """, Statement.RETURN_GENERATED_KEYS);
             ps.setInt(1, command.userId());
@@ -60,6 +70,9 @@ public class DatabaseCommentWriter implements CommentWriter {
         return key.intValue();
     }
 
+    /**
+     * 校验评论提交业务边界。
+     */
     private void validate(CommentCreateCommand command) {
         if (command.type() == CommentType.TALK) {
             throw new ApiException(ApiErrorCode.VALIDATION_ERROR, "说说评论暂未支持");
@@ -81,6 +94,9 @@ public class DatabaseCommentWriter implements CommentWriter {
         }
     }
 
+    /**
+     * 校验文章评论的目标文章是否存在且可评论。
+     */
     private void validateArticleTarget(Integer topicId) {
         if (topicId == null) {
             throw new ApiException(ApiErrorCode.VALIDATION_ERROR, "文章评论必须指定文章");
@@ -90,6 +106,7 @@ public class DatabaseCommentWriter implements CommentWriter {
                 from t_article
                 where id = ?
                   and is_delete = 0
+                  -- status in (1, 2) 表示公开文章或受保护文章可以接收评论。
                   and status in (1, 2)
                 """, Integer.class, topicId);
         if (count == null || count == 0) {
@@ -97,6 +114,9 @@ public class DatabaseCommentWriter implements CommentWriter {
         }
     }
 
+    /**
+     * 校验回复关系。
+     */
     private void validateReply(CommentCreateCommand command) {
         if (command.replyUserId() == null) {
             throw new ApiException(ApiErrorCode.VALIDATION_ERROR, "回复评论必须指定回复用户");
@@ -117,6 +137,7 @@ public class DatabaseCommentWriter implements CommentWriter {
                 .findFirst()
                 .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND, "父评论不存在"));
         if (parent.parentId() != null) {
+            // 旧库当前只允许二级评论，不能继续回复回复。
             throw new ApiException(ApiErrorCode.VALIDATION_ERROR, "只能回复根评论");
         }
         if (parent.type() != command.type().code()) {
@@ -136,6 +157,9 @@ public class DatabaseCommentWriter implements CommentWriter {
         }
     }
 
+    /**
+     * 写入可为空的整数值。
+     */
     private void setNullableInt(PreparedStatement ps, int index, Integer value) throws java.sql.SQLException {
         if (value == null) {
             ps.setObject(index, null);
@@ -144,6 +168,9 @@ public class DatabaseCommentWriter implements CommentWriter {
         }
     }
 
+    /**
+     * 父评论校验所需的旧库字段。
+     */
     private record ParentComment(int id, Integer parentId, Integer topicId, int type) {
     }
 }

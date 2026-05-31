@@ -14,6 +14,12 @@ import java.time.Instant;
 import java.util.Base64;
 
 @Service
+/**
+ * 基于 HMAC 签名的受保护文章访问令牌服务。
+ *
+ * <p>令牌只用于访问单篇受保护文章，默认 30 分钟有效。
+ * 签名密钥复用 JWT 密钥，后续如果文章访问策略变复杂，应拆分独立密钥。</p>
+ */
 public class SignedArticleAccessTokenService implements ArticleAccessTokenService {
 
     private static final String HMAC_ALGORITHM = "HmacSHA256";
@@ -25,6 +31,9 @@ public class SignedArticleAccessTokenService implements ArticleAccessTokenServic
         this.secret = jwtProperties.secret().getBytes(StandardCharsets.UTF_8);
     }
 
+    /**
+     * 签发指定文章的临时访问令牌。
+     */
     @Override
     public ArticleAccessToken issue(int articleId) {
         Instant expiresAt = Instant.now().plus(ACCESS_TOKEN_TTL);
@@ -33,6 +42,9 @@ public class SignedArticleAccessTokenService implements ArticleAccessTokenServic
         return new ArticleAccessToken(encode(payload) + "." + signature, expiresAt);
     }
 
+    /**
+     * 校验访问令牌是否匹配当前文章且未过期。
+     */
     @Override
     public boolean verify(int articleId, String token) {
         if (token == null || token.isBlank()) {
@@ -58,6 +70,9 @@ public class SignedArticleAccessTokenService implements ArticleAccessTokenServic
         }
     }
 
+    /**
+     * 对令牌载荷生成 HMAC 签名。
+     */
     private String sign(String payload) {
         try {
             Mac mac = Mac.getInstance(HMAC_ALGORITHM);
@@ -69,14 +84,23 @@ public class SignedArticleAccessTokenService implements ArticleAccessTokenServic
         }
     }
 
+    /**
+     * URL 安全 Base64 编码。
+     */
     private String encode(String payload) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(payload.getBytes(StandardCharsets.UTF_8));
     }
 
+    /**
+     * URL 安全 Base64 解码。
+     */
     private String decode(String value) {
         return new String(Base64.getUrlDecoder().decode(value), StandardCharsets.UTF_8);
     }
 
+    /**
+     * 常量时间比较签名，降低时序侧信道风险。
+     */
     private boolean sameSignature(String expected, String actual) {
         return MessageDigest.isEqual(
                 expected.getBytes(StandardCharsets.UTF_8),

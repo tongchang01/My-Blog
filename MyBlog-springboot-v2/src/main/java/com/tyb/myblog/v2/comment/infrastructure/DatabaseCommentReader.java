@@ -18,6 +18,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+/**
+ * 基于旧库评论表的前台评论读取器。
+ *
+ * <p>所有前台查询都必须过滤 {@code is_review = 1} 和 {@code is_delete = 0}，
+ * 避免待审核或已删除评论出现在前台。</p>
+ */
 public class DatabaseCommentReader implements CommentReader {
 
     private final JdbcTemplate jdbcTemplate;
@@ -26,6 +32,9 @@ public class DatabaseCommentReader implements CommentReader {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * 查询前台一级评论分页。
+     */
     @Override
     public PageResponse<CommentThread> listComments(CommentType type, Integer topicId, CommentPageQuery query) {
         Long total = jdbcTemplate.queryForObject("""
@@ -41,11 +50,17 @@ public class DatabaseCommentReader implements CommentReader {
         return new PageResponse<>(attachReplies(roots), total == null ? 0 : total, query.page(), query.size());
     }
 
+    /**
+     * 查询指定一级评论下的回复。
+     */
     @Override
     public List<CommentReply> listRepliesByCommentId(int commentId) {
         return loadReplies(List.of(commentId));
     }
 
+    /**
+     * 查询首页热门评论。
+     */
     @Override
     public List<CommentThread> listTopComments(int limit) {
         List<CommentThread> roots = jdbcTemplate.query("""
@@ -80,6 +95,9 @@ public class DatabaseCommentReader implements CommentReader {
         return attachReplies(roots);
     }
 
+    /**
+     * 加载一级评论。
+     */
     private List<CommentThread> loadRootComments(CommentType type, Integer topicId, CommentPageQuery query) {
         return jdbcTemplate.query("""
                         select c.id,
@@ -114,6 +132,9 @@ public class DatabaseCommentReader implements CommentReader {
                 type.code(), topicId, topicId, query.size(), query.offset());
     }
 
+    /**
+     * 给一级评论挂载回复列表。
+     */
     private List<CommentThread> attachReplies(List<CommentThread> roots) {
         if (roots.isEmpty()) {
             return List.of();
@@ -133,6 +154,9 @@ public class DatabaseCommentReader implements CommentReader {
                 .toList();
     }
 
+    /**
+     * 批量加载回复。
+     */
     private List<CommentReply> loadReplies(List<Integer> parentIds) {
         if (parentIds.isEmpty()) {
             return List.of();
@@ -177,6 +201,9 @@ public class DatabaseCommentReader implements CommentReader {
                 parentIds.toArray());
     }
 
+    /**
+     * 将旧库一级评论行转换为领域评论线程。
+     */
     private CommentThread toThread(RootRow row) {
         return new CommentThread(
                 row.id(),
@@ -188,6 +215,9 @@ public class DatabaseCommentReader implements CommentReader {
                 List.of());
     }
 
+    /**
+     * 读取可为空的时间字段。
+     */
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp == null ? null : timestamp.toLocalDateTime();
     }

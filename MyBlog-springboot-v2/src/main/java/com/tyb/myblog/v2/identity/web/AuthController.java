@@ -20,6 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/auth")
+/**
+ * 认证接口。
+ *
+ * <p>负责登录、查询当前用户和注销。登录接口会记录客户端 IP，
+ * 当前用户接口依赖 JWT 认证上下文。</p>
+ */
 public class AuthController {
 
     private final AuthService authService;
@@ -30,6 +36,11 @@ public class AuthController {
         this.identityQueryService = identityQueryService;
     }
 
+    /**
+     * 用户名密码登录。
+     *
+     * <p>登录成功后返回访问令牌和最小用户信息，失败时不区分账号不存在和密码错误。</p>
+     */
     @PostMapping("/login")
     ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpServletRequest servletRequest) {
         var result = authService.login(new LoginCommand(
@@ -43,6 +54,9 @@ public class AuthController {
         return ApiResponse.ok(new LoginResponse(result.token().accessToken(), result.token().expiresAt(), user));
     }
 
+    /**
+     * 查询当前登录用户资料。
+     */
     @GetMapping("/me")
     ApiResponse<MeResponse> me(@CurrentUser AuthenticatedPrincipal user) {
         var profile = identityQueryService.currentProfile(user);
@@ -56,6 +70,9 @@ public class AuthController {
                 user.roles().stream().map(AuthRole::valueOf).collect(java.util.stream.Collectors.toSet())));
     }
 
+    /**
+     * 注销当前访问令牌。
+     */
     @PostMapping("/logout")
     ApiResponse<Void> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
         authService.logout(authorization.replaceFirst("Bearer ", ""));

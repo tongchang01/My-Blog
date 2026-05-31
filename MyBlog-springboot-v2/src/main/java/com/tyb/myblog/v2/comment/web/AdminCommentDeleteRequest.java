@@ -4,6 +4,11 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
+/**
+ * 后台评论删除请求。
+ *
+ * @param ids 评论 ID 列表
+ */
 public record AdminCommentDeleteRequest(
         @NotEmpty(message = "评论 ID 不能为空")
         List<Integer> ids

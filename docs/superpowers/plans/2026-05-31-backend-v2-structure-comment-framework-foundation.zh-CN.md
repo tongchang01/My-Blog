@@ -126,7 +126,7 @@ content
 
 - Read: `docs/superpowers/specs/2026-05-31-backend-v2-code-comment-standards.zh-CN.md`
 
-- [ ] **Step 1: 新增项目结构决策文档**
+- [x] **Step 1: 新增项目结构决策文档**
 
 写清楚以下决策：
 
@@ -138,7 +138,7 @@ api 改为 web
 模块内部结构：web / application / domain / infrastructure
 ```
 
-- [ ] **Step 2: 写清楚每一层允许放什么**
+- [x] **Step 2: 写清楚每一层允许放什么**
 
 必须覆盖：
 
@@ -162,7 +162,7 @@ api 改为 web
 
 - `infrastructure`
 
-- [ ] **Step 3: 写清楚每一层禁止做什么**
+- [x] **Step 3: 写清楚每一层禁止做什么**
 
 必须明确：
 
@@ -176,7 +176,7 @@ api 改为 web
 
 - `common` 不放业务模块私有逻辑。
 
-- [ ] **Step 4: 提交项目结构决策文档**
+- [x] **Step 4: 提交项目结构决策文档**
 
 Run:
 
@@ -197,7 +197,7 @@ git commit -m "记录后端V2项目结构决策"
 
 - Modify: `MyBlog-springboot-v2/src/test/java/**`
 
-- [ ] **Step 1: 执行前确认工作区干净**
+- [x] **Step 1: 执行前确认工作区干净**
 
 Run:
 
@@ -207,7 +207,7 @@ git status --short
 
 Expected: 无输出。
 
-- [ ] **Step 2: 将基础包名从 `com.aurora.myblog.v2` 改为 `com.tyb.myblog.v2`**
+- [x] **Step 2: 将基础包名从 `com.aurora.myblog.v2` 改为 `com.tyb.myblog.v2`**
 
 需要修改：
 
@@ -223,7 +223,7 @@ Expected: 无输出。
 
 - 测试类包名。
 
-- [ ] **Step 3: 去掉 `modules` 目录层级**
+- [x] **Step 3: 去掉 `modules` 目录层级**
 
 从：
 
@@ -241,7 +241,7 @@ com/tyb/myblog/v2/comment
 com/tyb/myblog/v2/identity
 ```
 
-- [ ] **Step 4: 将业务模块内 `api` 改为 `web`**
+- [x] **Step 4: 将业务模块内 `api` 改为 `web`**
 
 从：
 
@@ -259,7 +259,7 @@ comment/web
 identity/web
 ```
 
-- [ ] **Step 5: 全局搜索确认旧包名不存在**
+- [x] **Step 5: 全局搜索确认旧包名不存在**
 
 Run:
 
@@ -269,7 +269,7 @@ rg "com\.aurora\.myblog\.v2|\.modules\.|\.api" MyBlog-springboot-v2/src/main/jav
 
 Expected: 不再出现旧包名、`.modules.`、业务模块 `.api` 包引用。
 
-- [ ] **Step 6: 运行测试**
+- [x] **Step 6: 运行测试**
 
 Run:
 
@@ -280,7 +280,7 @@ mvn test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 7: 提交结构迁移**
+- [x] **Step 7: 提交结构迁移**
 
 Run:
 
@@ -299,7 +299,7 @@ git commit -m "调整后端V2基础包名和模块结构"
 
 - Modify: `MyBlog-springboot-v2/src/test/java/**/ArchitectureRulesTest.java`
 
-- [ ] **Step 1: 检查现有 ArchUnit 规则**
+- [x] **Step 1: 检查现有 ArchUnit 规则**
 
 Run:
 
@@ -307,7 +307,7 @@ Run:
 Get-Content -Raw -Encoding UTF8 MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java
 ```
 
-- [ ] **Step 2: 更新包名规则**
+- [x] **Step 2: 更新包名规则**
 
 规则应基于新包名：
 
@@ -315,7 +315,7 @@ Get-Content -Raw -Encoding UTF8 MyBlog-springboot-v2/src/test/java/com/tyb/myblo
 com.tyb.myblog.v2
 ```
 
-- [ ] **Step 3: 增加分层约束**
+- [x] **Step 3: 增加分层约束**
 
 至少覆盖：
 
@@ -327,7 +327,7 @@ com.tyb.myblog.v2
 
 - 业务模块不能直接访问其他模块的 infrastructure。
 
-- [ ] **Step 4: 运行 ArchUnit 测试**
+- [x] **Step 4: 运行 ArchUnit 测试**
 
 Run:
 
@@ -338,7 +338,7 @@ mvn "-Dtest=ArchitectureRulesTest" test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 5: 提交架构约束**
+- [x] **Step 5: 提交架构约束**
 
 Run:
 
@@ -361,7 +361,7 @@ git commit -m "强化后端V2项目结构约束"
 
 - Read: `docs/superpowers/specs/2026-05-31-backend-v2-code-comment-standards.zh-CN.md`
 
-- [ ] **Step 1: 列出缺少 Javadoc 的类**
+- [x] **Step 1: 列出缺少 Javadoc 的类**
 
 Run:
 
@@ -369,7 +369,7 @@ Run:
 rg "^public|^class|^record|^interface|^enum" MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/infrastructure -n
 ```
 
-- [ ] **Step 2: 补齐配置、安全、错误处理、Web 支撑类注释**
+- [x] **Step 2: 补齐配置、安全、错误处理、Web 支撑类注释**
 
 必须覆盖：
 
@@ -385,7 +385,7 @@ rg "^public|^class|^record|^interface|^enum" MyBlog-springboot-v2/src/main/java/
 
 - 客户端 IP、User-Agent、JWT 等关键逻辑。
 
-- [ ] **Step 3: 运行 common 相关测试**
+- [x] **Step 3: 运行 common 相关测试**
 
 Run:
 
@@ -396,7 +396,7 @@ mvn "-Dtest=BackendPropertiesTest,GlobalExceptionHandlerTest,SecurityConfigTest,
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 4: 提交 common 注释补齐**
+- [x] **Step 4: 提交 common 注释补齐**
 
 Run:
 
@@ -421,7 +421,7 @@ git commit -m "补齐后端V2通用基础设施注释"
 
 - Read: `docs/superpowers/specs/2026-05-31-backend-v2-code-comment-standards.zh-CN.md`
 
-- [ ] **Step 1: identity 注释补齐**
+- [x] **Step 1: identity 注释补齐**
 
 覆盖：
 
@@ -435,7 +435,7 @@ git commit -m "补齐后端V2通用基础设施注释"
 
 - 旧库字段兼容。
 
-- [ ] **Step 2: 运行 identity 测试**
+- [x] **Step 2: 运行 identity 测试**
 
 Run:
 
@@ -446,7 +446,7 @@ mvn "-Dtest=AuthControllerTest,AuthServiceTest,DatabaseCurrentUserProfileReaderT
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 3: content 注释补齐**
+- [x] **Step 3: content 注释补齐**
 
 覆盖：
 
@@ -460,7 +460,7 @@ Expected: `BUILD SUCCESS`。
 
 - 受保护文章访问。
 
-- [ ] **Step 4: 运行 content 测试**
+- [x] **Step 4: 运行 content 测试**
 
 Run:
 
@@ -471,7 +471,7 @@ mvn "-Dtest=ContentArticleControllerTest,ContentCatalogControllerTest,DatabaseAr
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 5: comment 注释补齐**
+- [x] **Step 5: comment 注释补齐**
 
 覆盖：
 
@@ -487,7 +487,7 @@ Expected: `BUILD SUCCESS`。
 
 - 软删除和审核状态兼容。
 
-- [ ] **Step 6: 运行 comment 测试**
+- [x] **Step 6: 运行 comment 测试**
 
 Run:
 
@@ -498,7 +498,7 @@ mvn "-Dtest=CommentControllerTest,AdminCommentControllerTest,DatabaseAdminCommen
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 7: 提交业务注释补齐**
+- [x] **Step 7: 提交业务注释补齐**
 
 Run:
 

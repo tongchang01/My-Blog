@@ -13,8 +13,17 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Component
+/**
+ * 基于旧库角色菜单表的用户菜单读取器。
+ *
+ * <p>通过用户角色关联表、角色菜单关联表和菜单表构造后台菜单树。
+ * 该实现兼容旧前端约定：叶子菜单会被包在 {@code Layout} 根组件下。</p>
+ */
 public class DatabaseUserMenuReader implements UserMenuReader {
 
+    /**
+     * 旧后台前端约定的根布局组件名称。
+     */
     private static final String ROOT_COMPONENT = "Layout";
 
     private final JdbcTemplate jdbcTemplate;
@@ -23,6 +32,9 @@ public class DatabaseUserMenuReader implements UserMenuReader {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * 查询当前用户可见菜单并组装树。
+     */
     @Override
     public List<UserMenu> findByAuthId(String authId) {
         if (authId == null || authId.isBlank()) {
@@ -44,6 +56,7 @@ public class DatabaseUserMenuReader implements UserMenuReader {
                         join t_menu m on rm.menu_id = m.id
                         join t_role r on ur.role_id = r.id
                         where ua.id = ?
+                          -- 被禁用角色不能贡献后台菜单权限。
                           and r.is_disable = 0
                         order by m.order_num, m.id
                         """,
@@ -60,6 +73,9 @@ public class DatabaseUserMenuReader implements UserMenuReader {
         return buildTree(rows);
     }
 
+    /**
+     * 按父子关系构建菜单树。
+     */
     private List<UserMenu> buildTree(List<MenuRow> rows) {
         Map<Integer, List<MenuRow>> childrenByParent = rows.stream()
                 .filter(row -> row.parentId() != null)
@@ -71,8 +87,12 @@ public class DatabaseUserMenuReader implements UserMenuReader {
                 .toList();
     }
 
+    /**
+     * 将旧库菜单行转换为前端需要的菜单节点。
+     */
     private UserMenu toUserMenu(MenuRow row, List<MenuRow> children) {
         if (children.isEmpty()) {
+            // 旧后台前端要求叶子路由挂在 Layout 下，否则路由组件无法正确渲染。
             List<UserMenu> leaf = new ArrayList<>();
             leaf.add(new UserMenu(row.name(), "", row.component(), row.icon(), false, List.of()));
             return new UserMenu(row.name(), row.path(), ROOT_COMPONENT, row.icon(), row.hidden(), leaf);
@@ -85,6 +105,9 @@ public class DatabaseUserMenuReader implements UserMenuReader {
         return new UserMenu(row.name(), row.path(), row.component(), row.icon(), row.hidden(), childMenus);
     }
 
+    /**
+     * 旧库菜单行。
+     */
     private record MenuRow(
             Integer id,
             String name,

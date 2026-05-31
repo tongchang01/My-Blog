@@ -11,6 +11,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+/**
+ * 前台评论查询应用服务。
+ *
+ * <p>负责前台评论列表、回复列表和首页热门评论查询。
+ * 前台只应展示已审核且未删除的评论。</p>
+ */
 public class CommentQueryService {
 
     private final CommentReader commentReader;
@@ -19,15 +25,24 @@ public class CommentQueryService {
         this.commentReader = commentReader;
     }
 
+    /**
+     * 查询指定类型和主题下的前台评论列表。
+     */
     public PageResponse<CommentThread> listComments(Integer type, Integer topicId, Integer page, Integer size) {
         CommentType commentType = CommentType.fromCode(type);
         return commentReader.listComments(commentType, topicId, CommentPageQuery.of(page, size));
     }
 
+    /**
+     * 查询指定一级评论下的回复列表。
+     */
     public List<CommentReply> listRepliesByCommentId(int commentId) {
         return commentReader.listRepliesByCommentId(commentId);
     }
 
+    /**
+     * 查询首页展示的热门评论。
+     */
     public List<CommentThread> listTopComments() {
         return commentReader.listTopComments(6);
     }

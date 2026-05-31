@@ -9,6 +9,11 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+/**
+ * 前台内容目录接口。
+ *
+ * <p>负责分类、标签和热门标签展示。</p>
+ */
 public class ContentCatalogController {
 
     private final ContentQueryService contentQueryService;
@@ -17,6 +22,9 @@ public class ContentCatalogController {
         this.contentQueryService = contentQueryService;
     }
 
+    /**
+     * 查询分类列表。
+     */
     @GetMapping("/api/categories")
     public ApiResponse<List<CategoryResponse>> listCategories() {
         List<CategoryResponse> categories = contentQueryService.listCategories().stream()
@@ -25,6 +33,9 @@ public class ContentCatalogController {
         return ApiResponse.ok(categories);
     }
 
+    /**
+     * 查询标签列表。
+     */
     @GetMapping("/api/tags")
     public ApiResponse<List<TagResponse>> listTags() {
         List<TagResponse> tags = contentQueryService.listTags().stream()
@@ -33,6 +44,9 @@ public class ContentCatalogController {
         return ApiResponse.ok(tags);
     }
 
+    /**
+     * 查询热门标签。
+     */
     @GetMapping("/api/tags/top")
     public ApiResponse<List<TagResponse>> listTopTags(@RequestParam(required = false) Integer limit) {
         List<TagResponse> tags = contentQueryService.listTopTags(limit).stream()

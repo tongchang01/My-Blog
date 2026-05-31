@@ -9,6 +9,11 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+/**
+ * 基于旧库分类和标签表的内容目录读取器。
+ *
+ * <p>只统计未删除且已发布的文章，避免前台分类、标签数量包含草稿或软删除文章。</p>
+ */
 public class DatabaseContentCatalogReader implements ContentCatalogReader {
 
     private final JdbcTemplate jdbcTemplate;
@@ -17,6 +22,9 @@ public class DatabaseContentCatalogReader implements ContentCatalogReader {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * 查询分类及已发布文章数量。
+     */
     @Override
     public List<CategorySummary> listCategories() {
         return jdbcTemplate.query("""
@@ -26,6 +34,7 @@ public class DatabaseContentCatalogReader implements ContentCatalogReader {
                         from t_category c
                         left join t_article a
                                on a.category_id = c.id
+                              -- 旧库 is_delete = 0 且 status = 1 表示前台可公开展示。
                               and a.is_delete = 0
                               and a.status = 1
                         group by c.id, c.category_name
@@ -37,6 +46,9 @@ public class DatabaseContentCatalogReader implements ContentCatalogReader {
                         rs.getLong("article_count")));
     }
 
+    /**
+     * 查询标签及已发布文章数量。
+     */
     @Override
     public List<TagSummary> listTags() {
         return jdbcTemplate.query("""
@@ -58,6 +70,9 @@ public class DatabaseContentCatalogReader implements ContentCatalogReader {
                         rs.getLong("article_count")));
     }
 
+    /**
+     * 查询按文章数量排序的热门标签。
+     */
     @Override
     public List<TagSummary> listTopTags(int limit) {
         return jdbcTemplate.query("""

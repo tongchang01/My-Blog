@@ -16,6 +16,12 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
+/**
+ * 基于旧库评论表的后台评论读取器。
+ *
+ * <p>后台可以按审核状态、删除状态、类型、主题和关键词查询评论，并读取审核、删除、
+ * 恢复等审计字段。</p>
+ */
 public class DatabaseAdminCommentReader implements AdminCommentReader {
 
     private final JdbcTemplate jdbcTemplate;
@@ -24,6 +30,9 @@ public class DatabaseAdminCommentReader implements AdminCommentReader {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    /**
+     * 查询后台评论分页列表。
+     */
     @Override
     public PageResponse<AdminCommentItem> list(AdminCommentQuery query) {
         SqlParts parts = buildWhere(query);
@@ -80,6 +89,9 @@ public class DatabaseAdminCommentReader implements AdminCommentReader {
         return new PageResponse<>(records, total == null ? 0 : total, query.page(), query.size());
     }
 
+    /**
+     * 查询后台评论详情。
+     */
     @Override
     public Optional<AdminCommentDetail> findDetail(int id) {
         List<AdminCommentDetail> records = jdbcTemplate.query("""
@@ -140,6 +152,9 @@ public class DatabaseAdminCommentReader implements AdminCommentReader {
         return records.stream().findFirst();
     }
 
+    /**
+     * 根据后台筛选条件构造 SQL where 片段和参数。
+     */
     private SqlParts buildWhere(AdminCommentQuery query) {
         List<String> clauses = new ArrayList<>();
         List<Object> args = new ArrayList<>();
@@ -166,10 +181,16 @@ public class DatabaseAdminCommentReader implements AdminCommentReader {
         return new SqlParts("where " + String.join(" and ", clauses), args);
     }
 
+    /**
+     * 读取可为空的时间字段。
+     */
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp == null ? null : timestamp.toLocalDateTime();
     }
 
+    /**
+     * SQL 条件片段和参数。
+     */
     private record SqlParts(String where, List<Object> args) {
     }
 }

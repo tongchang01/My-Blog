@@ -24,6 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/admin/comments")
+/**
+ * 后台评论管理接口。
+ *
+ * <p>负责评论列表、详情、审核、软删除和恢复。所有写操作都记录当前后台操作人。</p>
+ */
 public class AdminCommentController {
 
     private final AdminCommentQueryService queryService;
@@ -35,6 +40,9 @@ public class AdminCommentController {
         this.commandService = commandService;
     }
 
+    /**
+     * 分页查询后台评论列表。
+     */
     @GetMapping
     ApiResponse<PageResponse<AdminCommentResponse>> list(@RequestParam(required = false) Integer type,
                                                          @RequestParam(required = false) Integer topicId,
@@ -59,11 +67,17 @@ public class AdminCommentController {
                 result.size()));
     }
 
+    /**
+     * 查询后台评论详情。
+     */
     @GetMapping("/{id}")
     ApiResponse<AdminCommentDetailResponse> detail(@PathVariable int id) {
         return ApiResponse.ok(AdminCommentDetailResponse.from(queryService.detail(id)));
     }
 
+    /**
+     * 审核或取消审核评论。
+     */
     @PutMapping("/review")
     ApiResponse<AdminCommentCommandService.Result> review(@CurrentUser AuthenticatedPrincipal currentUser,
                                                           @Valid @RequestBody AdminCommentReviewRequest request) {
@@ -73,6 +87,9 @@ public class AdminCommentController {
                 Integer.parseInt(currentUser.id()))));
     }
 
+    /**
+     * 软删除评论。
+     */
     @DeleteMapping
     ApiResponse<AdminCommentCommandService.Result> delete(@CurrentUser AuthenticatedPrincipal currentUser,
                                                           @Valid @RequestBody AdminCommentDeleteRequest request) {
@@ -81,6 +98,9 @@ public class AdminCommentController {
                 Integer.parseInt(currentUser.id()))));
     }
 
+    /**
+     * 恢复已软删除评论。
+     */
     @PutMapping("/restore")
     ApiResponse<AdminCommentCommandService.Result> restore(@CurrentUser AuthenticatedPrincipal currentUser,
                                                            @Valid @RequestBody AdminCommentRestoreRequest request) {

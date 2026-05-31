@@ -12,6 +12,12 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
+/**
+ * 当前用户查询应用服务。
+ *
+ * <p>负责编排“我的资料”和“后台菜单”读取。调用方必须传入已认证主体，
+ * 具体用户资料和菜单来源由 domain 端口隔离。</p>
+ */
 public class IdentityQueryService {
 
     private final CurrentUserProfileReader profileReader;
@@ -22,11 +28,23 @@ public class IdentityQueryService {
         this.userMenuReader = userMenuReader;
     }
 
+    /**
+     * 查询当前登录用户资料。
+     *
+     * @param principal 当前认证主体
+     * @return 用户资料
+     */
     public CurrentUserProfile currentProfile(AuthenticatedPrincipal principal) {
         return profileReader.findByAuthId(principal.id())
                 .orElseThrow(() -> new ApiException(ApiErrorCode.AUTHENTICATION_REQUIRED, "用户未登录"));
     }
 
+    /**
+     * 查询当前登录用户可见的后台菜单树。
+     *
+     * @param principal 当前认证主体
+     * @return 菜单树
+     */
     public List<UserMenu> currentUserMenus(AuthenticatedPrincipal principal) {
         return userMenuReader.findByAuthId(principal.id());
     }
