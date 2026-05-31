@@ -21,16 +21,43 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * JWT 访问令牌服务。
+ *
+ * <p>负责签发、解析和撤销访问令牌。当前实现使用 HS256 对称签名，
+ * 因此生产环境必须保护好 {@link SecurityJwtProperties#secret()}，不能提交到 Git。</p>
+ */
 @Service
 public class JwtTokenService {
 
+    /**
+     * JWT HMAC 签名算法。
+     */
     private static final String HMAC_ALGORITHM = "HmacSHA256";
 
+    /**
+     * JWT 配置项。
+     */
     private final SecurityJwtProperties properties;
+    /**
+     * token 撤销存储。
+     */
     private final TokenRevocationStore revocationStore;
+    /**
+     * JWT 编码器。
+     */
     private final JwtEncoder jwtEncoder;
+    /**
+     * JWT 解码器。
+     */
     private final JwtDecoder jwtDecoder;
 
+    /**
+     * 创建 JWT 服务。
+     *
+     * @param properties      JWT 配置项
+     * @param revocationStore token 撤销存储
+     */
     public JwtTokenService(SecurityJwtProperties properties, TokenRevocationStore revocationStore) {
         this.properties = properties;
         this.revocationStore = revocationStore;
@@ -41,6 +68,14 @@ public class JwtTokenService {
                 .build();
     }
 
+    /**
+     * 签发访问令牌。
+     *
+     * @param userId   用户 ID
+     * @param username 登录用户名
+     * @param roles    用户角色名称列表
+     * @return 访问令牌和过期时间
+     */
     public TokenPair issueAccessToken(String userId, String username, List<String> roles) {
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(properties.accessTokenTtl());
@@ -59,6 +94,14 @@ public class JwtTokenService {
         return new TokenPair(accessToken, expiresAt);
     }
 
+    /**
+     * 解析访问令牌。
+     *
+     * <p>签名无效、令牌过期、格式错误或已撤销时统一返回空，避免认证过滤器泄露具体失败原因。</p>
+     *
+     * @param token 原始访问令牌
+     * @return 解析后的声明
+     */
     public Optional<TokenClaims> parse(String token) {
         try {
             Jwt jwt = jwtDecoder.decode(token);
@@ -77,10 +120,20 @@ public class JwtTokenService {
         }
     }
 
+    /**
+     * 撤销访问令牌。
+     *
+     * <p>当前用于登出场景。撤销记录只需要保存到 token 原始过期时间，过期后可清理。</p>
+     *
+     * @param token 原始访问令牌
+     */
     public void revoke(String token) {
         parse(token).ifPresent(claims -> revocationStore.revoke(claims.tokenId(), claims.expiresAt()));
     }
 
+    /**
+     * 读取 JWT 中的业务角色列表。
+     */
     private List<String> readRoles(Jwt jwt) {
         List<String> roleNames = jwt.getClaimAsStringList("roles");
         if (roleNames == null) {

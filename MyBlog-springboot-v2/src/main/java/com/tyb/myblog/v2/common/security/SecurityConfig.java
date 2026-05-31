@@ -25,6 +25,12 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+/**
+ * API 安全配置。
+ *
+ * <p>当前后端 V2 使用无状态 JWT 认证。白名单接口允许匿名访问，后台接口要求
+ * {@code ADMIN} 角色，其余接口默认要求登录。生产环境需要配合安全的 JWT 密钥和明确的 CORS 来源。</p>
+ */
 @Configuration
 @EnableConfigurationProperties({
         ApiCorsProperties.class,
@@ -33,6 +39,11 @@ import java.util.List;
 })
 public class SecurityConfig {
 
+    /**
+     * 构建接口安全过滤链。
+     *
+     * <p>该配置关闭 session 和 HTTP Basic，避免前后端分离接口出现多套认证入口。</p>
+     */
     @Bean
     SecurityFilterChain apiSecurity(HttpSecurity http,
                                     SecurityPublicEndpointProperties publicEndpointProperties,
@@ -41,6 +52,7 @@ public class SecurityConfig {
         String[] publicEndpoints = publicEndpointProperties.publicEndpoints().toArray(String[]::new);
         jwtAuthenticationFilter.ifAvailable(filter -> http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class));
         return http
+                // 前后端分离接口使用 JWT，不依赖浏览器 Cookie，因此关闭 CSRF。
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -56,22 +68,40 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * JWT 认证过滤器。
+     *
+     * <p>只有 {@link JwtTokenService} 存在时才注册，便于测试和后续替换认证实现。</p>
+     */
     @Bean
     @ConditionalOnBean(JwtTokenService.class)
     JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenService tokenService) {
         return new JwtAuthenticationFilter(tokenService);
     }
 
+    /**
+     * 安全异常响应写入器。
+     */
     @Bean
     SecurityProblemSupport securityProblemSupport(ObjectMapper objectMapper) {
         return new SecurityProblemSupport(objectMapper);
     }
 
+    /**
+     * 密码加密器。
+     *
+     * <p>当前使用 BCrypt，适合保存后台账号密码摘要，禁止明文存储密码。</p>
+     */
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    /**
+     * CORS 配置源。
+     *
+     * <p>允许携带凭证时，{@code allowedOrigins} 必须配置为明确来源，不能使用通配符。</p>
+     */
     @Bean
     CorsConfigurationSource corsConfigurationSource(ApiCorsProperties corsProperties) {
         CorsConfiguration configuration = new CorsConfiguration();

@@ -14,15 +14,27 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
+/**
+ * {@link CurrentUser} 参数解析器。
+ *
+ * <p>用于在 Controller 方法参数中直接注入当前登录用户，避免各接口重复读取
+ * {@link SecurityContextHolder}。如果当前请求没有有效认证信息，会抛出统一的未登录异常。</p>
+ */
 @Component
 public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolver, WebMvcConfigurer {
 
+    /**
+     * 判断方法参数是否需要由当前解析器处理。
+     */
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(CurrentUser.class)
                 && parameter.getParameterType().equals(AuthenticatedPrincipal.class);
     }
 
+    /**
+     * 从 Spring Security 上下文解析当前登录用户。
+     */
     @Override
     public Object resolveArgument(MethodParameter parameter,
                                   ModelAndViewContainer mavContainer,
@@ -35,6 +47,9 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
         return principal;
     }
 
+    /**
+     * 将当前解析器注册到 Spring MVC。
+     */
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(this);
