@@ -150,6 +150,14 @@ create table t_comment (
     type tinyint not null,
     is_delete tinyint not null default 0,
     is_review tinyint not null default 1,
+    create_ip varchar(45),
+    user_agent varchar(255),
+    reviewed_by int,
+    review_time timestamp,
+    deleted_by int,
+    delete_time timestamp,
+    restored_by int,
+    restore_time timestamp,
     create_time timestamp not null,
     update_time timestamp
 );
@@ -188,14 +196,35 @@ values
 
 insert into t_comment (
     id, user_id, reply_user_id, topic_id, comment_content,
-    parent_id, type, is_delete, is_review, create_time, update_time
+    parent_id, type, is_delete, is_review,
+    create_ip, user_agent, reviewed_by, review_time,
+    deleted_by, delete_time, restored_by, restore_time,
+    create_time, update_time
 )
 values
-    (1, 2, null, 1, '第一条文章评论', null, 1, 0, 1, timestamp '2026-05-29 10:00:00', timestamp '2026-05-29 10:00:00'),
-    (2, 1, 2, 1, '管理员回复普通用户', 1, 1, 0, 1, timestamp '2026-05-29 10:05:00', timestamp '2026-05-29 10:05:00'),
-    (3, 2, null, 1, '待审核评论', null, 1, 0, 0, timestamp '2026-05-29 10:10:00', timestamp '2026-05-29 10:10:00'),
-    (4, 2, null, 1, '已删除评论', null, 1, 1, 1, timestamp '2026-05-29 10:15:00', timestamp '2026-05-29 10:15:00'),
-    (5, 2, null, null, '留言板第一条', null, 2, 0, 1, timestamp '2026-05-29 11:00:00', timestamp '2026-05-29 11:00:00'),
-    (6, 1, 2, null, '留言板回复', 5, 2, 0, 1, timestamp '2026-05-29 11:05:00', timestamp '2026-05-29 11:05:00');
+    (1, 2, null, 1, '第一条文章评论', null, 1, 0, 1,
+     '203.0.113.1', 'JUnit Browser', 1, timestamp '2026-05-29 10:01:00',
+     null, null, null, null,
+     timestamp '2026-05-29 10:00:00', timestamp '2026-05-29 10:00:00'),
+    (2, 1, 2, 1, '管理员回复普通用户', 1, 1, 0, 1,
+     '203.0.113.2', 'JUnit Browser', 1, timestamp '2026-05-29 10:06:00',
+     null, null, null, null,
+     timestamp '2026-05-29 10:05:00', timestamp '2026-05-29 10:05:00'),
+    (3, 2, null, 1, '待审核评论', null, 1, 0, 0,
+     '203.0.113.3', 'JUnit Browser', null, null,
+     null, null, null, null,
+     timestamp '2026-05-29 10:10:00', timestamp '2026-05-29 10:10:00'),
+    (4, 2, null, 1, '已删除评论', null, 1, 1, 1,
+     '203.0.113.4', 'JUnit Browser', 1, timestamp '2026-05-29 10:16:00',
+     1, timestamp '2026-05-29 10:16:00', null, null,
+     timestamp '2026-05-29 10:15:00', timestamp '2026-05-29 10:15:00'),
+    (5, 2, null, null, '留言板第一条', null, 2, 0, 1,
+     '203.0.113.5', 'JUnit Browser', 1, timestamp '2026-05-29 11:01:00',
+     null, null, null, null,
+     timestamp '2026-05-29 11:00:00', timestamp '2026-05-29 11:00:00'),
+    (6, 1, 2, null, '留言板回复', 5, 2, 0, 1,
+     '203.0.113.6', 'JUnit Browser', 1, timestamp '2026-05-29 11:06:00',
+     null, null, null, null,
+     timestamp '2026-05-29 11:05:00', timestamp '2026-05-29 11:05:00');
 
 alter table t_comment alter column id restart with 7;

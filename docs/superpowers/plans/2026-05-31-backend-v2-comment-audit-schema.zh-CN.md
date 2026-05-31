@@ -135,7 +135,7 @@ alter table t_comment
 - Create: `docs/superpowers/specs/2026-05-31-backend-v2-comment-audit-schema.sql`
 - Modify: `MyBlog-springboot-v2/src/test/resources/db/migration/V2__create_legacy_identity_tables_for_tests.sql`
 
-- [ ] **Step 1: 创建真实 MySQL 手工 SQL 文档**
+- [x] **Step 1: 创建真实 MySQL 手工 SQL 文档**
 
 创建 `docs/superpowers/specs/2026-05-31-backend-v2-comment-audit-schema.sql`：
 
@@ -176,7 +176,7 @@ where table_schema = database()
 order by ordinal_position;
 ```
 
-- [ ] **Step 2: 更新 H2 测试建表 SQL**
+- [x] **Step 2: 更新 H2 测试建表 SQL**
 
 把 `t_comment` 建表改成：
 
@@ -204,7 +204,7 @@ create table t_comment (
 );
 ```
 
-- [ ] **Step 3: 更新 H2 测试数据插入列**
+- [x] **Step 3: 更新 H2 测试数据插入列**
 
 把 `insert into t_comment` 的列追加为：
 
@@ -229,7 +229,7 @@ insert into t_comment (
 
 其他行可以按需要填 `null`，但已删除评论 `id=4` 应设置 `deleted_by=1`、`delete_time=timestamp '2026-05-29 10:16:00'`。
 
-- [ ] **Step 4: 运行测试上下文验证迁移可用**
+- [x] **Step 4: 运行测试上下文验证迁移可用**
 
 Run:
 
@@ -239,7 +239,7 @@ mvn -pl MyBlog-springboot-v2 "-Dtest=DatabaseCommentReaderTest" test
 
 Expected: `BUILD SUCCESS`，且 H2 建表不报字段数量不匹配。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```powershell
 git add docs/superpowers/specs/2026-05-31-backend-v2-comment-audit-schema.sql `
@@ -854,4 +854,3 @@ git commit -m "同步后端V2评论审计计划状态"
 - 操作审计独立流水表。
 - 自动部署。
 - 前台和后台 Vue 页面改造。
-
