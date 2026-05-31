@@ -684,7 +684,7 @@ git commit -m "试迁移后端V2持久层到MyBatis-Plus"
 
 - Create: `docs/superpowers/plans/YYYY-MM-DD-backend-v2-mybatis-plus-module-migration.zh-CN.md`
 
-- [ ] **Step 1: 盘点所有 JdbcTemplate 使用点**
+- [x] **Step 1: 盘点所有 JdbcTemplate 使用点**
 
 Run:
 
@@ -692,7 +692,7 @@ Run:
 rg "JdbcTemplate" MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/test/java -n
 ```
 
-- [ ] **Step 2: 按模块分组**
+- [x] **Step 2: 按模块分组**
 
 分为：
 
@@ -704,7 +704,7 @@ rg "JdbcTemplate" MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/te
 
 - common/infrastructure
 
-- [ ] **Step 3: 为每个模块写迁移顺序**
+- [x] **Step 3: 为每个模块写迁移顺序**
 
 建议：
 
@@ -719,11 +719,11 @@ rg "JdbcTemplate" MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/te
 5. comment 写入、审核、删除、恢复。
 
 6. login audit 和 comment audit 补充。
-- [ ] **Step 4: 写清楚每个模块的测试命令**
+- [x] **Step 4: 写清楚每个模块的测试命令**
 
 每个模块都必须写明确 Maven 命令和预期结果。
 
-- [ ] **Step 5: 提交分模块迁移计划**
+- [x] **Step 5: 提交分模块迁移计划**
 
 Run:
 
