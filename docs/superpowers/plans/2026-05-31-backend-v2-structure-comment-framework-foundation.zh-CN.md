@@ -82,9 +82,11 @@ content
 ## 3. 本计划执行原则
 
 - 每个任务单独提交。
+- Git 提交信息必须使用中文，且要准确描述本次提交的真实改动。
 - 每个任务完成后停下汇报，等待用户确认后再开始下一任务。
 - 结构迁移和行为改动分开提交。
 - 注释补齐和业务逻辑改动分开提交。
+- 代码中的 Javadoc、字段注释、行内注释、测试场景注释必须使用中文。
 - MyBatis-Plus 基础设施引入和 JdbcTemplate 业务迁移分开提交。
 - 不在本计划中引入 Redis、RabbitMQ、AWS SDK、Elasticsearch。
 - RabbitMQ、Redis、AWS SDK 只在后续明确业务场景出现时按单独计划引入。
@@ -103,14 +105,14 @@ content
 
 ## 5. 阶段总览
 
-| 阶段 | 名称 | 目标 | 是否阻塞后续业务迁移 |
-| --- | --- | --- | --- |
-| Phase 1 | 项目结构决策落地 | 包名、目录、ArchUnit 规则统一 | 是 |
-| Phase 2 | 注释规范补齐 | 当前已有 V2 代码补上必要 Javadoc 和业务注释 | 是 |
-| Phase 3 | 框架基础设施引入 | MyBatis-Plus、Hutool、springdoc-openapi 基础配置落地 | 是 |
-| Phase 4 | 持久层试迁移 | 选择低风险模块验证 MyBatis-Plus 迁移方式 | 是 |
-| Phase 5 | 分模块替换 JdbcTemplate | identity、content、comment 逐步转为 MyBatis-Plus | 是 |
-| Phase 6 | 恢复业务迁移 | 继续后端 V2 未完成业务能力 | 否 |
+| 阶段      | 名称                 | 目标                                           | 是否阻塞后续业务迁移 |
+| ------- | ------------------ | -------------------------------------------- | ---------- |
+| Phase 1 | 项目结构决策落地           | 包名、目录、ArchUnit 规则统一                          | 是          |
+| Phase 2 | 注释规范补齐             | 当前已有 V2 代码补上必要 Javadoc 和业务注释                 | 是          |
+| Phase 3 | 框架基础设施引入           | MyBatis-Plus、Hutool、springdoc-openapi 基础配置落地 | 是          |
+| Phase 4 | 持久层试迁移             | 选择低风险模块验证 MyBatis-Plus 迁移方式                  | 是          |
+| Phase 5 | 分模块替换 JdbcTemplate | identity、content、comment 逐步转为 MyBatis-Plus   | 是          |
+| Phase 6 | 恢复业务迁移             | 继续后端 V2 未完成业务能力                              | 否          |
 
 ---
 
@@ -119,7 +121,9 @@ content
 **Files:**
 
 - Create: `docs/superpowers/specs/2026-05-31-backend-v2-package-structure-decisions.zh-CN.md`
+
 - Read: `docs/superpowers/specs/2026-05-31-backend-v2-technology-decisions.zh-CN.md`
+
 - Read: `docs/superpowers/specs/2026-05-31-backend-v2-code-comment-standards.zh-CN.md`
 
 - [ ] **Step 1: 新增项目结构决策文档**
@@ -139,14 +143,23 @@ api 改为 web
 必须覆盖：
 
 - `common`
+
 - `infrastructure`
+
 - `identity`
+
 - `content`
+
 - `comment`
+
 - `system`
+
 - `web`
+
 - `application`
+
 - `domain`
+
 - `infrastructure`
 
 - [ ] **Step 3: 写清楚每一层禁止做什么**
@@ -154,9 +167,13 @@ api 改为 web
 必须明确：
 
 - `web` 不直接访问 Mapper。
+
 - `domain` 不依赖 Spring Web。
+
 - `application` 不拼 SQL。
+
 - `infrastructure` 不反向污染 domain。
+
 - `common` 不放业务模块私有逻辑。
 
 - [ ] **Step 4: 提交项目结构决策文档**
@@ -177,6 +194,7 @@ git commit -m "记录后端V2项目结构决策"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/src/main/java/**`
+
 - Modify: `MyBlog-springboot-v2/src/test/java/**`
 
 - [ ] **Step 1: 执行前确认工作区干净**
@@ -194,10 +212,15 @@ Expected: 无输出。
 需要修改：
 
 - main Java 源码目录。
+
 - test Java 源码目录。
+
 - 所有 `package` 声明。
+
 - 所有 `import com.aurora.myblog.v2...`。
+
 - 启动类包名。
+
 - 测试类包名。
 
 - [ ] **Step 3: 去掉 `modules` 目录层级**
@@ -297,8 +320,11 @@ com.tyb.myblog.v2
 至少覆盖：
 
 - `web` 不访问 `infrastructure.persistence.mapper`。
+
 - `domain` 不依赖 `web`、`application`、`infrastructure`。
+
 - `application` 可以依赖 `domain`，但不依赖 MyBatis-Plus Mapper。
+
 - 业务模块不能直接访问其他模块的 infrastructure。
 
 - [ ] **Step 4: 运行 ArchUnit 测试**
@@ -330,7 +356,9 @@ git commit -m "强化后端V2项目结构约束"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/**`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/infrastructure/**`
+
 - Read: `docs/superpowers/specs/2026-05-31-backend-v2-code-comment-standards.zh-CN.md`
 
 - [ ] **Step 1: 列出缺少 Javadoc 的类**
@@ -345,10 +373,16 @@ rg "^public|^class|^record|^interface|^enum" MyBlog-springboot-v2/src/main/java/
 
 必须覆盖：
 
+- 所有注释必须使用中文。
+
 - 类职责。
+
 - 配置项用途。
+
 - 安全边界。
+
 - 默认值风险。
+
 - 客户端 IP、User-Agent、JWT 等关键逻辑。
 
 - [ ] **Step 3: 运行 common 相关测试**
@@ -380,8 +414,11 @@ git commit -m "补齐后端V2通用基础设施注释"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/**`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/**`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/comment/**`
+
 - Read: `docs/superpowers/specs/2026-05-31-backend-v2-code-comment-standards.zh-CN.md`
 
 - [ ] **Step 1: identity 注释补齐**
@@ -389,9 +426,13 @@ git commit -m "补齐后端V2通用基础设施注释"
 覆盖：
 
 - 登录认证。
+
 - 当前用户资料。
+
 - 角色、菜单。
+
 - 登录审计。
+
 - 旧库字段兼容。
 
 - [ ] **Step 2: 运行 identity 测试**
@@ -410,9 +451,13 @@ Expected: `BUILD SUCCESS`。
 覆盖：
 
 - 文章列表。
+
 - 文章详情。
+
 - 分类、标签。
+
 - 归档、置顶、推荐。
+
 - 受保护文章访问。
 
 - [ ] **Step 4: 运行 content 测试**
@@ -431,10 +476,15 @@ Expected: `BUILD SUCCESS`。
 覆盖：
 
 - 评论提交。
+
 - 评论展示。
+
 - 后台审核。
+
 - 删除、恢复。
+
 - 客户端 IP、User-Agent 审计。
+
 - 软删除和审核状态兼容。
 
 - [ ] **Step 6: 运行 comment 测试**
@@ -466,7 +516,9 @@ git commit -m "补齐后端V2业务模块注释"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/pom.xml`
+
 - Create or Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/config/**`
+
 - Create or Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/**`
 
 - [ ] **Step 1: 在 `pom.xml` 引入依赖**
@@ -498,8 +550,11 @@ git commit -m "补齐后端V2业务模块注释"
 配置内容：
 
 - Mapper 扫描。
+
 - 分页插件。
+
 - 明确 XML mapper 路径。
+
 - Javadoc 说明配置用途。
 
 - [ ] **Step 3: 新增 springdoc 基础配置**
@@ -507,8 +562,11 @@ git commit -m "补齐后端V2业务模块注释"
 配置内容：
 
 - 文档标题。
+
 - V2 API 描述。
+
 - 当前版本。
+
 - 暂不暴露生产安全策略，后续部署阶段再收口。
 
 - [ ] **Step 4: 新增最小启动测试**
@@ -516,7 +574,9 @@ git commit -m "补齐后端V2业务模块注释"
 验证：
 
 - Spring Context 可加载。
+
 - MyBatis-Plus 配置可加载。
+
 - springdoc 配置不破坏安全配置。
 
 - [ ] **Step 5: 运行全量测试**
@@ -548,6 +608,7 @@ git commit -m "引入后端V2框架基础设施"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/**` 或 `content/**`
+
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/**`
 
 - [ ] **Step 1: 选择第一个试迁移目标**
@@ -561,8 +622,11 @@ git commit -m "引入后端V2框架基础设施"
 选择标准：
 
 - SQL 较简单。
+
 - 业务风险低。
+
 - 测试覆盖已有。
+
 - 能体现 Entity、Mapper、Repository 的放置方式。
 
 - [ ] **Step 2: 新增 Entity**
@@ -570,15 +634,19 @@ git commit -m "引入后端V2框架基础设施"
 Entity 必须：
 
 - 放在模块 `infrastructure.persistence.entity`。
+
 - 使用 MyBatis-Plus 注解。
-- 每个字段都有 Javadoc，写明对应表字段和中文含义。
+
+- 每个字段都有中文 Javadoc，写明对应表字段和中文含义。
 
 - [ ] **Step 3: 新增 Mapper**
 
 Mapper 必须：
 
 - 放在模块 `infrastructure.persistence.mapper`。
+
 - 继承 MyBatis-Plus `BaseMapper`。
+
 - 复杂查询使用 XML 或明确注释。
 
 - [ ] **Step 4: 替换对应 JdbcTemplate 实现**
@@ -586,7 +654,9 @@ Mapper 必须：
 要求：
 
 - application/domain 接口不变。
+
 - Controller 响应不变。
+
 - 测试断言不因实现替换而弱化。
 
 - [ ] **Step 5: 运行目标模块测试**
@@ -627,8 +697,11 @@ rg "JdbcTemplate" MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/te
 分为：
 
 - identity
+
 - content
+
 - comment
+
 - common/infrastructure
 
 - [ ] **Step 3: 为每个模块写迁移顺序**
@@ -636,12 +709,16 @@ rg "JdbcTemplate" MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/te
 建议：
 
 1. identity 基础读取。
-2. content 分类标签读取。
-3. content 文章读取。
-4. comment 前台读取。
-5. comment 写入、审核、删除、恢复。
-6. login audit 和 comment audit 补充。
 
+2. content 分类标签读取。
+
+3. content 文章读取。
+
+4. comment 前台读取。
+
+5. comment 写入、审核、删除、恢复。
+
+6. login audit 和 comment audit 补充。
 - [ ] **Step 4: 写清楚每个模块的测试命令**
 
 每个模块都必须写明确 Maven 命令和预期结果。
@@ -754,14 +831,14 @@ git commit -m "同步后端V2基础改造验收记录"
 
 ## 7. 风险和回避策略
 
-| 风险 | 影响 | 回避策略 |
-| --- | --- | --- |
-| 包名迁移影响大量文件 | 容易漏改 import 或测试包名 | 一次性搜索旧包名，跑全量测试 |
-| `api` 改 `web` 后测试引用失效 | Controller 测试编译失败 | 结构迁移提交只做包名目录变更，不改业务行为 |
-| MyBatis-Plus 引入后与 JdbcTemplate 共存 | 短期技术栈混合 | 明确过渡期，后续分模块替换 |
-| 注释补齐混入重构 | diff 过大，难 review | 注释任务不改变行为 |
-| Entity 字段注释不准确 | 误导后续维护 | 以数据库表字段、已有 SQL、业务测试为依据 |
-| springdoc 与安全配置冲突 | 文档接口无法访问或暴露过多 | 基础配置先保守，部署阶段再收口 |
+| 风险                                | 影响                | 回避策略                   |
+| --------------------------------- | ----------------- | ---------------------- |
+| 包名迁移影响大量文件                        | 容易漏改 import 或测试包名 | 一次性搜索旧包名，跑全量测试         |
+| `api` 改 `web` 后测试引用失效             | Controller 测试编译失败 | 结构迁移提交只做包名目录变更，不改业务行为  |
+| MyBatis-Plus 引入后与 JdbcTemplate 共存 | 短期技术栈混合           | 明确过渡期，后续分模块替换          |
+| 注释补齐混入重构                          | diff 过大，难 review  | 注释任务不改变行为              |
+| Entity 字段注释不准确                    | 误导后续维护            | 以数据库表字段、已有 SQL、业务测试为依据 |
+| springdoc 与安全配置冲突                 | 文档接口无法访问或暴露过多     | 基础配置先保守，部署阶段再收口        |
 
 ---
 
