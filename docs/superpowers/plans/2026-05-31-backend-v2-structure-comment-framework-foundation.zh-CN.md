@@ -611,7 +611,7 @@ git commit -m "引入后端V2框架基础设施"
 
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/**`
 
-- [ ] **Step 1: 选择第一个试迁移目标**
+- [x] **Step 1: 选择第一个试迁移目标**
 
 优先级：
 
@@ -629,7 +629,7 @@ git commit -m "引入后端V2框架基础设施"
 
 - 能体现 Entity、Mapper、Repository 的放置方式。
 
-- [ ] **Step 2: 新增 Entity**
+- [x] **Step 2: 新增 Entity**
 
 Entity 必须：
 
@@ -639,7 +639,7 @@ Entity 必须：
 
 - 每个字段都有中文 Javadoc，写明对应表字段和中文含义。
 
-- [ ] **Step 3: 新增 Mapper**
+- [x] **Step 3: 新增 Mapper**
 
 Mapper 必须：
 
@@ -649,7 +649,7 @@ Mapper 必须：
 
 - 复杂查询使用 XML 或明确注释。
 
-- [ ] **Step 4: 替换对应 JdbcTemplate 实现**
+- [x] **Step 4: 替换对应 JdbcTemplate 实现**
 
 要求：
 
@@ -659,13 +659,13 @@ Mapper 必须：
 
 - 测试断言不因实现替换而弱化。
 
-- [ ] **Step 5: 运行目标模块测试**
+- [x] **Step 5: 运行目标模块测试**
 
 根据迁移模块运行对应测试。
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 6: 提交试迁移**
+- [x] **Step 6: 提交试迁移**
 
 Run:
 

@@ -3,19 +3,25 @@ package com.tyb.myblog.v2.content;
 import com.tyb.myblog.v2.content.infrastructure.DatabaseContentCatalogReader;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
-@JdbcTest
-@Import(DatabaseContentCatalogReader.class)
+@SpringBootTest
 class DatabaseContentCatalogReaderTest {
 
     @Autowired
     private DatabaseContentCatalogReader reader;
+
+    @Test
+    void usesMyBatisPlusMapperAsPersistenceBoundary() {
+        assertThat(DatabaseContentCatalogReader.class.getDeclaredFields())
+                .noneMatch(field -> field.getType().equals(JdbcTemplate.class))
+                .anyMatch(field -> field.getType().getName().endsWith(".ContentCatalogMapper"));
+    }
 
     @Test
     void listsCategoriesWithPublishedArticleCountsOnly() {
