@@ -23,52 +23,52 @@
 
 ## 2. 已确认决策
 
-| 决策项 | 结论 | 说明 |
-| --- | --- | --- |
-| 项目形态 | 模块化单体 | 项目体量不适合拆微服务。微服务会提前引入部署、链路、事务和运维复杂度。 |
-| Java 版本 | Java 17 | 旧版 Java 8 不再作为 V2 兼容目标。 |
-| 构建工具 | Maven | 保持当前 Maven，不切换 Gradle。 |
-| Spring Boot | Spring Boot 3.5.x | V2 已经使用 Spring Boot 3.5.14，后续继续沿用 3.x 体系。 |
-| Web 框架 | Spring MVC | 当前系统是典型后台 API，不需要 WebFlux。 |
-| 安全框架 | Spring Security + JWT | V2 已使用 Spring Security 和 OAuth2 JOSE 相关能力生成/解析 JWT，继续沿用。 |
-| ORM | MyBatis-Plus | 后续统一切到 MyBatis-Plus，不再扩大 JdbcTemplate 使用范围。已有 JdbcTemplate 代码通过单独任务逐步迁移。 |
-| 数据库 | MySQL | 主库继续使用 MySQL。 |
-| 数据库迁移 | SQL 迁移规范优先，Flyway 使用范围待收口 | 目前测试环境已用 Flyway，local 真实库仍关闭自动迁移。后续需要明确正式环境迁移策略。 |
-| 缓存 | Redis 后续按需引入 | 当前阶段不作为必选基础设施。出现验证码、限流、热点缓存、访问统计等明确场景后再引入。 |
-| MQ | RabbitMQ 后续按需引入 | 当前阶段不引入。后续仅用于邮件、订阅通知、异步后处理等非核心链路。 |
-| 搜索 | 暂不引入 Elasticsearch | 当前文章搜索先由 MySQL 承担。等数据量、分词、相关性排序需求明确后再评估 ES。 |
-| AWS SDK | 后续继续使用 AWS SDK | 旧版已有 S3、SES，后续能力仍可保留，但业务层必须通过接口隔离 AWS 具体实现。 |
-| 工具库 | 引入 Hutool | Hutool 作为通用工具库引入，但需要约束使用边界，避免工具方法侵入核心业务规则。 |
-| 接口文档 | springdoc-openapi | Spring Boot 3 下优先使用 `springdoc-openapi-starter-webmvc-ui`，不沿用旧 `knife4j-spring-boot-starter 2.0.7`。 |
-| JSON | Jackson | 使用 Spring Boot 默认 Jackson，不继续引入旧版 Fastjson。 |
-| 健康检查 | Actuator | V2 已使用 Actuator 暴露 health，后续保留。 |
-| 测试 | JUnit 5 + Spring Boot Test + Spring Security Test + H2 + ArchUnit | 保持并继续加强测试。ArchUnit 用于约束分层。 |
-| 模板引擎 | 不在后端 V2 使用 Thymeleaf | 前台和后台后续走 Vue3，后端只提供 API。 |
+| 决策项         | 结论                                                                | 说明                                                                                                  |
+| ----------- | ----------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| 项目形态        | 模块化单体                                                             | 项目体量不适合拆微服务。微服务会提前引入部署、链路、事务和运维复杂度。                                                                 |
+| Java 版本     | Java 17                                                           | 旧版 Java 8 不再作为 V2 兼容目标。                                                                             |
+| 构建工具        | Maven                                                             | 保持当前 Maven，不切换 Gradle。                                                                              |
+| Spring Boot | Spring Boot 3.5.x                                                 | V2 已经使用 Spring Boot 3.5.14，后续继续沿用 3.x 体系。                                                           |
+| Web 框架      | Spring MVC                                                        | 当前系统是典型后台 API，不需要 WebFlux。                                                                          |
+| 安全框架        | Spring Security + JWT                                             | V2 已使用 Spring Security 和 OAuth2 JOSE 相关能力生成/解析 JWT，继续沿用。                                            |
+| ORM         | MyBatis-Plus                                                      | 后续统一切到 MyBatis-Plus，不再扩大 JdbcTemplate 使用范围。已有 JdbcTemplate 代码通过单独任务逐步迁移。                            |
+| 数据库         | MySQL                                                             | 主库继续使用 MySQL。                                                                                       |
+| 数据库迁移       | SQL 迁移规范优先，Flyway 使用范围待收口                                         | 目前测试环境已用 Flyway，local 真实库仍关闭自动迁移。后续需要明确正式环境迁移策略。                                                    |
+| 缓存          | Redis 后续按需引入                                                      | 当前阶段不作为必选基础设施。出现验证码、限流、热点缓存、访问统计等明确场景后再引入。                                                          |
+| MQ          | RabbitMQ 后续按需引入                                                   | 当前阶段不引入。后续仅用于邮件、订阅通知、异步后处理等非核心链路。                                                                   |
+| 搜索          | 暂不引入 Elasticsearch                                                | 当前文章搜索先由 MySQL 承担。等数据量、分词、相关性排序需求明确后再评估 ES。                                                         |
+| AWS SDK     | 后续继续使用 AWS SDK                                                    | 旧版已有 S3、SES，后续能力仍可保留，但业务层必须通过接口隔离 AWS 具体实现。                                                         |
+| 工具库         | 引入 Hutool                                                         | Hutool 作为通用工具库引入，但需要约束使用边界，避免工具方法侵入核心业务规则。                                                          |
+| 接口文档        | springdoc-openapi                                                 | Spring Boot 3 下优先使用 `springdoc-openapi-starter-webmvc-ui`，不沿用旧 `knife4j-spring-boot-starter 2.0.7`。 |
+| JSON        | Jackson                                                           | 使用 Spring Boot 默认 Jackson，不继续引入旧版 Fastjson。                                                         |
+| 健康检查        | Actuator                                                          | V2 已使用 Actuator 暴露 health，后续保留。                                                                     |
+| 测试          | JUnit 5 + Spring Boot Test + Spring Security Test + H2 + ArchUnit | 保持并继续加强测试。ArchUnit 用于约束分层。                                                                          |
+| 模板引擎        | 不在后端 V2 使用 Thymeleaf                                              | 前台和后台后续走 Vue3，后端只提供 API。                                                                            |
 
 ---
 
 ## 3. 旧版、新版与后续技术对照
 
-| 类别 | 旧版后端已使用 | 当前 V2 已使用 | 后续决策 |
-| --- | --- | --- | --- |
-| Java | Java 8 | Java 17 | 固定 Java 17 |
-| Spring Boot | 2.3.7.RELEASE | 3.5.14 | 继续 3.x |
-| Web | Spring MVC | Spring MVC | 继续 Spring MVC |
-| Security | Spring Security + 自定义 JWT + `jjwt 0.9.0` | Spring Security + OAuth2 JOSE JWT | 继续新版方案 |
-| ORM | MyBatis-Plus 3.4.2 | JdbcTemplate | 全量迁移到 MyBatis-Plus |
-| 数据库 | MySQL | MySQL / H2 测试库 | 主库 MySQL，测试继续 H2 |
-| Migration | 无系统化迁移机制 | Flyway 测试迁移，local 关闭 | 建立 SQL 迁移规范，再决定正式 Flyway 策略 |
-| Redis | Spring Data Redis | 未引入 | 按明确场景引入 |
-| MQ | RabbitMQ | 未引入 | 仅异步通知/后处理场景引入 |
-| Search | Elasticsearch | 未引入 | 暂不引入 |
-| Scheduler | Quartz | 未引入 | 后续有定时任务再引入 |
-| Mail | Spring Mail / AWS SES | 未引入 | 后续保留 AWS SES 能力 |
-| Storage | AWS S3 SDK | 未引入 | 后续保留 AWS S3 能力 |
-| API Doc | Knife4j 2.0.7 | 未引入 | 使用 springdoc-openapi |
-| 工具库 | Hutool、commons-lang3、commons-codec | 未引入 | 引入 Hutool，其他按需 |
-| JSON | Fastjson、Jackson | Jackson | 使用 Jackson |
-| Monitoring | 无明确体系 | Actuator health | 继续 Actuator |
-| Test | Spring Boot Test | Spring Boot Test、Spring Security Test、H2、ArchUnit | 继续增强 |
+| 类别          | 旧版后端已使用                                  | 当前 V2 已使用                                         | 后续决策                        |
+| ----------- | ---------------------------------------- | ------------------------------------------------- | --------------------------- |
+| Java        | Java 8                                   | Java 17                                           | 固定 Java 17                  |
+| Spring Boot | 2.3.7.RELEASE                            | 3.5.14                                            | 继续 3.x                      |
+| Web         | Spring MVC                               | Spring MVC                                        | 继续 Spring MVC               |
+| Security    | Spring Security + 自定义 JWT + `jjwt 0.9.0` | Spring Security + OAuth2 JOSE JWT                 | 继续新版方案                      |
+| ORM         | MyBatis-Plus 3.4.2                       | JdbcTemplate                                      | 全量迁移到 MyBatis-Plus          |
+| 数据库         | MySQL                                    | MySQL / H2 测试库                                    | 主库 MySQL，测试继续 H2            |
+| Migration   | 无系统化迁移机制                                 | Flyway 测试迁移，local 关闭                              | 建立 SQL 迁移规范，再决定正式 Flyway 策略 |
+| Redis       | Spring Data Redis                        | 未引入                                               | 按明确场景引入                     |
+| MQ          | RabbitMQ                                 | 未引入                                               | 仅异步通知/后处理场景引入               |
+| Search      | Elasticsearch                            | 未引入                                               | 暂不引入                        |
+| Scheduler   | Quartz                                   | 未引入                                               | 后续有定时任务再引入                  |
+| Mail        | Spring Mail / AWS SES                    | 未引入                                               | 后续保留 AWS SES 能力             |
+| Storage     | AWS S3 SDK                               | 未引入                                               | 后续保留 AWS S3 能力              |
+| API Doc     | Knife4j 2.0.7                            | 未引入                                               | 使用 springdoc-openapi        |
+| 工具库         | Hutool、commons-lang3、commons-codec       | 未引入                                               | 引入 Hutool，其他按需              |
+| JSON        | Fastjson、Jackson                         | Jackson                                           | 使用 Jackson                  |
+| Monitoring  | 无明确体系                                    | Actuator health                                   | 继续 Actuator                 |
+| Test        | Spring Boot Test                         | Spring Boot Test、Spring Security Test、H2、ArchUnit | 继续增强                        |
 
 ---
 

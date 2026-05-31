@@ -23,23 +23,23 @@
 
 ## 预期新增字段
 
-| 字段 | 类型 | 说明 |
-| --- | --- | --- |
-| `create_ip` | `varchar(45)` | 评论提交 IP |
-| `user_agent` | `varchar(255)` | 评论提交 User-Agent |
-| `reviewed_by` | `int` | 最后审核人用户 ID |
-| `review_time` | `timestamp` | 最后审核时间 |
-| `deleted_by` | `int` | 最后删除人用户 ID |
-| `delete_time` | `timestamp` | 最后删除时间 |
-| `restored_by` | `int` | 最后恢复人用户 ID |
-| `restore_time` | `timestamp` | 最后恢复时间 |
+| 字段             | 类型             | 说明              |
+| -------------- | -------------- | --------------- |
+| `create_ip`    | `varchar(45)`  | 评论提交 IP         |
+| `user_agent`   | `varchar(255)` | 评论提交 User-Agent |
+| `reviewed_by`  | `int`          | 最后审核人用户 ID      |
+| `review_time`  | `timestamp`    | 最后审核时间          |
+| `deleted_by`   | `int`          | 最后删除人用户 ID      |
+| `delete_time`  | `timestamp`    | 最后删除时间          |
+| `restored_by`  | `int`          | 最后恢复人用户 ID      |
+| `restore_time` | `timestamp`    | 最后恢复时间          |
 
 ## 预期新增索引
 
-| 索引 | 字段 |
-| --- | --- |
-| `idx_comment_review_delete_time` | `is_review, is_delete, create_time` |
-| `idx_comment_parent_delete_review` | `parent_id, is_delete, is_review` |
+| 索引                                 | 字段                                  |
+| ---------------------------------- | ----------------------------------- |
+| `idx_comment_review_delete_time`   | `is_review, is_delete, create_time` |
+| `idx_comment_parent_delete_review` | `parent_id, is_delete, is_review`   |
 
 ---
 
