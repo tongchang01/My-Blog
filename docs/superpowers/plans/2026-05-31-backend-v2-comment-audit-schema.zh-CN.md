@@ -768,7 +768,7 @@ git commit -m "展示后端V2评论审计详情"
 
 - Modify: `docs/superpowers/plans/2026-05-31-backend-v2-comment-audit-schema.zh-CN.md`
 
-- [ ] **Step 1: 运行评论模块测试**
+- [x] **Step 1: 运行评论模块测试**
 
 Run:
 
@@ -778,7 +778,7 @@ mvn -pl MyBlog-springboot-v2 "-Dtest=CommentControllerTest,CommentCommandService
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 2: 运行全量测试**
+- [x] **Step 2: 运行全量测试**
 
 Run:
 
@@ -788,7 +788,7 @@ mvn -pl MyBlog-springboot-v2 test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 3: 打包验证**
+- [x] **Step 3: 打包验证**
 
 Run:
 
@@ -798,7 +798,7 @@ mvn -pl MyBlog-springboot-v2 package
 
 Expected: `BUILD SUCCESS`，生成 V2 jar。
 
-- [ ] **Step 4: 本地 MySQL 只读结构检查**
+- [x] **Step 4: 本地 MySQL 只读结构检查**
 
 如果你已经手工执行过 `docs/superpowers/specs/2026-05-31-backend-v2-comment-audit-schema.sql`，再运行：
 
@@ -810,7 +810,7 @@ Expected: 返回 8 个新增字段。
 
 如果没有手工执行 SQL，这一步记录为“跳过，真实 MySQL 结构尚未变更”，不要把它当失败。
 
-- [ ] **Step 5: 更新本计划完成状态**
+- [x] **Step 5: 更新本计划完成状态**
 
 把已经完成的任务 checkbox 从 `- [ ]` 改为 `- [x]`，并在文末追加实际验证结果：
 
@@ -823,7 +823,7 @@ Expected: 返回 8 个新增字段。
 - 真实 MySQL 迁移：未自动执行；如已手工执行，记录执行时间和验证结果。
 ```
 
-- [ ] **Step 6: 提交**
+- [x] **Step 6: 提交**
 
 ```powershell
 git add docs/superpowers/plans/2026-05-31-backend-v2-comment-audit-schema.zh-CN.md
@@ -843,6 +843,14 @@ git commit -m "同步后端V2评论审计计划状态"
 - local profile 仍不自动执行 Flyway。
 - 真实 MySQL 迁移脚本存在，但不会被自动执行。
 - 评论模块测试、后端 V2 全量测试、打包验证通过。
+
+## 实施记录
+
+- 评论模块测试：通过，`CommentControllerTest,CommentCommandServiceTest,DatabaseCommentReaderTest,DatabaseCommentWriterTest,AdminCommentControllerTest,DatabaseAdminCommentReaderTest,DatabaseAdminCommentModeratorTest` 共 34 个测试通过。
+- 后端 V2 全量测试：通过，`mvn test` 共 121 个测试通过。
+- 打包验证：通过，`mvn package` 共 121 个测试通过，并生成 `target/myblog-springboot-v2-0.1.0-SNAPSHOT.jar`。
+- 真实 MySQL 迁移：未自动执行；本期只提交 `docs/superpowers/specs/2026-05-31-backend-v2-comment-audit-schema.sql` 作为手工审阅脚本。
+- 本地 MySQL 只读结构检查：跳过；真实 MySQL 结构尚未手工执行本期 SQL。
 
 ## 暂不处理
 
