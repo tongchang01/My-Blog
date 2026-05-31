@@ -10,6 +10,11 @@ management:
       exposure:
         include: health
 
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
 myblog:
   cors:
     allowed-origins:

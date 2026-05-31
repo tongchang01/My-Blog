@@ -521,7 +521,7 @@ git commit -m "补齐后端V2业务模块注释"
 
 - Create or Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/**`
 
-- [ ] **Step 1: 在 `pom.xml` 引入依赖**
+- [x] **Step 1: 在 `pom.xml` 引入依赖**
 
 新增：
 
@@ -545,7 +545,7 @@ git commit -m "补齐后端V2业务模块注释"
 
 注：执行时需要确认版本和 Spring Boot 3.5.x 兼容。如果 Maven 解析失败，优先查官方兼容版本，不要随意降级到 Boot 2 生态依赖。
 
-- [ ] **Step 2: 新增 MyBatis-Plus 配置**
+- [x] **Step 2: 新增 MyBatis-Plus 配置**
 
 配置内容：
 
@@ -557,7 +557,7 @@ git commit -m "补齐后端V2业务模块注释"
 
 - Javadoc 说明配置用途。
 
-- [ ] **Step 3: 新增 springdoc 基础配置**
+- [x] **Step 3: 新增 springdoc 基础配置**
 
 配置内容：
 
@@ -569,7 +569,7 @@ git commit -m "补齐后端V2业务模块注释"
 
 - 暂不暴露生产安全策略，后续部署阶段再收口。
 
-- [ ] **Step 4: 新增最小启动测试**
+- [x] **Step 4: 新增最小启动测试**
 
 验证：
 
@@ -579,7 +579,7 @@ git commit -m "补齐后端V2业务模块注释"
 
 - springdoc 配置不破坏安全配置。
 
-- [ ] **Step 5: 运行全量测试**
+- [x] **Step 5: 运行全量测试**
 
 Run:
 
@@ -590,7 +590,7 @@ mvn test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 6: 提交框架基础设施**
+- [x] **Step 6: 提交框架基础设施**
 
 Run:
 
