@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -27,6 +29,9 @@ class AdminCommentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Test
     void rejectsAnonymousAdminCommentList() throws Exception {
@@ -95,6 +100,11 @@ class AdminCommentControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.affected").value(1));
+
+        Integer reviewedBy = jdbcTemplate.queryForObject("select reviewed_by from t_comment where id = 3", Integer.class);
+        Object reviewTime = jdbcTemplate.queryForObject("select review_time from t_comment where id = 3", Object.class);
+        assertThat(reviewedBy).isEqualTo(1);
+        assertThat(reviewTime).isNotNull();
     }
 
     @Test
@@ -109,6 +119,11 @@ class AdminCommentControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.affected").value(1));
+
+        Integer deletedBy = jdbcTemplate.queryForObject("select deleted_by from t_comment where id = 5", Integer.class);
+        Object deleteTime = jdbcTemplate.queryForObject("select delete_time from t_comment where id = 5", Object.class);
+        assertThat(deletedBy).isEqualTo(1);
+        assertThat(deleteTime).isNotNull();
     }
 
     @Test
@@ -123,6 +138,11 @@ class AdminCommentControllerTest {
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.affected").value(1));
+
+        Integer restoredBy = jdbcTemplate.queryForObject("select restored_by from t_comment where id = 4", Integer.class);
+        Object restoreTime = jdbcTemplate.queryForObject("select restore_time from t_comment where id = 4", Object.class);
+        assertThat(restoredBy).isEqualTo(1);
+        assertThat(restoreTime).isNotNull();
     }
 
     private String loginAndToken(String username) throws Exception {

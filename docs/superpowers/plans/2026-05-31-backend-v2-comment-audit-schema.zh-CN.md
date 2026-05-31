@@ -557,7 +557,7 @@ git commit -m "记录后端V2评论提交审计信息"
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/DatabaseAdminCommentModeratorTest.java`
 - Test: `MyBlog-springboot-v2/src/test/java/com/aurora/myblog/v2/modules/comment/AdminCommentControllerTest.java`
 
-- [ ] **Step 1: 更新后台命令对象**
+- [x] **Step 1: 更新后台命令对象**
 
 ```java
 public record AdminCommentModerationCommand(List<Integer> ids, boolean reviewed, int operatorUserId) {
@@ -570,7 +570,7 @@ public record AdminCommentRestoreCommand(List<Integer> ids, int operatorUserId) 
 }
 ```
 
-- [ ] **Step 2: 后台控制器读取当前管理员**
+- [x] **Step 2: 后台控制器读取当前管理员**
 
 `AdminCommentController` 引入：
 
@@ -592,7 +592,7 @@ ApiResponse<AdminCommentCommandService.Result> review(
 
 删除和恢复同理，把 `currentUser.id()` 传给命令。
 
-- [ ] **Step 3: 审核写入审计字段**
+- [x] **Step 3: 审核写入审计字段**
 
 审核 SQL 改为：
 
@@ -605,7 +605,7 @@ set is_review = ?,
 where id in (...)
 ```
 
-- [ ] **Step 4: 删除写入审计字段**
+- [x] **Step 4: 删除写入审计字段**
 
 删除 SQL 改为：
 
@@ -618,7 +618,7 @@ set is_delete = 1,
 where id in (...)
 ```
 
-- [ ] **Step 5: 恢复写入审计字段**
+- [x] **Step 5: 恢复写入审计字段**
 
 恢复 SQL 改为：
 
@@ -631,7 +631,7 @@ set is_delete = 0,
 where id in (...)
 ```
 
-- [ ] **Step 6: 写入层测试**
+- [x] **Step 6: 写入层测试**
 
 在 `DatabaseAdminCommentModeratorTest` 分别断言：
 
@@ -644,11 +644,11 @@ assertThat(row.get("restored_by")).isEqualTo(1);
 assertThat(row.get("restore_time")).isNotNull();
 ```
 
-- [ ] **Step 7: 控制器测试**
+- [x] **Step 7: 控制器测试**
 
 在 `AdminCommentControllerTest` 的 review/delete/restore 请求后查询数据库，确认操作者来自测试登录用户。
 
-- [ ] **Step 8: 运行测试**
+- [x] **Step 8: 运行测试**
 
 Run:
 
@@ -658,7 +658,7 @@ mvn -pl MyBlog-springboot-v2 "-Dtest=DatabaseAdminCommentModeratorTest,AdminComm
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 9: 提交**
+- [x] **Step 9: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/aurora/myblog/v2/modules/comment/domain/AdminCommentModerationCommand.java `

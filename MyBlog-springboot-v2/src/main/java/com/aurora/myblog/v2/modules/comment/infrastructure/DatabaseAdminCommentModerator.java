@@ -25,34 +25,80 @@ public class DatabaseAdminCommentModerator implements AdminCommentModerator {
     @Override
     public int review(AdminCommentModerationCommand command) {
         List<Integer> ids = normalizeIds(command.ids());
-        return update(ids, "is_review", command.reviewed() ? 1 : 0);
+        return review(ids, command.reviewed() ? 1 : 0, command.operatorUserId());
     }
 
     @Override
     public int delete(AdminCommentDeletionCommand command) {
         List<Integer> ids = normalizeIds(command.ids());
-        return update(ids, "is_delete", 1);
+        return delete(ids, command.operatorUserId());
     }
 
     @Override
     public int restore(AdminCommentRestoreCommand command) {
         List<Integer> ids = normalizeIds(command.ids());
-        return update(ids, "is_delete", 0);
+        return restore(ids, command.operatorUserId());
     }
 
-    private int update(List<Integer> ids, String column, int value) {
+    private int review(List<Integer> ids, int reviewed, int operatorUserId) {
         String placeholders = String.join(",", ids.stream().map(id -> "?").toList());
-        Object[] args = new Object[ids.size() + 2];
-        args[0] = value;
-        args[1] = Timestamp.valueOf(LocalDateTime.now());
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        Object[] args = new Object[ids.size() + 4];
+        args[0] = reviewed;
+        args[1] = operatorUserId;
+        args[2] = now;
+        args[3] = now;
         for (int i = 0; i < ids.size(); i++) {
-            args[i + 2] = ids.get(i);
+            args[i + 4] = ids.get(i);
         }
         return jdbcTemplate.update("""
                 update t_comment
-                set %s = ?, update_time = ?
+                set is_review = ?,
+                    reviewed_by = ?,
+                    review_time = ?,
+                    update_time = ?
                 where id in (%s)
-                """.formatted(column, placeholders), args);
+                """.formatted(placeholders), args);
+    }
+
+    private int delete(List<Integer> ids, int operatorUserId) {
+        String placeholders = String.join(",", ids.stream().map(id -> "?").toList());
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        Object[] args = new Object[ids.size() + 3];
+        args[0] = operatorUserId;
+        args[1] = now;
+        args[2] = now;
+        for (int i = 0; i < ids.size(); i++) {
+            args[i + 3] = ids.get(i);
+        }
+        return jdbcTemplate.update("""
+                update t_comment
+                set is_delete = 1,
+                    deleted_by = ?,
+                    delete_time = ?,
+                    update_time = ?
+                where id in (%s)
+                """.formatted(placeholders), args);
+    }
+
+    private int restore(List<Integer> ids, int operatorUserId) {
+        String placeholders = String.join(",", ids.stream().map(id -> "?").toList());
+        Timestamp now = Timestamp.valueOf(LocalDateTime.now());
+        Object[] args = new Object[ids.size() + 3];
+        args[0] = operatorUserId;
+        args[1] = now;
+        args[2] = now;
+        for (int i = 0; i < ids.size(); i++) {
+            args[i + 3] = ids.get(i);
+        }
+        return jdbcTemplate.update("""
+                update t_comment
+                set is_delete = 0,
+                    restored_by = ?,
+                    restore_time = ?,
+                    update_time = ?
+                where id in (%s)
+                """.formatted(placeholders), args);
     }
 
     private List<Integer> normalizeIds(List<Integer> ids) {

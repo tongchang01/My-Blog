@@ -1,5 +1,7 @@
 package com.aurora.myblog.v2.modules.comment.api;
 
+import com.aurora.myblog.v2.common.auth.AuthenticatedPrincipal;
+import com.aurora.myblog.v2.common.auth.CurrentUser;
 import com.aurora.myblog.v2.common.web.ApiResponse;
 import com.aurora.myblog.v2.common.web.PageResponse;
 import com.aurora.myblog.v2.modules.comment.application.AdminCommentCommandService;
@@ -63,17 +65,27 @@ public class AdminCommentController {
     }
 
     @PutMapping("/review")
-    ApiResponse<AdminCommentCommandService.Result> review(@Valid @RequestBody AdminCommentReviewRequest request) {
-        return ApiResponse.ok(commandService.review(new AdminCommentModerationCommand(request.ids(), request.reviewed())));
+    ApiResponse<AdminCommentCommandService.Result> review(@CurrentUser AuthenticatedPrincipal currentUser,
+                                                          @Valid @RequestBody AdminCommentReviewRequest request) {
+        return ApiResponse.ok(commandService.review(new AdminCommentModerationCommand(
+                request.ids(),
+                request.reviewed(),
+                Integer.parseInt(currentUser.id()))));
     }
 
     @DeleteMapping
-    ApiResponse<AdminCommentCommandService.Result> delete(@Valid @RequestBody AdminCommentDeleteRequest request) {
-        return ApiResponse.ok(commandService.delete(new AdminCommentDeletionCommand(request.ids())));
+    ApiResponse<AdminCommentCommandService.Result> delete(@CurrentUser AuthenticatedPrincipal currentUser,
+                                                          @Valid @RequestBody AdminCommentDeleteRequest request) {
+        return ApiResponse.ok(commandService.delete(new AdminCommentDeletionCommand(
+                request.ids(),
+                Integer.parseInt(currentUser.id()))));
     }
 
     @PutMapping("/restore")
-    ApiResponse<AdminCommentCommandService.Result> restore(@Valid @RequestBody AdminCommentRestoreRequest request) {
-        return ApiResponse.ok(commandService.restore(new AdminCommentRestoreCommand(request.ids())));
+    ApiResponse<AdminCommentCommandService.Result> restore(@CurrentUser AuthenticatedPrincipal currentUser,
+                                                           @Valid @RequestBody AdminCommentRestoreRequest request) {
+        return ApiResponse.ok(commandService.restore(new AdminCommentRestoreCommand(
+                request.ids(),
+                Integer.parseInt(currentUser.id()))));
     }
 }
