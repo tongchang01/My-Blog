@@ -123,7 +123,7 @@ git commit -m "收口后端V2持久层SQL放置规则"
 - Create: `docs/superpowers/README.md`
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 新增 docs 入口**
+- [x] **Step 1: 新增 docs 入口**
 
 入口文档至少说明：
 
@@ -133,7 +133,7 @@ git commit -m "收口后端V2持久层SQL放置规则"
 - 当前风险收口计划是哪一份。
 - 早期文档若与当前决策冲突，以最新权威文档为准。
 
-- [ ] **Step 2: 验证**
+- [x] **Step 2: 验证**
 
 Run:
 
@@ -147,7 +147,7 @@ Expected:
 - `git diff --check` 无输出。
 - README 不再把旧包名、旧 `modules` 结构、旧 `api` 层作为当前推荐结构。
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```powershell
 git add docs/superpowers/README.md docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md
