@@ -65,7 +65,7 @@
 - Modify: `docs/superpowers/plans/2026-05-31-backend-v2-mybatis-plus-module-migration.zh-CN.md`
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 新增 SQL 放置规范**
+- [x] **Step 1: 新增 SQL 放置规范**
 
 新增规范文档，明确：
 
@@ -75,7 +75,7 @@
 - 多表 join、动态 where、聚合统计、分页排序、后台管理查询、projection DTO 查询必须使用 XML。
 - SQL 超过 10 行或需要解释旧库兼容规则时，必须使用 XML 并写中文注释。
 
-- [ ] **Step 2: 修正 MyBatis-Plus 迁移计划**
+- [x] **Step 2: 修正 MyBatis-Plus 迁移计划**
 
 把原计划中的宽松规则：
 
@@ -91,7 +91,7 @@
 
 并补充 `ContentCatalogMapper` 已有复杂注解 SQL 需要优先迁入 XML。
 
-- [ ] **Step 3: 验证**
+- [x] **Step 3: 验证**
 
 Run:
 
@@ -105,7 +105,7 @@ Expected:
 - `rg` 不再找到“注解或 XML”的宽松表达。
 - `git diff --check` 无输出。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```powershell
 git add docs/superpowers/specs/2026-06-01-backend-v2-persistence-sql-placement-rules.zh-CN.md docs/superpowers/plans/2026-05-31-backend-v2-mybatis-plus-module-migration.zh-CN.md docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md

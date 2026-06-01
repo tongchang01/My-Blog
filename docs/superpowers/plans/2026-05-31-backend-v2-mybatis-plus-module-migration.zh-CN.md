@@ -51,7 +51,10 @@ rg "JdbcTemplate" MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/te
 - 不弱化已有测试断言。
 - Entity 字段必须使用中文 Javadoc，写明对应表字段和中文含义。
 - Mapper 必须继承 MyBatis-Plus `BaseMapper`。
-- 多表聚合、动态条件、批量更新优先使用 Mapper 注解或 XML，不在 application 层拼 SQL。
+- 复杂 SQL 放置规则以 `docs/superpowers/specs/2026-06-01-backend-v2-persistence-sql-placement-rules.zh-CN.md` 为准。
+- 多表聚合、动态条件、批量更新、分页排序、后台管理查询必须使用 XML，不在 application 层拼 SQL。
+- Mapper 注解 SQL 只允许用于短小、固定、无 join、无动态条件的过渡查询。
+- `ContentCatalogMapper` 当前已完成 MyBatis-Plus 试迁移，但其中复杂注解 SQL 需要优先迁入 XML，作为后续迁移样板。
 - 迁移后对应生产实现类不得持有 `JdbcTemplate` 字段。
 - `JdbcTemplate` 全量删除不作为单个任务目标，避免测试辅助代码和生产迁移混在一起。
 
