@@ -263,7 +263,7 @@ git commit -m "统一后端V2中文注释位置"
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/SecurityConfigTest.java`
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 先补安全回归测试**
+- [x] **Step 1: 先补安全回归测试**
 
 在 `SecurityConfigTest` 中增加或确认：
 
@@ -280,7 +280,7 @@ mvn "-Dtest=SecurityConfigTest" test
 
 Expected: 新增 `POST /api/comments` 断言先失败，证明当前 path-only 白名单存在风险。
 
-- [ ] **Step 2: 修改配置模型**
+- [x] **Step 2: 修改配置模型**
 
 把公开端点从字符串列表改为对象列表：
 
@@ -294,11 +294,11 @@ myblog:
 
 配置类使用 `PublicEndpoint(method, path)` 表达。
 
-- [ ] **Step 3: 修改 SecurityConfig**
+- [x] **Step 3: 修改 SecurityConfig**
 
 按 method + path 注册 `requestMatchers`，只放行明确配置的方法和路径。
 
-- [ ] **Step 4: 验证**
+- [x] **Step 4: 验证**
 
 Run:
 
@@ -310,7 +310,7 @@ mvn test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common MyBlog-springboot-v2/src/main/resources MyBlog-springboot-v2/src/test/resources MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/SecurityConfigTest.java docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md

@@ -28,6 +28,28 @@ class SecurityConfigTest {
     }
 
     @Test
+    void permitsAnonymousGetComments() throws Exception {
+        mockMvc.perform(get("/api/comments?type=1&topicId=1&page=1&size=10"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void rejectsAnonymousPostComments() throws Exception {
+        mockMvc.perform(post("/api/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"type":1,"topicId":1,"content":"匿名评论"}
+                                """))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void rejectsPublicPathWhenHttpMethodIsNotConfigured() throws Exception {
+        mockMvc.perform(post("/api/public/security-probe"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void rejectsUnconfiguredApiRoute() throws Exception {
         mockMvc.perform(get("/api/admin/security-probe"))
                 .andExpect(status().isUnauthorized());

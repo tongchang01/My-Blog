@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -25,6 +26,12 @@ class BackendPropertiesTest {
     @Test
     void bindsPublicEndpoints() {
         assertThat(securityProperties.publicEndpoints())
-                .contains("/actuator/health", "/api/public/security-probe");
+                .extracting(
+                        SecurityPublicEndpointProperties.PublicEndpoint::method,
+                        SecurityPublicEndpointProperties.PublicEndpoint::path)
+                .contains(
+                        tuple("GET", "/actuator/health"),
+                        tuple("GET", "/api/public/security-probe"),
+                        tuple("POST", "/api/auth/login"));
     }
 }

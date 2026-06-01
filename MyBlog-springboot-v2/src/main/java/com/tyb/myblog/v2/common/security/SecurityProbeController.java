@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.common.security;
 
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -19,6 +20,14 @@ public class SecurityProbeController {
     @GetMapping("/api/public/security-probe")
     ApiResponse<String> publicProbe() {
         return ApiResponse.ok("public");
+    }
+
+    /**
+     * 与公开探针同路径的写探针，用于验证白名单必须同时匹配请求方法和路径。
+     */
+    @PostMapping("/api/public/security-probe")
+    ApiResponse<String> publicWriteProbe() {
+        return ApiResponse.ok("public-write");
     }
 
     /**

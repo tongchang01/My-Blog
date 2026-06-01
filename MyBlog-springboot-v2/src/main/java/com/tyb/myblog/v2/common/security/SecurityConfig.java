@@ -49,18 +49,20 @@ public class SecurityConfig {
                                     SecurityPublicEndpointProperties publicEndpointProperties,
                                     ObjectProvider<JwtAuthenticationFilter> jwtAuthenticationFilter,
                                     SecurityProblemSupport problemSupport) throws Exception {
-        String[] publicEndpoints = publicEndpointProperties.publicEndpoints().toArray(String[]::new);
         jwtAuthenticationFilter.ifAvailable(filter -> http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class));
         return http
                 // 前后端分离接口使用 JWT，不依赖浏览器 Cookie，因此关闭 CSRF。
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(publicEndpoints).permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(authorize -> {
+                    publicEndpointProperties.publicEndpoints().forEach(endpoint ->
+                            authorize.requestMatchers(endpoint.httpMethod(), endpoint.path()).permitAll());
+                    authorize
+                            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                            .anyRequest().authenticated();
+                })
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint((request, response, ex) -> problemSupport.writeUnauthorized(response))
                         .accessDeniedHandler((request, response, ex) -> problemSupport.writeForbidden(response)))
