@@ -332,7 +332,7 @@ git commit -m "支持后端V2安全白名单请求方法"
 - Create or Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/jwt/JwtSecretStartupValidatorTest.java`
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 先补启动校验测试**
+- [x] **Step 1: 先补启动校验测试**
 
 测试应覆盖：
 
@@ -340,7 +340,7 @@ git commit -m "支持后端V2安全白名单请求方法"
 - secret 为 `change-me-change-me-change-me-change-me` 时启动校验失败。
 - local/test 明确配置测试 secret 时通过。
 
-- [ ] **Step 2: 修改配置**
+- [x] **Step 2: 修改配置**
 
 主配置去掉默认 fallback：
 
@@ -350,7 +350,7 @@ secret: ${MYBLOG_JWT_SECRET}
 
 本地和测试配置显式提供非生产测试 secret，禁止提交真实线上密钥。
 
-- [ ] **Step 3: 验证**
+- [x] **Step 3: 验证**
 
 Run:
 
@@ -362,7 +362,7 @@ mvn test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/resources MyBlog-springboot-v2/src/test/resources MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/jwt MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/jwt docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md

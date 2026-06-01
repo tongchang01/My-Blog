@@ -7,8 +7,8 @@ import java.time.Duration;
 /**
  * JWT 配置项。
  *
- * <p>绑定 {@code myblog.security.jwt}。生产环境必须通过环境变量或安全配置中心覆盖默认密钥，
- * 不能使用开发环境的默认值。</p>
+ * <p>绑定 {@code myblog.security.jwt}。生产环境必须通过环境变量或安全配置中心提供密钥，
+ * 不能使用开发环境的测试值。</p>
  *
  * @param issuer         JWT 签发者标识，用于区分当前系统签发的 token
  * @param secret         JWT HMAC 签名密钥，生产环境应使用足够长度且不可提交到 Git 的密钥

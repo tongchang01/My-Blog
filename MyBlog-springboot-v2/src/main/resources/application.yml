@@ -22,7 +22,7 @@ myblog:
   security:
     jwt:
       issuer: myblog-v2
-      secret: ${MYBLOG_JWT_SECRET:change-me-change-me-change-me-change-me}
+      secret: ${MYBLOG_JWT_SECRET}
       access-token-ttl: 15m
     public-endpoints:
       - method: GET

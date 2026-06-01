@@ -13,6 +13,10 @@ myblog:
       - http://localhost:5173
       - http://localhost:5174
   security:
+    jwt:
+      issuer: myblog-v2-local
+      secret: local-secret-local-secret-local-secret-123456
+      access-token-ttl: 15m
     public-endpoints:
       - method: GET
         path: /actuator/health
