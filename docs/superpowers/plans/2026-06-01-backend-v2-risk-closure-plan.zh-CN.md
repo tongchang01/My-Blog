@@ -204,7 +204,7 @@ git commit -m "同步后端V2 Maven 坐标"
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/**/*.java`
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 搜索 Javadoc 位于注解之后的类**
+- [x] **Step 1: 搜索 Javadoc 位于注解之后的类**
 
 Run:
 
@@ -214,7 +214,7 @@ rg -n -U "@(RestController|Service|Component|Repository|Configuration|Configurat
 
 Expected: 列出需要修正的位置。
 
-- [ ] **Step 2: 调整注释位置**
+- [x] **Step 2: 调整注释位置**
 
 统一为：
 
@@ -229,7 +229,7 @@ public class ExampleService {
 
 不改方法逻辑、不改字段、不改导入。
 
-- [ ] **Step 3: 验证**
+- [x] **Step 3: 验证**
 
 Run:
 
@@ -240,7 +240,7 @@ mvn test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2 docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md

@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-@Component
 /**
  * 基于旧库用户表的当前用户资料读取器。
  *
  * <p>从 {@code t_user_auth} 和 {@code t_user_info} 联表读取当前用户资料，
  * 并过滤 {@code t_user_info.is_disable = 0} 的启用用户。</p>
  */
+@Component
 public class DatabaseCurrentUserProfileReader implements CurrentUserProfileReader {
 
     private final JdbcTemplate jdbcTemplate;

@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
 /**
  * 前台评论接口。
  *
  * <p>负责评论展示、回复展示、热门评论和评论提交。
  * 评论提交时会记录客户端 IP 和 User-Agent，供后续审核和安全审计使用。</p>
  */
+@RestController
 public class CommentController {
 
     private final CommentQueryService commentQueryService;

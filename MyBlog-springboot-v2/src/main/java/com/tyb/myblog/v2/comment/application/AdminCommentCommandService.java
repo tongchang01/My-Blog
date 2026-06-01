@@ -6,12 +6,12 @@ import com.tyb.myblog.v2.comment.domain.AdminCommentModerator;
 import com.tyb.myblog.v2.comment.domain.AdminCommentRestoreCommand;
 import org.springframework.stereotype.Service;
 
-@Service
 /**
  * 后台评论命令应用服务。
  *
  * <p>编排评论审核、软删除和恢复操作，具体旧库字段更新由 {@link AdminCommentModerator} 实现。</p>
  */
+@Service
 public class AdminCommentCommandService {
 
     private final AdminCommentModerator moderator;

@@ -9,15 +9,15 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-@Profile("configured-identity")
-@Component
-@EnableConfigurationProperties(ConfiguredIdentityProperties.class)
 /**
  * 基于配置文件的用户凭证读取器。
  *
  * <p>只在 {@code configured-identity} profile 下启用，用于测试或临时环境。
  * 数据库登录读取器仍是长期主路径。</p>
  */
+@Profile("configured-identity")
+@Component
+@EnableConfigurationProperties(ConfiguredIdentityProperties.class)
 public class ConfiguredUserCredentialReader implements UserCredentialReader {
 
     private final ConfiguredIdentityProperties properties;

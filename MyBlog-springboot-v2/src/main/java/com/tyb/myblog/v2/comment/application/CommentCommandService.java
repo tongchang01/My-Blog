@@ -5,12 +5,12 @@ import com.tyb.myblog.v2.comment.domain.CommentType;
 import com.tyb.myblog.v2.comment.domain.CommentWriter;
 import org.springframework.stereotype.Service;
 
-@Service
 /**
  * 前台评论命令应用服务。
  *
  * <p>负责组装评论提交命令，并把当前登录用户、客户端 IP 和 User-Agent 一并传给写入端口。</p>
  */
+@Service
 public class CommentCommandService {
 
     private final CommentWriter commentWriter;

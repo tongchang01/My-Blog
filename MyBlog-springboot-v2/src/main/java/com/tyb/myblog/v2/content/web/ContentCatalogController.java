@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@RestController
 /**
  * 前台内容目录接口。
  *
  * <p>负责分类、标签和热门标签展示。</p>
  */
+@RestController
 public class ContentCatalogController {
 
     private final ContentQueryService contentQueryService;

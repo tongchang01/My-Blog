@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
-@Component
 /**
  * 基于旧库用户认证表的登录凭证读取器。
  *
  * <p>从 {@code t_user_auth} 读取用户名和密码摘要，从角色关联表读取用户角色。
  * 查询时会过滤被禁用的用户资料和被禁用的角色。</p>
  */
+@Component
 public class DatabaseUserCredentialReader implements UserCredentialReader {
 
     private final JdbcTemplate jdbcTemplate;

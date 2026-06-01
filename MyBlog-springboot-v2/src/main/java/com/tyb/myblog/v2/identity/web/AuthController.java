@@ -18,14 +18,14 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/api/auth")
 /**
  * 认证接口。
  *
  * <p>负责登录、查询当前用户和注销。登录接口会记录客户端 IP，
  * 当前用户接口依赖 JWT 认证上下文。</p>
  */
+@RestController
+@RequestMapping("/api/auth")
 public class AuthController {
 
     private final AuthService authService;

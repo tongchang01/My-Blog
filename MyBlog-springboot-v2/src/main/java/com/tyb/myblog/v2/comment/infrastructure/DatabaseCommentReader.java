@@ -17,13 +17,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
 /**
  * 基于旧库评论表的前台评论读取器。
  *
  * <p>所有前台查询都必须过滤 {@code is_review = 1} 和 {@code is_delete = 0}，
  * 避免待审核或已删除评论出现在前台。</p>
  */
+@Component
 public class DatabaseCommentReader implements CommentReader {
 
     private final JdbcTemplate jdbcTemplate;

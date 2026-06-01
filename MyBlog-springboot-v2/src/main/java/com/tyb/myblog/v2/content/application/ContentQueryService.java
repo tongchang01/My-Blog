@@ -19,13 +19,13 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Objects;
 
-@Service
 /**
  * 内容查询应用服务。
  *
  * <p>编排前台文章、分类、标签、归档、推荐文章和受保护文章访问。
  * 该类负责业务边界判断，不直接拼接 SQL。</p>
  */
+@Service
 public class ContentQueryService {
 
     private static final int DEFAULT_TOP_TAG_LIMIT = 10;

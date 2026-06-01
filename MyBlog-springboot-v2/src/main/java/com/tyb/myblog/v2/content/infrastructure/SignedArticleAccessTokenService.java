@@ -13,13 +13,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Base64;
 
-@Service
 /**
  * 基于 HMAC 签名的受保护文章访问令牌服务。
  *
  * <p>令牌只用于访问单篇受保护文章，默认 30 分钟有效。
  * 签名密钥复用 JWT 密钥，后续如果文章访问策略变复杂，应拆分独立密钥。</p>
  */
+@Service
 public class SignedArticleAccessTokenService implements ArticleAccessTokenService {
 
     private static final String HMAC_ALGORITHM = "HmacSHA256";

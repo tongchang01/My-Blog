@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-@RequestMapping("/api/admin/comments")
 /**
  * 后台评论管理接口。
  *
  * <p>负责评论列表、详情、审核、软删除和恢复。所有写操作都记录当前后台操作人。</p>
  */
+@RestController
+@RequestMapping("/api/admin/comments")
 public class AdminCommentController {
 
     private final AdminCommentQueryService queryService;

@@ -12,13 +12,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-@Service
 /**
  * 登录认证应用服务。
  *
  * <p>负责编排账号读取、密码校验、登录审计和访问令牌签发。
  * 该类不直接读取数据库表，账号来源由 {@link UserCredentialReader} 实现层适配。</p>
  */
+@Service
 public class AuthService {
 
     private final UserCredentialReader credentialReader;

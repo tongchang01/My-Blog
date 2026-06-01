@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 /**
  * 当前用户查询应用服务。
  *
  * <p>负责编排“我的资料”和“后台菜单”读取。调用方必须传入已认证主体，
  * 具体用户资料和菜单来源由 domain 端口隔离。</p>
  */
+@Service
 public class IdentityQueryService {
 
     private final CurrentUserProfileReader profileReader;

@@ -25,13 +25,13 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-@Component
 /**
  * 基于旧库文章表的文章读取器。
  *
  * <p>负责把 {@code t_article}、分类、作者、标签等旧库表转换为 V2 领域对象。
  * 前台查询必须过滤 {@code is_delete = 0}，并按业务场景控制 {@code status} 可见范围。</p>
  */
+@Component
 public class DatabaseArticleReader implements ArticleReader {
 
     private final JdbcTemplate jdbcTemplate;

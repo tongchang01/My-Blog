@@ -17,13 +17,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
-@Component
 /**
  * 基于旧库评论表的前台评论写入器。
  *
  * <p>写入 {@code t_comment} 时会记录评论人、主题、父评论、回复用户、客户端 IP 和 User-Agent。
  * 当前新评论默认写入未审核状态，前台展示由读取端过滤审核状态。</p>
  */
+@Component
 public class DatabaseCommentWriter implements CommentWriter {
 
     private final JdbcTemplate jdbcTemplate;

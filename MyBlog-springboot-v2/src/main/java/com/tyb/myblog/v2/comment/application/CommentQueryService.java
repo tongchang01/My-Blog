@@ -10,13 +10,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 /**
  * 前台评论查询应用服务。
  *
  * <p>负责前台评论列表、回复列表和首页热门评论查询。
  * 前台只应展示已审核且未删除的评论。</p>
  */
+@Service
 public class CommentQueryService {
 
     private final CommentReader commentReader;

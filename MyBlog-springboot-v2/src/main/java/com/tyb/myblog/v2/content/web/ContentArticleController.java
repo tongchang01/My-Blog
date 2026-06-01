@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-@RestController
 /**
  * 前台文章接口。
  *
  * <p>负责文章列表、详情、分类文章、标签文章、归档、推荐文章和受保护文章访问。</p>
  */
+@RestController
 public class ContentArticleController {
 
     private final ContentQueryService contentQueryService;

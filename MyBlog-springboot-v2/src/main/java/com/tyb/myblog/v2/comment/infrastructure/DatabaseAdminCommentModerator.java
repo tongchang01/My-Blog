@@ -13,13 +13,13 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Component
 /**
  * 基于旧库评论表的后台评论状态变更器。
  *
  * <p>通过更新 {@code t_comment.is_review}、{@code is_delete} 和审计字段实现审核、
  * 软删除、恢复。所有批量操作都会限制 ID 数量，避免误操作过大范围。</p>
  */
+@Component
 public class DatabaseAdminCommentModerator implements AdminCommentModerator {
 
     private final JdbcTemplate jdbcTemplate;

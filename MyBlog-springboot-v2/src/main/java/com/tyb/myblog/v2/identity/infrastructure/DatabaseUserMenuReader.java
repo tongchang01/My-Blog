@@ -12,13 +12,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-@Component
 /**
  * 基于旧库角色菜单表的用户菜单读取器。
  *
  * <p>通过用户角色关联表、角色菜单关联表和菜单表构造后台菜单树。
  * 该实现兼容旧前端约定：叶子菜单会被包在 {@code Layout} 根组件下。</p>
  */
+@Component
 public class DatabaseUserMenuReader implements UserMenuReader {
 
     /**

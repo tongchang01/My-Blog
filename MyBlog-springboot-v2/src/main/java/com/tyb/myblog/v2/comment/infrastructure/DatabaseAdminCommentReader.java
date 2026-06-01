@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Component
 /**
  * 基于旧库评论表的后台评论读取器。
  *
  * <p>后台可以按审核状态、删除状态、类型、主题和关键词查询评论，并读取审核、删除、
  * 恢复等审计字段。</p>
  */
+@Component
 public class DatabaseAdminCommentReader implements AdminCommentReader {
 
     private final JdbcTemplate jdbcTemplate;
