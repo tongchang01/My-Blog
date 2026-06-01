@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.aurora</groupId>
+    <groupId>com.tyb</groupId>
     <artifactId>myblog-springboot-v2</artifactId>
     <version>0.1.0-SNAPSHOT</version>
     <name>myblog-springboot-v2</name>

@@ -165,7 +165,7 @@ git commit -m "新增后端V2文档权威入口"
 - Modify: `MyBlog-springboot-v2/pom.xml`
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 修改 groupId**
+- [x] **Step 1: 修改 groupId**
 
 把 `MyBlog-springboot-v2/pom.xml` 中项目自身 `groupId` 改为：
 
@@ -175,7 +175,7 @@ git commit -m "新增后端V2文档权威入口"
 
 不改依赖坐标，不改包名，不改业务代码。
 
-- [ ] **Step 2: 验证**
+- [x] **Step 2: 验证**
 
 Run:
 
@@ -186,7 +186,7 @@ mvn test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/pom.xml docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md
