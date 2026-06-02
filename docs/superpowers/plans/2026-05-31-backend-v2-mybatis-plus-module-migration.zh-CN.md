@@ -39,6 +39,7 @@ rg "JdbcTemplate" MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/te
 - `DatabaseContentCatalogReader` 已迁移到 `ContentCatalogMapper`。
 - `CategoryEntity`、`TagEntity` 已放入 `content.infrastructure.persistence.entity`。
 - `ContentCatalogMapper` 已放入 `content.infrastructure.persistence.mapper`。
+- 风险收口计划已完成，复杂 SQL 放置规则已收口，`ContentCatalogMapper` 的分类、标签、热门标签聚合查询已迁入 XML，作为后续复杂 SQL 迁移样板。
 
 ---
 
@@ -54,7 +55,7 @@ rg "JdbcTemplate" MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/te
 - 复杂 SQL 放置规则以 `docs/superpowers/specs/2026-06-01-backend-v2-persistence-sql-placement-rules.zh-CN.md` 为准。
 - 多表聚合、动态条件、批量更新、分页排序、后台管理查询必须使用 XML，不在 application 层拼 SQL。
 - Mapper 注解 SQL 只允许用于短小、固定、无 join、无动态条件的过渡查询。
-- `ContentCatalogMapper` 当前已完成 MyBatis-Plus 试迁移，但其中复杂注解 SQL 需要优先迁入 XML，作为后续迁移样板。
+- `ContentCatalogMapper` 已完成复杂 SQL XML 迁移，后续多表聚合、分页排序、projection DTO 查询按该样板落地。
 - 迁移后对应生产实现类不得持有 `JdbcTemplate` 字段。
 - `JdbcTemplate` 全量删除不作为单个任务目标，避免测试辅助代码和生产迁移混在一起。
 
@@ -79,6 +80,12 @@ rg "JdbcTemplate" MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/te
 - identity 表结构简单，适合继续沉淀 Entity/Mapper 规范。
 - content 文章读取 SQL 多、聚合多，放在 identity 之后可以复用更稳定的 Mapper 模式。
 - comment 写入和后台审核涉及状态流转、审计字段、批量更新，风险最高，放到最后。
+
+当前继续点：
+
+- 风险收口计划已经完成。
+- 下一步从 Task 1：迁移当前用户资料读取开始，先处理 identity 低风险读模型。
+- 后续任务继续遵守复杂 SQL 必须 XML 的规则，不再回到复杂 `@Select` 注解。
 
 ---
 

@@ -566,7 +566,7 @@ git commit -m "迁移内容目录复杂SQL到XML"
 
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 更新原迁移计划状态**
+- [x] **Step 1: 更新原迁移计划状态**
 
 在原 MyBatis-Plus 迁移计划中标注：
 
@@ -576,7 +576,7 @@ git commit -m "迁移内容目录复杂SQL到XML"
 
 - 后续从 identity 低风险读模型继续推进。
 
-- [ ] **Step 2: 验证**
+- [x] **Step 2: 验证**
 
 Run:
 
@@ -591,7 +591,7 @@ Expected:
 
 - `rg` 不再找到宽松表达。
 
-- [ ] **Step 3: 提交**
+- [x] **Step 3: 提交**
 
 ```powershell
 git add docs/superpowers/plans/2026-05-31-backend-v2-mybatis-plus-module-migration.zh-CN.md docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md
