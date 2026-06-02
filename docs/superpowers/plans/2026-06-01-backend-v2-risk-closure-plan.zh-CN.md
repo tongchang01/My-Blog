@@ -517,7 +517,7 @@ git commit -m "明确后端V2认证授权错误码语义"
 
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 先补 Mapper 不含复杂注解 SQL 的守护测试**
+- [x] **Step 1: 先补 Mapper 不含复杂注解 SQL 的守护测试**
 
 测试目标：
 
@@ -525,7 +525,7 @@ git commit -m "明确后端V2认证授权错误码语义"
 
 - 分类、标签、热门标签读取行为不变。
 
-- [ ] **Step 2: 新增 XML**
+- [x] **Step 2: 新增 XML**
 
 把以下方法迁入 XML：
 
@@ -535,7 +535,7 @@ git commit -m "明确后端V2认证授权错误码语义"
 
 XML 中需要保留旧库字段含义的中文注释。
 
-- [ ] **Step 3: 验证**
+- [x] **Step 3: 验证**
 
 Run:
 
@@ -547,7 +547,7 @@ mvn test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/infrastructure/persistence/mapper/ContentCatalogMapper.java MyBlog-springboot-v2/src/main/resources/mapper/content/ContentCatalogMapper.xml MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/DatabaseContentCatalogReaderTest.java docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md

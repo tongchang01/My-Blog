@@ -1,6 +1,8 @@
 package com.tyb.myblog.v2.content;
 
 import com.tyb.myblog.v2.content.infrastructure.DatabaseContentCatalogReader;
+import com.tyb.myblog.v2.content.infrastructure.persistence.mapper.ContentCatalogMapper;
+import org.apache.ibatis.annotations.Select;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +23,13 @@ class DatabaseContentCatalogReaderTest {
         assertThat(DatabaseContentCatalogReader.class.getDeclaredFields())
                 .noneMatch(field -> field.getType().equals(JdbcTemplate.class))
                 .anyMatch(field -> field.getType().getName().endsWith(".ContentCatalogMapper"));
+    }
+
+    @Test
+    void keepsComplexCatalogSqlInXmlInsteadOfSelectAnnotations() {
+        assertThat(ContentCatalogMapper.class.getDeclaredMethods())
+                .filteredOn(method -> method.getName().endsWith("Summaries"))
+                .noneMatch(method -> method.isAnnotationPresent(Select.class));
     }
 
     @Test
