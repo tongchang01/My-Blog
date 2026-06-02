@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.common.security.auth;
 
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
+import com.tyb.myblog.v2.common.auth.BearerTokenResolver;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,14 +26,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * JWT 签发、解析和撤销服务。
      */
     private final JwtTokenService tokenService;
+    /**
+     * Bearer Token 请求头解析器。
+     */
+    private final BearerTokenResolver bearerTokenResolver;
 
     /**
      * 创建 JWT 认证过滤器。
      *
-     * @param tokenService token 服务
+     * @param tokenService         token 服务
+     * @param bearerTokenResolver  Bearer Token 解析器
      */
-    public JwtAuthenticationFilter(JwtTokenService tokenService) {
+    public JwtAuthenticationFilter(JwtTokenService tokenService, BearerTokenResolver bearerTokenResolver) {
         this.tokenService = tokenService;
+        this.bearerTokenResolver = bearerTokenResolver;
     }
 
     /**
@@ -42,8 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authorization != null && authorization.startsWith("Bearer ")) {
-            String token = authorization.substring("Bearer ".length());
+        bearerTokenResolver.resolve(authorization).ifPresent(token ->
             tokenService.parse(token).ifPresent(claims -> {
                 AuthenticatedPrincipal principal = new AuthenticatedPrincipal(
                         claims.userId(),
@@ -55,8 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         .toList();
                 SecurityContextHolder.getContext().setAuthentication(
                         new UsernamePasswordAuthenticationToken(principal, token, authorities));
-            });
-        }
+            }));
         filterChain.doFilter(request, response);
     }
 }

@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.identity.web;
 
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
+import com.tyb.myblog.v2.common.auth.BearerTokenResolver;
 import com.tyb.myblog.v2.common.auth.CurrentUser;
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.common.web.ClientIpResolver;
@@ -30,10 +31,14 @@ public class AuthController {
 
     private final AuthService authService;
     private final IdentityQueryService identityQueryService;
+    private final BearerTokenResolver bearerTokenResolver;
 
-    public AuthController(AuthService authService, IdentityQueryService identityQueryService) {
+    public AuthController(AuthService authService,
+                          IdentityQueryService identityQueryService,
+                          BearerTokenResolver bearerTokenResolver) {
         this.authService = authService;
         this.identityQueryService = identityQueryService;
+        this.bearerTokenResolver = bearerTokenResolver;
     }
 
     /**
@@ -75,7 +80,7 @@ public class AuthController {
      */
     @PostMapping("/logout")
     ApiResponse<Void> logout(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorization) {
-        authService.logout(authorization.replaceFirst("Bearer ", ""));
+        bearerTokenResolver.resolve(authorization).ifPresent(authService::logout);
         return ApiResponse.ok(null);
     }
 }

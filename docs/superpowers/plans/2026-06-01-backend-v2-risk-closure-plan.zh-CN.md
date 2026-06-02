@@ -27,17 +27,17 @@
 
 ## 2. 已确认风险
 
-| 优先级 | 风险 | 已核对事实 | 收口方向 |
-| --- | --- | --- | --- |
-| P0 | 复杂 SQL 规则过松 | `ContentCatalogMapper` 已出现 `left join`、`count`、`group by`、`order by` 的 `@Select` SQL | 明确复杂 SQL 必须进入 XML |
-| P0 | 安全白名单缺少 HTTP Method | `myblog.security.public-endpoints` 当前是 path 列表，`/api/comments` 同时承载 GET 和 POST | 改为 `method + path` 配置，并补测试 |
-| P0 | 原迁移计划继续推进前规则不够稳 | MyBatis-Plus 迁移计划中存在“Mapper 注解或 XML”的宽松表述 | 先修正文档，再继续迁移 |
-| P1 | 文档权威关系不清 | 早期文档里仍可看到旧包名、旧结构或旧术语 | 增加 docs 入口说明，标明当前权威文档 |
-| P1 | Maven 坐标仍是旧命名 | `pom.xml` 中 `groupId` 仍为 `com.aurora` | 同步为 `com.tyb` |
-| P1 | 注释规范未完全落地 | 多处类注释位于 Spring 注解之后 | 统一 Javadoc 放在注解之前 |
-| P1 | JWT secret 有默认 fallback | `application.yml` 存在 `change-me...` 默认值 | 生产缺失 secret 时启动失败，本地和测试显式配置 |
-| P2 | Bearer token 解析分散 | `AuthController.logout` 直接 `replaceFirst("Bearer ", "")` | 抽取统一解析器 |
-| P2 | 401/403 语义边界不够清楚 | `ApiErrorCode.UNAUTHORIZED` 注释含义接近 403 | 清理命名或注释，补足测试 |
+| 优先级 | 风险                      | 已核对事实                                                                                | 收口方向                        |
+| --- | ----------------------- | ------------------------------------------------------------------------------------ | --------------------------- |
+| P0  | 复杂 SQL 规则过松             | `ContentCatalogMapper` 已出现 `left join`、`count`、`group by`、`order by` 的 `@Select` SQL | 明确复杂 SQL 必须进入 XML           |
+| P0  | 安全白名单缺少 HTTP Method     | `myblog.security.public-endpoints` 当前是 path 列表，`/api/comments` 同时承载 GET 和 POST       | 改为 `method + path` 配置，并补测试  |
+| P0  | 原迁移计划继续推进前规则不够稳         | MyBatis-Plus 迁移计划中存在“Mapper 注解或 XML”的宽松表述                                            | 先修正文档，再继续迁移                 |
+| P1  | 文档权威关系不清                | 早期文档里仍可看到旧包名、旧结构或旧术语                                                                 | 增加 docs 入口说明，标明当前权威文档       |
+| P1  | Maven 坐标仍是旧命名           | `pom.xml` 中 `groupId` 仍为 `com.aurora`                                                | 同步为 `com.tyb`               |
+| P1  | 注释规范未完全落地               | 多处类注释位于 Spring 注解之后                                                                  | 统一 Javadoc 放在注解之前           |
+| P1  | JWT secret 有默认 fallback | `application.yml` 存在 `change-me...` 默认值                                              | 生产缺失 secret 时启动失败，本地和测试显式配置 |
+| P2  | Bearer token 解析分散       | `AuthController.logout` 直接 `replaceFirst("Bearer ", "")`                             | 抽取统一解析器                     |
+| P2  | 401/403 语义边界不够清楚        | `ApiErrorCode.UNAUTHORIZED` 注释含义接近 403                                               | 清理命名或注释，补足测试                |
 
 ---
 
@@ -62,7 +62,9 @@
 **Files:**
 
 - Create: `docs/superpowers/specs/2026-06-01-backend-v2-persistence-sql-placement-rules.zh-CN.md`
+
 - Modify: `docs/superpowers/plans/2026-05-31-backend-v2-mybatis-plus-module-migration.zh-CN.md`
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
 - [x] **Step 1: 新增 SQL 放置规范**
@@ -70,9 +72,13 @@
 新增规范文档，明确：
 
 - 单表按 ID 查询优先使用 MyBatis-Plus `BaseMapper`。
+
 - 单表简单条件查询可使用 `LambdaQueryWrapper`，但只能在 `infrastructure` 层。
+
 - 很短、固定、无 join、无动态条件的 SQL 可以使用注解。
+
 - 多表 join、动态 where、聚合统计、分页排序、后台管理查询、projection DTO 查询必须使用 XML。
+
 - SQL 超过 10 行或需要解释旧库兼容规则时，必须使用 XML 并写中文注释。
 
 - [x] **Step 2: 修正 MyBatis-Plus 迁移计划**
@@ -103,6 +109,7 @@ git diff --check
 Expected:
 
 - `rg` 不再找到“注解或 XML”的宽松表达。
+
 - `git diff --check` 无输出。
 
 - [x] **Step 4: 提交**
@@ -121,6 +128,7 @@ git commit -m "收口后端V2持久层SQL放置规则"
 **Files:**
 
 - Create: `docs/superpowers/README.md`
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
 - [x] **Step 1: 新增 docs 入口**
@@ -128,9 +136,13 @@ git commit -m "收口后端V2持久层SQL放置规则"
 入口文档至少说明：
 
 - 当前权威结构文档是哪一份。
+
 - 当前权威框架决策文档是哪一份。
+
 - 当前权威 MyBatis-Plus 迁移文档是哪一份。
+
 - 当前风险收口计划是哪一份。
+
 - 早期文档若与当前决策冲突，以最新权威文档为准。
 
 - [x] **Step 2: 验证**
@@ -145,6 +157,7 @@ rg "com.aurora|modules|api 层|api层" docs/superpowers/README.md
 Expected:
 
 - `git diff --check` 无输出。
+
 - README 不再把旧包名、旧 `modules` 结构、旧 `api` 层作为当前推荐结构。
 
 - [x] **Step 3: 提交**
@@ -163,6 +176,7 @@ git commit -m "新增后端V2文档权威入口"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/pom.xml`
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
 - [x] **Step 1: 修改 groupId**
@@ -202,6 +216,7 @@ git commit -m "同步后端V2 Maven 坐标"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/**/*.java`
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
 - [x] **Step 1: 搜索 Javadoc 位于注解之后的类**
@@ -256,11 +271,17 @@ git commit -m "统一后端V2中文注释位置"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/config/SecurityPublicEndpointProperties.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/SecurityConfig.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/resources/application.yml`
+
 - Modify: `MyBlog-springboot-v2/src/main/resources/application-local.yml`
+
 - Modify: `MyBlog-springboot-v2/src/test/resources/application-test.yml`
+
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/SecurityConfigTest.java`
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
 - [x] **Step 1: 先补安全回归测试**
@@ -326,10 +347,15 @@ git commit -m "支持后端V2安全白名单请求方法"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/src/main/resources/application.yml`
+
 - Modify: `MyBlog-springboot-v2/src/main/resources/application-local.yml`
+
 - Modify: `MyBlog-springboot-v2/src/test/resources/application-test.yml`
+
 - Create or Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/jwt/JwtSecretStartupValidator.java`
+
 - Create or Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/jwt/JwtSecretStartupValidatorTest.java`
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
 - [x] **Step 1: 先补启动校验测试**
@@ -337,7 +363,9 @@ git commit -m "支持后端V2安全白名单请求方法"
 测试应覆盖：
 
 - secret 为空时启动校验失败。
+
 - secret 为 `change-me-change-me-change-me-change-me` 时启动校验失败。
+
 - local/test 明确配置测试 secret 时通过。
 
 - [x] **Step 2: 修改配置**
@@ -377,25 +405,33 @@ git commit -m "移除后端V2 JWT 默认密钥"
 
 **Files:**
 
-- Create: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/auth/BearerTokenResolver.java`
-- Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/auth/BearerTokenResolverTest.java`
+- Create: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/auth/BearerTokenResolver.java`
+
+- Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/auth/BearerTokenResolverTest.java`
+
+- Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/auth/JwtAuthenticationFilter.java`
+
+- Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/SecurityConfig.java`
+
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/web/AuthController.java`
-- Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/AuthControllerTest.java`
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 先补解析器测试**
+- [x] **Step 1: 先补解析器测试**
 
 测试应覆盖：
 
 - 标准 `Bearer token`。
+
 - 大小写或多空格是否接受，需要先定规则，建议只接受标准格式。
+
 - 缺失 header、非 Bearer、空 token 返回空。
 
-- [ ] **Step 2: 替换 AuthController 中的字符串处理**
+- [x] **Step 2: 替换 AuthController 中的字符串处理**
 
 `AuthController.logout` 不再直接调用 `replaceFirst("Bearer ", "")`，改为依赖 `BearerTokenResolver`。
 
-- [ ] **Step 3: 验证**
+- [x] **Step 3: 验证**
 
 Run:
 
@@ -407,10 +443,10 @@ mvn test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```powershell
-git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/auth MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/auth MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/web/AuthController.java MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/AuthControllerTest.java docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md
+git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/auth MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/auth MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/auth/JwtAuthenticationFilter.java MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/SecurityConfig.java MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/web/AuthController.java docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md
 git commit -m "统一后端V2 Bearer Token 解析"
 ```
 
@@ -423,7 +459,9 @@ git commit -m "统一后端V2 Bearer Token 解析"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/api/ApiErrorCode.java`
+
 - Modify: related exception handler or security tests after usage inspection
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
 - [ ] **Step 1: 先盘点使用点**
@@ -472,8 +510,11 @@ git commit -m "明确后端V2认证授权错误码语义"
 **Files:**
 
 - Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/infrastructure/persistence/mapper/ContentCatalogMapper.java`
+
 - Create: `MyBlog-springboot-v2/src/main/resources/mapper/content/ContentCatalogMapper.xml`
+
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/DatabaseContentCatalogReaderTest.java`
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
 - [ ] **Step 1: 先补 Mapper 不含复杂注解 SQL 的守护测试**
@@ -481,6 +522,7 @@ git commit -m "明确后端V2认证授权错误码语义"
 测试目标：
 
 - `ContentCatalogMapper` 不再存在 `@Select` 复杂 SQL。
+
 - 分类、标签、热门标签读取行为不变。
 
 - [ ] **Step 2: 新增 XML**
@@ -521,6 +563,7 @@ git commit -m "迁移内容目录复杂SQL到XML"
 **Files:**
 
 - Modify: `docs/superpowers/plans/2026-05-31-backend-v2-mybatis-plus-module-migration.zh-CN.md`
+
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
 - [ ] **Step 1: 更新原迁移计划状态**
@@ -528,7 +571,9 @@ git commit -m "迁移内容目录复杂SQL到XML"
 在原 MyBatis-Plus 迁移计划中标注：
 
 - SQL 放置规则已收口。
+
 - `ContentCatalogMapper` 已作为 XML 样板迁移。
+
 - 后续从 identity 低风险读模型继续推进。
 
 - [ ] **Step 2: 验证**
@@ -543,6 +588,7 @@ rg "注解或 XML|Mapper 注解或 XML" docs/superpowers/plans/2026-05-31-backen
 Expected:
 
 - `git diff --check` 无输出。
+
 - `rg` 不再找到宽松表达。
 
 - [ ] **Step 3: 提交**
@@ -583,4 +629,3 @@ git commit -m "更新后端V2持久层迁移计划状态"
 - Maven 坐标与 `com.tyb.myblog.v2` 包名方向一致。
 - Javadoc 位置统一为注释在注解之前。
 - 本计划所有任务 checkbox 已勾选。
-

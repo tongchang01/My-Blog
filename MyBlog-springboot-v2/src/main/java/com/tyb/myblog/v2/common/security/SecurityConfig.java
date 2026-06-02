@@ -3,6 +3,7 @@ package com.tyb.myblog.v2.common.security;
 import com.tyb.myblog.v2.common.config.ApiCorsProperties;
 import com.tyb.myblog.v2.common.config.SecurityJwtProperties;
 import com.tyb.myblog.v2.common.config.SecurityPublicEndpointProperties;
+import com.tyb.myblog.v2.common.auth.BearerTokenResolver;
 import com.tyb.myblog.v2.common.security.auth.JwtAuthenticationFilter;
 import com.tyb.myblog.v2.common.security.auth.JwtTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -77,8 +78,8 @@ public class SecurityConfig {
      */
     @Bean
     @ConditionalOnBean(JwtTokenService.class)
-    JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenService tokenService) {
-        return new JwtAuthenticationFilter(tokenService);
+    JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenService tokenService, BearerTokenResolver bearerTokenResolver) {
+        return new JwtAuthenticationFilter(tokenService, bearerTokenResolver);
     }
 
     /**
