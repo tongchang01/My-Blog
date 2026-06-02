@@ -26,11 +26,7 @@ public enum ApiErrorCode {
      */
     INVALID_TOKEN(HttpStatus.UNAUTHORIZED),
     /**
-     * 已登录但身份不满足当前业务要求，对应 HTTP 401。
-     */
-    UNAUTHORIZED(HttpStatus.UNAUTHORIZED),
-    /**
-     * 已认证但没有访问目标资源的权限，对应 HTTP 403。
+     * 已认证但角色或权限不足，对应 HTTP 403。
      */
     FORBIDDEN(HttpStatus.FORBIDDEN),
     /**

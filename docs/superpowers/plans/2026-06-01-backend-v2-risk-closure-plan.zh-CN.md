@@ -464,7 +464,7 @@ git commit -m "统一后端V2 Bearer Token 解析"
 
 - Modify: `docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md`
 
-- [ ] **Step 1: 先盘点使用点**
+- [x] **Step 1: 先盘点使用点**
 
 Run:
 
@@ -474,7 +474,7 @@ rg "UNAUTHORIZED|FORBIDDEN|ACCESS_DENIED|认证|授权|权限" MyBlog-springboot
 
 Expected: 明确当前 401/403 使用边界。
 
-- [ ] **Step 2: 修改错误码注释或命名**
+- [x] **Step 2: 修改错误码注释或命名**
 
 推荐规则：
 
@@ -483,7 +483,7 @@ Expected: 明确当前 401/403 使用边界。
 
 若已有代码只使用 401，则先修注释和测试，不强行扩大 403 行为面。
 
-- [ ] **Step 3: 验证**
+- [x] **Step 3: 验证**
 
 Run:
 
@@ -494,7 +494,7 @@ mvn test
 
 Expected: `BUILD SUCCESS`。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 4: 提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common MyBlog-springboot-v2/src/test/java docs/superpowers/plans/2026-06-01-backend-v2-risk-closure-plan.zh-CN.md
