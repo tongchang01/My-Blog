@@ -44,7 +44,22 @@ V2 需要重新设计认证体系。
 后续需关注：
 - 多实例部署前必须把 `TokenRevocationStore` 迁到 Redis
 
+## 补充（2026-06，R6 C1 决定后）
+
+撤销机制已**重新设计**，不再走"内存 `TokenRevocationStore` → 未来迁 Redis"路线，改为：
+
+- **`token_version` + DB `t_refresh_token` 表**双 token 机制
+- access token JWT 携带自定义 claim `ver`（int），校验时比对 `t_user_auth.token_version`
+- 改密 / 主动登出 / 强制下线 → `token_version += 1`，所有未过期 access token 立即失效
+- refresh token 为随机字符串（非 JWT），SHA-256 哈希后存 `t_refresh_token` 表
+- access token 增加 `typ` claim（`"access"` / `"article_access"`），PASSWORD 文章 token 与登录 token 强隔离
+
+**原 `TokenRevocationStore` 内存实现废弃**。Redis 不再是"必须迁移项"，DB 方案已能满足跨重启 + 跨实例（如未来水平扩展）撤销需求。
+
+详见：`product/decisions-draft.md` R6 C1、`arch/auth-flow.md`、`pitfalls.md` P-001 状态更新。
+
 ## 相关
 
 - 相关 rules：`rules/security-baseline.md`
-- 相关 pitfalls：`pitfalls.md` 撤销存储项
+- 相关 pitfalls：`pitfalls.md` P-001
+- 相关 arch：`arch/auth-flow.md`

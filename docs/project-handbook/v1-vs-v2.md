@@ -1,30 +1,23 @@
-# V1 与 V2 关系说明
+# V1 → V2 对照
 
-> 本文档回答："V1 和 V2 是什么关系？V2 是否兼容 V1 数据库？V1 在重构中承担什么作用？"
-> 适用范围：MyBlog 全量 V2 重构期间的产品、数据库、后端和前端设计讨论。
-
-## 0. 结论
-
-- V1 继续线上运行，作为业务参考和数据来源。
-- V2 独立重构，不兼容 V1 数据库结构。
-- V2 schema 重新设计，V1 表只用于业务考古和一次性数据导入映射。
-- 当前已写的 V2 后端业务代码属于过渡实现，基盘能力保留，最终业务实现以后续产品规格、领域模型和新 schema 为准。
+> 本文档回答："V1 有什么问题？V2 怎么改的？区别在哪？"
+> 性质：阶段性快照，V2 稳定后可归档。
 
 ## 1. 技术栈对照
 
-| 维度          | V1                              | V2                            |
-| ----------- | ------------------------------- | ----------------------------- |
-| Spring Boot | 2.3.7（EOL）                      | 3.5.14                        |
-| Java        | 1.8                             | 17 LTS                        |
-| ORM         | JdbcTemplate + MyBatis 混用       | MyBatis-Plus 3.5.12 为主        |
-| JWT         | `jjwt 0.9.0`（停维护）               | `spring-security-oauth2-jose` |
-| API 文档      | knife4j 2.x                     | springdoc-openapi             |
-| JSON        | fastjson 1.2.76（CVE）            | Jackson（Spring Boot 默认）       |
-| 数据库迁移       | 无（手工 SQL）                       | Flyway                        |
-| 安全          | Spring Security + 手写 JWT        | Spring Security 6 + 标准 JWT    |
-| 包结构         | `com.aurora.myblog`             | `com.tyb.myblog.v2`           |
-| 架构          | 技术分层（controller/service/mapper） | 模块化单体 + 四层 DDD-lite           |
-| 架构守护        | 无                               | ArchUnit                      |
+| 维度 | V1 | V2 |
+|------|-----|-----|
+| Spring Boot | 2.3.7（EOL） | 3.5.14 |
+| Java | 1.8 | 17 LTS |
+| ORM | JdbcTemplate + MyBatis 混用 | MyBatis-Plus 3.5.12 为主 |
+| JWT | `jjwt 0.9.0`（停维护） | `spring-security-oauth2-jose` |
+| API 文档 | knife4j 2.x | knife4j 4.x（基于 springdoc-openapi） |
+| JSON | fastjson 1.2.76（CVE） | Jackson（Spring Boot 默认） |
+| 数据库迁移 | 无（手工 SQL） | Flyway |
+| 安全 | Spring Security + 手写 JWT | Spring Security 6 + 标准 JWT |
+| 包结构 | `com.aurora.myblog` | `com.tyb.myblog.v2` |
+| 架构 | 技术分层（controller/service/mapper）| 模块化单体 + 四层 DDD-lite |
+| 架构守护 | 无 | ArchUnit |
 
 ## 2. V1 关键问题清单
 
@@ -65,91 +58,92 @@
 
 ### 3.1 总体思路
 
-- 三端、后端、数据库和业务规则按 V2 重新设计。
-- V1 仅作为业务语义参考，不作为新 schema 兼容目标。
-- 重新设计代码组织：模块化单体 + 四层
+- **完整 schema 重设计**（不复用 V1 旧表结构）：审计列规范、软删三件套、i18n 三语副本、状态枚举等全部按 V2 决定重新建表
+- 重新设计代码组织：模块化 + 四层 DDD-lite
 - 升级核心依赖到当前长期支持版本
 - 引入架构守护（ArchUnit）防止退化
 - 引入迁移工具（Flyway）规范化 DB 变更
 - 文档先行，规则可执行
+- V1 冻结只读，V2 与 V1 **不共用数据库**
 
 ### 3.2 模块化决策
 
-划分为 6 个模块（见 `arch/module-map.md`）：
+划分为 6 个模块（见 `arch/module-map.md`、`product/decisions-draft.md` R5 B1）：
 
-- `common`、`infrastructure`、`identity`、`content`、`comment`、`system`（system 尚未创建）
+| 模块 | 职责 |
+|---|---|
+| `identity` | t_user_auth / t_user_info / 登录 / JWT |
+| `content` | t_article / t_category / t_tag / t_article_tag |
+| `comment` | t_comment |
+| `system` | t_site_config / t_attachment / 全局配置 |
+| `stats` | t_page_view / t_page_view_daily |
+| `common-infra` | 基础设施：异常、响应包装、审计 handler、storage 抽象、限流等 |
 
 每个业务模块四层：`web / application / domain / infrastructure`。
 
 ### 3.3 安全设计
 
 - 强制环境变量注入 JWT secret，启动校验缺失即失败
-- Token 自包含（exp + jti），撤销走独立 store
+- **双 Token 机制**：access token (JWT, 15min) + refresh token (DB, 7d)；`token_version` claim 实现跨重启 / 跨实例撤销（**不引 Redis**）
+- access token 携带 `typ` claim 区分登录 token 与 PASSWORD 文章解锁 token
 - 白名单 method + path 双维度
+- 登录限流：同 IP+username 5 次/10 分钟冷却（Caffeine）
 - 登录审计：成功才更新 `last_login_time` / `ip_address`，审计失败不签发 token
+- 详见 `arch/auth-flow.md`、`rules/security-baseline.md`
 
 ### 3.4 错误处理
 
 - 业务异常统一走 `ApiException` + `ApiErrorCode`
 - `GlobalExceptionHandler` 统一兜底
-- HTTP 状态码语义明确（401 / 403 / 404 / 409 / 500）
+- HTTP 状态码语义明确（401 / 403 / 404 / 409 / 429 / 500）
+- **错误码空间**：String 5 位 MMSSS（如 `00000` / `10001` / `99999`），详见 `rules/error-handling.md` §3
 
 ### 3.5 持久化
 
-- MyBatis-Plus 为主
+- MyBatis-Plus 为主，统一 ORM
+- 审计列规范：8 列基线（id + 4 个 created/updated + 3 个 deleted）由 `BaseEntity` + `AuditFieldHandler` 自动填
+- **DB 不用 FOREIGN KEY 约束**（详见 `pitfalls.md` R-012），引用完整性由 application 层维护
 - SQL 写法分层：BaseMapper / @Select / XML（详见 `rules/sql-placement.md`）
-- JdbcTemplate 渐进迁移
-- Flyway + H2 测试
+- Flyway 管理 schema 变更
 
-### 3.6 测试
+### 3.6 横切
+
+- **时区**：JVM + MySQL + Clock + API + 前端五层全部 Asia/Tokyo（详见 `product/decisions-draft.md` R7 D11、`pitfalls.md` R-011）
+- **i18n**：UI 文案前端 JSON + vue-i18n；业务内容 DB 三语副本（文章标题/摘要、分类/标签、站点配置）；fallback 到中文
+- **URL 策略**：id 主导 + slug 可读性增强 `/{lang}/posts/{id}-{slug}`；不维护 slug 历史
+- **CORS**：白名单显式列出，禁止 `*`
+- **日志**：Logback + JSON + MDC traceId + 敏感字段脱敏
+
+### 3.7 测试
 
 - JUnit 5 + Spring Boot Test + Spring Security Test
 - ArchUnit 守护架构规则
 - 必测场景明确列出（见 `rules/testing-policy.md`）
 
-## 4. 兼容策略
+## 4. V1 / V2 关系
 
-V2 与 V1 并存期间的原则：
+V2 是**独立的新项目**：
+- 独立代码库（`MyBlog-springboot-v2/`，包前缀 `com.tyb.myblog.v2`）
+- **独立的新数据库**（不复用 V1 schema；Flyway 从 V1__init 起重新建表）
+- V1 冻结只读，作为"原功能怎么做"的历史参考
+- 路径前缀区分（V2 用 `/api/public/**` / `/api/auth/**` / `/api/admin/**`）
+- V2 上线后 V1 整体下线
 
-- V1 线上服务保持不动，除非出现必须修复的生产事故。
-- V2 不共享 V1 schema，不以兼容旧表字段为目标。
-- V1 数据在 V2 上线前通过一次性导入迁移，具体映射写入 `migration/`。
-- V1 旧字段、旧状态值、旧表名只在业务考古和导入映射中说明，不散落到 V2 新业务代码规范里。
-- V2 接口契约以后续 `api-contract/` 为准，不继续沿用 V1 接口惯性。
-
-## 5. 当前 V2 代码的定位
-
-当前后端 V2 已经完成一批基础工程能力：
-
-- 包名和模块结构：`com.tyb.myblog.v2`
-- 模块化单体与四层结构
-- Spring Boot 3、Java 17、MyBatis-Plus、Flyway、ArchUnit
-- JWT、安全白名单、统一异常、统一响应、中文注释规则
-
-这些属于 V2 基盘，原则上保留。
-
-identity、content、comment 中按旧表写出的业务实现，需要降级理解为"过渡实现"：
-
-- 可以作为测试、分层和 MyBatis-Plus 迁移样板参考。
-- 不代表最终业务功能、接口字段或表结构已经定稿。
-- 后续会根据 `product/feature-inventory.md`、`product/use-cases.md`、`product/data-model.md`、`arch/schema-design.md` 调整或重写。
-
-## 6. 已完成 vs 待完成
+## 5. 已完成 vs 待完成
 
 详见 `status.md` 与 `roadmap.md`。
 
-## 7. V1 不会再做的事
+## 6. V1 不会再做的事
 
-- 不做 V1 大规模重构
+- 不修复 V1 bug（除非影响 V2 共用数据）
 - 不升级 V1 依赖
 - 不补 V1 测试
-- 不把 V1 schema 当作 V2 兼容目标
-- V2 上线并完成数据导入后，V1 整体下线
+- V2 迁完后 V1 整体下线
 
-## 8. 相关文档
+## 7. 相关文档
 
+- 设计决定（早期难改）：`product/decisions-draft.md` R1–R7
 - 架构：`arch/module-map.md`、`arch/auth-flow.md`、`arch/persistence-strategy.md`
-- 决策：`decisions/0013-no-v1-compatibility.md`、`decisions/0014-schema-redesign-principles.md`
+- 决策：`decisions/0001-0014`
 - 规则：`rules/`
-- 数据迁移：`migration/`
 - 已识别问题：`pitfalls.md`

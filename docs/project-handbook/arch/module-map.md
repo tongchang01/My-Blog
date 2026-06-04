@@ -1,33 +1,35 @@
 # 模块地图
 
 > 本文档回答："V2 现在有哪些模块？模块之间能怎么调？谁守护规则？"
-> 适用范围：V2 当前实现。
-> 相关 ADR：ADR-0001、ADR-0003、ADR-0004、ADR-0012
+> 适用范围：V2 R5 修订后的目标结构（DDL 冻结后落地）。
+> 相关 ADR：ADR-0001、ADR-0003、ADR-0004（2026-06 修订）、ADR-0012
 
-## 1. 模块总览
+## 1. 模块总览（R5 修订）
 
 ```
 com.tyb.myblog.v2
-├── common              基础设施（响应、异常、安全工具、Web 工具）
-├── infrastructure      全局基础设施（MyBatis-Plus / Flyway 配置）
-├── identity            用户、角色、登录、JWT
-├── content             文章、分类、标签
-├── comment             评论、审核、举报
-└── system              ⏳ 系统配置、字典、菜单（尚未创建）
+├── common               common-infra：跨模块基础设施
+│   ├── (响应封装 / 异常 / Security 链路 / Knife4j / Clock / i18n / ArchUnit)
+│   └── infrastructure   MyBatis-Plus / Flyway / DataSource 配置
+├── identity             用户、登录、JWT 双 token（access + refresh）
+├── content              文章、分类、标签
+├── comment              评论、留言板（复用 t_comment）、审核
+├── system               站点配置、附件、友链申请
+└── stats                访客统计（自研日聚合 + 原始打点）
 ```
 
-| 模块 | 文件数（含测试） | 状态 |
-|------|------------------|------|
-| common | 25 | ✅ 稳定 |
-| infrastructure | 2 | ✅ 仅含配置 |
-| identity | 25 | ✅ 已实现 |
-| content | 34 | ✅ 已实现（有遗留 @Select 待迁移） |
-| comment | 34 | ✅ 已实现 |
-| system | — | ⏳ 尚未创建 |
+| 模块 | 核心表 | 错误码段 |
+|------|------|------|
+| identity | t_user_auth / t_user_info / t_refresh_token | 10xxx |
+| content | t_article / t_article_tag / t_category / t_tag | 20xxx |
+| comment | t_comment | 30xxx |
+| system | t_site_config / t_attachment / t_friend_link | 40xxx |
+| stats | t_page_view / t_page_view_daily（AuditOnlyBase 例外） | 50xxx |
+| common-infra | — | 90xxx（兜底 99999） |
 
 ## 2. 业务模块四层结构
 
-每个业务模块（identity/content/comment/system）内部固定四层：
+每个业务模块（identity / content / comment / system / stats）内部固定四层：
 
 ```
 {module}
@@ -57,15 +59,18 @@ com.tyb.myblog.v2
 
 | 调用方 | 被调方 | 允许方式 |
 |--------|--------|----------|
-| `comment` | `identity` | 通过 `identity.application` 公开接口（如获取用户名） |
+| `comment` | `identity` | 通过 `identity.application` 公开接口（如获取用户名 / 头像） |
 | `comment` | `content` | 通过 `content.application` 公开接口（如校验文章存在） |
-| 任意业务模块 | `common` / `infrastructure` | 允许直接依赖 |
+| `content` | `system` | 通过 `system.application` 公开接口（如校验 attachment 存在） |
+| `stats` | `content` / `identity` | 通过对应 application 公开接口（聚合时按文章 id 反查标题） |
+| 任意业务模块 | `common-infra` | 允许直接依赖 |
 | 业务模块 A | 业务模块 B 的 `infrastructure.persistence` | 🔴 禁止 |
 | 业务模块 A | 业务模块 B 的 `domain` 内部实体 | 🔴 禁止 |
+| `common-infra` | 任何业务模块 | 🔴 禁止（防反向依赖） |
 
 ## 5. ArchUnit 守护规则
 
-位置：`src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`
+位置：`src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`（DDL 冻结后按 R5 模块清单重写）
 
 | # | 规则 | 含义 |
 |---|------|------|
@@ -74,15 +79,17 @@ com.tyb.myblog.v2
 | 3 | `..application..` 不直接访问 MyBatis-Plus Mapper | 应用层通过仓储抽象 |
 | 4 | `..common..` 不依赖业务模块 | 公共层不能反向依赖 |
 | 5 | 业务模块不互相访问对方 `infrastructure.persistence` | 跨模块只能走 application 接口 |
+| 6 | `..domain..` 不直接 `LocalDateTime.now()` / `new Date()` | 必须用注入的 Clock（ADR-0018 / R-011） |
+| 7 | Flyway 脚本不出现 `FOREIGN KEY` | 禁 DB FK（ADR-0017 / R-012）—— 由 Flyway review 守护，非 ArchUnit |
 
-任何违反 → `mvn test` 失败。
+任何 ArchUnit 违反 → `mvn test` 失败。
 
-## 6. 已知遗留
+## 6. 状态
 
-- `content` 模块的 `ContentCatalogMapper` 存在 @Select 长查询，需迁 XML（见 `pitfalls.md`）
-- `system` 模块尚未建立，旧库相关表的迁移工作待启动
+**当前 V2 实现与本图不完全一致**：旧实现按"common / infrastructure / identity / content / comment / system"6 模块写，stats 未建，common / infrastructure 是两个顶层包。DDL 冻结后按 `roadmap.md` M1 清理 + M2 基础设施补齐 + M3 模块重建。
 
 ## 7. 相关文档
 
-- ADR：`../decisions/0001-modular-monolith.md`、`../decisions/0003-four-layer-architecture.md`、`../decisions/0004-six-business-modules.md`、`../decisions/0012-archunit-guards.md`
-- 规则：`../rules/package-layout.md`
+- ADR：`../decisions/0001-modular-monolith.md`、`../decisions/0003-four-layer-architecture.md`、`../decisions/0004-six-business-modules.md`（R5 修订）、`../decisions/0012-archunit-guards.md`
+- 规则：`../rules/package-layout.md`、`../rules/error-handling.md`
+- 关联决定：`../product/decisions-draft.md` R5 B1

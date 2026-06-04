@@ -32,6 +32,6 @@ api-contract 是后端与前端的**单一事实源**。前后端任何一方想
 
 - 每个接口写清：method、path、auth 要求、请求体 schema、响应体 schema、可能错误码、典型示例
 - 字段名用 camelCase（JSON 约定）；后端 snake_case 字段在序列化时映射
-- 时间字段统一 ISO 8601 字符串（如 `2026-06-01T12:34:56Z`）
+- 时间字段统一 ISO 8601 本地时间字符串，语义固定为 JST（如 `2026-06-01T12:34:56`）
 - 分页统一：`?page=1&size=20`，响应含 `total/list/page/size`
 - 错误码统一走 `error-codes.md`，禁止接口里临时新造

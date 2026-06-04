@@ -19,13 +19,16 @@
 | `state-and-routing.md` | 路由结构、全局状态（用户、主题）、鉴权拦截 | ⏳ |
 | `styling.md` | 设计语言、暗黑模式、响应式断点 | ⏳ |
 
-## V1 → V2 的待定事项
+## V1 → V2 已决策事项（详见 `product/feature-inventory.md` + `product/decisions-draft.md`）
 
-- Vue 3 + Element Plus + Pinia 大概率保留（V1 前台已是 Vue 3）
-- 国际化 vue-i18n：看 `product/feature-inventory.md` 标注结果
-- 音乐播放器 aplayer：跟随"音乐功能"去留
-- Markdown 渲染：保留 markdown-it 全家桶，但精简插件
-- 相册组件：跟随"相册功能"去留
+- **技术栈**：Vue 3 + Element Plus + Pinia + TypeScript + vue-i18n（前后台统一）
+- **国际化**：留，三语 zh / ja / en，路径前缀 `/{lang}/`；UI 文案 vue-i18n 打包，业务内容 DB 三语副本；字体 CSS `:lang()` + Noto Sans SC/JP/Sans（R2 #7-#19）
+- **音乐播放器**：删 aplayer，改用 **Spotify 官方 Embed iframe**，读 `t_site_config.spotify_playlist_id`（⑬）
+- **相册**：全删（⑫）
+- **说说**：全删（⑪）
+- **Markdown 渲染**：评论只渲后端 sanitize 后的 `content_html`（R-013 红线）；文章正文走 Vditor 渲染管线
+- **暗黑模式**：留，跟随系统 + 手动切换（🟢 候选，待与新功能候选一起最终敲定）
+- **活动热图**：从后台仪表盘迁到前台 about 页（⑯）
 
 ## 写作约定
 

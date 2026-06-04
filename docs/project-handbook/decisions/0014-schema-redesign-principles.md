@@ -1,9 +1,19 @@
 # ADR-0014: V2 数据库 schema 重设计原则
 
-- 状态：accepted
+- 状态：accepted（**部分被 ADR-0015 / ADR-0018 超越**）
 - 日期：2026-06
 - 决策者：项目负责人
 - 依赖：ADR-0013（V2 不再兼容 V1 数据结构）
+
+> ⚠️ **2026-06 更新**：以下章节已被后续 ADR 超越，请优先参考新 ADR：
+> - §2 主键（`BIGINT UNSIGNED AUTO_INCREMENT`）→ **ADR-0015 改为 `BIGINT NOT NULL`（不带 AUTO_INCREMENT）+ MyBatis-Plus `IdType.ASSIGN_ID`（雪花）在应用层生成**；日志型例外表（t_page_view / t_page_view_daily）可保留 AUTO_INCREMENT
+> - §3 字段类型规范（时间类型 TIMESTAMP）→ **ADR-0015 / ADR-0018 改为 DATETIME**
+> - §4 时间字段统一（`created_at` / `updated_at` only）→ **ADR-0015 改为 8 列审计基线（含 `created_by` / `updated_by` / `deleted_*`）**
+> - §5 软删除统一（单列 `deleted_at TIMESTAMP NULL`）→ **ADR-0015 改为三件套 `deleted TINYINT + deleted_at DATETIME + deleted_by BIGINT`，配合 MyBatis-Plus `@TableLogic`**
+> - §6 字段命名（`is_xxx` 布尔）→ 仍有效，但状态枚举字段命名见 R3 / R4
+> - "例：标准业务表模板"中的 `t_article` 示例 → **已过时**，三语字段 / slug / cover_attachment_id / status 5 态 / 8 列审计 / DATETIME / ASSIGN_ID 等详见 `product/decisions-draft.md` R2-R3 与 `arch/schema-design.md`
+>
+> 本 ADR 的"表命名 / 索引规范 / 字符集 / COMMENT / 关联表"原则仍有效。
 
 ## 背景
 
@@ -22,9 +32,10 @@ V2 全部新表遵循以下原则：
 
 ### 2. 主键
 
-- 默认 `BIGINT UNSIGNED AUTO_INCREMENT`（替代 V1 的 INT，未来量上来不会爆）
+- 默认 `BIGINT NOT NULL`（**不带** `AUTO_INCREMENT`，**已被 ADR-0015 超越**）
+- id 由 MyBatis-Plus `IdType.ASSIGN_ID`（雪花算法）在应用层生成
 - 字段名统一 `id`
-- 大流量或分布式场景才用 UUID / Snowflake，目前个人博客不需要
+- 例外：日志 / 高写入 append-only 表（如 `t_page_view` / `t_page_view_daily`）可保留 DB AUTO_INCREMENT
 
 ### 3. 字段类型规范
 
@@ -86,9 +97,12 @@ updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMEST
 - 用复合主键或独立 id + 唯一索引
 - 业务模块归属：与"主"实体同模块（如 `t_article_tag` 归 content 模块）
 
-## 例：标准业务表模板
+## 例：标准业务表模板（**已过时，仅作历史参考**）
+
+> 此例保留 V1 习惯的 AUTO_INCREMENT / TIMESTAMP / 单列软删，已被 ADR-0015 / ADR-0018 全面替换。新表请按 `arch/schema-design.md` + ADR-0015 的 8 列基线撰写。
 
 ```sql
+-- 已过时示例（请勿照抄）
 CREATE TABLE t_article (
     id              BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '主键',
     user_id         BIGINT UNSIGNED NOT NULL                COMMENT '作者 id',

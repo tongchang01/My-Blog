@@ -9,15 +9,16 @@
 只覆盖**管理员**视角的页面：仪表盘、文章管理、评论审核、用户管理、网站配置等。
 访客面向的页面在 `frontend-user/`。
 
-## 关键待定项（待决策后回填）
+## 关键决策项（已定，详见 `product/feature-inventory.md` + `product/decisions-draft.md`）
 
-| 议题 | 选项 | 状态 |
+| 议题 | 决策 | 引用 |
 |------|------|------|
-| Vue 版本 | 跟前台一起升 Vue 3 + Element Plus / 维持 Vue 2 + Element UI | ⏳ |
-| 菜单方式 | 后端动态下发 / 前端静态路由 | ⏳（与 RBAC 决策绑定） |
-| 角色模型 | 复杂 RBAC / 简化 USER+ADMIN | ⏳ |
-| 编辑器 | 沿用 mavon-editor / 换 Vditor / 换 Bytemd | ⏳ |
-| 仪表盘 | echarts 全家桶 / 简化数字卡 | ⏳ |
+| Vue 版本 | **Vue 3 + Element Plus + Pinia + TypeScript + vue-i18n**（前后台统一栈） | ⑳ / R7 D11 |
+| 菜单方式 | **前端静态路由**，删 `t_menu` + `/admin/user/menus` 接口 | ⑩ |
+| 角色模型 | **Role 三态枚举 ADMIN / DEMO / GUEST**，删 4 张 RBAC 表，`@PreAuthorize("hasRole('ADMIN')")` 控制 | ⑨ / R5 / R6 |
+| 编辑器 | **Vditor**（候选 Vditor / Bytemd，前端实施前最终敲定） | ⑳ / R7 D11 |
+| 仪表盘 | **简化为数字卡 + 最新评论 + 文章访问 TOP 10**；活动热图迁前台 about 页 | ⑯ |
+| API 文档 | **Knife4j 4.x**（基于 springdoc-openapi） | R7 / ADR-0009 |
 
 ## 计划包含的文件
 

@@ -4,116 +4,107 @@
 > 性质：滚动更新，每完成一个里程碑就调整。
 > 当前日期：2026-06
 
-## 1. 短期（1~2 个月内）
+## ⚠️ 主线：完成产品规格 + Schema 设计 → DDL 冻结 → 重建 V2 代码
 
-聚焦：**V2 既有模块的稳定与补齐**。
+R5-R7 多处与既有 V2 实现冲突（详见 `status.md` § 2）。继续修旧实现 = 返工。**DDL 冻结前停止写实体 / Mapper / Controller / Flyway DDL**。
 
-### S1：修历史遗留
-- [ ] `ContentCatalogMapper` 中 @Select 长查询迁移到 XML（参考 `workflows/migrate-jdbc-to-mybatis-plus.md`）
-- [ ] 创建 `src/main/resources/mapper/content/` 目录
+## 1. 短期（当前阶段，至 DDL 冻结）
 
-### S2：补关键测试
-- [ ] `CommentCommandService` 集成测试
-- [ ] `AdminCommentCommandService` 集成测试
-- [ ] 评论软删除 → 恢复完整链路 E2E 测试
-- [ ] content 模块 ApplicationService 集成测试
+### S1：新功能候选范围敲定
 
-### S3：建 system 模块
-- [ ] 按 `workflows/add-new-module.md` 建包结构
-- [ ] 迁移系统配置 / 字典等表
-- [ ] 更新 ArchUnit 规则纳入 system
+- [x] 过 `product/feature-inventory.md` 末尾 🟢🟡🤔 三组候选，决定 V2 范围（已由 R1-R8 + 14 表 schema 收敛）
+- [x] 新增可能引入表的候选写进 schema 范围或明确后置：点赞 / Newsletter 不进 V2 起点 schema
 
-### S4：Bearer Token 解析公共化
-- [ ] 抽出公共工具，消除多处重复
+### S2：领域建模
 
-## 2. 中期（3~6 个月）
+- [x] `product/er-diagram.md`：ER / 领域关系图（Mermaid）
+- [x] `product/use-cases.md`：用户故事按角色 ADMIN / DEMO / GUEST / 系统任务分组
+- [x] `product/business-rules.md`：状态机 / 校验规则 / 业务不变量
+- [x] `product/data-model.md`：聚合根 / 实体 / 值对象 / 边界
 
-聚焦：**安全加固与可运维性**。
+### S3：Schema 设计
 
-### M1：富文本与上传安全
-- [ ] 富文本 XSS 清洗（Jsoup 或 OWASP HTML Sanitizer）
-- [ ] 上传文件 MIME 校验、大小限制
-- [ ] **必须**在迁移文章模块前完成
+- [x] `arch/schema-design.md`：14 张表 DDL 草案（按 ADR-0014 / 0015 / 0017 / 0018 + R1-R8）
+- [x] Flyway `V1__init.sql`：从 schema-design.md 转换为可执行 SQL，并通过迁移烟测
+- [x] 种子数据策略：`t_site_config` 默认行入 Flyway；管理员 / DEMO 账号由首次部署运维 SQL 插入
+- [ ] **DDL 冻结里程碑**
 
-### M2：登录限流
-- [ ] ADR 决定方案（IP / 用户名 / 验证码组合）
-- [ ] 实现限流组件
-- [ ] 失败次数到达阈值后冷却
+## 2. 中期（DDL 冻结后，进入代码阶段）
 
-### M3：Redis 引入（如确实需要）
-- [ ] 写 ADR 论证必要性
-- [ ] 引入 Redis
-- [ ] `TokenRevocationStore` 迁到 Redis
-- [ ] 考虑在线用户管理 / 踢下线 / 设备管理
+### M1：V2 代码清理
 
-### M4：监控与日志
-- [ ] Actuator 端点暴露（注意安全）
-- [ ] 关键业务日志结构化
-- [ ] 考虑接入轻量监控（如 Prometheus + Grafana，视部署规模）
+- [ ] 删除 `content/` `comment/` `identity/` 三个业务模块的 `domain/` `application/` `web/`
+- [ ] 删除 CategoryEntity / TagEntity（按旧规则写，不可复用）
+- [ ] 删除 V1 marker Flyway 脚本，替换为 V1__init.sql
+- [ ] 保留 `common/`、`infrastructure/security/`、ArchUnit、Spring Security 链路
 
-### M5：CI/CD
-- [ ] GitHub Actions 跑 `mvn test`
-- [ ] PR 必须通过 ArchUnit + 单元测试
-- [ ] 可选：构建产物自动部署到测试环境
+### M2：基础设施补齐
 
-## 3. 长期（6 个月以上）
+- [ ] BaseEntity（8 列审计） / AuditOnlyBase（7 列例外）
+- [ ] AuditFieldHandler（MyBatis-Plus MetaObjectHandler）
+- [ ] Clock Bean（Asia/Tokyo）+ 启动校验
+- [ ] i18n 配置（LocaleResolver / MessageSource）
+- [ ] 更新 `application.yml`（serverTimezone=Asia/Tokyo / Jackson 时区 / Knife4j 4.x 配置）
+- [ ] ArchUnit 规则按新 6 模块（identity / content / comment / system / stats / common-infra）调整
 
-聚焦：**V1 下线 + 性能/扩展性**。
+### M3：模块重建（按新 schema）
 
-### L1：V1 完整迁移
-- [ ] 全部业务迁到 V2
-- [ ] V1 与 V2 共用数据库期间的过渡稳定
-- [ ] V1 下线计划（流量切换、回滚预案）
-- [ ] V1 代码归档（保留分支，主分支移除）
+- [ ] identity：t_user_auth / t_user_info / t_refresh_token + 双 token 流程
+- [ ] content：t_article / t_article_tag / t_category / t_tag + slug + 5 态状态机
+- [ ] comment：t_comment（含 content_md / content_html 双存）+ Resend 邮件
+- [ ] system：t_site_config / t_attachment / t_friend_link
+- [ ] stats：t_page_view / t_page_view_daily（AuditOnlyBase 例外）
+- [ ] common-infra：跨模块公共能力
 
-### L2：技术债清零
-- [ ] 全部 JdbcTemplate 替换为 MyBatis-Plus
-- [ ] 包名 v2 后缀去除（需 ADR 取代 ADR-0002）
+### M4：前端骨架
 
-### L3：性能优化
-- [ ] 评估热点查询，加索引或加缓存
-- [ ] 评估前后端分离 + CDN 静态资源
-- [ ] 考虑读写分离（视访问量）
+- [ ] frontend-user：Vue 3 + Element Plus + Pinia + TS + vue-i18n + 三语路由
+- [ ] frontend-admin：同栈 + Vditor 编辑器 + 数字卡仪表盘
+- [ ] Spotify Embed 接入（读 `t_site_config.spotify_playlist_id`）
 
-### L4：可选增强
-- [ ] 第三方登录（OAuth2）
-- [ ] IP 归属地（视隐私权衡）
-- [ ] 文章/评论全文搜索（先试 MySQL 全文索引，不够再考虑 ES）
+## 3. 长期（上线及之后）
 
-## 4. 永远不做（或需充分论证才做）
+### L1：上线准备
 
-- 拆微服务（个人博客规模不匹配）
+- [ ] CI/CD（GitHub Actions 跑 mvn test + ArchUnit）
+- [ ] 部署文档（`ops/deployment.md`）
+- [ ] 自动备份（DB dump + 文章 .md 双备份）
+- [ ] Sitemap.xml + RSS 自动生成
+- [ ] Resend / Spotify playlist 等环境变量配置
+
+### L2：上线后增量
+
+- [ ] 富文本编辑器图床抽象（本地 / 七牛 / OSS）
+- [ ] 评论 @ 回复邮件通知
+- [ ] 文章访问 TOP 10 / 活动热图
+- [ ] PASSWORD 文章访问 token 完整流程
+
+### L3：可选第三方接入（任何时刻可加，零架构债）
+
+- [ ] Umami / Plausible 自托管（嵌前端 `<script>`，不进 V2 schema）
+- [ ] IP 归属地（需第三方库 + 隐私权衡）
+
+## 4. 永远不做（除非有强需求 + ADR 论证）
+
+- 拆微服务
 - 引入复杂消息中间件
-- 多语言 / i18n（无需求）
-- 大型前后端框架重写（前端 Vue 暂稳定）
+- 大型前后端框架替换（Vue 3 + SpringBoot 3 稳定栈不动）
+- 自建 Newsletter 系统（如需走 Buttondown / Substack 嵌入）
+- 自建相册系统（V1 已删）
+- 自建音乐播放器（V1 已删，改 Spotify Embed）
 
-## 5. 里程碑节奏建议
-
-按"修历史 → 补能力 → 拓边界"循环：
-
-```
-S1 + S2 完成
-    ↓
-S3 + S4 启动
-    ↓
-M1 完成（解锁文章模块迁移）
-    ↓
-M3 完成（解锁多实例部署）
-    ↓
-L1 启动
-```
-
-## 6. 与文档的同步
+## 5. 与文档的同步
 
 每完成一个里程碑：
+
 - 更新 `status.md`
 - 涉及决策的写 ADR
 - 涉及规则变更的改 `rules/`
 - 涉及架构变更的改 `arch/`
 
-## 7. 相关文档
+## 6. 相关文档
 
 - 当前进度：`status.md`
 - 已知问题：`pitfalls.md`
-- V1 对比：`v1-vs-v2.md`
-- 操作 SOP：`workflows/`
+- V1 vs V2：`v1-vs-v2.md`
+- 文档索引：`INDEX.md`

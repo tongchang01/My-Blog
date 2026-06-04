@@ -2,7 +2,7 @@
 
 > 本文档回答："这条 SQL 该写在哪？用 BaseMapper、`@Select` 注解，还是 XML？"
 > 适用范围：V2 所有持久层代码。
-> 相关 ADR：`../decisions/0005-mybatis-plus-as-primary-orm.md`、`../decisions/0010-sql-placement-strategy.md`
+> 相关 ADR：`../decisions/0005-mybatis-plus-as-orm.md`、`../decisions/0010-sql-placement.md`
 
 ## 1. 总原则
 
@@ -25,7 +25,7 @@
 | 分页、排序、多条件组合 | **XML** | 后台管理列表尤其如此 |
 | 返回 projection DTO（不是 Entity） | **XML** | 优先 XML |
 | SQL 超过 10 行 | **XML** | 硬规则 |
-| V1 数据导入映射或过渡实现需要解释旧字段 | **XML** | 注释更易写 |
+| 含旧库兼容逻辑、需中文注释 | **XML** | 注释更易写 |
 
 ## 3. 审查口径
 
@@ -37,7 +37,7 @@
 4. 有分页排序
 5. 返回结果不是 Entity
 6. SQL 超过 10 行
-7. 需要解释 V1 字段、状态值或数据导入映射
+7. 需要解释旧库字段或状态含义
 
 ## 4. 禁止事项
 
@@ -67,9 +67,9 @@ Mapper 接口：
 
 复杂 SQL 必须写中文注释说明：
 - 服务于哪个业务场景
-- 涉及哪些 V1 表或过渡表
+- 涉及哪些旧表
 - 关键状态字段含义（如 `is_delete=0` 表示未删除）
-- 该条件是过渡实现还是 V1 数据导入映射
+- 旧库兼容条件为何存在
 - 排序规则为何这样写
 
 ## 7. 正反例

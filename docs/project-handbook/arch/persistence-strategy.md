@@ -75,14 +75,16 @@ infrastructure.persistence.CommentRepositoryImpl  (用 Mapper 实现)
 
 历史遗留：已写的 Entity 中带有"旧库兼容"注释（如 `is_review` Integer 包装），在业务清空重写时一并清理。
 
-## 8. 当前已知问题
+## 8. 旧实现盘点（不作为当前行动项）
 
-| 项 | 描述 | 状态 |
+> ⚠️ **不是 TODO**。按 `status.md` / `roadmap.md` 当前主线，DDL 冻结前**停止修旧实现**，下表只用于"DDL 冻结后清理 / 重建"时回顾。
+
+| 项 | 描述 | 处置时机 |
 |----|------|------|
-| `ContentCatalogMapper` 含 @Select 长查询 | 应迁移到 XML mapper | ⏳ 待迁移 |
-| JdbcTemplate 与 MyBatis-Plus 并存 | 风格不统一 | ⏳ 渐进替换 |
-| 尚无 `src/main/resources/mapper/` 目录 | 首个 XML mapper 落地时同步创建 | ⏳ |
-| TokenRevocationStore 是内存实现 | 多实例部署会失效 | ⏳ 后续迁 Redis |
+| `ContentCatalogMapper` 含 @Select 长查询 | 应放到 XML mapper（rules/sql-placement.md） | M3 模块重建时按新规则重写 |
+| JdbcTemplate 与 MyBatis-Plus 并存 | V1 遗留 JdbcTemplate 残留 | M1 清理时随业务层一起删除 |
+| 尚无 `src/main/resources/mapper/` 目录 | 首个 XML mapper 落地时同步创建 | M3 第一个复杂查询出现时建 |
+| `TokenRevocationStore` 是内存实现 | V2 单实例部署，进程内 Caffeine 已够用（R7 D6） | 不计划迁 Redis；多实例部署是 V3 议题 |
 
 ## 9. 相关文档
 

@@ -16,19 +16,66 @@ class FlywayMigrationTest {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    void createsV2SchemaMarkerFromMigration() {
-        Integer markerCount = jdbcTemplate.queryForObject(
-                "select count(*) from v2_schema_marker where marker_key = 'backend-v2-foundation'",
+    void createsAllV2SchemaTables() {
+        Integer tableCount = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from information_schema.tables
+                        where table_schema = 'PUBLIC'
+                          and table_name in (
+                              'T_USER_AUTH',
+                              'T_USER_INFO',
+                              'T_REFRESH_TOKEN',
+                              'T_ARTICLE',
+                              'T_ARTICLE_TAG',
+                              'T_CATEGORY',
+                              'T_TAG',
+                              'T_COMMENT',
+                              'T_SITE_CONFIG',
+                              'T_ATTACHMENT',
+                              'T_FRIEND_LINK',
+                              'T_PAGE_VIEW',
+                              'T_PAGE_VIEW_DAILY',
+                              'T_MAIL_LOG'
+                          )
+                        """,
                 Integer.class);
 
-        assertThat(markerCount).isEqualTo(1);
+        assertThat(tableCount).isEqualTo(14);
     }
 
     @Test
-    void migratesLegacyCommentTablesForTests() {
-        Integer count = jdbcTemplate.queryForObject("select count(*) from t_comment", Integer.class);
+    void insertsDefaultSiteConfigOnly() {
+        Integer siteConfigCount = jdbcTemplate.queryForObject(
+                "select count(*) from t_site_config where id = 1 and site_title_zh = 'MyBlog'",
+                Integer.class);
+        Integer userCount = jdbcTemplate.queryForObject("select count(*) from t_user_auth", Integer.class);
 
-        assertThat(count).isNotNull();
-        assertThat(count).isGreaterThanOrEqualTo(6);
+        assertThat(siteConfigCount).isEqualTo(1);
+        assertThat(userCount).isZero();
+    }
+
+    @Test
+    void createsNewCommentSchemaColumns() {
+        Integer columnCount = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from information_schema.columns
+                        where table_schema = 'PUBLIC'
+                          and table_name = 'T_COMMENT'
+                          and column_name in (
+                              'TARGET_TYPE',
+                              'TARGET_ID',
+                              'CONTENT_MD',
+                              'CONTENT_HTML',
+                              'AUDIT_STATUS',
+                              'DELETED',
+                              'DELETED_AT',
+                              'DELETED_BY'
+                          )
+                        """,
+                Integer.class);
+
+        assertThat(columnCount).isEqualTo(8);
     }
 }

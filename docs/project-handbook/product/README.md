@@ -2,7 +2,7 @@
 
 > 本目录回答："这个博客系统该做什么？哪些功能要保留 / 删除 / 新增？"
 > 性质：业务层文档，**先于代码与表结构**确定。
-> 当前状态：起步阶段，feature-inventory.md 已完成 V1 考古，待你逐条标注去/留。
+> 当前状态：feature-inventory.md ⑳ 项已全部回填决策；use-cases / business-rules / data-model 已生成，等待评审后进入 Flyway `V1__init.sql`。
 
 ## 与代码层文档的区别
 
@@ -17,10 +17,11 @@
 
 | 文件 | 内容 | 状态 |
 |------|------|------|
-| `feature-inventory.md` | V1 全部功能清单 + 去/留/待讨论标注 | ✅ 已完成 V1 考古，待人工标注 |
-| `use-cases.md` | 用户能做什么（按角色：访客、登录用户、管理员） | ⏳ 待标注完 inventory 后写 |
-| `business-rules.md` | 关键业务规则（评论审核策略、文章可见性、权限模型等） | ⏳ |
-| `data-model.md` | 业务实体与关系（领域模型，先于数据库表） | ⏳ |
+| `feature-inventory.md` | V1 全部功能清单 + 去/留/待讨论标注 | ✅ ⑳ 项已全部回填 R1-R7 决策 |
+| `use-cases.md` | 用户能做什么（按角色：GUEST / DEMO / ADMIN / 系统任务） | ✅ 已生成 |
+| `business-rules.md` | 关键业务规则（评论审核策略、文章可见性、权限模型等） | ✅ 已生成 |
+| `data-model.md` | 业务实体与关系（领域模型，先于数据库表） | ✅ 已生成 |
+| `er-diagram.md` | ER / 领域关系图（Mermaid） | ✅ 已生成 |
 | `roles-and-permissions.md` | 角色权限模型（重设计后的，简化版） | ⏳ |
 
 ## 工作顺序

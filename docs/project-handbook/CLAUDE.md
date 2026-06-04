@@ -12,10 +12,7 @@
 - **V2 前台 / 后台**：待启动；规格分别在 `frontend-user/` 和 `frontend-admin/`
 - **数据**：V2 不兼容 V1 schema（ADR-0013），一次性导入（见 `migration/`）
 
-当前阶段：**基盘收口已完成，准备进入业务规格和数据模型定稿**。
-
-- 不依赖产品规格的基盘任务可以继续推进。
-- 大规模业务迁移、schema 重写、接口契约重写，必须等 `product/feature-inventory.md` 和后续业务文档定稿后再执行。
+当前阶段：**业务规格 + Schema 设计**（DDL 冻结前停止业务层代码改动）。feature-inventory.md ⑳ 项已全部回填决策；下一步走 use-cases → business-rules → data-model → schema-design → Flyway `V1__init.sql`，详见 `status.md` / `roadmap.md`。
 
 ## 二、开始任何任务前必读
 
@@ -61,7 +58,7 @@
 
 ## 六、为什么这么定（ADR）
 
-历史决策见 `decisions/0001` ~ `decisions/0014`，覆盖：模块化单体、包名、四层架构、六大模块、MyBatis-Plus、Spring Boot 3、JWT、Hutool、springdoc、SQL 分层、中文注释、ArchUnit、**V2 不兼容 V1 数据结构（0013）、schema 重设计原则（0014）**。
+历史决策见 `decisions/0001` ~ `decisions/0018`，覆盖：模块化单体、包名、四层架构、六大模块、MyBatis-Plus、Spring Boot 3、JWT（含 R6 C1 双 token 补充）、Hutool、Knife4j 4.x（基于 springdoc-openapi）、SQL 分层、中文注释、ArchUnit、**V2 不兼容 V1 数据结构（0013）、schema 重设计原则（0014，部分被 0015 / 0018 超越）、审计列 + 软删三件套（0015）、URL id-led + slug（0016）、不使用 DB FOREIGN KEY（0017）、时区统一 Asia/Tokyo 五层（0018）**。
 
 ## 七、红线（永远不要做）
 
@@ -96,13 +93,12 @@ mvn test -Dtest=ArchitectureRulesTest       # 单跑架构守护
 mvn spring-boot:run -Dspring-boot.run.profiles=local   # 本地启动
 ```
 
-环境变量：非 local/test 环境必须设置 `MYBLOG_JWT_SECRET`（≥32 字节），缺失启动失败。local/test 使用显式测试密钥，禁止提交真实密钥。详见 `workflows/build-and-test.md`。
+环境变量：`MYBLOG_JWT_SECRET`（≥32 字节）必设，缺失启动失败。详见 `workflows/build-and-test.md`。
 
 ## 十、当前焦点
 
-- **进行中**：长期文档入口已迁入 `docs/project-handbook/`，下一步聚焦业务规格梳理
-- **下一步**：标注 `product/feature-inventory.md` 的【V2 决定】列
-- **后续**：`product/use-cases.md` → `product/business-rules.md` → `product/data-model.md` → `arch/schema-design.md` → `api-contract/` → V2 三端实现
+- **进行中**：业务规格梳理 — 用户正在标注 `product/feature-inventory.md` 的【V2 决定】列
+- **下一步**（用户标注完成后）：`product/use-cases.md` → `product/data-model.md` → `arch/schema-design.md` → V2 后端业务代码重写
 - **并行待启动**：`api-contract/` 接口契约、`frontend-user/` 与 `frontend-admin/` 规格
 
 ## 十一、文档地图

@@ -2,22 +2,26 @@
 
 > 本文档回答："V2 代码该放在哪个包？层与层之间能不能直接调？"
 > 适用范围：`MyBlog-springboot-v2/` 所有 Java 代码。
-> 相关 ADR：`../decisions/0002-package-base-com-tyb-myblog-v2.md`、`0003-four-layer-architecture.md`、`0004-six-business-modules.md`、`0012-archunit-guards.md`
+> 相关 ADR：`../decisions/0002-package-base-com-tyb-myblog-v2.md`、`0003-four-layer-architecture.md`、`0004-six-business-modules.md`（**R5 修订**）、`0012-archunit-guards.md`
 
 ## 1. 基础包名
 
 固定为 `com.tyb.myblog.v2`，不再使用旧的 `com.aurora.myblog.v2`。
 
-## 2. 顶层包结构（六大模块）
+## 2. 顶层包结构（六大模块，R5 修订）
 
 | 包 | 类型 | 职责 |
 |----|------|------|
-| `common` | 非业务 | 全局通用：异常处理、响应模型、分页、Web 支撑、安全能力、配置属性、IP/UA 解析等 |
-| `infrastructure` | 非业务 | 全局技术基础设施：MyBatis-Plus 基础配置、数据源、事务、Flyway、全局认证适配 |
-| `identity` | 业务 | 身份、用户、角色、权限、登录、审计 |
-| `content` | 业务 | 文章、分类、标签、归档、访问控制 |
-| `comment` | 业务 | 评论、审核、恢复 |
-| `system` | 业务（预留） | 系统配置、菜单、站点参数 |
+| `common` | 非业务 | `common-infra` 一层：响应封装、异常体系、Security 链路、Knife4j、Clock、i18n、ArchUnit 规则；其下 `infrastructure/` 子包放 MyBatis-Plus / Flyway / DataSource 等数据库基础配置 |
+| `identity` | 业务 | 用户、角色、登录、JWT 签发与刷新（access 15min + refresh 7d） |
+| `content` | 业务 | 文章、分类、标签 |
+| `comment` | 业务 | 评论、留言板（复用 t_comment）、审核 |
+| `system` | 业务 | 站点配置、附件、友链申请（**不含** V1 的字典 / 后台菜单 / 操作日志） |
+| `stats` | 业务 | 访客统计（自研日聚合：t_page_view 明细 + t_page_view_daily 聚合） |
+
+> **命名说明**：文档里写的 `common-infra` 指代 `com.tyb.myblog.v2.common`（含子目录 `infrastructure`）这一整层，**不是两个顶层包**。详见 ADR-0004 R5 修订。
+
+错误码段映射：identity=10 / content=20 / comment=30 / system=40 / stats=50 / common-infra=90 / 兜底=99。
 
 ## 3. 业务模块内部统一四层
 
@@ -48,20 +52,20 @@
 ### 4.3 domain 层（最严格）
 
 - **允许**：领域对象、领域枚举、业务规则、状态流转判断、领域服务、不依赖技术框架的策略
-- **禁止**：依赖 Spring Web / MyBatis-Plus / JdbcTemplate / 数据库 Entity；读 HTTP Header；返回 HTTP Response；调外部 SDK
+- **禁止**：依赖 Spring Web / MyBatis-Plus / JdbcTemplate / 数据库 Entity；读 HTTP Header；返回 HTTP Response；调外部 SDK；直接 `LocalDateTime.now()` / `new Date()`（必须用注入的 `Clock`，ADR-0018 / R-011）
 - **依赖方向**：`domain` 不依赖 `web/application/infrastructure`
 
 ### 4.4 infrastructure 层
 
-- **允许**：MyBatis-Plus Entity、Mapper、XML、Repository 实现、Reader/Writer/Gateway 数据库实现、V1 数据导入映射、外部服务适配
+- **允许**：MyBatis-Plus Entity、Mapper、XML、Repository 实现、Reader/Writer/Gateway 数据库实现、外部服务适配
 - **禁止**：写 Controller、定义业务规则、让其它模块直接访问本模块 Mapper、把 Entity 泄漏到 web 层
+- **禁止**：Flyway 脚本里出现 `FOREIGN KEY`（ADR-0017 / R-012）
 
-### 4.5 common 与顶层 infrastructure
+### 4.5 common-infra（`com.tyb.myblog.v2.common`）
 
-- **common 允许**：全局异常处理、统一响应、分页、Web 支撑、安全能力、配置属性、跨模块基础工具
-- **common 禁止**：任何业务模块的私有逻辑、只被一个模块使用的 DTO、数据库 Entity、MyBatis-Plus Mapper、具体外部服务实现
-- **顶层 infrastructure 允许**：全局认证适配、全局数据库配置、MyBatis-Plus 基础配置、springdoc 配置、Flyway、数据源、事务配置
-- **顶层 infrastructure 禁止**：业务模块私有 Mapper / Entity、Controller、业务规则
+- **允许**：全局异常处理、统一响应、分页、Web 支撑、Security 链路、Clock Bean、i18n、Knife4j / springdoc 配置、跨模块基础工具；`common/infrastructure/` 子包放 MyBatis-Plus 配置、数据源、事务、Flyway 配置
+- **禁止**：任何业务模块的私有逻辑、只被一个模块使用的 DTO、数据库 Entity、业务 Mapper、具体外部服务实现
+- **禁止反向依赖**：`common` 不依赖任何业务模块（ArchUnit 规则 #4）
 
 ## 5. 跨模块协作规则
 
@@ -69,6 +73,7 @@
 
 ```
 ✅ comment.application → content.application.ArticleVisibilityService
+✅ stats.application → content.application.ArticleQueryService（聚合时反查文章标题）
 ❌ comment.infrastructure → content.infrastructure.persistence.mapper.ArticleMapper
 ```
 
@@ -78,19 +83,28 @@
 - `common` 反向依赖任一业务模块
 - 业务模块之间共享 Entity
 
+常见跨模块关系（见 `arch/module-map.md` §4 完整表）：
+
+| 调用方 | 被调方 | 典型场景 |
+|--------|--------|----------|
+| `comment` | `identity` | 评论展示用户名/头像 |
+| `comment` | `content` | 校验文章存在 |
+| `content` | `system` | 校验封面 attachment 存在 |
+| `stats` | `content` / `identity` | 聚合时按文章 id 反查标题 |
+
 ## 6. ArchUnit 守护（自动校验）
 
-测试文件：`src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`
+测试文件：`src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`（DDL 冻结后按 R5 模块清单重写）。
 
-强制以下规则：
-1. `..domain..` 不依赖 `..web..`
-2. `..domain..` 不依赖 `..infrastructure..`
-3. `..web..` 不访问 `..infrastructure.persistence.mapper..`
-4. `..application..` 不直接访问 MyBatis-Plus Mapper
-5. `..common..` 不依赖 `..identity..` `..content..` `..comment..` `..system..`
-6. 业务模块不能直接访问其它业务模块的 `infrastructure.persistence`
-7. 业务模块不依赖 `common.security` 的具体实现
-8. `common` 不反向依赖任何业务模块
+| # | 规则 |
+|---|------|
+| 1 | `..domain..` 不依赖 `..web..` / `..infrastructure..` |
+| 2 | `..web..` 不访问 `..infrastructure.persistence.mapper..` |
+| 3 | `..application..` 不直接访问 MyBatis-Plus Mapper |
+| 4 | `..common..` 不依赖业务模块 |
+| 5 | 业务模块不互相访问对方 `infrastructure.persistence` |
+| 6 | `..domain..` 不直接 `LocalDateTime.now()` / `new Date()`（必须用注入的 Clock，ADR-0018 / R-011） |
+| 7 | Flyway 脚本不出现 `FOREIGN KEY`（ADR-0017 / R-012，由 Flyway review 守护，非 ArchUnit）|
 
 违反任一规则，`mvn test` 直接失败。**新增模块务必同步更新 ArchUnit 规则**。
 
@@ -108,4 +122,4 @@
 ## 8. 例外
 
 - 跨模块协作必须通过 `application` 服务接口；如有特殊场景需要例外，先写 ADR 评估后再实施
-- 顶层 `common` 与 `infrastructure` 可被任何业务模块依赖，但不能反向依赖业务模块
+- `common-infra` 可被任何业务模块依赖，但不能反向依赖业务模块
