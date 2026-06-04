@@ -30,7 +30,7 @@ CREATE TABLE t_xxx_yyy (
     -- 审计 8 列
     created_at      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP                       COMMENT '创建时间',
     created_by      BIGINT      NULL                                                     COMMENT '创建者 t_user_auth.id（游客 NULL）',
-    updated_at      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '最后修改时间',
+    updated_at      DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP                       COMMENT '最后修改时间',
     updated_by      BIGINT      NULL                                                     COMMENT '最后修改者',
     deleted         TINYINT     NOT NULL DEFAULT 0                                       COMMENT '软删标记（0=正常 1=已删，配 @TableLogic）',
     deleted_at      DATETIME    NULL                                                     COMMENT '删除时间',
@@ -45,6 +45,7 @@ CREATE TABLE t_xxx_yyy (
 
 - 🔴 **不**写 `AUTO_INCREMENT`（id 由应用层 ASSIGN_ID 生成）；唯一例外：日志型 append-only 表 `t_page_view` / `t_mail_log`（ADR-0015 §6）。`t_page_view_daily` 是复合 PK 例外，无独立 `id`
 - 🔴 时间列**只**用 `DATETIME`，不用 `TIMESTAMP`（ADR-0015 §1 / ADR-0018）
+- 🔴 不写 `ON UPDATE`，`updated_at` 由 `AuditFieldHandler` 在应用层填充，避免 DB 自动更新和应用层审计双写
 - 🔴 软删用三件套 `deleted` + `deleted_at` + `deleted_by`，不用 V1 的 `is_delete` 单列
 - 🔴 审计列用 `created_at` / `updated_at` / `deleted_at`（后缀 `_at`），不用 V1 的 `create_time` / `update_time`
 - 🔴 不写 `FOREIGN KEY`，仅建普通索引 `KEY idx_xxx`（ADR-0017 / R-012）

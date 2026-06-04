@@ -1,7 +1,7 @@
-# Schema 设计（V2 DDL 草案）
+# Schema 设计（V2 DDL）
 
 > 本文档回答："V2 的物理表 schema 长什么样？DDL 在哪里？"
-> 状态：📝 **DDL 草案（R1–R8 决策合并版）**，已产出并烟测通过 `Flyway V1__init.sql`，待人工评审后冻结。
+> 状态：✅ **DDL 已冻结（R1–R8 决策合并版）**，已产出并烟测通过 `Flyway V1__init.sql`。后续 schema 变更另起 `V2__xxx.sql` / `V3__xxx.sql`，不再修改 V1。
 > 权威源：所有字段、索引、约束追溯到 `product/decisions-draft.md` R1–R8 + `decisions/` ADR-0014/0015/0017/0018。
 
 ## 一、横切约束（写 DDL 前必读）
@@ -157,7 +157,7 @@ CREATE TABLE `t_article` (
   `slug`                  VARCHAR(160)  NULL     DEFAULT NULL             COMMENT 'URL 别名 a-z 0-9 - ；不强制唯一',
   `status`                TINYINT       NOT NULL                          COMMENT '1=DRAFT 2=PUBLISHED 3=PRIVATE 4=PASSWORD 5=SCHEDULED',
   `access_password`       VARCHAR(255)  NULL     DEFAULT NULL             COMMENT 'PASSWORD 状态用，BCrypt 哈希',
-  `publish_at`            DATETIME      NULL     DEFAULT NULL             COMMENT 'SCHEDULED 状态用',
+  `publish_at`            DATETIME      NULL     DEFAULT NULL             COMMENT '公开发布时间；PUBLISHED/PASSWORD 为首次公开时间，SCHEDULED 为预定公开时间',
   `cover_attachment_id`   BIGINT        NULL     DEFAULT NULL             COMMENT '逻辑引用 t_attachment.id',
   `comment_count`         INT           NOT NULL DEFAULT 0                COMMENT '冗余：target_type=ARTICLE AND target_id=本文 AND deleted=0 AND audit_status=PASS 的评论数',
   `created_at`            DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -328,7 +328,7 @@ CREATE TABLE `t_attachment` (
   `width`               INT           NULL     DEFAULT NULL             COMMENT '仅图片',
   `height`              INT           NULL     DEFAULT NULL             COMMENT '仅图片',
   `original_filename`   VARCHAR(255)  NULL     DEFAULT NULL             COMMENT '原始文件名',
-  `hash_sha256`         VARCHAR(64)   NULL     DEFAULT NULL             COMMENT 'SHA-256，用于去重',
+  `hash_sha256`         VARCHAR(64)   NOT NULL                          COMMENT 'SHA-256，用于去重',
   `created_at`          DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
   `created_by`          BIGINT        NULL     DEFAULT NULL             COMMENT '创建者 user_id',
   `updated_at`          DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '最后修改时间',

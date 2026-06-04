@@ -36,7 +36,7 @@ ADR-0014 给出了 schema 重设计的总原则，但在以下几点早期决定
 | `id` | BIGINT | NOT NULL | （无默认，MyBatis-Plus `IdType.ASSIGN_ID` 雪花生成；日志型例外见 §6） | 主键 |
 | `created_at` | DATETIME | NOT NULL | CURRENT_TIMESTAMP | 创建时间 |
 | `created_by` | BIGINT | NULL | NULL | 创建者 `t_user_auth.id`（游客 NULL） |
-| `updated_at` | DATETIME | NOT NULL | CURRENT_TIMESTAMP ON UPDATE | 最后修改时间 |
+| `updated_at` | DATETIME | NOT NULL | CURRENT_TIMESTAMP | 最后修改时间；由 `AuditFieldHandler` 在应用层更新，不使用 DB `ON UPDATE` |
 | `updated_by` | BIGINT | NULL | NULL | 最后修改者 |
 | `deleted` | TINYINT | NOT NULL | 0 | 软删标记（0=正常 1=已删） |
 | `deleted_at` | DATETIME | NULL | NULL | 删除时间 |

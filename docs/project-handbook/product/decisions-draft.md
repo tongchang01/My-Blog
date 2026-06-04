@@ -322,7 +322,7 @@ Sitemap: https://blog.example.com/sitemap.xml
 
 配套字段：
 - `t_article.access_password VARCHAR(255) NULL`（BCrypt 哈希，PASSWORD 用）
-- `t_article.publish_at DATETIME NULL`（SCHEDULED 用）
+- `t_article.publish_at DATETIME NULL`（公开发布时间；PUBLISHED / PASSWORD 为首次公开时间，SCHEDULED 为预定公开时间）
 
 **PASSWORD 校验流程**（关键）：
 
@@ -359,9 +359,9 @@ WHERE status = 5
 | 状态 | title_zh / summary_zh | title_ja/en / summary_ja/en | body | category_id | slug | access_password | publish_at |
 |---|---|---|---|---|---|---|---|
 | DRAFT | 可空 | 可空 | 可空 | 可空 | 可空 | 忽略 | 忽略 |
-| PUBLISHED | **必填** | 可空（缺失 fallback 到 zh） | 必填 | 必填 | 可空 | 忽略并清空 | 忽略并清空 |
+| PUBLISHED | **必填** | 可空（缺失 fallback 到 zh） | 必填 | 必填 | 可空 | 忽略并清空 | **必填；为空时保存为当前 JST 时间** |
 | PRIVATE | **必填** | 可空（fallback） | 必填 | 必填 | 可空 | 忽略并清空 | 忽略并清空 |
-| PASSWORD | **必填** | 可空（fallback） | 必填 | 必填 | 可空 | **必填**（BCrypt 哈希后存） | 忽略并清空 |
+| PASSWORD | **必填** | 可空（fallback） | 必填 | 必填 | 可空 | **必填**（BCrypt 哈希后存） | **必填；为空时保存为当前 JST 时间** |
 | SCHEDULED | **必填** | 可空（fallback） | 必填 | 必填 | 可空 | 忽略并清空 | **必填且 > 当前 JST 时间** |
 
 **i18n fallback 规则**：
@@ -369,6 +369,8 @@ WHERE status = 5
 - 前端按访问路径 `/ja/` 或 `/en/` 取对应字段，**取不到则 fallback 到 zh**
 - 非中文页面 fallback 到中文标题/摘要时，前端在标题附近显示小提示："本文主要以中文写作"（与 R2 产品定位声明一致）
 - 重点文章作者可手动补三语，普通文章中文一把过即可，降低发布门槛
+
+`publish_at` 不参与 PUBLISHED / PASSWORD 的可见性判断，但用于归档、Sitemap、RSS、后台"本月发布"等统计口径。SCHEDULED 到点转 PUBLISHED 后保留原 `publish_at`，不改成任务执行时间。
 
 特别防止：PASSWORD 没密码 / SCHEDULED 没 publish_at / PUBLISHED 中文标题或正文为空 / publish_at 已过期还存 SCHEDULED。
 
@@ -559,7 +561,7 @@ t_attachment:
   width             INT          NULL        -- 仅图片
   height            INT          NULL        -- 仅图片
   original_filename VARCHAR(255) NULL
-  hash_sha256       VARCHAR(64)  NULL        -- 去重 + 完整性校验
+  hash_sha256       VARCHAR(64)  NOT NULL    -- 去重 + 完整性校验
   -- 审计 8 列
   UNIQUE KEY uk_hash (hash_sha256)
   INDEX idx_storage_key (storage_type, object_key)
@@ -912,7 +914,7 @@ V2 所有时间相关处理统一 **Asia/Tokyo（UTC+9）**：
 | `id` | BIGINT | NOT NULL | （MyBatis-Plus `IdType.ASSIGN_ID` 雪花生成；日志型例外可保留 DB AUTO_INCREMENT） | 主键 |
 | `created_at` | DATETIME | NOT NULL | CURRENT_TIMESTAMP | 创建时间 |
 | `created_by` | BIGINT | NULL | NULL | 创建者 `t_user_auth.id`（游客 NULL） |
-| `updated_at` | DATETIME | NOT NULL | CURRENT_TIMESTAMP ON UPDATE | 最后修改时间 |
+| `updated_at` | DATETIME | NOT NULL | CURRENT_TIMESTAMP | 最后修改时间；由 `AuditFieldHandler` 在应用层更新，不使用 DB `ON UPDATE` |
 | `updated_by` | BIGINT | NULL | NULL | 最后修改者 |
 | `deleted` | TINYINT | NOT NULL | 0 | 软删标记（0=正常 1=已删） |
 | `deleted_at` | DATETIME | NULL | NULL | 删除时间 |
