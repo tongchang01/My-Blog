@@ -44,6 +44,10 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 
 ## 3. PR / 提交前 Checklist
 
+- [ ] 当前提交只完成一个明确目的，没有混入下一阶段或无关模块
+- [ ] 已检查 `git status --short` 和 `git diff --stat`
+- [ ] 变更文件过多时已继续拆分；不可再拆的批量机械变更已提前说明
+- [ ] Git 提交信息使用中文，并准确描述本次提交
 - [ ] `mvn clean test` 全过
 - [ ] ArchitectureRulesTest 通过
 - [ ] 新增/修改的逻辑有对应测试
