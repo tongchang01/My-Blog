@@ -1,15 +1,17 @@
 package com.tyb.myblog.v2.common.security;
 
+import com.tyb.myblog.v2.common.security.auth.JwtTokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import java.util.List;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -21,26 +23,13 @@ class SecurityConfigTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private JwtTokenService tokenService;
+
     @Test
     void permitsOnlyConfiguredPublicProbe() throws Exception {
         mockMvc.perform(get("/api/public/security-probe"))
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    void permitsAnonymousGetComments() throws Exception {
-        mockMvc.perform(get("/api/comments?type=1&topicId=1&page=1&size=10"))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void rejectsAnonymousPostComments() throws Exception {
-        mockMvc.perform(post("/api/comments")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"type":1,"topicId":1,"content":"匿名评论"}
-                                """))
-                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -57,16 +46,9 @@ class SecurityConfigTest {
 
     @Test
     void returnsForbiddenWhenRoleIsInsufficient() throws Exception {
-        String response = mockMvc.perform(post("/api/auth/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                {"username":"user@163.com","password":"password123"}
-                                """))
-                .andExpect(status().isOk())
-                .andReturn()
-                .getResponse()
-                .getContentAsString();
-        String token = com.jayway.jsonpath.JsonPath.read(response, "$.data.accessToken");
+        String token = tokenService
+                .issueAccessToken("user-1", "demo@example.com", List.of("DEMO"))
+                .accessToken();
 
         mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden())

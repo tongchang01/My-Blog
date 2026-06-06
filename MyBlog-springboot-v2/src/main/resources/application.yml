@@ -27,27 +27,3 @@ myblog:
     public-endpoints:
       - method: GET
         path: /actuator/health
-      - method: POST
-        path: /api/auth/login
-      - method: GET
-        path: /api/categories
-      - method: GET
-        path: /api/tags
-      - method: GET
-        path: /api/tags/top
-      - method: GET
-        path: /api/articles
-      - method: GET
-        path: /api/articles/*
-      - method: POST
-        path: /api/articles/*/access
-      - method: GET
-        path: /api/categories/*/articles
-      - method: GET
-        path: /api/tags/*/articles
-      - method: GET
-        path: /api/comments
-      - method: GET
-        path: /api/comments/*/replies
-      - method: GET
-        path: /api/comments/top

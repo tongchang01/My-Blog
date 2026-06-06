@@ -29,9 +29,8 @@ class BackendPropertiesTest {
                 .extracting(
                         SecurityPublicEndpointProperties.PublicEndpoint::method,
                         SecurityPublicEndpointProperties.PublicEndpoint::path)
-                .contains(
+                .containsExactly(
                         tuple("GET", "/actuator/health"),
-                        tuple("GET", "/api/public/security-probe"),
-                        tuple("POST", "/api/auth/login"));
+                        tuple("GET", "/api/public/security-probe"));
     }
 }

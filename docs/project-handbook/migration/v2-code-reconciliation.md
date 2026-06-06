@@ -2,16 +2,37 @@
 name: V2 代码留删计划
 description: schema 冻结后，对 MyBlog-springboot-v2 现有源码逐文件给出留 / 改 / 删决策
 type: project
-status: draft
+status: completed
 date: 2026-06-04
 ---
 
 # V2 代码留删计划
 
+## 执行结果（2026-06-06）
+
+M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽然名称仍有参考价值，但方法签名和依赖类型绑定旧 schema：使用 `String/int` ID、旧文章置顶/推荐字段、旧评论五类型、`is_review/is_delete` 等。原样保留会把旧模型带入重建阶段，因此本次删除 identity / content / comment 的全部旧业务源码，后续按冻结模型重新定义端口。
+
+已保留：
+
+- `common/` 横切能力
+- Spring Security / JWT 访问 token 链路
+- ArchUnit 架构测试
+- Flyway `V1__init.sql` 与迁移测试
+
+已删除：
+
+- identity / content / comment 的 domain / application / web / infrastructure
+- 依赖旧 identity application 的 `JwtAuthTokenServiceAdapter`
+- 旧 Mapper XML 和全部旧业务测试
+- `hutool-all`
+- 已不存在业务端点的公开白名单
+
+验证：`mvn clean test` 通过，46 tests，0 failures。
+
 > **触发原因**：`arch/schema-design.md` + `MyBlog-springboot-v2/src/main/resources/db/migration/V1__init.sql` 已形成 14 张表的新 schema 草案，与现有 v2 工程基于旧 schema 假设写的代码字段级冲突。
 > **决策原则**：
 > 1. **横切组件（common/）默认留**，与 schema 解耦；只在与 R6 C1 双 token 等新决策不一致处增量改
-> 2. **业务模块 domain 端口接口默认留**（hexagonal 架构的端口稳定，实现可换），实体/Mapper/XML/Controller/DTO 删重写
+> 2. **业务模块 domain 端口只保留概念，不保留旧源码**：逐文件审计确认旧端口签名已绑定旧 schema，后续按冻结模型重新定义
 > 3. **违反 pitfalls 红线的依赖**（hutool-all）无条件删
 > 4. **测试代码跟随被测对象**：被测对象重写则测试重写
 > 5. ArchUnit 等架构测试与 schema 无关，**全留**

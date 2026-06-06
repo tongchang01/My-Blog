@@ -10,10 +10,10 @@
 
 **从现在开始，不再修改 Flyway V1__init.sql；后续 schema 变更走 V2__xxx.sql / V3__xxx.sql。**
 
-代码阶段的推进原则：
+M1 旧代码清理已经完成，当前进入 M2 基础设施补齐。代码阶段的推进原则：
 
-- 先按 `migration/v2-code-reconciliation.md` 清理旧业务实现
 - 保留 `common/`、Security、ArchUnit 等横切能力
+- 先补齐审计、时间、i18n、配置与新模块架构守护
 - 再按冻结后的 14 张表 schema 重建业务模块
 
 允许做的：V2 代码清理 / 基础设施补齐 / 按新 schema 重建业务模块 / 配套测试。
@@ -32,23 +32,24 @@
 | `product/use-cases.md` / `product/data-model.md` / `product/business-rules.md` / `product/er-diagram.md` | ✅ 已生成                                                        |
 | Codex review 反馈消化                                                                                        | ✅ P0/P1/P2 已处理                                               |
 
-## 2. V2 后端代码现状（只读盘点）
+## 2. V2 后端代码现状
 
-详见 `MIGRATION-STATUS.md`（待更新）。摘要：
+详见 `migration/v2-code-reconciliation.md`。摘要：
 
 - 包结构 `com.tyb.myblog.v2` 符合 ADR-0002
-- 已写：`common/`（错误码 / 响应包装 / Security 链路 / Exception handler / ArchUnit）、`infrastructure/security/`、CategoryEntity / TagEntity、6 个 Controller 骨架
-- 未写：BaseEntity / AuditFieldHandler / Clock Bean / i18n 配置 / 14 张表 Flyway 初始化脚本 / 核心实体（Article / Comment / User 等）
-- 与新决策冲突：`is_delete` 单列软删（→需改三件套）、USER/ADMIN 二态（→需改 ADMIN/DEMO/GUEST）、AUTO_INCREMENT 主键（→需改 ASSIGN_ID）
+- 已保留：`common/`（错误码 / 响应包装 / Security 链路 / Exception handler）、ArchUnit、Spring Security、Flyway V1__init.sql
+- 已删除：identity / content / comment 的旧 domain / application / web / infrastructure、旧 Mapper XML、业务测试、CategoryEntity / TagEntity、动态菜单与配置式账号实现
+- 已删除：`hutool-all`；公开接口白名单已移除不存在的旧业务路径
+- 未写：BaseEntity / AuditOnlyBase / AuditFieldHandler / Clock Bean / i18n 配置 / 核心实体与 Mapper
+- 清理后基线：`mvn clean test` 通过（46 tests，0 failures）
 
-**处置方案**：DDL 冻结后清掉业务层（content / comment / identity 三个模块的 domain/application/web），保留基础设施层（common / Security / ArchUnit），再按新 schema 长出新业务代码。
+**当前处置方案**：先完成 M2 基础设施，再按 identity → system → content → comment → stats / common-infra 顺序重建。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. V2 后端代码清理（按 `migration/v2-code-reconciliation.md`）
-2. 基础设施补齐：BaseEntity / AuditFieldHandler / Clock Bean / i18n / application.yml / ArchUnit
-3. 按模块重建：identity → system → content → comment → stats / common-infra
-4. 前台 / 后台前端骨架
+1. 基础设施补齐：BaseEntity / AuditOnlyBase / AuditFieldHandler / Clock Bean / i18n / application.yml / ArchUnit
+2. 按模块重建：identity → system → content → comment → stats / common-infra
+3. 前台 / 后台前端骨架
 
 ## 4. 相关文档
 
