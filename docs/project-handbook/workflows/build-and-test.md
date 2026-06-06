@@ -54,6 +54,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 - [ ] 注释符合 `../rules/comment-style.md`
 - [ ] 新增 API 已加 Swagger 注解
 - [ ] 涉及配置变更已在 `../arch/` 或 `../rules/` 同步
+- [ ] 新增第三方依赖有当前任务的实际使用点，没有仅为未来可能需求提前占位
 
 ## 4. 测试 Profile 行为
 

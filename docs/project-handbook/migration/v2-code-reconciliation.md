@@ -284,8 +284,11 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 | `mysql-connector-j` | 留 | |
 | `h2` | 留 | 测试用；注意 P1.1 索引命名兼容 |
 | 新增：`resend-java` 或自实现 HTTP 客户端 | **新增** | R7 D5 Resend HTTP API 邮件发送 |
-| 新增：`caffeine` | **新增** | R7 D5 进程内限流（评论 / 登录 / 文章访问 token） |
-| 新增：`commonmark-java` + `jsoup`（或 `OWASP html-sanitizer`） | **新增** | 评论 Markdown 渲染 + HTML 清洗（R-013 红线："前端只渲染 content_html"） |
+| 新增：`caffeine` | **按需新增** | identity 实现登录限流时引入，不在基础设施阶段提前占位 |
+| 新增：`commonmark-java` + `OWASP html-sanitizer` | **按需新增** | comment 实现 Markdown 渲染 + HTML 清洗时引入（R-013 红线："前端只渲染 content_html"） |
+| 新增：`mapstruct` | **按需新增** | 首个 DTO / Entity 转换落地时引入，统一使用编译期类型安全映射 |
+| 新增：`testcontainers-mysql` | **按需新增** | 首个 Mapper 集成测试落地时引入，用真实 MySQL 补充 H2 方言验证；执行环境需要 Docker |
+| 新增：`maven-enforcer-plugin` | **M2 收尾评估** | 用于锁定 Java / Maven 版本和依赖收敛，不在尚无规则配置时提前启用 |
 
 ### 配置文件
 
@@ -301,7 +304,7 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 
 1. **第 1 步：基础设施先行**（解锁后续）
    - 修复 P1.1（索引命名）→ 把 `docs/sql/V1__init.sql` 拷成 `src/main/resources/db/migration/V1__create_v2_schema_marker.sql`（删 DROP），删 test V2 fixture
-   - 删 `hutool-all`，加 `caffeine` / `commonmark-java` / `jsoup` 等
+   - 删 `hutool-all`；第三方工具依赖在首个实际使用任务中单独引入、测试和提交
    - `application*.yml` 配置项扩展
    - 跑 `MyBlogV2ApplicationTest` + `FlywayMigrationTest` 确保启动 & schema 加载
 
