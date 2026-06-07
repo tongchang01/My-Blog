@@ -149,3 +149,11 @@ public Comment save(Comment comment) {
 | infrastructure | `@SpringBootTest` + H2 |
 
 详见 `../rules/testing-policy.md`。
+
+## 8. 服务端消息语言
+
+- `LocaleResolver` 读取请求 `Accept-Language`，支持 `zh-CN`、`ja`、`en`
+- 缺少请求头或请求语言不受支持时回退 `zh-CN`
+- `MessageSource` 只负责错误、校验和邮件等服务端消息
+- 文章、分类、标签等业务内容语言仍由 `/{lang}/` 接口路径决定，不依赖全局 Locale
+- 前端按钮、菜单等 UI 文案由 `vue-i18n` 管理，不放入后端消息资源
