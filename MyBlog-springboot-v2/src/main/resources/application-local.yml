@@ -7,6 +7,15 @@ spring:
   flyway:
     enabled: false
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
+knife4j:
+  enable: true
+
 myblog:
   cors:
     allowed-origins:
@@ -22,3 +31,11 @@ myblog:
         path: /actuator/health
       - method: GET
         path: /api/public/security-probe
+      - method: GET
+        path: /doc.html
+      - method: GET
+        path: /webjars/**
+      - method: GET
+        path: /v3/api-docs/**
+      - method: GET
+        path: /swagger-ui/**

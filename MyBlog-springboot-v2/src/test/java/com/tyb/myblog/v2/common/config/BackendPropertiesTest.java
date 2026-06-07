@@ -31,6 +31,10 @@ class BackendPropertiesTest {
                         SecurityPublicEndpointProperties.PublicEndpoint::path)
                 .containsExactly(
                         tuple("GET", "/actuator/health"),
-                        tuple("GET", "/api/public/security-probe"));
+                        tuple("GET", "/api/public/security-probe"),
+                        tuple("GET", "/doc.html"),
+                        tuple("GET", "/webjars/**"),
+                        tuple("GET", "/v3/api-docs/**"),
+                        tuple("GET", "/swagger-ui/**"));
     }
 }

@@ -3,6 +3,20 @@ spring:
     name: myblog-v2
   profiles:
     default: local
+  jackson:
+    time-zone: Asia/Tokyo
+    date-format: yyyy-MM-dd'T'HH:mm:ss
+    serialization:
+      write-dates-as-timestamps: false
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+knife4j:
+  enable: false
 
 management:
   endpoints:
