@@ -150,10 +150,10 @@ public Comment save(Comment comment) {
 
 详见 `../rules/testing-policy.md`。
 
-## 8. 服务端消息语言
+## 8. API 错误消息边界
 
-- `LocaleResolver` 读取请求 `Accept-Language`，支持 `zh-CN`、`ja`、`en`
-- 缺少请求头或请求语言不受支持时回退 `zh-CN`
-- `MessageSource` 只负责错误、校验和邮件等服务端消息
-- 文章、分类、标签等业务内容语言仍由 `/{lang}/` 接口路径决定，不依赖全局 Locale
-- 前端按钮、菜单等 UI 文案由 `vue-i18n` 管理，不放入后端消息资源
+- 后端返回稳定的 5 位 `code`，前端以 `code` 作为错误类型判断依据
+- `ApiErrorCode` 统一维护 HTTP 状态与中文兜底消息
+- 前端面向用户的中、日、英提示由 `vue-i18n` 根据 `code` 生成，不直接依赖后端 `msg`
+- 后端不维护通用 API 错误多语言资源，避免同一文案在前后端重复维护
+- 文章、分类、标签等业务内容语言仍由 `/{lang}/` 接口路径和数据库三语字段决定

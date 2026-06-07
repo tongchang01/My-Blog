@@ -30,10 +30,10 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse<Void>> handleApiException(ApiException exception) {
         // 5xx 错误统一隐藏原始消息，避免把内部实现细节返回给前端。
         String message = exception.code().status().is5xxServerError()
-                ? "internal server error"
+                ? exception.code().defaultMessage()
                 : exception.getMessage();
         return ResponseEntity.status(exception.code().status())
-                .body(ApiResponse.fail(exception.code().name(), message));
+                .body(ApiResponse.fail(exception.code().code(), message));
     }
 
     /**
@@ -49,7 +49,7 @@ public class GlobalExceptionHandler {
                 .map(fieldError -> fieldError.getDefaultMessage())
                 .orElse("request validation failed");
         return ResponseEntity.badRequest()
-                .body(ApiResponse.fail(ApiErrorCode.VALIDATION_ERROR.name(), message));
+                .body(ApiResponse.fail(ApiErrorCode.VALIDATION_ERROR.code(), message));
     }
 
     /**
@@ -61,7 +61,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ApiResponse<Void>> handleUnreadableMessageException(HttpMessageNotReadableException exception) {
         return ResponseEntity.badRequest()
-                .body(ApiResponse.fail(ApiErrorCode.VALIDATION_ERROR.name(), "malformed request body"));
+                .body(ApiResponse.fail(ApiErrorCode.VALIDATION_ERROR.code(), "请求体格式错误"));
     }
 
     /**
@@ -74,6 +74,8 @@ public class GlobalExceptionHandler {
     ResponseEntity<ApiResponse<Void>> handleUnexpectedException(Exception exception) {
         log.error("Unhandled API exception", exception);
         return ResponseEntity.internalServerError()
-                .body(ApiResponse.fail(ApiErrorCode.INTERNAL_ERROR.name(), "internal server error"));
+                .body(ApiResponse.fail(
+                        ApiErrorCode.INTERNAL_ERROR.code(),
+                        ApiErrorCode.INTERNAL_ERROR.defaultMessage()));
     }
 }

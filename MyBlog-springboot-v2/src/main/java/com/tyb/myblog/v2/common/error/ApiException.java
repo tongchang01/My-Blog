@@ -14,6 +14,15 @@ public class ApiException extends RuntimeException {
     private final ApiErrorCode code;
 
     /**
+     * 使用错误码的中文默认消息创建业务异常。
+     *
+     * @param code 错误码
+     */
+    public ApiException(ApiErrorCode code) {
+        this(code, code.defaultMessage());
+    }
+
+    /**
      * 创建业务异常。
      *
      * @param code    错误码

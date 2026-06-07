@@ -38,7 +38,7 @@ class GlobalExceptionHandlerTest {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.code").value("90001"))
                 .andExpect(jsonPath("$.message").value("title must not be blank"));
     }
 
@@ -51,8 +51,8 @@ class GlobalExceptionHandlerTest {
                                 """))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
-                .andExpect(jsonPath("$.message").value("malformed request body"));
+                .andExpect(jsonPath("$.code").value("90001"))
+                .andExpect(jsonPath("$.message").value("请求体格式错误"));
     }
 
     @Test
@@ -60,8 +60,8 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(post("/api/test/errors/business"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.code").value("CONFLICT"))
-                .andExpect(jsonPath("$.message").value("duplicate title"));
+                .andExpect(jsonPath("$.code").value("90004"))
+                .andExpect(jsonPath("$.message").value("标题重复"));
     }
 
     @Test
@@ -69,8 +69,8 @@ class GlobalExceptionHandlerTest {
         mockMvc.perform(post("/api/test/errors/internal"))
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.code").value("INTERNAL_ERROR"))
-                .andExpect(jsonPath("$.message").value("internal server error"));
+                .andExpect(jsonPath("$.code").value("99999"))
+                .andExpect(jsonPath("$.message").value("系统内部错误"));
     }
 
     @RestController
@@ -82,7 +82,7 @@ class GlobalExceptionHandlerTest {
 
         @PostMapping("/api/test/errors/business")
         void conflict() {
-            throw new ApiException(ApiErrorCode.CONFLICT, "duplicate title");
+            throw new ApiException(ApiErrorCode.CONFLICT, "标题重复");
         }
 
         @PostMapping("/api/test/errors/internal")

@@ -18,6 +18,14 @@ class ApiErrorCodeTest {
     }
 
     @Test
+    void exposesStableCodeAndChineseDefaultMessage() {
+        assertThat(ApiErrorCode.VALIDATION_ERROR.code()).isEqualTo("90001");
+        assertThat(ApiErrorCode.VALIDATION_ERROR.defaultMessage()).isEqualTo("参数校验失败");
+        assertThat(ApiErrorCode.INTERNAL_ERROR.code()).isEqualTo("99999");
+        assertThat(ApiErrorCode.INTERNAL_ERROR.defaultMessage()).isEqualTo("系统内部错误");
+    }
+
+    @Test
     void doesNotKeepAmbiguousUnauthorizedErrorCode() {
         assertThat(Arrays.stream(ApiErrorCode.values()).map(Enum::name))
                 .doesNotContain("UNAUTHORIZED");
