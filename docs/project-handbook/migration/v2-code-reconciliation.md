@@ -288,7 +288,7 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 | 新增：`commonmark-java` + `OWASP html-sanitizer` | **按需新增** | comment 实现 Markdown 渲染 + HTML 清洗时引入（R-013 红线："前端只渲染 content_html"） |
 | 新增：`mapstruct` | **按需新增** | 首个 DTO / Entity 转换落地时引入，统一使用编译期类型安全映射 |
 | 新增：`testcontainers-mysql` | **按需新增** | 首个 Mapper 集成测试落地时引入，用真实 MySQL 补充 H2 方言验证；执行环境需要 Docker |
-| 新增：`maven-enforcer-plugin` | **M2 收尾评估** | 用于锁定 Java / Maven 版本和依赖收敛，不在尚无规则配置时提前启用 |
+| 新增：`maven-enforcer-plugin` 3.6.3 | **已启用** | 锁定 Java 17 / Maven 3.9.x，并用 `dependencyConvergence` 检查依赖收敛 |
 
 ### 配置文件
 

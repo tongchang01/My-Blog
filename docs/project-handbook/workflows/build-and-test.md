@@ -4,8 +4,8 @@
 
 ## 1. 环境准备
 
-- JDK 17+（必须）
-- Maven 3.8+
+- JDK 17（Enforcer 拒绝其它大版本）
+- Maven 3.9.x（Enforcer 暂不接受 Maven 4）
 - 本地 MySQL（开发用，可选；测试不需要）
 - 环境变量：
   - `MYBLOG_JWT_SECRET`（≥32 字节）— 启动必需
@@ -19,6 +19,9 @@ cd MyBlog-springboot-v2
 
 # 干净编译
 mvn clean compile
+
+# 只检查 Java / Maven 基线与依赖收敛
+mvn validate
 
 # 跑全部测试（含 ArchUnit + Flyway 迁移验证）
 mvn test
@@ -70,6 +73,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 | 报错 | 可能原因 |
 |------|----------|
 | `MYBLOG_JWT_SECRET must be set` | 未配置环境变量 |
+| Maven Enforcer 失败 | Java / Maven 版本不符合基线，或依赖树出现版本分叉 |
 | ArchitectureRulesTest 失败 | 新写代码违反层依赖规则 |
 | Flyway checksum mismatch | 已执行的迁移脚本被改动（不允许）|
 | H2 Syntax error | 写了 MySQL 专属语法，H2 不识别 |
