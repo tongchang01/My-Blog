@@ -60,12 +60,14 @@ class AuditFieldHandlerTest {
     }
 
     @Test
-    void fillsOnlyUpdatedFieldsOnUpdate() {
+    void overwritesExistingUpdatedFieldsOnUpdate() {
         authenticate("1002");
         TestEntity entity = new TestEntity();
         LocalDateTime createdAt = LocalDateTime.of(2026, 1, 1, 9, 0);
         entity.setCreatedAt(createdAt);
         entity.setCreatedBy(99L);
+        entity.setUpdatedAt(LocalDateTime.of(2026, 1, 2, 9, 0));
+        entity.setUpdatedBy(98L);
         MetaObject metaObject = SystemMetaObject.forObject(entity);
 
         handler.updateFill(metaObject);

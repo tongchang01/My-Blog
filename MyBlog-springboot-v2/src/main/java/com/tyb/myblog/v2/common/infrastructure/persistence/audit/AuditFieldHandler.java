@@ -38,9 +38,11 @@ public class AuditFieldHandler implements MetaObjectHandler {
     public void updateFill(MetaObject metaObject) {
         Long currentUserId = auditor.currentUserId();
 
-        strictUpdateFill(metaObject, "updatedAt", LocalDateTime.class, LocalDateTime.now(clock));
-        if (currentUserId != null) {
-            strictUpdateFill(metaObject, "updatedBy", Long.class, currentUserId);
+        if (metaObject.hasSetter("updatedAt")) {
+            metaObject.setValue("updatedAt", LocalDateTime.now(clock));
+        }
+        if (currentUserId != null && metaObject.hasSetter("updatedBy")) {
+            metaObject.setValue("updatedBy", currentUserId);
         }
     }
 }
