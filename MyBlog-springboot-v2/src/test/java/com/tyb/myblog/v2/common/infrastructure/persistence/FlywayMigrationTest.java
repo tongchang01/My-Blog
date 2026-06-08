@@ -1,4 +1,4 @@
-package com.tyb.myblog.v2.infrastructure.persistence;
+package com.tyb.myblog.v2.common.infrastructure.persistence;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
