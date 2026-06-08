@@ -22,6 +22,7 @@ docs/ClaudeCode/
 ├── status.md             当前进度（每次开工先看）
 ├── v1-vs-v2.md           V1 问题清单 + V2 重构方向
 ├── roadmap.md            短期 / 中期 / 长期路线图
+├── m3-preflight-review.md M3 开始前全量审查、修正清单与准入条件
 ├── pitfalls.md           【红线】+ 历史踩坑 + 未解决项
 ├── MIGRATION-STATUS.md   旧 docs/superpowers/ 内容迁移进度
 │
