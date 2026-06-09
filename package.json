@@ -1,32 +1,15 @@
 {
-  "name": "hexo-theme-aurora",
-  "version": "0.0.0-semantic-release",
-  "description": "Futuristic auroral theme for Hexo.",
-  "author": "Benny Guo <bennyxguo6@gmail.com>",
+  "name": "myblog-frontend",
+  "version": "0.1.0",
+  "description": "MyBlog V2 frontend (forked from auroral-ui/hexo-theme-aurora).",
+  "author": "",
   "license": "MIT",
-  "repository": "https://github.com/auroral-ui/hexo-theme-aurora",
-  "keywords": [
-    "hexo",
-    "hexo-theme",
-    "aurora",
-    "auroral-ui",
-    "blog"
-  ],
-  "files": [
-    "data/**",
-    "layout/**",
-    "public/**",
-    "source/**"
-  ],
+  "private": true,
   "scripts": {
-    "serve": "vite",
-    "build": "vite build --mode production",
-    "postbuild": "cat source/",
-    "lint": "eslint --ext .js,.vue .",
+    "dev": "vite",
+    "build": "vite build",
     "preview": "vite preview",
-    "env:local": "node ./build/scripts/config-script.js local",
-    "env:prod": "node ./build/scripts/config-script.js prod",
-    "env:pub": "node ./build/scripts/config-script.js publish",
+    "lint": "eslint --ext .js,.vue .",
     "prepare": "husky install"
   },
   "dependencies": {
