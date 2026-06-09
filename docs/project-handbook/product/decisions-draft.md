@@ -893,7 +893,7 @@ V2 所有时间相关处理统一 **Asia/Tokyo（UTC+9）**：
 | 层 | 配置 / 做法 |
 |---|---|
 | JVM | 启动参数 `-Duser.timezone=Asia/Tokyo` |
-| MySQL session | `time_zone='+09:00'`（DataSource 连接 URL 设 `serverTimezone=Asia/Tokyo`） |
+| MySQL session | `time_zone='+09:00'`（DataSource URL 通过 `sessionVariables` 强制设置） |
 | 应用层 | `Clock.system(ZoneId.of("Asia/Tokyo"))` 注入；禁止散落 `LocalDateTime.now()` 直接调用，统一走 `Clock` |
 | SCHEDULED SQL | 不用 `NOW()`；`#{now}` 应用层传入 JST `LocalDateTime`（R3 #8 已定） |
 | API 返回 | `LocalDateTime` 序列化为 ISO-8601 不带时区后缀（`2026-06-03T14:30:00`），前端按 JST 展示 |

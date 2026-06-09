@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: ${MYBLOG_DATASOURCE_URL:jdbc:mysql://localhost:3306/aurora?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Tokyo}
+    url: ${MYBLOG_DATASOURCE_URL:jdbc:mysql://localhost:3306/aurora?useUnicode=true&characterEncoding=utf8&useSSL=false&connectionTimeZone=Asia/Tokyo&forceConnectionTimeToSession=true&sessionVariables=time_zone='%2B09:00'}
     username: ${MYBLOG_DATASOURCE_USERNAME:root}
     password: ${MYBLOG_DATASOURCE_PASSWORD:}
     driver-class-name: com.mysql.cj.jdbc.Driver

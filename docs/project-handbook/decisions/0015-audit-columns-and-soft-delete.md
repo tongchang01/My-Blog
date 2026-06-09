@@ -22,7 +22,7 @@ ADR-0014 给出了 schema 重设计的总原则，但在以下几点早期决定
 
 理由：
 - `DATETIME` 存什么读什么，不参与 session 时区转换
-- 配合 JVM `-Duser.timezone=Asia/Tokyo` + MySQL `serverTimezone=Asia/Tokyo`（详见 ADR-0018），全链路一致
+- 配合 JVM `-Duser.timezone=Asia/Tokyo` + MySQL session `time_zone='+09:00'`（详见 ADR-0018），全链路一致
 - `TIMESTAMP` 的 2038 上限对长生命周期数据是隐患（虽对当前博客无实际影响，但 DATETIME 无此问题）
 
 ### 2. 审计列 8 列基线

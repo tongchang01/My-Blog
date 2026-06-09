@@ -177,9 +177,9 @@ PASSWORD 文章功能落地前必须完成。
 
 ### P2-2 MySQL session 时区未强制设置
 
-- [ ] 使用 Connector/J 当前属性显式设置连接时区
-- [ ] 强制 session `time_zone`
-- [ ] 在真实 MySQL 测试中验证 `@@session.time_zone`
+- [x] 使用 Connector/J 当前属性显式设置连接时区
+- [x] 强制 session `time_zone`
+- [x] 在真实 MySQL 测试中验证 `@@session.time_zone`
 
 `serverTimezone` 是 `connectionTimeZone` 的别名，不等于强制修改 session。
 
@@ -277,7 +277,7 @@ mvn clean test
 - [ ] P1-1 至 P1-6 全部关闭
 - [ ] `mvn clean test` 全部通过
 - [!] V1 已在本地 MySQL 8.0.35 从空 schema 迁移成功；Testcontainers 执行按当前决定暂缓
-- [ ] MySQL session 时区验证通过
+- [x] MySQL session 时区验证通过
 - [ ] JWT 与 identity 依赖方向有代码和 ArchUnit 双重守护
 - [ ] prod 缺少密钥或数据库配置时失败启动
 - [ ] 文档中的错误码、配置名、字段名与代码一致
