@@ -71,18 +71,19 @@ export default ({ mode }) => {
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
     },
     server: {
-      proxy: {
-        '/api': {
-          target: 'http://localhost:4000/api',
-          changeOrigin: true,
-          rewrite: path => path.replace(/^\/api/, '')
-        },
-        '/assets': {
-          target: 'http://localhost:4000/assets',
-          changeOrigin: true,
-          rewrite: path => path.replace(/^\/assets/, '')
-        }
-      }
+      // Proxy disabled for local preview — mock JSON served from public/api/
+      // proxy: {
+      //   '/api': {
+      //     target: 'http://localhost:4000/api',
+      //     changeOrigin: true,
+      //     rewrite: path => path.replace(/^\/api/, '')
+      //   },
+      //   '/assets': {
+      //     target: 'http://localhost:4000/assets',
+      //     changeOrigin: true,
+      //     rewrite: path => path.replace(/^\/assets/, '')
+      //   }
+      // }
     }
   })
 }
