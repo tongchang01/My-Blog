@@ -45,7 +45,7 @@
 
 ### P1-2 Flyway 缺少 MySQL 支持模块
 
-- [!] 已增加依赖和 Testcontainers 测试；Docker 实际执行暂缓
+- [x] 已增加依赖和 Testcontainers 测试；V1 已在本地 MySQL 8.0.35 完成迁移验证，Docker 执行暂缓
 
 项目只有 `flyway-core`，依赖树中没有 `flyway-mysql`。H2 测试不能发现真实 MySQL 初始化问题。
 
@@ -276,7 +276,7 @@ mvn clean test
 
 - [ ] P1-1 至 P1-6 全部关闭
 - [ ] `mvn clean test` 全部通过
-- [ ] V1 在 Testcontainers MySQL 上从空 schema 迁移成功
+- [!] V1 已在本地 MySQL 8.0.35 从空 schema 迁移成功；Testcontainers 执行按当前决定暂缓
 - [ ] MySQL session 时区验证通过
 - [ ] JWT 与 identity 依赖方向有代码和 ArchUnit 双重守护
 - [ ] prod 缺少密钥或数据库配置时失败启动
