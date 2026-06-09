@@ -171,7 +171,6 @@ export default defineComponent({
     const pushPage = (path: string): void => {
       if (!path) return
       navigatorStore.toggleMobileMenu()
-      navigatorStore.setOpenNavigator(false)
       if (path.match(/(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g)) {
         window.location.href = path
       } else {

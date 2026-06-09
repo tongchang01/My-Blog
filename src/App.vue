@@ -27,8 +27,6 @@
   <template v-if="isMobile">
     <MobileMenu />
   </template>
-  <!-- <Navigator /> -->
-  <Dia v-if="!isMobile && configReady" />
   <teleport to="head">
     <title>{{ title }}</title>
   </teleport>
@@ -62,9 +60,7 @@ import { useMetaStore } from '@/stores/meta'
 import { useSearchStore } from './stores/search'
 import HeaderMain from '@/components/Header/src/Header.vue'
 import FooterContainer from '@/components/Footer/FooterContainer.vue'
-import Navigator from '@/components/Navigator.vue'
 import MobileMenu from '@/components/MobileMenu.vue'
-import Dia from '@/components/Dia.vue'
 import defaultCover from '@/assets/default-cover.jpg'
 import { useI18n } from 'vue-i18n'
 import VueEasyLightbox from 'vue-easy-lightbox'
@@ -75,9 +71,7 @@ export default defineComponent({
   components: {
     HeaderMain,
     FooterContainer,
-    Navigator,
     MobileMenu,
-    Dia,
     VueEasyLightbox,
     FooterLink
   },

@@ -531,13 +531,6 @@ export interface PluginsData {
       en: string
     }
   }
-
-  aurora_bot: {
-    enable: boolean
-    locale: string
-    bot_type: string
-    tips: { [key: string]: { selector: string; text: string | string[] } }
-  }
 }
 
 export class Plugins implements PluginsData {
@@ -607,12 +600,6 @@ export class Plugins implements PluginsData {
       cn: '',
       en: ''
     }
-  }
-  aurora_bot = {
-    enable: false,
-    locale: 'en',
-    bot_type: 'dia',
-    tips: {}
   }
 
   /**
