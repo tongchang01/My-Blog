@@ -45,7 +45,7 @@
 
 ### P1-2 Flyway 缺少 MySQL 支持模块
 
-- [ ] 增加依赖和真实 MySQL 迁移测试
+- [!] 已增加依赖和 Testcontainers 测试；Docker 实际执行暂缓
 
 项目只有 `flyway-core`，依赖树中没有 `flyway-mysql`。H2 测试不能发现真实 MySQL 初始化问题。
 
