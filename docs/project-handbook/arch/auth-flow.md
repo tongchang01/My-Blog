@@ -183,12 +183,24 @@ POST /api/public/articles/{id}/unlock   Body: { password }
 
 ## 10. 关键代码路径（V2 目标）
 
-- `JwtTokenService` — access token 签发 / 解析（含 typ 区分）
+- `AccessTokenIssuer` — identity 应用层使用的访问令牌签发端口
+- `AccessTokenVerifier` — Security 过滤器使用的访问令牌验证端口
+- `JwtTokenService` — common 内部 JWT 编解码实现，实现上述端口（含 typ 区分）
 - `RefreshTokenService` — refresh token 签发 / 校验 / 撤销 / SHA-256 哈希
 - `ArticleAccessTokenService` — PASSWORD 文章 token 签发 / 校验
 - `JwtAuthenticationFilter` — Authorization header 处理（typ=access）
 - `ArticleAccessTokenFilter` — X-Article-Token 处理（typ=article_access）
 - `JwtSecretStartupValidator` — 启动校验密钥
+
+依赖方向固定为：
+
+```text
+identity.application -> common.auth.token.AccessTokenIssuer
+common.security.JwtAuthenticationFilter -> common.auth.token.AccessTokenVerifier
+```
+
+identity 不调用过滤器或 Spring Security 具体实现；过滤器后续通过验证端口完成
+`token_version` 校验，不直接依赖 identity infrastructure。
 - `AuthApplicationService` — 登录 / 刷新 / 登出用例编排
 - `LoginRateLimiter` — 登录限流（Caffeine）
 - `LoginAuditService` / `t_user_auth` — 审计

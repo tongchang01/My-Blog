@@ -4,8 +4,8 @@ import com.tyb.myblog.v2.common.config.ApiCorsProperties;
 import com.tyb.myblog.v2.common.config.SecurityJwtProperties;
 import com.tyb.myblog.v2.common.config.SecurityPublicEndpointProperties;
 import com.tyb.myblog.v2.common.auth.BearerTokenResolver;
+import com.tyb.myblog.v2.common.auth.token.AccessTokenVerifier;
 import com.tyb.myblog.v2.common.security.auth.JwtAuthenticationFilter;
-import com.tyb.myblog.v2.common.security.auth.JwtTokenService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -74,12 +74,13 @@ public class SecurityConfig {
     /**
      * JWT 认证过滤器。
      *
-     * <p>只有 {@link JwtTokenService} 存在时才注册，便于测试和后续替换认证实现。</p>
+     * <p>只有 {@link AccessTokenVerifier} 存在时才注册，过滤器不绑定 JWT 或 identity 具体实现。</p>
      */
     @Bean
-    @ConditionalOnBean(JwtTokenService.class)
-    JwtAuthenticationFilter jwtAuthenticationFilter(JwtTokenService tokenService, BearerTokenResolver bearerTokenResolver) {
-        return new JwtAuthenticationFilter(tokenService, bearerTokenResolver);
+    @ConditionalOnBean(AccessTokenVerifier.class)
+    JwtAuthenticationFilter jwtAuthenticationFilter(AccessTokenVerifier tokenVerifier,
+                                                      BearerTokenResolver bearerTokenResolver) {
+        return new JwtAuthenticationFilter(tokenVerifier, bearerTokenResolver);
     }
 
     /**

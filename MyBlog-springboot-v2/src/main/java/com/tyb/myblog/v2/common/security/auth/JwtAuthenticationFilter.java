@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.common.security.auth;
 
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.auth.BearerTokenResolver;
+import com.tyb.myblog.v2.common.auth.token.AccessTokenVerifier;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * JWT 签发、解析和撤销服务。
      */
-    private final JwtTokenService tokenService;
+    private final AccessTokenVerifier tokenVerifier;
     /**
      * Bearer Token 请求头解析器。
      */
@@ -34,11 +35,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     /**
      * 创建 JWT 认证过滤器。
      *
-     * @param tokenService         token 服务
+     * @param tokenVerifier        访问令牌验证端口
      * @param bearerTokenResolver  Bearer Token 解析器
      */
-    public JwtAuthenticationFilter(JwtTokenService tokenService, BearerTokenResolver bearerTokenResolver) {
-        this.tokenService = tokenService;
+    public JwtAuthenticationFilter(AccessTokenVerifier tokenVerifier, BearerTokenResolver bearerTokenResolver) {
+        this.tokenVerifier = tokenVerifier;
         this.bearerTokenResolver = bearerTokenResolver;
     }
 
@@ -50,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
         bearerTokenResolver.resolve(authorization).ifPresent(token ->
-            tokenService.parse(token).ifPresent(claims -> {
+            tokenVerifier.verify(token).ifPresent(claims -> {
                 AuthenticatedPrincipal principal = new AuthenticatedPrincipal(
                         claims.userId(),
                         claims.username(),

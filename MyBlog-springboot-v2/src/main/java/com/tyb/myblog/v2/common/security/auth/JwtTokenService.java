@@ -1,5 +1,9 @@
 package com.tyb.myblog.v2.common.security.auth;
 
+import com.tyb.myblog.v2.common.auth.token.AccessTokenIssuer;
+import com.tyb.myblog.v2.common.auth.token.AccessTokenVerifier;
+import com.tyb.myblog.v2.common.auth.token.TokenClaims;
+import com.tyb.myblog.v2.common.auth.token.TokenPair;
 import com.tyb.myblog.v2.common.config.SecurityJwtProperties;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -28,7 +32,7 @@ import java.util.UUID;
  * 因此生产环境必须保护好 {@link SecurityJwtProperties#secret()}，不能提交到 Git。</p>
  */
 @Service
-public class JwtTokenService {
+public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
 
     /**
      * JWT HMAC 签名算法。
@@ -76,6 +80,7 @@ public class JwtTokenService {
      * @param roles    用户角色名称列表
      * @return 访问令牌和过期时间
      */
+    @Override
     public TokenPair issueAccessToken(String userId, String username, List<String> roles) {
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(properties.accessTokenTtl());
@@ -102,7 +107,8 @@ public class JwtTokenService {
      * @param token 原始访问令牌
      * @return 解析后的声明
      */
-    public Optional<TokenClaims> parse(String token) {
+    @Override
+    public Optional<TokenClaims> verify(String token) {
         try {
             Jwt jwt = jwtDecoder.decode(token);
             if (revocationStore.isRevoked(jwt.getId())) {
@@ -128,7 +134,7 @@ public class JwtTokenService {
      * @param token 原始访问令牌
      */
     public void revoke(String token) {
-        parse(token).ifPresent(claims -> revocationStore.revoke(claims.tokenId(), claims.expiresAt()));
+        verify(token).ifPresent(claims -> revocationStore.revoke(claims.tokenId(), claims.expiresAt()));
     }
 
     /**

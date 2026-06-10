@@ -19,7 +19,7 @@ class JwtTokenServiceTest {
     @Test
     void issuesAndParsesAccessToken() {
         var token = tokenService.issueAccessToken("user-1", "admin@example.com", List.of("ADMIN"));
-        var claims = tokenService.parse(token.accessToken()).orElseThrow();
+        var claims = tokenService.verify(token.accessToken()).orElseThrow();
 
         assertThat(claims.userId()).isEqualTo("user-1");
         assertThat(claims.username()).isEqualTo("admin@example.com");
@@ -31,6 +31,6 @@ class JwtTokenServiceTest {
         var token = tokenService.issueAccessToken("user-1", "admin@example.com", List.of("ADMIN"));
         tokenService.revoke(token.accessToken());
 
-        assertThat(tokenService.parse(token.accessToken())).isEmpty();
+        assertThat(tokenService.verify(token.accessToken())).isEmpty();
     }
 }

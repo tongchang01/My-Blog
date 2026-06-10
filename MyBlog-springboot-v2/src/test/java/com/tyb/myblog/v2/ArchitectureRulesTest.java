@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2;
 
 import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
@@ -9,10 +10,12 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.stream.Stream;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @AnalyzeClasses(packages = "com.tyb.myblog.v2", importOptions = ImportOption.DoNotIncludeTests.class)
 class ArchitectureRulesTest {
@@ -27,6 +30,10 @@ class ArchitectureRulesTest {
     private static final String[] BUSINESS_MODULE_PACKAGES = Arrays.stream(BUSINESS_MODULES)
             .map(module -> ".." + module + "..")
             .toArray(String[]::new);
+    private static final String[] TOKEN_PORT_FORBIDDEN_PACKAGES = Stream.concat(
+                    Stream.of("org.springframework.security.."),
+                    Arrays.stream(BUSINESS_MODULE_PACKAGES))
+            .toArray(String[]::new);
 
     // 业务模块可以依赖 common 的抽象能力，但不能直接依赖 common.security 的具体安全实现。
     @ArchTest
@@ -35,6 +42,14 @@ class ArchitectureRulesTest {
                     .that().resideInAnyPackage(BUSINESS_MODULE_PACKAGES)
                     .should().dependOnClassesThat().resideInAPackage("..common.security..")
                     .allowEmptyShould(true);
+
+    // token 端口属于稳定 common API，不能泄漏 Spring Security 或业务模块实现。
+    @ArchTest
+    static final ArchRule common_token_ports_remain_framework_and_business_independent =
+            noClasses()
+                    .that().resideInAPackage("..common.auth.token..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage(TOKEN_PORT_FORBIDDEN_PACKAGES);
 
     // common 必须保持全局通用，不能反向依赖任何业务模块。
     @ArchTest
@@ -153,5 +168,26 @@ class ArchitectureRulesTest {
     void guardsAllFiveBusinessModules() {
         assertThat(BUSINESS_MODULES)
                 .containsExactly("identity", "content", "comment", "system", "stats");
+    }
+
+    @Test
+    void applicationMapperRuleRejectsDeliberateViolationFixture() {
+        var fixtureClasses = new ClassFileImporter()
+                .importPackages("com.tyb.myblog.v2.architecture.fixture");
+
+        assertThatThrownBy(() -> application_does_not_depend_on_persistence_mappers.check(fixtureClasses))
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContaining("InvalidApplicationService")
+                .hasMessageContaining("InvalidMapper");
+    }
+
+    @Test
+    void identityApplicationMayDependOnCommonTokenIssuerPort() {
+        var fixtureClasses = new ClassFileImporter()
+                .importPackages("com.tyb.myblog.v2.architecture.fixture.identity");
+
+        assertThatCode(() ->
+                business_modules_do_not_depend_on_common_security_implementation.check(fixtureClasses))
+                .doesNotThrowAnyException();
     }
 }

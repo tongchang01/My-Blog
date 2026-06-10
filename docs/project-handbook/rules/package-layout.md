@@ -12,7 +12,7 @@
 
 | 包 | 类型 | 职责 |
 |----|------|------|
-| `common` | 非业务 | `common-infra` 一层：响应封装、异常体系、Security 链路、Knife4j、Clock、i18n、ArchUnit 规则；其下 `infrastructure/` 子包放 MyBatis-Plus / Flyway / DataSource 等数据库基础配置 |
+| `common` | 非业务 | `common-infra` 一层：响应封装、异常体系、认证上下文与 token 端口、Security 链路、Knife4j、Clock、i18n、ArchUnit 规则；其下 `infrastructure/` 子包放 MyBatis-Plus / Flyway / DataSource 等数据库基础配置 |
 | `identity` | 业务 | 用户、角色、登录、JWT 签发与刷新（access 15min + refresh 7d） |
 | `content` | 业务 | 文章、分类、标签 |
 | `comment` | 业务 | 评论、留言板（复用 t_comment）、审核 |
@@ -45,9 +45,9 @@
 
 ### 4.2 application 层
 
-- **允许**：ApplicationService、Command、Query、用例输入输出对象、跨领域编排、事务、权限/审计/状态流转组织
-- **禁止**：拼 SQL、继承 MyBatis-Plus `BaseMapper`、暴露 HTTP Request/Response、存放数据库 Entity、直接暴露外部 SDK
-- **依赖方向**：`application → domain`、`application → 本模块 infrastructure`
+- **允许**：ApplicationService、Command、Query、用例输入输出对象、跨领域编排、事务、权限/审计/状态流转组织、调用 domain 中定义的端口
+- **禁止**：拼 SQL、继承或调用 MyBatis-Plus `BaseMapper`、依赖本模块 infrastructure、暴露 HTTP Request/Response、存放数据库 Entity、直接暴露外部 SDK
+- **依赖方向**：`application → domain port`
 
 ### 4.3 domain 层（最严格）
 
@@ -58,12 +58,14 @@
 ### 4.4 infrastructure 层
 
 - **允许**：MyBatis-Plus Entity、Mapper、XML、Repository 实现、Reader/Writer/Gateway 数据库实现、外部服务适配
+- **依赖方向**：`infrastructure → domain port`，由 infrastructure 实现 domain 定义的端口
 - **禁止**：写 Controller、定义业务规则、让其它模块直接访问本模块 Mapper、把 Entity 泄漏到 web 层
 - **禁止**：Flyway 脚本里出现 `FOREIGN KEY`（ADR-0017 / R-012）
 
 ### 4.5 common-infra（`com.tyb.myblog.v2.common`）
 
 - **允许**：全局异常处理、统一响应、分页、Web 支撑、Security 链路、Clock Bean、i18n、Knife4j / springdoc 配置、跨模块基础工具；`common/infrastructure/` 子包放 MyBatis-Plus 配置、数据源、事务、Flyway 配置
+- **认证端口**：`common.auth.token` 只放 `AccessTokenIssuer`、`AccessTokenVerifier` 和稳定载荷类型，不依赖 Spring Security；JWT 编解码实现与过滤器留在 `common.security`
 - **禁止**：任何业务模块的私有逻辑、只被一个模块使用的 DTO、数据库 Entity、业务 Mapper、具体外部服务实现
 - **禁止反向依赖**：`common` 不依赖任何业务模块（ArchUnit 规则 #4）
 
@@ -82,6 +84,15 @@
 - 直接使用另一个模块的 MyBatis-Plus Mapper
 - `common` 反向依赖任一业务模块
 - 业务模块之间共享 Entity
+
+identity 的认证依赖是特例中的公共端口，不是跨业务模块调用：
+
+```text
+identity.application -> common.auth.token.AccessTokenIssuer
+common.security.JwtAuthenticationFilter -> common.auth.token.AccessTokenVerifier
+```
+
+identity 不依赖 `common.security` 的过滤器、JWT 实现或 Spring Security 类型。
 
 常见跨模块关系（见 `arch/module-map.md` §4 完整表）：
 
@@ -105,6 +116,7 @@
 | 5 | 业务模块不互相访问对方 `infrastructure.persistence` |
 | 6 | `..domain..` 不直接 `LocalDateTime.now()` / `new Date()`（必须用注入的 Clock，ADR-0018 / R-011） |
 | 7 | Flyway 脚本不出现 `FOREIGN KEY`（ADR-0017 / R-012，由 Flyway review 守护，非 ArchUnit）|
+| 8 | 业务模块不依赖 `common.security` 具体实现；`common.auth.token` 不依赖 Spring Security 或业务模块 |
 
 违反任一规则，`mvn test` 直接失败。**新增模块务必同步更新 ArchUnit 规则**。
 

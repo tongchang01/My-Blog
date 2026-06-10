@@ -90,7 +90,7 @@
 
 ### P1-4 JWT 与 identity 模块边界冲突
 
-- [ ] 冻结组件所有权并调整 ArchUnit
+- [x] 冻结组件所有权并调整 ArchUnit
 
 ArchUnit 禁止业务模块依赖 `common.security`，但 JWT 签发服务位于该包；过滤器又需要 identity 的 `token_version`。当前结构无法避免违规或反向依赖。
 
@@ -278,7 +278,7 @@ mvn clean test
 - [x] `mvn clean test` 全部通过
 - [!] V1 已在本地 MySQL 8.0.35 从空 schema 迁移成功；Testcontainers 执行按当前决定暂缓
 - [x] MySQL session 时区验证通过
-- [ ] JWT 与 identity 依赖方向有代码和 ArchUnit 双重守护
+- [x] JWT 与 identity 依赖方向有代码和 ArchUnit 双重守护
 - [x] prod 缺少密钥或数据库配置时失败启动
 - [ ] 文档中的错误码、配置名、字段名与代码一致
 - [ ] 工作区不存在本轮无关修改
@@ -293,3 +293,4 @@ mvn clean test
 | 2026-06-10 | P1-3 已关闭 | 取消默认 local，新增 prod 基线，统一数据库环境变量并验证安全失败 |
 | 2026-06-10 | P1-6 已关闭 | 默认不信任代理头，仅允许显式可信代理 IP / CIDR 提供客户端地址 |
 | 2026-06-10 | P2-4 已关闭 | Security 探针仅在 local / test profile 注册 |
+| 2026-06-10 | P1-4 已关闭 | token 签发 / 验证端口归 common.auth，identity 与过滤器不依赖对方具体实现 |

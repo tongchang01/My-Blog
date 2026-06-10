@@ -1,4 +1,4 @@
-package com.tyb.myblog.v2.common.security.auth;
+package com.tyb.myblog.v2.common.auth.token;
 
 import java.time.Instant;
 

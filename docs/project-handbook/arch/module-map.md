@@ -9,7 +9,9 @@
 ```
 com.tyb.myblog.v2
 ├── common               common-infra：跨模块基础设施
-│   ├── (响应封装 / 异常 / Security 链路 / Knife4j / Clock / i18n / ArchUnit)
+│   ├── auth.token       token 签发 / 验证端口与稳定载荷
+│   ├── security         JWT 实现、过滤器、Spring Security 接入
+│   ├── (响应封装 / 异常 / Knife4j / Clock / i18n / ArchUnit)
 │   └── infrastructure   MyBatis-Plus / Flyway / DataSource 配置
 ├── identity             用户、登录、JWT 双 token（access + refresh）
 ├── content              文章、分类、标签
@@ -55,6 +57,18 @@ com.tyb.myblog.v2
 - `web` 依赖 `application`，不直接访问 `infrastructure`
 - `infrastructure` 实现 `domain` 中的仓储接口
 
+认证能力边界：
+
+```text
+identity.application ──► common.auth.token.AccessTokenIssuer
+common.security filter ──► common.auth.token.AccessTokenVerifier
+common.security JWT implementation ── implements both ports
+```
+
+- identity 拥有登录、refresh token、用户状态、`token_version` 和签发用例
+- common 拥有无业务状态的 token 端口、JWT 编解码实现与 Spring Security 接入
+- common 不依赖 identity Entity、Mapper 或 Repository 实现
+
 ## 4. 跨模块依赖
 
 | 调用方 | 被调方 | 允许方式 |
@@ -81,6 +95,7 @@ com.tyb.myblog.v2
 | 5 | 业务模块不互相访问对方 `infrastructure.persistence` | 跨模块只能走 application 接口 |
 | 6 | `..domain..` 不直接 `LocalDateTime.now()` / `new Date()` | 必须用注入的 Clock（ADR-0018 / R-011） |
 | 7 | Flyway 脚本不出现 `FOREIGN KEY` | 禁 DB FK（ADR-0017 / R-012）—— 由 Flyway review 守护，非 ArchUnit |
+| 8 | 业务模块不依赖 `common.security`，token 端口不依赖框架或业务模块 | 冻结认证所有权边界 |
 
 任何 ArchUnit 违反 → `mvn test` 失败。
 
