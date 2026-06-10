@@ -88,7 +88,7 @@ infrastructure.persistence.CommentRepositoryImpl  (用 Mapper 实现)
 | `ContentCatalogMapper` 含 @Select 长查询 | 应放到 XML mapper（rules/sql-placement.md） | M3 模块重建时按新规则重写 |
 | JdbcTemplate 与 MyBatis-Plus 并存 | V1 遗留 JdbcTemplate 残留 | M1 清理时随业务层一起删除 |
 | 尚无 `src/main/resources/mapper/` 目录 | 首个 XML mapper 落地时同步创建 | M3 第一个复杂查询出现时建 |
-| `TokenRevocationStore` 是内存实现 | V2 单实例部署，进程内 Caffeine 已够用（R7 D6） | 不计划迁 Redis；多实例部署是 V3 议题 |
+| access token 撤销依赖进程内黑名单 | 已废弃；access token 通过 `token_version` 与用户状态比对失效，refresh token 使用数据库持久化 | 不再保留 `TokenRevocationStore`，也不规划 Redis 黑名单迁移 |
 
 ## 9. 相关文档
 

@@ -26,7 +26,7 @@ class JwtAuthenticationFilterTest {
     private JwtTokenService tokenService;
 
     @Test
-    void authenticatesValidBearerTokenAndRejectsRevokedToken() throws Exception {
+    void authenticatesValidBearerTokenAndRejectsInvalidToken() throws Exception {
         String token = tokenService
                 .issueAccessToken("user-1", "admin@example.com", List.of("ADMIN"), 0)
                 .accessToken();
@@ -34,7 +34,7 @@ class JwtAuthenticationFilterTest {
         mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk());
 
-        tokenService.revoke(token);
+        token = token + "-invalid";
 
         mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized())

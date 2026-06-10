@@ -2,7 +2,6 @@ package com.tyb.myblog.v2.common.security;
 
 import com.tyb.myblog.v2.common.config.SecurityJwtProperties;
 import com.tyb.myblog.v2.common.security.auth.JwtTokenService;
-import com.tyb.myblog.v2.common.security.support.InMemoryTokenRevocationStore;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
@@ -19,6 +18,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 
 class JwtTokenServiceTest {
 
@@ -26,8 +26,7 @@ class JwtTokenServiceTest {
     private static final String SECRET = "test-secret-test-secret-test-secret-123456";
 
     private final JwtTokenService tokenService = new JwtTokenService(
-            new SecurityJwtProperties(ISSUER, SECRET, Duration.ofMinutes(15)),
-            new InMemoryTokenRevocationStore());
+            new SecurityJwtProperties(ISSUER, SECRET, Duration.ofMinutes(15)));
 
     @Test
     void issuesAndParsesAccessToken() {
@@ -41,11 +40,13 @@ class JwtTokenServiceTest {
     }
 
     @Test
-    void revokedTokenCannotBeParsed() {
-        var token = tokenService.issueAccessToken("user-1", "admin@example.com", List.of("ADMIN"), 0);
-        tokenService.revoke(token.accessToken());
-
-        assertThat(tokenService.verify(token.accessToken())).isEmpty();
+    void doesNotExposeLegacyInMemoryRevocationTypes() {
+        assertThatCode(() -> Class.forName(
+                "com.tyb.myblog.v2.common.security.auth.TokenRevocationStore"))
+                .isInstanceOf(ClassNotFoundException.class);
+        assertThatCode(() -> Class.forName(
+                "com.tyb.myblog.v2.common.security.support.InMemoryTokenRevocationStore"))
+                .isInstanceOf(ClassNotFoundException.class);
     }
 
     @Test

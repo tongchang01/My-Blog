@@ -29,7 +29,7 @@ import java.util.UUID;
 /**
  * JWT 访问令牌服务。
  *
- * <p>负责签发、解析和撤销访问令牌。当前实现使用 HS256 对称签名，
+ * <p>负责签发和解析访问令牌。当前实现使用 HS256 对称签名，
  * 因此生产环境必须保护好 {@link SecurityJwtProperties#secret()}，不能提交到 Git。</p>
  */
 @Service
@@ -47,10 +47,6 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
      */
     private final SecurityJwtProperties properties;
     /**
-     * token 撤销存储。
-     */
-    private final TokenRevocationStore revocationStore;
-    /**
      * JWT 编码器。
      */
     private final JwtEncoder jwtEncoder;
@@ -62,12 +58,10 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
     /**
      * 创建 JWT 服务。
      *
-     * @param properties      JWT 配置项
-     * @param revocationStore token 撤销存储
+     * @param properties JWT 配置项
      */
-    public JwtTokenService(SecurityJwtProperties properties, TokenRevocationStore revocationStore) {
+    public JwtTokenService(SecurityJwtProperties properties) {
         this.properties = properties;
-        this.revocationStore = revocationStore;
         SecretKey secretKey = new SecretKeySpec(properties.secret().getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM);
         this.jwtEncoder = new NimbusJwtEncoder(new ImmutableSecret<>(secretKey));
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey)
@@ -110,7 +104,7 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
     /**
      * 解析访问令牌。
      *
-     * <p>签名无效、令牌过期、格式错误或已撤销时统一返回空，避免认证过滤器泄露具体失败原因。</p>
+     * <p>签名无效、令牌过期、格式错误或声明不合法时统一返回空，避免认证过滤器泄露具体失败原因。</p>
      *
      * @param token 原始访问令牌
      * @return 解析后的声明
@@ -120,7 +114,7 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
         try {
             Jwt jwt = jwtDecoder.decode(token);
             Integer tokenVersion = readTokenVersion(jwt);
-            if (!hasRequiredAccessClaims(jwt, tokenVersion) || revocationStore.isRevoked(jwt.getId())) {
+            if (!hasRequiredAccessClaims(jwt, tokenVersion)) {
                 return Optional.empty();
             }
             return Optional.of(new TokenClaims(
@@ -134,17 +128,6 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
         } catch (RuntimeException ex) {
             return Optional.empty();
         }
-    }
-
-    /**
-     * 撤销访问令牌。
-     *
-     * <p>当前用于登出场景。撤销记录只需要保存到 token 原始过期时间，过期后可清理。</p>
-     *
-     * @param token 原始访问令牌
-     */
-    public void revoke(String token) {
-        verify(token).ifPresent(claims -> revocationStore.revoke(claims.tokenId(), claims.expiresAt()));
     }
 
     /**
