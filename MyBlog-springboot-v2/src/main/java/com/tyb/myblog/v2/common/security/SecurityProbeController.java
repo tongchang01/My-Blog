@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.common.security;
 
 import com.tyb.myblog.v2.common.web.ApiResponse;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>仅用于自动化测试验证公开接口和后台接口的鉴权边界。
  * 业务接口不应依赖这些探针返回值。</p>
  */
+@Profile({"local", "test"})
 @RestController
 public class SecurityProbeController {
 

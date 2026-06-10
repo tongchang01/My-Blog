@@ -196,7 +196,7 @@ PASSWORD 文章功能落地前必须完成。
 
 ### P2-4 测试探针进入生产扫描
 
-- [ ] 将 `SecurityProbeController` 限定到 `local/test`，或迁到测试源码
+- [x] 将 `SecurityProbeController` 限定到 `local/test`
 
 ### P2-5 逻辑删除审计没有统一路径
 
@@ -292,3 +292,4 @@ mvn clean test
 | 2026-06-08 | 暂不进入 M3 | 发现 6 个 P1 与 6 个 P2，先按本文档逐项关闭 |
 | 2026-06-10 | P1-3 已关闭 | 取消默认 local，新增 prod 基线，统一数据库环境变量并验证安全失败 |
 | 2026-06-10 | P1-6 已关闭 | 默认不信任代理头，仅允许显式可信代理 IP / CIDR 提供客户端地址 |
+| 2026-06-10 | P2-4 已关闭 | Security 探针仅在 local / test profile 注册 |

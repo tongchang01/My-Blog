@@ -74,7 +74,7 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 | `common/security/support/InMemoryTokenRevocationStore` | 留 | 用于 access token 黑名单仍需要；refresh token 走 DB（新 `t_refresh_token`） |
 | `common/security/JwtAuthenticationFilter` | **微调** | 取出 `tokenVersion` 与 DB `t_user_auth.token_version` 比对，不一致 401 |
 | `common/security/SecurityConfig` | **微调** | refresh token 端点白名单；DEMO 角色权限矩阵 |
-| `common/security/SecurityProblemSupport` `SecurityProbeController` | 留 | 与 schema 无关 |
+| `common/security/SecurityProblemSupport` `SecurityProbeController` | 留 | 与 schema 无关；探针仅限 `local/test` profile |
 | `common/config/SecurityJwtProperties` | **微调** | 加 `refreshTokenTtl`（默认 7d）配置项 |
 | `common/config/SecurityPublicEndpointProperties` | 留 | 配置类不变，白名单内容由 yml 调 |
 | `common/config/ApiCorsProperties` | 留 | |
