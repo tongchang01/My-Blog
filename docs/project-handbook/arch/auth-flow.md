@@ -173,10 +173,11 @@ POST /api/public/articles/{id}/unlock   Body: { password }
 
 ## 9. 客户端 IP 提取
 
-按优先级：
-1. `X-Forwarded-For`（首个非空段）
-2. `X-Real-IP`
-3. `request.getRemoteAddr()`
+登录、评论限流和审计必须共用 `ClientIpResolver`：
+
+1. 直连请求只使用 `request.getRemoteAddr()`，忽略客户端提供的代理头
+2. 仅当远端地址匹配 `myblog.web.trusted-proxies` 时读取 `X-Forwarded-For` / `X-Real-IP`
+3. `X-Forwarded-For` 取首个非空段；无有效代理头时回退到远端地址
 
 空白返回 `null`，不写入伪造值。`ip_source`（归属地）**V2 不解析**（R2 #16）。
 

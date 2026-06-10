@@ -1,16 +1,27 @@
 package com.tyb.myblog.v2.common.web;
 
+import com.tyb.myblog.v2.common.config.TrustedProxyProperties;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.web.util.matcher.IpAddressMatcher;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 /**
  * 客户端 IP 解析工具。
  *
- * <p>优先读取反向代理写入的 {@code X-Forwarded-For}，其次读取 {@code X-Real-IP}，
- * 最后回退到 Servlet 容器看到的远端地址。该类只负责解析候选值，不负责判断代理链是否可信。</p>
+ * <p>仅当 Servlet 容器看到的远端地址属于可信代理时，才读取代理转发头；
+ * 直连请求始终使用连接远端地址，避免客户端伪造转发头。</p>
  */
-public final class ClientIpResolver {
+@Component
+public class ClientIpResolver {
 
-    private ClientIpResolver() {
+    private final List<IpAddressMatcher> trustedProxyMatchers;
+
+    public ClientIpResolver(TrustedProxyProperties properties) {
+        this.trustedProxyMatchers = properties.trustedProxies().stream()
+                .map(IpAddressMatcher::new)
+                .toList();
     }
 
     /**
@@ -19,7 +30,12 @@ public final class ClientIpResolver {
      * @param request 当前请求
      * @return 解析后的 IP；当所有来源都为空时返回 {@code null}
      */
-    public static String resolve(HttpServletRequest request) {
+    public String resolve(HttpServletRequest request) {
+        String remoteAddress = normalize(request.getRemoteAddr());
+        if (remoteAddress == null || !isTrustedProxy(remoteAddress)) {
+            return remoteAddress;
+        }
+
         String forwardedFor = firstForwardedIp(request.getHeader("X-Forwarded-For"));
         if (forwardedFor != null) {
             return forwardedFor;
@@ -28,7 +44,11 @@ public final class ClientIpResolver {
         if (realIp != null) {
             return realIp;
         }
-        return normalize(request.getRemoteAddr());
+        return remoteAddress;
+    }
+
+    private boolean isTrustedProxy(String remoteAddress) {
+        return trustedProxyMatchers.stream().anyMatch(matcher -> matcher.matches(remoteAddress));
     }
 
     private static String firstForwardedIp(String value) {

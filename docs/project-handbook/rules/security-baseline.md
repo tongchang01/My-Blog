@@ -109,10 +109,18 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 
 登录失败、账号不存在、密码错误、禁用用户**都不更新**审计字段（但 `login_fail_count` 按需 +1）。
 
-客户端 IP 提取顺序：
-1. `X-Forwarded-For`（取第一个）
-2. `X-Real-IP`
-3. `request.getRemoteAddr()`
+客户端 IP 统一通过 `ClientIpResolver` 获取：
+
+1. 连接远端地址不在 `myblog.web.trusted-proxies` 中：忽略所有转发头，使用 `request.getRemoteAddr()`
+2. 连接来自可信代理：优先取 `X-Forwarded-For` 第一个非空值，其次取 `X-Real-IP`
+3. 可信代理未提供有效转发头：回退到 `request.getRemoteAddr()`
+
+生产环境默认不信任任何代理。部署 Nginx 时必须显式配置代理 IP / CIDR，并覆盖而不是追加客户端传入的头：
+
+```nginx
+proxy_set_header X-Forwarded-For $remote_addr;
+proxy_set_header X-Real-IP $remote_addr;
+```
 
 空白值返回 `null`，不写入伪造值。**`ip_source`（归属地）V2 不解析**（R2 #16 决定）。
 
@@ -169,6 +177,7 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 | `MYBLOG_DATASOURCE_USERNAME` | 数据库账号 | ✅ local / prod |
 | `MYBLOG_DATASOURCE_PASSWORD` | 数据库密码 | ✅ local / prod |
 | `MYBLOG_CORS_ALLOWED_ORIGINS` | 生产环境允许的前端来源 | 视部署环境 |
+| `MYBLOG_WEB_TRUSTED_PROXIES` | 可信反向代理 IP / CIDR，多个值用逗号分隔 | 使用反向代理时 |
 | `MYBLOG_MAIL_API_KEY` | Resend API key | ✅ 是（mail 启用时） |
 
 启动时 `MyBlogConfigStartupValidator` 一次性校验所有必填项。

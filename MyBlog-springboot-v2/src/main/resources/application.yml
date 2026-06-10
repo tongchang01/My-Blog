@@ -30,6 +30,8 @@ mybatis-plus:
 myblog:
   cors:
     allowed-origins: []
+  web:
+    trusted-proxies: []
   security:
     jwt:
       issuer: myblog-v2
