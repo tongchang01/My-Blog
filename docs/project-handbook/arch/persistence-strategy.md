@@ -60,9 +60,13 @@ infrastructure.persistence.CommentRepositoryImpl  (用 Mapper 实现)
 
 | Profile | 数据库 | Flyway | 用途 |
 |---------|--------|--------|------|
-| `local` | 真实 MySQL | 关闭 | 本地开发，避免改坏开发库 |
+| `local` | V2 开发 MySQL | 关闭 | 本地开发，必须显式激活 |
 | `test` | H2 内存 | 启动时迁移 | 自动化测试 |
-| `prod` | 生产 MySQL | 手动审视后启用 | 生产环境 |
+| `prod` | 生产 MySQL | 启动时迁移 | 生产环境，发布前审视迁移脚本 |
+
+应用不提供默认 profile。`local` 与 `prod` 的连接信息统一通过
+`MYBLOG_DATASOURCE_URL`、`MYBLOG_DATASOURCE_USERNAME`、`MYBLOG_DATASOURCE_PASSWORD`
+注入，不提供 root、空密码或旧数据库名兜底。
 
 ## 7. 与 V1 的关系（已转向全量重设计）
 

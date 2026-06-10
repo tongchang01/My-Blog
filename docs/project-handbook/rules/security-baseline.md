@@ -165,9 +165,10 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 | 变量 | 用途 | 必填 |
 |------|------|------|
 | `MYBLOG_JWT_SECRET` | JWT 签名密钥（≥32 字节） | ✅ 是 |
-| `MYBLOG_DB_URL` | 数据库连接 URL | 视环境 |
-| `MYBLOG_DB_USERNAME` | 数据库账号 | 视环境 |
-| `MYBLOG_DB_PASSWORD` | 数据库密码 | 视环境 |
+| `MYBLOG_DATASOURCE_URL` | 数据库连接 URL | ✅ local / prod |
+| `MYBLOG_DATASOURCE_USERNAME` | 数据库账号 | ✅ local / prod |
+| `MYBLOG_DATASOURCE_PASSWORD` | 数据库密码 | ✅ local / prod |
+| `MYBLOG_CORS_ALLOWED_ORIGINS` | 生产环境允许的前端来源 | 视部署环境 |
 | `MYBLOG_MAIL_API_KEY` | Resend API key | ✅ 是（mail 启用时） |
 
 启动时 `MyBlogConfigStartupValidator` 一次性校验所有必填项。

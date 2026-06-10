@@ -67,7 +67,7 @@
 
 ### P1-3 运行环境默认行为不安全
 
-- [ ] 取消默认 local profile并建立生产配置基线
+- [x] 取消默认 local profile并建立生产配置基线
 
 `spring.profiles.default=local` 会自动启用本地环境；该环境默认连接旧 `aurora` 库、允许 root 空密码、使用固定 JWT 密钥、关闭 Flyway并公开 API 文档。仓库没有 V2 生产配置。
 
@@ -275,11 +275,11 @@ mvn clean test
 ## 7. M3 准入条件
 
 - [ ] P1-1 至 P1-6 全部关闭
-- [ ] `mvn clean test` 全部通过
+- [x] `mvn clean test` 全部通过
 - [!] V1 已在本地 MySQL 8.0.35 从空 schema 迁移成功；Testcontainers 执行按当前决定暂缓
 - [x] MySQL session 时区验证通过
 - [ ] JWT 与 identity 依赖方向有代码和 ArchUnit 双重守护
-- [ ] prod 缺少密钥或数据库配置时失败启动
+- [x] prod 缺少密钥或数据库配置时失败启动
 - [ ] 文档中的错误码、配置名、字段名与代码一致
 - [ ] 工作区不存在本轮无关修改
 
@@ -290,3 +290,4 @@ mvn clean test
 | 日期 | 结论 | 说明 |
 |---|---|---|
 | 2026-06-08 | 暂不进入 M3 | 发现 6 个 P1 与 6 个 P2，先按本文档逐项关闭 |
+| 2026-06-10 | P1-3 已关闭 | 取消默认 local，新增 prod 基线，统一数据库环境变量并验证安全失败 |

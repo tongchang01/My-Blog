@@ -9,7 +9,8 @@
 - 本地 MySQL（开发用，可选；测试不需要）
 - 环境变量：
   - `MYBLOG_JWT_SECRET`（≥32 字节）— 启动必需
-  - `MYBLOG_DB_URL` / `MYBLOG_DB_USERNAME` / `MYBLOG_DB_PASSWORD`（开发/生产）
+  - `MYBLOG_DATASOURCE_URL` / `MYBLOG_DATASOURCE_USERNAME` / `MYBLOG_DATASOURCE_PASSWORD`（开发/生产）
+  - `MYBLOG_CORS_ALLOWED_ORIGINS`（生产环境按需设置，多个来源用逗号分隔）
 
 ## 2. 常用命令
 
@@ -43,6 +44,9 @@ mvn package
 
 # 本地起服务（local profile）
 mvn spring-boot:run -Dspring-boot.run.profiles=local
+
+# 生产配置基线（必须显式激活 prod）
+mvn spring-boot:run -Dspring-boot.run.profiles=prod
 ```
 
 ## 3. PR / 提交前 Checklist
@@ -61,18 +65,22 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 
 ## 4. 测试 Profile 行为
 
-| Profile | 数据库 | Flyway |
-|---------|--------|--------|
-| `local` | 真实 MySQL | **关闭** |
-| `test`  | H2 内存 | **启动时执行** |
+| Profile | 数据库 | Flyway | API 文档 |
+|---------|--------|--------|----------|
+| `local` | V2 开发 MySQL | **关闭** | 开启 |
+| `test`  | H2 内存 | **启动时执行** | 开启 |
+| `prod`  | 生产 MySQL | **启动时执行** | 关闭 |
 
 集成测试默认走 `test` profile，强制 H2。**不**用真实 MySQL 跑自动化测试。
+
+应用不设置默认 profile。`local` / `prod` 都必须显式激活；数据库账号、密码和 JWT 密钥没有代码默认值，缺失时启动失败。
 
 ## 5. 常见构建报错
 
 | 报错 | 可能原因 |
 |------|----------|
-| `MYBLOG_JWT_SECRET must be set` | 未配置环境变量 |
+| `JWT 密钥不能为空` | 未配置 `MYBLOG_JWT_SECRET` |
+| `Failed to configure a DataSource` / `MYBLOG_DATASOURCE_URL` | 未配置数据库环境变量或未显式激活 profile |
 | Maven Enforcer 失败 | Java / Maven 版本不符合基线，或依赖树出现版本分叉 |
 | ArchitectureRulesTest 失败 | 新写代码违反层依赖规则 |
 | Flyway checksum mismatch | 已执行的迁移脚本被改动（不允许）|

@@ -42,10 +42,11 @@ M1 旧代码清理与 M2 基础设施补齐已经完成，当前准备进入 M3 
 - 已删除：`hutool-all`；公开接口白名单已移除不存在的旧业务路径
 - 已完成：BaseEntity / AuditOnlyBase / AuditFieldHandler / Clock Bean；API 错误消息收口到 ApiErrorCode 中文兜底
 - 已完成：Jackson 固定 Asia/Tokyo 与 ISO-8601 输出；MySQL 连接强制 session 使用 Asia/Tokyo；Knife4j 4.x 仅在 `local` / `test` 开启
+- 已完成：取消默认 local profile；local / prod 必须显式激活，数据库与 JWT 密钥缺失时安全失败
 - 已完成：ArchUnit 按 identity / content / comment / system / stats / common-infra 重写，跨模块只允许依赖对方 application 接口
 - 已完成：Maven Enforcer 锁定 Java 17 / Maven 3.9.x，并执行依赖收敛检查
 - M3 尚未开始；下一步拆分 identity 模块的首批任务
-- 当前基线：`mvn clean test` 通过（68 tests，0 failures）
+- 当前基线：`mvn clean test` 通过（74 tests，0 failures，1 skipped）
 
 **当前处置方案**：M2 已完成，按 identity → system → content → comment → stats / common-infra 顺序重建。
 

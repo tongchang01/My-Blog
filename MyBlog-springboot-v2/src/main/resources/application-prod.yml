@@ -1,0 +1,32 @@
+spring:
+  datasource:
+    url: ${MYBLOG_DATASOURCE_URL}
+    username: ${MYBLOG_DATASOURCE_USERNAME}
+    password: ${MYBLOG_DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  flyway:
+    enabled: true
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false
+
+knife4j:
+  enable: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+myblog:
+  cors:
+    allowed-origins: ${MYBLOG_CORS_ALLOWED_ORIGINS:}
+  security:
+    jwt:
+      issuer: myblog-v2
+      secret: ${MYBLOG_JWT_SECRET}
+      access-token-ttl: 15m

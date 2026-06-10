@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${MYBLOG_DATASOURCE_URL:jdbc:mysql://localhost:3306/aurora?useUnicode=true&characterEncoding=utf8&useSSL=false&connectionTimeZone=Asia/Tokyo&forceConnectionTimeToSession=true&sessionVariables=time_zone='%2B09:00'}
-    username: ${MYBLOG_DATASOURCE_USERNAME:root}
-    password: ${MYBLOG_DATASOURCE_PASSWORD:}
+    url: ${MYBLOG_DATASOURCE_URL:jdbc:mysql://localhost:3306/myblog_v2_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&connectionTimeZone=Asia/Tokyo&forceConnectionTimeToSession=true&sessionVariables=time_zone='%2B09:00'}
+    username: ${MYBLOG_DATASOURCE_USERNAME}
+    password: ${MYBLOG_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
     enabled: false
@@ -24,7 +24,7 @@ myblog:
   security:
     jwt:
       issuer: myblog-v2-local
-      secret: local-secret-local-secret-local-secret-123456
+      secret: ${MYBLOG_JWT_SECRET}
       access-token-ttl: 15m
     public-endpoints:
       - method: GET
