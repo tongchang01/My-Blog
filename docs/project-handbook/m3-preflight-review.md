@@ -218,7 +218,7 @@ PASSWORD 文章功能落地前必须完成。
 
 ## 4. 文档一致性修正
 
-- [ ] `rules/package-layout.md` 与 `arch/module-map.md` 统一 application 依赖方向
+- [x] `rules/package-layout.md` 与 `arch/module-map.md` 统一 application 依赖方向
 - [ ] `rules/security-baseline.md` 删除内存撤销残留
 - [ ] `arch/persistence-strategy.md` 删除保留 `TokenRevocationStore` 的旧结论
 - [ ] `migration/v2-code-reconciliation.md` 更新 JWT 文件处置方案

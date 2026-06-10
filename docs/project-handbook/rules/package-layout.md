@@ -45,9 +45,11 @@
 
 ### 4.2 application 层
 
-- **允许**：ApplicationService、Command、Query、用例输入输出对象、跨领域编排、事务、权限/审计/状态流转组织、调用 domain 中定义的端口
+- **允许**：ApplicationService、Command、Query、用例输入输出对象、跨领域编排、事务、权限/审计/状态流转组织、调用本模块 domain 对象、领域服务和端口
 - **禁止**：拼 SQL、继承或调用 MyBatis-Plus `BaseMapper`、依赖本模块 infrastructure、暴露 HTTP Request/Response、存放数据库 Entity、直接暴露外部 SDK
-- **依赖方向**：`application → domain port`
+- **模块内依赖**：`application → 本模块 domain`
+- **跨模块依赖**：`application → 对方模块 application 契约`，禁止直接依赖对方 domain / web / infrastructure
+- **公共能力依赖**：只依赖 `common` 暴露的稳定 API（如 `common.auth.token`），禁止依赖 `common.security` 等具体实现
 
 ### 4.3 domain 层（最严格）
 
@@ -109,14 +111,15 @@ identity 不依赖 `common.security` 的过滤器、JWT 实现或 Spring Securit
 
 | # | 规则 |
 |---|------|
-| 1 | `..domain..` 不依赖 `..web..` / `..infrastructure..` |
-| 2 | `..web..` 不访问 `..infrastructure.persistence.mapper..` |
-| 3 | `..application..` 不直接访问 MyBatis-Plus Mapper |
+| 1 | `..domain..` 不依赖 `..web..` / `..application..` / `..infrastructure..`，也不依赖 Spring Web、MyBatis、Servlet API |
+| 2 | `..web..` 不依赖 `..infrastructure..` |
+| 3 | `..application..` 不依赖 `..web..` / `..infrastructure..` |
 | 4 | `..common..` 不依赖业务模块 |
-| 5 | 业务模块不互相访问对方 `infrastructure.persistence` |
+| 5 | 跨业务模块只允许依赖对方 `application`，禁止访问对方 `domain` / `web` / `infrastructure` |
 | 6 | `..domain..` 不直接 `LocalDateTime.now()` / `new Date()`（必须用注入的 Clock，ADR-0018 / R-011） |
 | 7 | Flyway 脚本不出现 `FOREIGN KEY`（ADR-0017 / R-012，由 Flyway review 守护，非 ArchUnit）|
 | 8 | 业务模块不依赖 `common.security` 具体实现；`common.auth.token` 不依赖 Spring Security 或业务模块 |
+| 9 | 顶层业务模块之间不存在循环依赖 |
 
 违反任一规则，`mvn test` 直接失败。**新增模块务必同步更新 ArchUnit 规则**。
 

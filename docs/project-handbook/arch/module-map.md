@@ -53,7 +53,9 @@ com.tyb.myblog.v2
 ```
 
 - `domain` 是核心，不依赖任何其它层
-- `application` 仅依赖 `domain`
+- `application` 在模块内依赖本模块 `domain`
+- 跨模块协作时，`application` 只依赖对方模块公开的 `application` 契约
+- 使用公共能力时，只依赖 `common` 的稳定 API，不依赖 `common.security` 等具体实现
 - `web` 依赖 `application`，不直接访问 `infrastructure`
 - `infrastructure` 实现 `domain` 中的仓储接口
 
@@ -88,14 +90,15 @@ common.security JWT implementation ── implements both ports
 
 | # | 规则 | 含义 |
 |---|------|------|
-| 1 | `..domain..` 不依赖 `..web..` / `..infrastructure..` | 领域层保持纯净 |
-| 2 | `..web..` 不访问 `..infrastructure.persistence.mapper..` | Controller 不能直连 Mapper |
-| 3 | `..application..` 不直接访问 MyBatis-Plus Mapper | 应用层通过仓储抽象 |
+| 1 | `..domain..` 不依赖其它层及 Spring Web、MyBatis、Servlet API | 领域层保持纯净 |
+| 2 | `..web..` 不依赖 `..infrastructure..` | HTTP 接入层不能访问 Entity、Mapper 等实现 |
+| 3 | `..application..` 不依赖 `..web..` / `..infrastructure..` | 应用层通过 domain 端口访问技术实现 |
 | 4 | `..common..` 不依赖业务模块 | 公共层不能反向依赖 |
-| 5 | 业务模块不互相访问对方 `infrastructure.persistence` | 跨模块只能走 application 接口 |
+| 5 | 跨业务模块只允许依赖对方 `application` | 禁止访问对方 domain、web、infrastructure |
 | 6 | `..domain..` 不直接 `LocalDateTime.now()` / `new Date()` | 必须用注入的 Clock（ADR-0018 / R-011） |
 | 7 | Flyway 脚本不出现 `FOREIGN KEY` | 禁 DB FK（ADR-0017 / R-012）—— 由 Flyway review 守护，非 ArchUnit |
 | 8 | 业务模块不依赖 `common.security`，token 端口不依赖框架或业务模块 | 冻结认证所有权边界 |
+| 9 | 顶层业务模块之间不存在循环依赖 | 防止模块边界逐步坍塌 |
 
 任何 ArchUnit 违反 → `mvn test` 失败。
 
