@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.stream.Stream;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -90,21 +91,45 @@ class ArchitectureRulesTest {
                     .should().callConstructor(Date.class)
                     .allowEmptyShould(true);
 
-    // web 层只处理 HTTP 入参出参，不能绕过应用层直接访问持久化 Mapper。
+    // web 层只处理 HTTP 入参出参，不能直接依赖 Entity 或其他基础设施实现。
     @ArchTest
-    static final ArchRule web_does_not_depend_on_persistence_mappers =
+    static final ArchRule web_does_not_depend_on_infrastructure =
             noClasses()
                     .that().resideInAPackage("..web..")
-                    .should().dependOnClassesThat().resideInAPackage("..infrastructure.persistence.mapper..")
+                    .should().dependOnClassesThat().resideInAPackage("..infrastructure..")
                     .allowEmptyShould(true);
 
-    // application 层可以依赖 domain，但不能直接依赖 MyBatis-Plus Mapper。
+    // application 层只编排用例，不能反向依赖 Web DTO、Mapper 或 Entity。
     @ArchTest
-    static final ArchRule application_does_not_depend_on_persistence_mappers =
+    static final ArchRule application_does_not_depend_on_web_or_infrastructure =
             noClasses()
                     .that().resideInAPackage("..application..")
-                    .should().dependOnClassesThat().resideInAPackage("..infrastructure.persistence.mapper..")
+                    .should().dependOnClassesThat().resideInAnyPackage("..web..", "..infrastructure..")
                     .allowEmptyShould(true);
+
+    // domain 必须保持框架无关，禁止依赖 Web、MyBatis 和 Servlet API。
+    @ArchTest
+    static final ArchRule domain_does_not_depend_on_framework_apis =
+            noClasses()
+                    .that().resideInAPackage("..domain..")
+                    .should().dependOnClassesThat().resideInAnyPackage(
+                            "org.springframework.web..",
+                            "org.mybatis..",
+                            "com.baomidou.mybatisplus..",
+                            "jakarta.servlet..")
+                    .allowEmptyShould(true);
+
+    // infrastructure 可以适配 application/domain，但不能反向依赖 HTTP 接入层。
+    @ArchTest
+    static final ArchRule infrastructure_does_not_depend_on_web =
+            noClasses()
+                    .that().resideInAPackage("..infrastructure..")
+                    .should().dependOnClassesThat().resideInAPackage("..web..")
+                    .allowEmptyShould(true);
+
+    @ArchTest
+    static final ArchRule business_modules_are_free_of_cycles =
+            moduleCyclesAreForbidden("com.tyb.myblog.v2.(*)..");
 
     // 跨模块只允许依赖对方 application 暴露的接口，禁止访问 domain、web 或 infrastructure。
     @ArchTest
@@ -156,6 +181,12 @@ class ArchitectureRulesTest {
                 .allowEmptyShould(true);
     }
 
+    private static ArchRule moduleCyclesAreForbidden(String packagePattern) {
+        return slices()
+                .matching(packagePattern)
+                .should().beFreeOfCycles();
+    }
+
     @Test
     void declaresCurrentArchitectureBoundaryPackages() {
         assertThatCode(() -> Class.forName("com.tyb.myblog.v2.package-info"))
@@ -171,14 +202,63 @@ class ArchitectureRulesTest {
     }
 
     @Test
-    void applicationMapperRuleRejectsDeliberateViolationFixture() {
+    void applicationRuleRejectsDeliberateLayerViolationFixture() {
         var fixtureClasses = new ClassFileImporter()
                 .importPackages("com.tyb.myblog.v2.architecture.fixture");
 
-        assertThatThrownBy(() -> application_does_not_depend_on_persistence_mappers.check(fixtureClasses))
+        assertThatThrownBy(() -> application_does_not_depend_on_web_or_infrastructure.check(fixtureClasses))
                 .isInstanceOf(AssertionError.class)
                 .hasMessageContaining("InvalidApplicationService")
-                .hasMessageContaining("InvalidMapper");
+                .hasMessageContaining("InvalidMapper")
+                .hasMessageContaining("InvalidEntity")
+                .hasMessageContaining("InvalidWebDto");
+    }
+
+    @Test
+    void webRuleRejectsDeliberateInfrastructureViolationFixture() {
+        var fixtureClasses = new ClassFileImporter()
+                .importPackages("com.tyb.myblog.v2.architecture.fixture");
+
+        assertThatThrownBy(() -> web_does_not_depend_on_infrastructure.check(fixtureClasses))
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContaining("InvalidWebController")
+                .hasMessageContaining("InvalidEntity");
+    }
+
+    @Test
+    void domainRuleRejectsDeliberateFrameworkViolationFixture() {
+        var fixtureClasses = new ClassFileImporter()
+                .importPackages("com.tyb.myblog.v2.architecture.fixture");
+
+        assertThatThrownBy(() -> domain_does_not_depend_on_framework_apis.check(fixtureClasses))
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContaining("InvalidDomainModel")
+                .hasMessageContaining("HttpServletRequest")
+                .hasMessageContaining("WebRequest")
+                .hasMessageContaining("BaseMapper");
+    }
+
+    @Test
+    void infrastructureRuleRejectsDeliberateWebViolationFixture() {
+        var fixtureClasses = new ClassFileImporter()
+                .importPackages("com.tyb.myblog.v2.architecture.fixture");
+
+        assertThatThrownBy(() -> infrastructure_does_not_depend_on_web.check(fixtureClasses))
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContaining("InvalidInfrastructureAdapter")
+                .hasMessageContaining("InvalidWebDto");
+    }
+
+    @Test
+    void moduleCycleRuleRejectsDeliberateCycleFixture() {
+        var fixtureClasses = new ClassFileImporter()
+                .importPackages("com.tyb.myblog.v2.architecture.fixture.cycle");
+
+        assertThatThrownBy(() -> moduleCyclesAreForbidden(
+                "com.tyb.myblog.v2.architecture.fixture.cycle.(*)..").check(fixtureClasses))
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContaining("alpha")
+                .hasMessageContaining("beta");
     }
 
     @Test

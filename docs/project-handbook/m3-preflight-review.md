@@ -187,12 +187,12 @@ PASSWORD 文章功能落地前必须完成。
 
 ### P2-3 ArchUnit 守护不足
 
-- [ ] 禁止 web 依赖 Entity 和 infrastructure
-- [ ] 禁止 application 依赖 Mapper、Entity、Web DTO
-- [ ] 禁止 domain 依赖 Spring Web、MyBatis、Servlet API
-- [ ] 禁止 infrastructure 依赖 web
-- [ ] 增加模块循环依赖检查
-- [ ] 处理空模块下 `allowEmptyShould(true)` 的假通过
+- [x] 禁止 web 依赖 Entity 和 infrastructure
+- [x] 禁止 application 依赖 Mapper、Entity、Web DTO
+- [x] 禁止 domain 依赖 Spring Web、MyBatis、Servlet API
+- [x] 禁止 infrastructure 依赖 web
+- [x] 增加模块循环依赖检查
+- [x] 处理空模块下 `allowEmptyShould(true)` 的假通过：空模块阶段允许规则跳过，但每条新增规则必须通过故意违规夹具证明能够拦截
 
 ### P2-4 测试探针进入生产扫描
 
