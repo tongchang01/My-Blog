@@ -1,0 +1,108 @@
+package com.tyb.myblog.v2.identity.application;
+
+import com.tyb.myblog.v2.identity.application.token.IssuedRefreshToken;
+import com.tyb.myblog.v2.identity.application.token.RefreshTokenService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.ActiveProfiles;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.util.HexFormat;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@ActiveProfiles("test")
+@SpringBootTest
+class RefreshTokenServiceTest {
+
+    @Autowired
+    private RefreshTokenService refreshTokenService;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @BeforeEach
+    void clearRefreshTokens() {
+        jdbcTemplate.update("delete from t_refresh_token");
+    }
+
+    @Test
+    void issuesHighEntropyTokenAndStoresOnlySha256Hash() {
+        IssuedRefreshToken issued = refreshTokenService.issue(1001L);
+
+        String storedHash = jdbcTemplate.queryForObject(
+                "select token_hash from t_refresh_token where user_id = 1001",
+                String.class);
+        Integer rawTokenCount = jdbcTemplate.queryForObject(
+                "select count(*) from t_refresh_token where token_hash = ?",
+                Integer.class,
+                issued.token());
+
+        assertThat(issued.token()).hasSizeGreaterThanOrEqualTo(43);
+        assertThat(storedHash).isEqualTo(sha256(issued.token()));
+        assertThat(rawTokenCount).isZero();
+        assertThat(issued.expiresAt()).isAfter(LocalDateTime.now());
+    }
+
+    @Test
+    void rotatesTokenOnceAndRejectsReusingConsumedToken() {
+        IssuedRefreshToken first = refreshTokenService.issue(1001L);
+
+        IssuedRefreshToken second = refreshTokenService.rotate(first.token()).orElseThrow();
+
+        assertThat(second.token()).isNotEqualTo(first.token());
+        assertThat(refreshTokenService.rotate(first.token())).isEmpty();
+        Integer activeCount = jdbcTemplate.queryForObject(
+                "select count(*) from t_refresh_token where user_id = 1001 and revoked = 0",
+                Integer.class);
+        assertThat(activeCount).isEqualTo(1);
+    }
+
+    @Test
+    void rejectsExpiredOrRevokedToken() {
+        IssuedRefreshToken expired = refreshTokenService.issue(1001L);
+        jdbcTemplate.update(
+                "update t_refresh_token set expires_at = ? where user_id = 1001",
+                LocalDateTime.now().minusMinutes(1));
+
+        IssuedRefreshToken revoked = refreshTokenService.issue(1001L);
+        assertThat(refreshTokenService.revoke(revoked.token())).isTrue();
+
+        assertThat(refreshTokenService.rotate(expired.token())).isEmpty();
+        assertThat(refreshTokenService.rotate(revoked.token())).isEmpty();
+        assertThat(refreshTokenService.revoke(revoked.token())).isFalse();
+    }
+
+    @Test
+    void revokesAllActiveTokensForUser() {
+        IssuedRefreshToken first = refreshTokenService.issue(1001L);
+        IssuedRefreshToken second = refreshTokenService.issue(1001L);
+        refreshTokenService.issue(2002L);
+
+        int revokedCount = refreshTokenService.revokeAllForUser(1001L);
+
+        assertThat(revokedCount).isEqualTo(2);
+        assertThat(refreshTokenService.rotate(first.token())).isEmpty();
+        assertThat(refreshTokenService.rotate(second.token())).isEmpty();
+        Integer otherUserActiveCount = jdbcTemplate.queryForObject(
+                "select count(*) from t_refresh_token where user_id = 2002 and revoked = 0",
+                Integer.class);
+        assertThat(otherUserActiveCount).isEqualTo(1);
+    }
+
+    private String sha256(String value) {
+        try {
+            byte[] digest = MessageDigest.getInstance("SHA-256")
+                    .digest(value.getBytes(StandardCharsets.UTF_8));
+            return HexFormat.of().formatHex(digest);
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IllegalStateException(ex);
+        }
+    }
+}

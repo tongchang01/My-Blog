@@ -143,7 +143,7 @@ infrastructure -> domain port implementation
 
 1. [x] `统一JWT声明与校验规则`
 2. [x] `移除内存Token撤销实现`
-3. [ ] `实现refresh token持久化流程`
+3. [x] `实现refresh token持久化流程`
 
 ### P1-6 客户端 IP 信任模型不安全
 

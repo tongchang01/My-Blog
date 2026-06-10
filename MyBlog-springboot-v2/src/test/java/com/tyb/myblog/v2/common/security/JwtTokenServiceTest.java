@@ -26,7 +26,7 @@ class JwtTokenServiceTest {
     private static final String SECRET = "test-secret-test-secret-test-secret-123456";
 
     private final JwtTokenService tokenService = new JwtTokenService(
-            new SecurityJwtProperties(ISSUER, SECRET, Duration.ofMinutes(15)));
+            new SecurityJwtProperties(ISSUER, SECRET, Duration.ofMinutes(15), Duration.ofDays(7)));
 
     @Test
     void issuesAndParsesAccessToken() {

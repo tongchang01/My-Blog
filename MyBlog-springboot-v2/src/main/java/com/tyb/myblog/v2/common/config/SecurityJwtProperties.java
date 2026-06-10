@@ -13,11 +13,13 @@ import java.time.Duration;
  * @param issuer         JWT 签发者标识，用于区分当前系统签发的 token
  * @param secret         JWT HMAC 签名密钥，生产环境应使用足够长度且不可提交到 Git 的密钥
  * @param accessTokenTtl 访问令牌有效期，过长会扩大 token 泄露后的风险窗口
+ * @param refreshTokenTtl refresh token 有效期
  */
 @ConfigurationProperties("myblog.security.jwt")
 public record SecurityJwtProperties(
         String issuer,
         String secret,
-        Duration accessTokenTtl
+        Duration accessTokenTtl,
+        Duration refreshTokenTtl
 ) {
 }

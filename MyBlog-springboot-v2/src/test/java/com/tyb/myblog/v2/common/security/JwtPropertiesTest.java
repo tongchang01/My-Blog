@@ -21,6 +21,7 @@ class JwtPropertiesTest {
     void bindsJwtSettings() {
         assertThat(jwtProperties.issuer()).isEqualTo("myblog-v2-test");
         assertThat(jwtProperties.accessTokenTtl()).isEqualTo(Duration.ofSeconds(900));
+        assertThat(jwtProperties.refreshTokenTtl()).isEqualTo(Duration.ofDays(7));
         assertThat(jwtProperties.secret()).hasSizeGreaterThanOrEqualTo(32);
     }
 }

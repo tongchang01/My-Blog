@@ -24,6 +24,7 @@ myblog:
       issuer: myblog-v2-test
       secret: test-secret-test-secret-test-secret-123456
       access-token-ttl: 15m
+      refresh-token-ttl: 7d
     public-endpoints:
       - method: GET
         path: /actuator/health

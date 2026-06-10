@@ -61,6 +61,10 @@ class JwtSecretStartupValidatorTest {
     }
 
     private SecurityJwtProperties properties(String secret) {
-        return new SecurityJwtProperties("myblog-v2-test", secret, Duration.ofMinutes(15));
+        return new SecurityJwtProperties(
+                "myblog-v2-test",
+                secret,
+                Duration.ofMinutes(15),
+                Duration.ofDays(7));
     }
 }
