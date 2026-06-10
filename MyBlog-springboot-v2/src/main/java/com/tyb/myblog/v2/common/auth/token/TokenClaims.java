@@ -10,13 +10,15 @@ import java.util.List;
  * @param userId    当前登录用户 ID，对应 JWT {@code sub}
  * @param username  登录用户名
  * @param roles     用户角色名称列表，不包含 {@code ROLE_} 前缀
- * @param expiresAt token 过期时间
+ * @param tokenVersion 用户 token 版本，对应 JWT {@code ver}
+ * @param expiresAt    token 过期时间
  */
 public record TokenClaims(
         String tokenId,
         String userId,
         String username,
         List<String> roles,
+        int tokenVersion,
         Instant expiresAt
 ) {
 }

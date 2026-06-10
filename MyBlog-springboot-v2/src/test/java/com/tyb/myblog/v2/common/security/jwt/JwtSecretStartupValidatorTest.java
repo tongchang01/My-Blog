@@ -33,6 +33,25 @@ class JwtSecretStartupValidatorTest {
     }
 
     @Test
+    void rejectsSecretShorterThanThirtyTwoUtf8Bytes() {
+        JwtSecretStartupValidator validator = new JwtSecretStartupValidator(
+                properties("1234567890123456789012345678901"));
+
+        assertThatThrownBy(validator::afterPropertiesSet)
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("32 字节");
+    }
+
+    @Test
+    void acceptsSecretWithAtLeastThirtyTwoUtf8Bytes() {
+        JwtSecretStartupValidator validator = new JwtSecretStartupValidator(
+                properties("密钥密钥密钥密钥密钥密钥密钥密钥密钥密钥密钥"));
+
+        assertThatCode(validator::afterPropertiesSet)
+                .doesNotThrowAnyException();
+    }
+
+    @Test
     void acceptsExplicitTestSecret() {
         JwtSecretStartupValidator validator = new JwtSecretStartupValidator(
                 properties("test-secret-test-secret-test-secret-123456"));

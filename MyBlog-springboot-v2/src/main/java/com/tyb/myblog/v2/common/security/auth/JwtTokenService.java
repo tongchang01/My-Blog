@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -33,6 +34,8 @@ import java.util.UUID;
  */
 @Service
 public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
+
+    private static final String ACCESS_TOKEN_TYPE = "access";
 
     /**
      * JWT HMAC 签名算法。
@@ -67,9 +70,11 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
         this.revocationStore = revocationStore;
         SecretKey secretKey = new SecretKeySpec(properties.secret().getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM);
         this.jwtEncoder = new NimbusJwtEncoder(new ImmutableSecret<>(secretKey));
-        this.jwtDecoder = NimbusJwtDecoder.withSecretKey(secretKey)
+        NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey)
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
+        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(properties.issuer()));
+        this.jwtDecoder = decoder;
     }
 
     /**
@@ -78,10 +83,11 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
      * @param userId   用户 ID
      * @param username 登录用户名
      * @param roles    用户角色名称列表
+     * @param tokenVersion 用户当前 token 版本
      * @return 访问令牌和过期时间
      */
     @Override
-    public TokenPair issueAccessToken(String userId, String username, List<String> roles) {
+    public TokenPair issueAccessToken(String userId, String username, List<String> roles, int tokenVersion) {
         Instant issuedAt = Instant.now();
         Instant expiresAt = issuedAt.plus(properties.accessTokenTtl());
         String tokenId = UUID.randomUUID().toString();
@@ -91,6 +97,8 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
                 .expiresAt(expiresAt)
                 .id(tokenId)
                 .subject(userId)
+                .claim("typ", ACCESS_TOKEN_TYPE)
+                .claim("ver", tokenVersion)
                 .claim("username", username)
                 .claim("roles", roles)
                 .build();
@@ -111,7 +119,8 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
     public Optional<TokenClaims> verify(String token) {
         try {
             Jwt jwt = jwtDecoder.decode(token);
-            if (revocationStore.isRevoked(jwt.getId())) {
+            Integer tokenVersion = readTokenVersion(jwt);
+            if (!hasRequiredAccessClaims(jwt, tokenVersion) || revocationStore.isRevoked(jwt.getId())) {
                 return Optional.empty();
             }
             return Optional.of(new TokenClaims(
@@ -119,6 +128,7 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
                     jwt.getSubject(),
                     jwt.getClaimAsString("username"),
                     readRoles(jwt),
+                    tokenVersion,
                     jwt.getExpiresAt()
             ));
         } catch (RuntimeException ex) {
@@ -146,5 +156,27 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
             return List.of();
         }
         return List.copyOf(roleNames);
+    }
+
+    private boolean hasRequiredAccessClaims(Jwt jwt, Integer tokenVersion) {
+        return ACCESS_TOKEN_TYPE.equals(jwt.getClaimAsString("typ"))
+                && jwt.getId() != null
+                && jwt.getSubject() != null
+                && jwt.getIssuedAt() != null
+                && jwt.getExpiresAt() != null
+                && tokenVersion != null;
+    }
+
+    private Integer readTokenVersion(Jwt jwt) {
+        Object claim = jwt.getClaim("ver");
+        if (!(claim instanceof Number number)) {
+            return null;
+        }
+        double value = number.doubleValue();
+        int integerValue = number.intValue();
+        if (integerValue < 0 || value != integerValue) {
+            return null;
+        }
+        return integerValue;
     }
 }

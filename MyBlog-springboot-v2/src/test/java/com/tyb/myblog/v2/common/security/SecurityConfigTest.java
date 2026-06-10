@@ -47,7 +47,7 @@ class SecurityConfigTest {
     @Test
     void returnsForbiddenWhenRoleIsInsufficient() throws Exception {
         String token = tokenService
-                .issueAccessToken("user-1", "demo@example.com", List.of("DEMO"))
+                .issueAccessToken("user-1", "demo@example.com", List.of("DEMO"), 0)
                 .accessToken();
 
         mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))

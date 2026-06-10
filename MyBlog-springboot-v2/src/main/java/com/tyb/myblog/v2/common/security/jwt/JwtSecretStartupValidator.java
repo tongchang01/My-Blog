@@ -5,6 +5,8 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.nio.charset.StandardCharsets;
+
 /**
  * JWT 密钥启动校验器。
  *
@@ -39,6 +41,9 @@ public class JwtSecretStartupValidator implements InitializingBean {
         }
         if (DEFAULT_DEVELOPMENT_SECRET.equals(secret)) {
             throw new IllegalStateException("JWT 密钥不能使用默认开发值，请配置真实密钥。");
+        }
+        if (secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException("JWT 密钥按 UTF-8 编码后不能少于 32 字节。");
         }
     }
 }

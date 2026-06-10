@@ -9,5 +9,5 @@ import java.util.List;
  */
 public interface AccessTokenIssuer {
 
-    TokenPair issueAccessToken(String userId, String username, List<String> roles);
+    TokenPair issueAccessToken(String userId, String username, List<String> roles, int tokenVersion);
 }
