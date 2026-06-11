@@ -144,6 +144,9 @@ infrastructure -> domain port implementation
 1. [x] `统一JWT声明与校验规则`
 2. [x] `移除内存Token撤销实现`
 3. [x] `实现refresh token持久化流程`
+4. [x] `实现token_version持久化校验`
+5. [ ] `实现用户Token整体撤销用例`
+6. [ ] `统一认证失败错误码`
 
 ### P1-6 客户端 IP 信任模型不安全
 

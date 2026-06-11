@@ -1,7 +1,7 @@
 package com.tyb.myblog.v2.common.security.auth;
 
 import com.tyb.myblog.v2.common.auth.token.AccessTokenIssuer;
-import com.tyb.myblog.v2.common.auth.token.AccessTokenVerifier;
+import com.tyb.myblog.v2.common.auth.token.AccessTokenDecoder;
 import com.tyb.myblog.v2.common.auth.token.TokenClaims;
 import com.tyb.myblog.v2.common.auth.token.TokenPair;
 import com.tyb.myblog.v2.common.config.SecurityJwtProperties;
@@ -33,7 +33,7 @@ import java.util.UUID;
  * 因此生产环境必须保护好 {@link SecurityJwtProperties#secret()}，不能提交到 Git。</p>
  */
 @Service
-public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
+public class JwtTokenService implements AccessTokenIssuer, AccessTokenDecoder {
 
     private static final String ACCESS_TOKEN_TYPE = "access";
 
@@ -110,7 +110,7 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenVerifier {
      * @return 解析后的声明
      */
     @Override
-    public Optional<TokenClaims> verify(String token) {
+    public Optional<TokenClaims> decode(String token) {
         try {
             Jwt jwt = jwtDecoder.decode(token);
             Integer tokenVersion = readTokenVersion(jwt);

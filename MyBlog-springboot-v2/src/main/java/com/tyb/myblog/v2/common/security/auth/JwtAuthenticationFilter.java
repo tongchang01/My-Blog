@@ -24,7 +24,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     /**
-     * JWT 签发、解析和撤销服务。
+     * 访问令牌验证端口。
      */
     private final AccessTokenVerifier tokenVerifier;
     /**

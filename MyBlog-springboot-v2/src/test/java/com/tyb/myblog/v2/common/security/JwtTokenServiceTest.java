@@ -31,7 +31,7 @@ class JwtTokenServiceTest {
     @Test
     void issuesAndParsesAccessToken() {
         var token = tokenService.issueAccessToken("user-1", "admin@example.com", List.of("ADMIN"), 3);
-        var claims = tokenService.verify(token.accessToken()).orElseThrow();
+        var claims = tokenService.decode(token.accessToken()).orElseThrow();
 
         assertThat(claims.userId()).isEqualTo("user-1");
         assertThat(claims.username()).isEqualTo("admin@example.com");
@@ -53,21 +53,21 @@ class JwtTokenServiceTest {
     void rejectsTokenFromWrongIssuer() {
         String token = signedToken(claims -> claims.issuer("another-service"));
 
-        assertThat(tokenService.verify(token)).isEmpty();
+        assertThat(tokenService.decode(token)).isEmpty();
     }
 
     @Test
     void rejectsArticleAccessTokenAsLoginAccessToken() {
         String token = signedToken(claims -> claims.claim("typ", "article_access"));
 
-        assertThat(tokenService.verify(token)).isEmpty();
+        assertThat(tokenService.decode(token)).isEmpty();
     }
 
     @Test
     void rejectsTokenWithoutIntegerVersion() {
         String token = signedToken(claims -> claims.claim("ver", "0"));
 
-        assertThat(tokenService.verify(token)).isEmpty();
+        assertThat(tokenService.decode(token)).isEmpty();
     }
 
     @Test
@@ -77,7 +77,7 @@ class JwtTokenServiceTest {
                 .issuedAt(now.minusSeconds(120))
                 .expiresAt(now.minusSeconds(60)));
 
-        assertThat(tokenService.verify(token)).isEmpty();
+        assertThat(tokenService.decode(token)).isEmpty();
     }
 
     private String signedToken(Consumer<JwtClaimsSet.Builder> customization) {

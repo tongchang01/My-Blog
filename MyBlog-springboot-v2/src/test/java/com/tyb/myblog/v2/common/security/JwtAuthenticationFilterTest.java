@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,10 +26,26 @@ class JwtAuthenticationFilterTest {
     @Autowired
     private JwtTokenService tokenService;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @Test
     void authenticatesValidBearerTokenAndRejectsInvalidToken() throws Exception {
+        jdbcTemplate.update("delete from t_refresh_token");
+        jdbcTemplate.update("delete from t_user_auth");
+        jdbcTemplate.update("""
+                insert into t_user_auth (
+                    id, username, password_hash, type, token_version, deleted
+                ) values (?, ?, ?, ?, ?, ?)
+                """,
+                1001L,
+                "admin",
+                "$2a$10$test-password-hash",
+                1,
+                0,
+                0);
         String token = tokenService
-                .issueAccessToken("user-1", "admin@example.com", List.of("ADMIN"), 0)
+                .issueAccessToken("1001", "admin@example.com", List.of("ADMIN"), 0)
                 .accessToken();
 
         mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))

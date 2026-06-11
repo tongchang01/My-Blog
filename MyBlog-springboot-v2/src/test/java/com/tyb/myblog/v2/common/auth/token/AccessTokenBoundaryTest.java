@@ -10,6 +10,7 @@ class AccessTokenBoundaryTest {
     @Test
     void jwtImplementationExposesStableCommonAuthPorts() {
         assertThat(AccessTokenIssuer.class).isAssignableFrom(JwtTokenService.class);
-        assertThat(AccessTokenVerifier.class).isAssignableFrom(JwtTokenService.class);
+        assertThat(AccessTokenDecoder.class).isAssignableFrom(JwtTokenService.class);
+        assertThat(AccessTokenVerifier.class.isAssignableFrom(JwtTokenService.class)).isFalse();
     }
 }
