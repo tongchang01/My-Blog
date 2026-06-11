@@ -13,6 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HexFormat;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,24 +121,13 @@ class RefreshTokenServiceTest {
     }
 
     /**
-     * 验证按用户整体撤销不会误伤其他后台用户的 refresh token。
+     * 验证 refresh token 服务不暴露绕过 access token 版本递增的批量撤销入口。
      */
     @Test
-    void revokesAllActiveTokensForUser() {
-        insertUser(1001L, 0);
-        IssuedRefreshToken first = refreshTokenService.issue(1001L);
-        IssuedRefreshToken second = refreshTokenService.issue(1001L);
-        refreshTokenService.issue(2002L);
-
-        int revokedCount = refreshTokenService.revokeAllForUser(1001L);
-
-        assertThat(revokedCount).isEqualTo(2);
-        assertThat(refreshTokenService.rotate(first.token())).isEmpty();
-        assertThat(refreshTokenService.rotate(second.token())).isEmpty();
-        Integer otherUserActiveCount = jdbcTemplate.queryForObject(
-                "select count(*) from t_refresh_token where user_id = 2002 and revoked = 0",
-                Integer.class);
-        assertThat(otherUserActiveCount).isEqualTo(1);
+    void exposesNoRefreshOnlyBulkRevocationOperation() {
+        assertThat(Arrays.stream(RefreshTokenService.class.getDeclaredMethods())
+                .map(method -> method.getName()))
+                .doesNotContain("revokeAllForUser");
     }
 
     private void insertUser(long userId, int deleted) {

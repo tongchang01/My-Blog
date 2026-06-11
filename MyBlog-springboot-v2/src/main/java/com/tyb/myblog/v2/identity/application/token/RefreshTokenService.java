@@ -90,17 +90,6 @@ public class RefreshTokenService {
                 .orElse(false);
     }
 
-    /**
-     * 撤销指定后台用户的全部有效 refresh token。
-     *
-     * @param userId 后台用户 ID
-     * @return 实际撤销的记录数
-     */
-    @Transactional
-    public int revokeAllForUser(long userId) {
-        return repository.revokeAllByUserId(userId);
-    }
-
     private String generateToken() {
         byte[] bytes = new byte[TOKEN_BYTES];
         secureRandom.nextBytes(bytes);
