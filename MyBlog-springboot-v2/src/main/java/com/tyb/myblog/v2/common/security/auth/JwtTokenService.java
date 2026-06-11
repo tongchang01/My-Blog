@@ -6,13 +6,15 @@ import com.tyb.myblog.v2.common.auth.token.TokenClaims;
 import com.tyb.myblog.v2.common.auth.token.TokenPair;
 import com.tyb.myblog.v2.common.config.SecurityJwtProperties;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
-import org.springframework.security.oauth2.jwt.JwtValidators;
+import org.springframework.security.oauth2.jwt.JwtIssuerValidator;
+import org.springframework.security.oauth2.jwt.JwtTimestampValidator;
 import org.springframework.security.oauth2.jwt.JwsHeader;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +54,10 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenDecoder {
      */
     private final JwtEncoder jwtEncoder;
     /**
+     * JWT 签发和校验使用的应用统一时钟。
+     */
+    private final Clock clock;
+    /**
      * JWT 解码器。
      */
     private final JwtDecoder jwtDecoder;
@@ -59,15 +66,21 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenDecoder {
      * 创建 JWT 服务。
      *
      * @param properties JWT 配置项
+     * @param clock      应用统一时钟
      */
-    public JwtTokenService(SecurityJwtProperties properties) {
+    public JwtTokenService(SecurityJwtProperties properties, Clock clock) {
         this.properties = properties;
+        this.clock = clock;
         SecretKey secretKey = new SecretKeySpec(properties.secret().getBytes(StandardCharsets.UTF_8), HMAC_ALGORITHM);
         this.jwtEncoder = new NimbusJwtEncoder(new ImmutableSecret<>(secretKey));
         NimbusJwtDecoder decoder = NimbusJwtDecoder.withSecretKey(secretKey)
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
-        decoder.setJwtValidator(JwtValidators.createDefaultWithIssuer(properties.issuer()));
+        JwtTimestampValidator timestampValidator = new JwtTimestampValidator();
+        timestampValidator.setClock(clock);
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                timestampValidator,
+                new JwtIssuerValidator(properties.issuer())));
         this.jwtDecoder = decoder;
     }
 
@@ -82,7 +95,7 @@ public class JwtTokenService implements AccessTokenIssuer, AccessTokenDecoder {
      */
     @Override
     public TokenPair issueAccessToken(String userId, String username, List<String> roles, int tokenVersion) {
-        Instant issuedAt = Instant.now();
+        Instant issuedAt = Instant.now(clock);
         Instant expiresAt = issuedAt.plus(properties.accessTokenTtl());
         String tokenId = UUID.randomUUID().toString();
         JwtClaimsSet claims = JwtClaimsSet.builder()
