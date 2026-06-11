@@ -8,6 +8,12 @@ import java.util.OptionalInt;
  */
 public interface UserTokenVersionRepository {
 
+    /**
+     * 查询未删除后台用户的当前 token 版本。
+     *
+     * @param userId 后台用户 ID
+     * @return 用户不存在或已删除时返回空
+     */
     OptionalInt findActiveTokenVersion(long userId);
 
     /**

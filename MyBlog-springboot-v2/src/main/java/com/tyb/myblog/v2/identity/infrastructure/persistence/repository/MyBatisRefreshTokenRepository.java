@@ -10,6 +10,11 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+/**
+ * 基于 MyBatis-Plus 的 refresh token 持久化适配器。
+ *
+ * <p>负责领域记录与数据库实体转换，不向上层暴露 Mapper 或持久化状态值。</p>
+ */
 @Repository
 public class MyBatisRefreshTokenRepository implements RefreshTokenRepository {
 

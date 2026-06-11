@@ -32,6 +32,9 @@ class PersistentAccessTokenVerifierTest {
         jdbcTemplate.update("delete from t_user_auth");
     }
 
+    /**
+     * 验证未被撤销且版本匹配的后台 access token 可以通过校验。
+     */
     @Test
     void acceptsTokenMatchingCurrentUserTokenVersion() {
         insertUser(1001L, 3, 0);
@@ -40,6 +43,9 @@ class PersistentAccessTokenVerifierTest {
         assertThat(tokenVerifier.verify(token)).isPresent();
     }
 
+    /**
+     * 验证整体撤销导致 token_version 递增后，旧 access token 立即失效。
+     */
     @Test
     void rejectsTokenWithOutdatedUserTokenVersion() {
         insertUser(1001L, 4, 0);
@@ -48,6 +54,9 @@ class PersistentAccessTokenVerifierTest {
         assertThat(tokenVerifier.verify(token)).isEmpty();
     }
 
+    /**
+     * 验证不存在或已删除的后台用户不能仅凭历史 JWT 继续访问。
+     */
     @Test
     void rejectsTokenForMissingOrDeletedUser() {
         String missingUserToken = issueToken(1001L, 0);

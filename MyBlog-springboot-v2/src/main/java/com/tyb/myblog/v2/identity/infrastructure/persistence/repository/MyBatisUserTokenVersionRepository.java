@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.OptionalInt;
 
+/**
+ * 基于 MyBatis 的后台用户 token 版本持久化适配器。
+ */
 @Repository
 public class MyBatisUserTokenVersionRepository implements UserTokenVersionRepository {
 

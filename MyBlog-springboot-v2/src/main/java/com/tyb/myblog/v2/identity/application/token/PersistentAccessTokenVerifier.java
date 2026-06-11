@@ -25,6 +25,15 @@ public class PersistentAccessTokenVerifier implements AccessTokenVerifier {
         this.userTokenVersionRepository = userTokenVersionRepository;
     }
 
+    /**
+     * 校验 JWT 本身及后台用户当前持久化状态。
+     *
+     * <p>只有用户仍存在、未删除且 token_version 与 JWT 声明一致时才接受访问令牌。
+     * 该校验保证整体撤销后，旧 access token 立即失效。</p>
+     *
+     * @param token access token 明文
+     * @return 校验成功时返回令牌声明，否则返回空
+     */
     @Override
     public Optional<TokenClaims> verify(String token) {
         return tokenDecoder.decode(token).flatMap(this::verifyUserState);

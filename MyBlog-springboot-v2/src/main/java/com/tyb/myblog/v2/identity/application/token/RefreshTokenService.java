@@ -38,6 +38,14 @@ public class RefreshTokenService {
         this.clock = clock;
     }
 
+    /**
+     * 为指定后台用户签发新的 refresh token。
+     *
+     * <p>仅向调用方返回一次明文，持久层只保存 SHA-256 摘要；过期时间使用应用统一时钟计算。</p>
+     *
+     * @param userId 后台用户 ID
+     * @return 包含明文和过期时间的签发结果
+     */
     @Transactional
     public IssuedRefreshToken issue(long userId) {
         String rawToken = generateToken();
@@ -46,6 +54,14 @@ public class RefreshTokenService {
         return new IssuedRefreshToken(userId, rawToken, expiresAt);
     }
 
+    /**
+     * 轮换仍有效的 refresh token。
+     *
+     * <p>查询时锁定旧记录，并在同一事务中完成撤销和重新签发，防止旧 token 被并发重复消费。</p>
+     *
+     * @param rawToken 调用方持有的 refresh token 明文
+     * @return 轮换成功时返回新 token；无效、过期或已撤销时返回空
+     */
     @Transactional
     public Optional<IssuedRefreshToken> rotate(String rawToken) {
         LocalDateTime now = LocalDateTime.now(clock);
@@ -54,6 +70,12 @@ public class RefreshTokenService {
                 .map(token -> issue(token.userId()));
     }
 
+    /**
+     * 撤销一枚仍有效的 refresh token。
+     *
+     * @param rawToken 调用方持有的 refresh token 明文
+     * @return 实际撤销成功时返回 true
+     */
     @Transactional
     public boolean revoke(String rawToken) {
         return repository.findActiveForUpdate(hash(rawToken), LocalDateTime.now(clock))
@@ -61,6 +83,12 @@ public class RefreshTokenService {
                 .orElse(false);
     }
 
+    /**
+     * 撤销指定后台用户的全部有效 refresh token。
+     *
+     * @param userId 后台用户 ID
+     * @return 实际撤销的记录数
+     */
     @Transactional
     public int revokeAllForUser(long userId) {
         return repository.revokeAllByUserId(userId);

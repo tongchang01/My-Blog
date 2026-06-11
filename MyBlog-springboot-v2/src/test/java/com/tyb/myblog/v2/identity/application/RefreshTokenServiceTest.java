@@ -32,6 +32,9 @@ class RefreshTokenServiceTest {
         jdbcTemplate.update("delete from t_refresh_token");
     }
 
+    /**
+     * 验证 refresh token 明文只返回给调用方，数据库仅保存不可逆摘要。
+     */
     @Test
     void issuesHighEntropyTokenAndStoresOnlySha256Hash() {
         IssuedRefreshToken issued = refreshTokenService.issue(1001L);
@@ -50,6 +53,9 @@ class RefreshTokenServiceTest {
         assertThat(issued.expiresAt()).isAfter(LocalDateTime.now());
     }
 
+    /**
+     * 验证同一枚 refresh token 只能成功轮换一次，防止旧 token 重放。
+     */
     @Test
     void rotatesTokenOnceAndRejectsReusingConsumedToken() {
         IssuedRefreshToken first = refreshTokenService.issue(1001L);
@@ -64,6 +70,9 @@ class RefreshTokenServiceTest {
         assertThat(activeCount).isEqualTo(1);
     }
 
+    /**
+     * 验证过期或已撤销的 refresh token 不能继续轮换或重复撤销。
+     */
     @Test
     void rejectsExpiredOrRevokedToken() {
         IssuedRefreshToken expired = refreshTokenService.issue(1001L);
@@ -79,6 +88,9 @@ class RefreshTokenServiceTest {
         assertThat(refreshTokenService.revoke(revoked.token())).isFalse();
     }
 
+    /**
+     * 验证按用户整体撤销不会误伤其他后台用户的 refresh token。
+     */
     @Test
     void revokesAllActiveTokensForUser() {
         IssuedRefreshToken first = refreshTokenService.issue(1001L);
