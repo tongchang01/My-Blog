@@ -8,4 +8,6 @@ import java.util.OptionalInt;
 public interface UserTokenVersionRepository {
 
     OptionalInt findActiveTokenVersion(long userId);
+
+    boolean incrementActiveTokenVersion(long userId);
 }

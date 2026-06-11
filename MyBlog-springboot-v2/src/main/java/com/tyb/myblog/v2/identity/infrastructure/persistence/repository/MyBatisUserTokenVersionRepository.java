@@ -20,4 +20,9 @@ public class MyBatisUserTokenVersionRepository implements UserTokenVersionReposi
         Integer tokenVersion = mapper.selectActiveTokenVersion(userId);
         return tokenVersion == null ? OptionalInt.empty() : OptionalInt.of(tokenVersion);
     }
+
+    @Override
+    public boolean incrementActiveTokenVersion(long userId) {
+        return mapper.incrementActiveTokenVersion(userId) == 1;
+    }
 }
