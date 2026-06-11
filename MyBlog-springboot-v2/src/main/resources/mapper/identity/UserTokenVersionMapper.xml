@@ -12,6 +12,15 @@
           AND deleted = 0
     </select>
 
+    <!-- refresh 时只接受未删除且锁定期已结束的后台用户。 -->
+    <select id="selectRefreshableTokenVersion" resultType="java.lang.Integer">
+        SELECT token_version
+        FROM t_user_auth
+        WHERE id = #{userId}
+          AND deleted = 0
+          AND (locked_until IS NULL OR locked_until &lt;= #{now})
+    </select>
+
     <!-- 撤销用户全部 access token，并保留应用层统一时钟与真实操作者审计信息。 -->
     <update id="incrementActiveTokenVersion">
         UPDATE t_user_auth

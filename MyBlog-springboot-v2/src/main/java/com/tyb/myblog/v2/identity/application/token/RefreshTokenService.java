@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.identity.application.token;
 
 import com.tyb.myblog.v2.common.config.SecurityJwtProperties;
+import com.tyb.myblog.v2.identity.domain.auth.UserTokenVersionRepository;
 import com.tyb.myblog.v2.identity.domain.token.RefreshTokenRecord;
 import com.tyb.myblog.v2.identity.domain.token.RefreshTokenRepository;
 import org.springframework.stereotype.Service;
@@ -25,15 +26,18 @@ public class RefreshTokenService {
     private static final int TOKEN_BYTES = 32;
 
     private final RefreshTokenRepository repository;
+    private final UserTokenVersionRepository userTokenVersionRepository;
     private final SecurityJwtProperties properties;
     private final Clock clock;
     private final SecureRandom secureRandom = new SecureRandom();
 
     public RefreshTokenService(
             RefreshTokenRepository repository,
+            UserTokenVersionRepository userTokenVersionRepository,
             SecurityJwtProperties properties,
             Clock clock) {
         this.repository = repository;
+        this.userTokenVersionRepository = userTokenVersionRepository;
         this.properties = properties;
         this.clock = clock;
     }
@@ -60,13 +64,16 @@ public class RefreshTokenService {
      * <p>查询时锁定旧记录，并在同一事务中完成撤销和重新签发，防止旧 token 被并发重复消费。</p>
      *
      * @param rawToken 调用方持有的 refresh token 明文
-     * @return 轮换成功时返回新 token；无效、过期或已撤销时返回空
+     * @return 轮换成功时返回新 token；token 无效或后台用户不可用时返回空
      */
     @Transactional
     public Optional<IssuedRefreshToken> rotate(String rawToken) {
         LocalDateTime now = LocalDateTime.now(clock);
         return repository.findActiveForUpdate(hash(rawToken), now)
                 .filter(token -> repository.revoke(token.id()))
+                .filter(token -> userTokenVersionRepository
+                        .findRefreshableTokenVersion(token.userId(), now)
+                        .isPresent())
                 .map(token -> issue(token.userId()));
     }
 

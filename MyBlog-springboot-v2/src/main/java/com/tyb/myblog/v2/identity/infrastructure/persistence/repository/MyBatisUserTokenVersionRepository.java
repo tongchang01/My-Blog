@@ -26,6 +26,12 @@ public class MyBatisUserTokenVersionRepository implements UserTokenVersionReposi
     }
 
     @Override
+    public OptionalInt findRefreshableTokenVersion(long userId, LocalDateTime now) {
+        Integer tokenVersion = mapper.selectRefreshableTokenVersion(userId, now);
+        return tokenVersion == null ? OptionalInt.empty() : OptionalInt.of(tokenVersion);
+    }
+
+    @Override
     public boolean incrementActiveTokenVersion(long userId, LocalDateTime updatedAt, Long updatedBy) {
         return mapper.incrementActiveTokenVersion(userId, updatedAt, updatedBy) == 1;
     }

@@ -17,6 +17,13 @@ public interface UserTokenVersionMapper {
     Integer selectActiveTokenVersion(@Param("userId") long userId);
 
     /**
+     * 查询未删除且不在锁定期的后台用户当前 token 版本。
+     */
+    Integer selectRefreshableTokenVersion(
+            @Param("userId") long userId,
+            @Param("now") LocalDateTime now);
+
+    /**
      * 递增未删除用户的 token 版本，并写入应用层提供的审计时间和实际操作者。
      */
     int incrementActiveTokenVersion(

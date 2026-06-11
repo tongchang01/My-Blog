@@ -30,6 +30,7 @@ class RefreshTokenServiceTest {
     @BeforeEach
     void clearRefreshTokens() {
         jdbcTemplate.update("delete from t_refresh_token");
+        jdbcTemplate.update("delete from t_user_auth");
     }
 
     /**
@@ -58,6 +59,7 @@ class RefreshTokenServiceTest {
      */
     @Test
     void rotatesTokenOnceAndRejectsReusingConsumedToken() {
+        insertUser(1001L, 0);
         IssuedRefreshToken first = refreshTokenService.issue(1001L);
 
         IssuedRefreshToken second = refreshTokenService.rotate(first.token()).orElseThrow();
@@ -75,6 +77,7 @@ class RefreshTokenServiceTest {
      */
     @Test
     void rejectsExpiredOrRevokedToken() {
+        insertUser(1001L, 0);
         IssuedRefreshToken expired = refreshTokenService.issue(1001L);
         jdbcTemplate.update(
                 "update t_refresh_token set expires_at = ? where user_id = 1001",
@@ -89,10 +92,39 @@ class RefreshTokenServiceTest {
     }
 
     /**
+     * 验证后台用户被删除后，历史 refresh token 不能再轮换出新 token。
+     */
+    @Test
+    void rejectsRotationForDeletedUser() {
+        insertUser(1001L, 0);
+        IssuedRefreshToken issued = refreshTokenService.issue(1001L);
+        jdbcTemplate.update("update t_user_auth set deleted = 1 where id = 1001");
+
+        assertThat(refreshTokenService.rotate(issued.token())).isEmpty();
+        assertThat(activeTokenCount(1001L)).isZero();
+    }
+
+    /**
+     * 验证后台用户仍处于锁定期时，历史 refresh token 不能再轮换出新 token。
+     */
+    @Test
+    void rejectsRotationForLockedUser() {
+        insertUser(1001L, 0);
+        IssuedRefreshToken issued = refreshTokenService.issue(1001L);
+        jdbcTemplate.update(
+                "update t_user_auth set locked_until = ? where id = 1001",
+                LocalDateTime.now().plusMinutes(5));
+
+        assertThat(refreshTokenService.rotate(issued.token())).isEmpty();
+        assertThat(activeTokenCount(1001L)).isZero();
+    }
+
+    /**
      * 验证按用户整体撤销不会误伤其他后台用户的 refresh token。
      */
     @Test
     void revokesAllActiveTokensForUser() {
+        insertUser(1001L, 0);
         IssuedRefreshToken first = refreshTokenService.issue(1001L);
         IssuedRefreshToken second = refreshTokenService.issue(1001L);
         refreshTokenService.issue(2002L);
@@ -106,6 +138,26 @@ class RefreshTokenServiceTest {
                 "select count(*) from t_refresh_token where user_id = 2002 and revoked = 0",
                 Integer.class);
         assertThat(otherUserActiveCount).isEqualTo(1);
+    }
+
+    private void insertUser(long userId, int deleted) {
+        jdbcTemplate.update("""
+                insert into t_user_auth (
+                    id, username, password_hash, type, token_version, deleted
+                ) values (?, ?, ?, ?, 0, ?)
+                """,
+                userId,
+                "admin-" + userId,
+                "$2a$10$test-password-hash",
+                1,
+                deleted);
+    }
+
+    private int activeTokenCount(long userId) {
+        return jdbcTemplate.queryForObject(
+                "select count(*) from t_refresh_token where user_id = ? and revoked = 0",
+                Integer.class,
+                userId);
     }
 
     private String sha256(String value) {

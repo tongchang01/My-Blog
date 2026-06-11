@@ -17,6 +17,15 @@ public interface UserTokenVersionRepository {
     OptionalInt findActiveTokenVersion(long userId);
 
     /**
+     * 查询允许执行 token 刷新的后台用户当前版本。
+     *
+     * @param userId 后台用户 ID
+     * @param now    应用层 Clock 生成的当前时间
+     * @return 用户不存在、已删除或仍在锁定期时返回空
+     */
+    OptionalInt findRefreshableTokenVersion(long userId, LocalDateTime now);
+
+    /**
      * 递增有效用户的 token 版本并记录真实审计信息。
      *
      * @param userId    目标用户 ID
