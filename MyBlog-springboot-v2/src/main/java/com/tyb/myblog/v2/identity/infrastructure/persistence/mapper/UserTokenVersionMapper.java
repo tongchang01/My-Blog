@@ -2,27 +2,25 @@ package com.tyb.myblog.v2.identity.infrastructure.persistence.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
+import java.time.LocalDateTime;
+
+/**
+ * 用户 token 版本持久化 Mapper。
+ */
 @Mapper
 public interface UserTokenVersionMapper {
 
-    @Select("""
-            select token_version
-            from t_user_auth
-            where id = #{userId}
-              and deleted = 0
-            """)
+    /**
+     * 查询未删除用户的当前 token 版本。
+     */
     Integer selectActiveTokenVersion(@Param("userId") long userId);
 
-    @Update("""
-            update t_user_auth
-            set token_version = token_version + 1,
-                updated_at = current_timestamp,
-                updated_by = #{userId}
-            where id = #{userId}
-              and deleted = 0
-            """)
-    int incrementActiveTokenVersion(@Param("userId") long userId);
+    /**
+     * 递增未删除用户的 token 版本，并写入应用层提供的审计时间和实际操作者。
+     */
+    int incrementActiveTokenVersion(
+            @Param("userId") long userId,
+            @Param("updatedAt") LocalDateTime updatedAt,
+            @Param("updatedBy") Long updatedBy);
 }

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.identity.infrastructure.persistence.mapper.UserTokenVersionMapper">
+
+    <!-- 只允许未删除用户通过 token_version 校验。 -->
+    <select id="selectActiveTokenVersion" resultType="java.lang.Integer">
+        SELECT token_version
+        FROM t_user_auth
+        WHERE id = #{userId}
+          AND deleted = 0
+    </select>
+
+    <!-- 撤销用户全部 access token，并保留应用层统一时钟与真实操作者审计信息。 -->
+    <update id="incrementActiveTokenVersion">
+        UPDATE t_user_auth
+        SET token_version = token_version + 1,
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{userId}
+          AND deleted = 0
+    </update>
+
+</mapper>

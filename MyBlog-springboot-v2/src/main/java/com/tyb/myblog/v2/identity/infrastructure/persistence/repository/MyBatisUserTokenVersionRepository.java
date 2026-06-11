@@ -4,6 +4,7 @@ import com.tyb.myblog.v2.identity.domain.auth.UserTokenVersionRepository;
 import com.tyb.myblog.v2.identity.infrastructure.persistence.mapper.UserTokenVersionMapper;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.OptionalInt;
 
 @Repository
@@ -22,7 +23,7 @@ public class MyBatisUserTokenVersionRepository implements UserTokenVersionReposi
     }
 
     @Override
-    public boolean incrementActiveTokenVersion(long userId) {
-        return mapper.incrementActiveTokenVersion(userId) == 1;
+    public boolean incrementActiveTokenVersion(long userId, LocalDateTime updatedAt, Long updatedBy) {
+        return mapper.incrementActiveTokenVersion(userId, updatedAt, updatedBy) == 1;
     }
 }

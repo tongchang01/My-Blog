@@ -41,6 +41,9 @@ class UserTokenRevocationServiceTest {
         jdbcTemplate.update("delete from t_user_auth");
     }
 
+    /**
+     * 验证整体撤销同时失效目标用户的访问令牌和刷新令牌，且不影响其他用户。
+     */
     @Test
     void revokesAllAccessAndRefreshTokensForUser() {
         insertUser(1001L, 3);
@@ -50,7 +53,7 @@ class UserTokenRevocationServiceTest {
         IssuedRefreshToken secondRefreshToken = refreshTokenService.issue(1001L);
         IssuedRefreshToken otherUserRefreshToken = refreshTokenService.issue(2002L);
 
-        boolean revoked = revocationService.revokeAll(1001L);
+        boolean revoked = revocationService.revokeAll(1001L, 9001L);
 
         assertThat(revoked).isTrue();
         assertThat(accessTokenVerifier.verify(accessToken)).isEmpty();
@@ -59,6 +62,7 @@ class UserTokenRevocationServiceTest {
         assertThat(refreshTokenService.rotate(otherUserRefreshToken.token())).isPresent();
         assertThat(currentTokenVersion(1001L)).isEqualTo(4);
         assertThat(currentTokenVersion(2002L)).isEqualTo(1);
+        assertThat(currentUpdatedBy(1001L)).isEqualTo(9001L);
     }
 
     private String issueAccessToken(long userId, int tokenVersion) {
@@ -86,6 +90,13 @@ class UserTokenRevocationServiceTest {
         return jdbcTemplate.queryForObject(
                 "select token_version from t_user_auth where id = ?",
                 Integer.class,
+                userId);
+    }
+
+    private long currentUpdatedBy(long userId) {
+        return jdbcTemplate.queryForObject(
+                "select updated_by from t_user_auth where id = ?",
+                Long.class,
                 userId);
     }
 }

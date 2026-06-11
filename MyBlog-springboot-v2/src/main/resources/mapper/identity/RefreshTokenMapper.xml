@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.identity.infrastructure.persistence.mapper.RefreshTokenMapper">
+
+    <!-- 锁定仍有效的 refresh token，保证并发轮换时旧 token 最多成功消费一次。 -->
+    <select id="selectActiveForUpdate"
+            resultType="com.tyb.myblog.v2.identity.infrastructure.persistence.entity.RefreshTokenEntity">
+        SELECT id,
+               user_id,
+               token_hash,
+               expires_at,
+               revoked,
+               created_at,
+               created_by,
+               updated_at,
+               updated_by
+        FROM t_refresh_token
+        WHERE token_hash = #{tokenHash}
+          AND revoked = 0
+          AND expires_at > #{now}
+        FOR UPDATE
+    </select>
+
+</mapper>
