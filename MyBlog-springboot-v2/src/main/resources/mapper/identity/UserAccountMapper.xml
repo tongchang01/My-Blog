@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.identity.infrastructure.persistence.mapper.UserAccountMapper">
+
+    <!-- 登录校验只读取未删除账号所需的凭据和状态字段。 -->
+    <select id="selectActiveByUsername"
+            resultType="com.tyb.myblog.v2.identity.infrastructure.persistence.entity.UserAccountEntity">
+        SELECT id,
+               username,
+               password_hash,
+               type,
+               token_version,
+               login_fail_count,
+               locked_until
+        FROM t_user_auth
+        WHERE username = #{username}
+          AND deleted = 0
+    </select>
+
+</mapper>
