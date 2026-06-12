@@ -224,7 +224,7 @@ PASSWORD 文章功能落地前必须完成。
 - [x] `rules/package-layout.md` 与 `arch/module-map.md` 统一 application 依赖方向
 - [x] `rules/security-baseline.md` 删除内存撤销残留
 - [x] `arch/persistence-strategy.md` 删除保留 `TokenRevocationStore` 的旧结论
-- [ ] `migration/v2-code-reconciliation.md` 更新 JWT 文件处置方案
+- [x] `migration/v2-code-reconciliation.md` 更新 JWT 文件处置方案
 - [ ] JWT 配置名统一为 `access-token-ttl` 或 `access-ttl`
 - [ ] 登录字段名统一为 `last_login_at`、`last_login_ip`
 - [x] 错误码统一 `10002/10003` 语义
@@ -299,3 +299,4 @@ mvn clean test
 | 2026-06-10 | P1-4 已关闭 | token 签发 / 验证端口归 common.auth，identity 与过滤器不依赖对方具体实现 |
 | 2026-06-12 | P1-5 已关闭 | JWT 声明、持久化撤销、刷新令牌用户状态与 `10002/10003` 认证错误码路线已统一 |
 | 2026-06-12 | 安全基线已同步 | 删除内存撤销实现残留，并明确 access token 需结合持久化 `token_version` 完成校验 |
+| 2026-06-12 | JWT 迁移对账已同步 | common 保留 JWT 原语和端口，identity 负责持久化校验、refresh token 与整体撤销 |

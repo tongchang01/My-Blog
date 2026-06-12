@@ -67,12 +67,12 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 | `common/auth/AuthenticatedPrincipal` | 留 | 与 schema 无关 |
 | `common/auth/BearerTokenResolver` | 留 | 标准 Bearer 解析 |
 | `common/auth/CurrentUser` `CurrentUserArgumentResolver` | 留 | 注解 + 解析器，与 schema 无关 |
-| `common/security/auth/JwtTokenService` | **微调** | 当前是单 token；按 R6 C1 加 refresh token 签发 + 校验 + `token_version` claim |
-| `common/security/auth/TokenClaims` | **微调** | 加 `tokenVersion` 字段 |
-| `common/security/auth/TokenPair` | **微调** | 拆 `accessToken / refreshToken / accessExpiresAt / refreshExpiresAt` |
-| `common/security/auth/TokenRevocationStore` | 留 | 端口定义不变 |
-| `common/security/support/InMemoryTokenRevocationStore` | 留 | 用于 access token 黑名单仍需要；refresh token 走 DB（新 `t_refresh_token`） |
-| `common/security/JwtAuthenticationFilter` | **微调** | 取出 `tokenVersion` 与 DB `t_user_auth.token_version` 比对，不一致 401 |
+| `common/security/auth/JwtTokenService` | **已微调** | 只负责 access token 编解码，实现 `AccessTokenIssuer` 与 `AccessTokenDecoder`，不承载 refresh token 持久化 |
+| `common/auth/token/TokenClaims` | **已微调** | 包含 `tokenVersion` 与 `typ` 等 access token 声明 |
+| `common/auth/token/TokenPair` | **留** | 仅表示 access token 及其过期时间；refresh token 由 identity 独立签发 |
+| `common/security/auth/TokenRevocationStore` | **已删** | 内存黑名单方案废弃，由持久化 `token_version` 取代 |
+| `common/security/support/InMemoryTokenRevocationStore` | **已删** | 不保留进程内撤销状态 |
+| `common/security/auth/JwtAuthenticationFilter` | **已微调** | 通过 `AccessTokenVerifier` 稳定端口完成 JWT 与持久化用户状态校验 |
 | `common/security/SecurityConfig` | **微调** | refresh token 端点白名单；DEMO 角色权限矩阵 |
 | `common/security/SecurityProblemSupport` `SecurityProbeController` | 留 | 与 schema 无关；探针仅限 `local/test` profile |
 | `common/config/SecurityJwtProperties` | **微调** | 加 `refreshTokenTtl`（默认 7d）配置项 |
@@ -86,7 +86,7 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 | `common/web/ApiResponse` `PageResponse` | 留 | 统一响应契约 |
 | `common/web/ClientIpResolver` `UserAgentResolver` | 留 | 评论审计需要继续用 |
 
-**common/ 总结**：5 个文件做小幅扩展（围绕双 token），其他不动。
+**common/ 总结**：只保留 JWT 编解码、认证过滤器与稳定端口；refresh token、用户状态和整体撤销归 identity。
 
 ---
 
@@ -112,6 +112,9 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 | `application/AuthService` | **重写** | 字段调整：`token_version` 校验、登录失败次数 / 锁定逻辑、双 token 签发 |
 | `application/AuthTokenService` | **重写** | 双 token 签发；refresh token SHA-256 hash 落 `t_refresh_token` |
 | `application/IdentityQueryService` | **重写** | 字段重对齐 |
+| `application/token/PersistentAccessTokenVerifier` | **已新增** | 实现 common 的 `AccessTokenVerifier`，组合 JWT 解码与 `token_version` 持久化校验 |
+| `application/token/RefreshTokenService` | **已新增** | 负责 refresh token 签发、轮换和单枚撤销，数据库只保存 SHA-256 |
+| `application/token/UserTokenRevocationService` | **已新增** | 同一事务递增 `token_version` 并撤销用户全部 refresh token |
 
 ### infrastructure
 
@@ -225,7 +228,7 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 | 路径 | 决策 | 理由 |
 |---|---|---|
 | `infrastructure/persistence/package-info` | 留 | 包标记 |
-| `infrastructure/security/JwtAuthTokenServiceAdapter` | **重写** | 跟随双 token 改造 |
+| `infrastructure/security/JwtAuthTokenServiceAdapter` | **已删** | 旧适配器依赖已删除的 identity application；新实现通过 common 端口与 identity 实现解耦 |
 
 ---
 
@@ -248,8 +251,8 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 |---|---|
 | `ArchitectureRulesTest` | **留** |
 | `MyBlogV2ApplicationTest` | 留（启动测试与 schema 无关，但需要新 V1__init 跑通） |
-| `common/security/JwtTokenServiceTest` | **微调**（覆盖 refresh token 路径） |
-| `common/security/JwtAuthenticationFilterTest` | **微调**（`token_version` 校验） |
+| `common/security/JwtTokenServiceTest` | **已微调**（覆盖 access token 声明、签发和解析） |
+| `common/security/JwtAuthenticationFilterTest` | **已微调**（验证过滤器委托持久化校验端口） |
 | `common/security/SecurityConfigTest` | **微调**（DEMO 角色） |
 | `common/error/GlobalExceptionHandlerTest` | 留 |
 | `common/auth/BearerTokenResolverTest` | 留 |
@@ -308,10 +311,11 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
    - `application*.yml` 配置项扩展
    - 跑 `MyBlogV2ApplicationTest` + `FlywayMigrationTest` 确保启动 & schema 加载
 
-2. **第 2 步：common/security 双 token 改造**
-   - `JwtTokenService / TokenClaims / TokenPair / JwtAuthenticationFilter`
-   - 新增 `RefreshTokenEntity / Mapper / Repository`
-   - 单测（含 JwtTokenServiceTest 扩展）
+2. **第 2 步：认证基础设施拆分**
+   - common：`JwtTokenService / TokenClaims / TokenPair / JwtAuthenticationFilter` 与 access token 稳定端口
+   - identity：`PersistentAccessTokenVerifier / RefreshTokenService / UserTokenRevocationService`
+   - identity infrastructure：`RefreshTokenEntity / Mapper / Repository` 与 `UserTokenVersionRepository`
+   - 删除 `TokenRevocationStore`、`InMemoryTokenRevocationStore` 和旧顶级 JWT 适配器
 
 3. **第 3 步：按模块串行重写**（每个模块内顺序：domain → infra entity/mapper → infra impl → application → web → 测试）
    - identity（依赖最少）
