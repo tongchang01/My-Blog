@@ -263,3 +263,19 @@ RATE_LIMITED("90002", HttpStatus.TOO_MANY_REQUESTS, "请求过于频繁")
 4. `同步登录限流实施结果`
 
 每个代码提交必须先完成对应 RED，再写最小实现转为 GREEN，并执行 ArchUnit、定向测试和必要的全量回归。
+
+## 11. 实施结果
+
+本设计已按两个独立代码提交落地：
+
+1. `262076c`：引入登录限流配置与领域端口。
+2. `b981222`：实现 Caffeine 登录失败限流。
+
+验证结果：
+
+- 配置、错误码、Caffeine 阈值、冷却、重置、键隔离、并发和容量测试通过。
+- domain 未依赖 Caffeine、Spring、Servlet 或 HTTP 类型。
+- 未新增 Mapper、SQL、Entity 或 Flyway 迁移。
+- `mvn clean test` 通过：144 tests，0 failures，0 errors，2 skipped。
+- 当前环境没有可用 Docker，既有两个 Testcontainers MySQL 测试按策略跳过。
+- 限流组件尚未接入 HTTP 登录流程；接入工作属于下一轮双 token 登录事务编排与 Controller。

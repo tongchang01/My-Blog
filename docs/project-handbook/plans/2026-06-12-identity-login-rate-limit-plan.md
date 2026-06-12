@@ -69,7 +69,7 @@
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/error/ApiErrorCodeTest.java`
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`
 
-- [ ] **Step 1: 编写配置绑定失败测试**
+- [x] **Step 1: 编写配置绑定失败测试**
 
 新增 `LoginRateLimitPropertiesTest`：
 
@@ -124,7 +124,7 @@ class LoginRateLimitPropertiesTest {
 }
 ```
 
-- [ ] **Step 2: 扩展错误码失败测试**
+- [x] **Step 2: 扩展错误码失败测试**
 
 在 `ApiErrorCodeTest` 增加：
 
@@ -145,7 +145,7 @@ void shouldExposeRateLimitError() {
 import org.springframework.http.HttpStatus;
 ```
 
-- [ ] **Step 3: 增加领域端口架构失败测试**
+- [x] **Step 3: 增加领域端口架构失败测试**
 
 在 `ArchitectureRulesTest` 现有 domain 规则附近增加：
 
@@ -164,7 +164,7 @@ static final ArchRule identity_domain_does_not_depend_on_rate_limit_implementati
 
 Spring、Servlet、MyBatis 和 infrastructure 依赖继续由该测试类已有 domain 规则守护，不新建第二套扫描入口。
 
-- [ ] **Step 4: 运行测试并确认 RED**
+- [x] **Step 4: 运行测试并确认 RED**
 
 Run:
 
@@ -174,7 +174,7 @@ mvn '-Dtest=LoginRateLimitPropertiesTest,ApiErrorCodeTest,ArchitectureRulesTest'
 
 Expected: 测试编译失败，提示 `LoginRateLimitProperties`、`LoginRateLimiter` 或 `RATE_LIMITED` 不存在。
 
-- [ ] **Step 5: 实现配置属性**
+- [x] **Step 5: 实现配置属性**
 
 新增 `LoginRateLimitProperties`：
 
@@ -233,7 +233,7 @@ ratelimit:
 
 配置由主应用现有 `@ConfigurationPropertiesScan` 自动发现，不在 `SecurityConfig` 重复注册。
 
-- [ ] **Step 6: 实现领域端口**
+- [x] **Step 6: 实现领域端口**
 
 新增 `LoginRateLimiter`：
 
@@ -272,7 +272,7 @@ public interface LoginRateLimiter {
 }
 ```
 
-- [ ] **Step 7: 实现 HTTP 429 错误码**
+- [x] **Step 7: 实现 HTTP 429 错误码**
 
 在 `ApiErrorCode` 的 `VALIDATION_ERROR` 后增加：
 
@@ -283,7 +283,7 @@ public interface LoginRateLimiter {
 RATE_LIMITED("90002", HttpStatus.TOO_MANY_REQUESTS, "请求过于频繁"),
 ```
 
-- [ ] **Step 8: 运行定向测试并确认 GREEN**
+- [x] **Step 8: 运行定向测试并确认 GREEN**
 
 Run:
 
@@ -298,7 +298,7 @@ Expected:
 - 既有架构测试加新增限流端口规则全部通过。
 - Spring 上下文可以绑定新配置。
 
-- [ ] **Step 9: 执行本任务回归和静态检查**
+- [x] **Step 9: 执行本任务回归和静态检查**
 
 Run:
 
@@ -311,7 +311,7 @@ git diff --check
 
 Expected: 新类型和错误码可定位；领域端口不包含框架、Servlet、Caffeine 或 `ApiErrorCode` 依赖；差异无空白错误。
 
-- [ ] **Step 10: 提交配置、错误码与领域端口**
+- [x] **Step 10: 提交配置、错误码与领域端口**
 
 ```powershell
 git add -- 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/config/LoginRateLimitProperties.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/error/ApiErrorCode.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/domain/auth/LoginRateLimiter.java' 'MyBlog-springboot-v2/src/main/resources/application.yml' 'MyBlog-springboot-v2/src/test/resources/application-test.yml' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/config/LoginRateLimitPropertiesTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/error/ApiErrorCodeTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java'
@@ -332,7 +332,7 @@ git commit -m "引入登录限流配置与领域端口"
 - Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/ratelimit/CaffeineLoginRateLimiterTest.java`
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/config/ApplicationConfigurationTest.java`
 
-- [ ] **Step 1: 引入 Caffeine 依赖**
+- [x] **Step 1: 引入 Caffeine 依赖**
 
 在 `pom.xml` 的依赖区增加，版本由 Spring Boot 3.5.14 dependency management 管理：
 
@@ -351,7 +351,7 @@ mvn dependency:tree '-Dincludes=com.github.ben-manes.caffeine:caffeine'
 
 Expected: 依赖树只出现一套收敛后的 Caffeine 版本，Maven Enforcer 不报 dependency convergence。
 
-- [ ] **Step 2: 编写阈值、键和重置失败测试**
+- [x] **Step 2: 编写阈值、键和重置失败测试**
 
 新增 `CaffeineLoginRateLimiterTest` 的首批测试：
 
@@ -459,7 +459,7 @@ class CaffeineLoginRateLimiterTest {
 }
 ```
 
-- [ ] **Step 3: 运行首批测试并确认 RED**
+- [x] **Step 3: 运行首批测试并确认 RED**
 
 Run:
 
@@ -469,7 +469,7 @@ mvn '-Dtest=CaffeineLoginRateLimiterTest' test
 
 Expected: 编译失败，提示 `CaffeineLoginRateLimiter` 不存在。
 
-- [ ] **Step 4: 实现限流键**
+- [x] **Step 4: 实现限流键**
 
 新增包内不可见 `LoginRateLimitKey`：
 
@@ -511,7 +511,7 @@ record LoginRateLimitKey(String clientIp, String username) {
 
 用户名空值由未来 Controller Bean Validation 阻止；基础设施仍拒绝空值，避免生成所有非法请求共享的空用户名键。
 
-- [ ] **Step 5: 实现最小 Caffeine 限流器**
+- [x] **Step 5: 实现最小 Caffeine 限流器**
 
 新增 `CaffeineLoginRateLimiter`：
 
@@ -576,7 +576,7 @@ public class CaffeineLoginRateLimiter implements LoginRateLimiter {
 }
 ```
 
-- [ ] **Step 6: 运行首批测试并确认 GREEN**
+- [x] **Step 6: 运行首批测试并确认 GREEN**
 
 Run:
 
@@ -586,7 +586,7 @@ mvn '-Dtest=CaffeineLoginRateLimiterTest' test
 
 Expected: 阈值、重置、规范化、未知 IP 和键隔离测试全部通过。
 
-- [ ] **Step 7: 增加时间、并发和容量失败测试**
+- [x] **Step 7: 增加时间、并发和容量失败测试**
 
 在 `CaffeineLoginRateLimiterTest` 增加：
 
@@ -663,7 +663,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 ```
 
-- [ ] **Step 8: 为并发封顶断言增加包内测试观察方法**
+- [x] **Step 8: 为并发封顶断言增加包内测试观察方法**
 
 在 `CaffeineLoginRateLimiter` 增加：
 
@@ -680,7 +680,7 @@ int failureCountForTesting(String clientIp, String normalizedUsername) {
 
 该方法保持包内可见，不进入 `LoginRateLimiter` 领域端口，也不被生产调用方依赖。
 
-- [ ] **Step 9: 运行完整限流器测试并确认 GREEN**
+- [x] **Step 9: 运行完整限流器测试并确认 GREEN**
 
 Run:
 
@@ -690,7 +690,7 @@ mvn '-Dtest=CaffeineLoginRateLimiterTest' test
 
 Expected: 时间推进无需 `Thread.sleep`；并发 20 次失败后计数固定为 5；容量清理后估算大小不超过 2。
 
-- [ ] **Step 10: 编写 Spring Bean 装配失败测试**
+- [x] **Step 10: 编写 Spring Bean 装配失败测试**
 
 在 `ApplicationConfigurationTest` 增加注入字段：
 
@@ -715,7 +715,7 @@ import com.tyb.myblog.v2.identity.domain.auth.LoginRateLimiter;
 import com.tyb.myblog.v2.identity.infrastructure.ratelimit.CaffeineLoginRateLimiter;
 ```
 
-- [ ] **Step 11: 运行上下文测试并确认 RED**
+- [x] **Step 11: 运行上下文测试并确认 RED**
 
 Run:
 
@@ -725,7 +725,7 @@ mvn '-Dtest=ApplicationConfigurationTest' test
 
 Expected: Spring 注入失败，提示不存在 `LoginRateLimiter` Bean。
 
-- [ ] **Step 12: 实现限流器 Spring 装配**
+- [x] **Step 12: 实现限流器 Spring 装配**
 
 新增 `IdentityLoginRateLimitConfiguration`：
 
@@ -766,7 +766,7 @@ public class IdentityLoginRateLimitConfiguration {
 }
 ```
 
-- [ ] **Step 13: 运行装配、限流和架构测试并确认 GREEN**
+- [x] **Step 13: 运行装配、限流和架构测试并确认 GREEN**
 
 Run:
 
@@ -776,7 +776,7 @@ mvn '-Dtest=CaffeineLoginRateLimiterTest,ApplicationConfigurationTest,LoginRateL
 
 Expected: Caffeine 行为、Spring Bean、配置、错误码和全部架构规则通过。
 
-- [ ] **Step 14: 执行依赖、范围和全量验证**
+- [x] **Step 14: 执行依赖、范围和全量验证**
 
 Run:
 
@@ -799,7 +799,7 @@ Expected:
 - 限流测试不使用 `Thread.sleep`。
 - 全量测试通过；Docker 不可用时只允许既有两个 Testcontainers MySQL 测试跳过。
 
-- [ ] **Step 15: 提交 Caffeine 限流实现**
+- [x] **Step 15: 提交 Caffeine 限流实现**
 
 ```powershell
 git add -- 'MyBlog-springboot-v2/pom.xml' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/config/IdentityLoginRateLimitConfiguration.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/ratelimit/LoginRateLimitKey.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/ratelimit/CaffeineLoginRateLimiter.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/ratelimit/CaffeineLoginRateLimiterTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/config/ApplicationConfigurationTest.java'
@@ -817,7 +817,7 @@ git commit -m "实现Caffeine登录失败限流"
 - Modify: `docs/project-handbook/specs/2026-06-12-identity-login-rate-limit-design.md`
 - Modify: `docs/project-handbook/plans/2026-06-12-identity-login-rate-limit-plan.md`
 
-- [ ] **Step 1: 运行新鲜全量验证**
+- [x] **Step 1: 运行新鲜全量验证**
 
 Run:
 
@@ -827,7 +827,7 @@ mvn clean test
 
 记录 Maven 最终输出中的 tests、failures、errors、skipped，禁止使用预估数字。Docker 不可用时明确写出被跳过的 Testcontainers 测试。
 
-- [ ] **Step 2: 更新当前状态**
+- [x] **Step 2: 更新当前状态**
 
 将 `status.md` 的 identity 状态更新为：
 
@@ -838,7 +838,7 @@ mvn clean test
 
 将当前测试基线替换为 Step 1 的真实输出。
 
-- [ ] **Step 3: 记录设计实施结果**
+- [x] **Step 3: 记录设计实施结果**
 
 在设计文档末尾追加：
 
@@ -864,11 +864,11 @@ git log -2 --format='%h %s'
 
 再使用 `apply_patch` 写入真实 SHA 和 Maven 输出，不在文档中保留示例值或占位符。
 
-- [ ] **Step 4: 勾选本计划实际完成项**
+- [x] **Step 4: 勾选本计划实际完成项**
 
 将 Task 1、Task 2 和 Task 3 已执行步骤改为 `[x]`。最终验收只勾选当前独立组件可以证明的事项；“登录请求在第 6 次返回 HTTP 429”属于尚未实现的 Controller/应用编排，不得提前勾选。
 
-- [ ] **Step 5: 检查文档**
+- [x] **Step 5: 检查文档**
 
 Run:
 
@@ -881,7 +881,7 @@ git diff --check
 
 Expected: 状态和实施结果包含真实数据，项目手册中没有本计划遗留占位符，差异无空白错误。
 
-- [ ] **Step 6: 提交文档**
+- [x] **Step 6: 提交文档**
 
 ```powershell
 git add -- 'docs/project-handbook/status.md' 'docs/project-handbook/specs/2026-06-12-identity-login-rate-limit-design.md' 'docs/project-handbook/plans/2026-06-12-identity-login-rate-limit-plan.md'
@@ -894,18 +894,18 @@ git commit -m "同步登录限流实施结果"
 
 ## 最终验收
 
-- [ ] 登录限流配置可绑定 5 次、10 分钟和最大容量 10000。
-- [ ] 非正阈值、冷却时间和缓存容量会被拒绝。
-- [ ] `LoginRateLimiter` 位于 domain 且不依赖框架、Servlet、HTTP 或 Caffeine。
-- [ ] 第 1 至第 4 次失败不阻止，第 5 次记录后进入阻止状态。
-- [ ] 第 5 次失败由调用方继续按 `10001` 处理；未来第 6 次请求可在凭据校验前检测到阻止。
-- [ ] 冷却期检查不延长过期时间，10 分钟后自动允许。
-- [ ] 成功重置后立即允许新的失败周期。
-- [ ] IP 和用户名组合隔离，用户名大小写与首尾空白被规范化。
-- [ ] 空 IP 使用 `<unknown>` 固定桶参与限流。
-- [ ] 并发失败累计不丢失，缓存计数封顶为阈值。
-- [ ] Caffeine 缓存受最大容量限制。
-- [ ] `90002` 对应 HTTP 429 和中文默认消息。
-- [ ] 未新增 Mapper、SQL、Entity、Flyway、Controller、token 编排或 Redis。
-- [ ] 全量 `mvn clean test` 通过，工作树干净。
+- [x] 登录限流配置可绑定 5 次、10 分钟和最大容量 10000。
+- [x] 非正阈值、冷却时间和缓存容量会被拒绝。
+- [x] `LoginRateLimiter` 位于 domain 且不依赖框架、Servlet、HTTP 或 Caffeine。
+- [x] 第 1 至第 4 次失败不阻止，第 5 次记录后进入阻止状态。
+- [x] 第 5 次失败由调用方继续按 `10001` 处理；未来第 6 次请求可在凭据校验前检测到阻止。
+- [x] 冷却期检查不延长过期时间，10 分钟后自动允许。
+- [x] 成功重置后立即允许新的失败周期。
+- [x] IP 和用户名组合隔离，用户名大小写与首尾空白被规范化。
+- [x] 空 IP 使用 `<unknown>` 固定桶参与限流。
+- [x] 并发失败累计不丢失，缓存计数封顶为阈值。
+- [x] Caffeine 缓存受最大容量限制。
+- [x] `90002` 对应 HTTP 429 和中文默认消息。
+- [x] 未新增 Mapper、SQL、Entity、Flyway、Controller、token 编排或 Redis。
+- [x] 全量 `mvn clean test` 通过，工作树干净。
 - [ ] HTTP 登录接口第 6 次实际返回 429 + `90002`。（留待下一轮登录编排与 Controller）
