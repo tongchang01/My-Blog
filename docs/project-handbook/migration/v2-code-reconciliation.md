@@ -75,7 +75,7 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 | `common/security/auth/JwtAuthenticationFilter` | **已微调** | 通过 `AccessTokenVerifier` 稳定端口完成 JWT 与持久化用户状态校验 |
 | `common/security/SecurityConfig` | **微调** | refresh token 端点白名单；DEMO 角色权限矩阵 |
 | `common/security/SecurityProblemSupport` `SecurityProbeController` | 留 | 与 schema 无关；探针仅限 `local/test` profile |
-| `common/config/SecurityJwtProperties` | **微调** | 加 `refreshTokenTtl`（默认 7d）配置项 |
+| `common/config/SecurityJwtProperties` | **已微调** | 配置键统一为 `access-token-ttl` / `refresh-token-ttl` |
 | `common/config/SecurityPublicEndpointProperties` | 留 | 配置类不变，白名单内容由 yml 调 |
 | `common/config/ApiCorsProperties` | 留 | |
 | `common/config/MyBatisPlusConfig` | 留 | 分页插件配置不变 |
@@ -297,7 +297,7 @@ M1 清理已经完成。逐文件审计后发现，现有业务 domain 端口虽
 
 | 文件 | 决策 |
 |---|---|
-| `application.yml` | **微调**：`myblog.security.jwt.refreshTokenTtl: 7d`；公开端点白名单更新（`/auth/refresh`、新评论路径）；新模块属性（mail / rate-limit / 站点 i18n 默认值） |
+| `application.yml` | **微调**：`myblog.security.jwt.refresh-token-ttl: 7d`；公开端点白名单更新（`/auth/refresh`、新评论路径）；新模块属性（mail / rate-limit / 站点 i18n 默认值） |
 | `application-local.yml` | **微调**：同上 |
 | `application-test.yml` | **微调**：同上；保留 H2 + Flyway 启用 |
 

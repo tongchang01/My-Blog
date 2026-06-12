@@ -32,7 +32,7 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 ### Access Token
 
 - 类型：JWT（`spring-security-oauth2-jose` 签发）
-- TTL：**15 分钟**（`myblog.security.jwt.access-ttl`）
+- TTL：**15 分钟**（`myblog.security.jwt.access-token-ttl`）
 - 校验：JWT 本体不保存服务端会话状态；过滤器先校验签名、`exp`、`typ`、`iss` 等声明，再通过持久化端口比对 `ver` 与当前用户 `token_version`
 - Claim：
   - 标准：`sub`（user_id）/ `exp` / `iat` / `iss`
@@ -43,7 +43,7 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 ### Refresh Token
 
 - 类型：随机字符串（**不是** JWT）
-- TTL：**7 天**（`myblog.security.jwt.refresh-ttl`）
+- TTL：**7 天**（`myblog.security.jwt.refresh-token-ttl`）
 - 存储：`t_refresh_token` 表，列含 `token_hash VARCHAR(64) UNIQUE`（SHA-256，**不存明文**）/ `user_id` / `expires_at` / `revoked`
 - 用法：`/api/auth/refresh` 拿 refresh token 换新 access token，同时再次校验 `user.token_version`
 

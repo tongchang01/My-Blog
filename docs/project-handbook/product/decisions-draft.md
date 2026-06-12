@@ -797,7 +797,7 @@ KEY idx_user (user_id)
 
 | 配置前缀 | 用途 | 示例 key |
 |---|---|---|
-| `myblog.security.jwt.*` | JWT 签名 / TTL | `secret` / `access-ttl` / `refresh-ttl` / `issuer` |
+| `myblog.security.jwt.*` | JWT 签名 / TTL | `secret` / `access-token-ttl` / `refresh-token-ttl` / `issuer` |
 | `myblog.security.password.*` | 登录限流 / BCrypt 强度 | `login-max-attempts` / `login-cooldown` / `bcrypt-strength` |
 | `myblog.cors.*` | CORS | `allowed-origins` / `allow-credentials` |
 | `myblog.storage.*` | 附件存储 | `type`(LOCAL/S3) / `local.root` / `local.public-base-url` |

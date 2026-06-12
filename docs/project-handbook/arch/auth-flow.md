@@ -59,14 +59,14 @@ payload : {
 }
 ```
 
-- TTL：15 分钟（`myblog.security.jwt.access-ttl`）
+- TTL：15 分钟（`myblog.security.jwt.access-token-ttl`）
 - 完全自包含 + `ver` 校验，**不依赖外部撤销存储**
 - 签名密钥：`MYBLOG_JWT_SECRET` 环境变量，启动时由 `JwtSecretStartupValidator` 校验
 
 ### Refresh Token（不是 JWT）
 
 - 类型：随机字符串（≥32 字节熵）
-- TTL：7 天（`myblog.security.jwt.refresh-ttl`）
+- TTL：7 天（`myblog.security.jwt.refresh-token-ttl`）
 - 存储：`t_refresh_token` 表
 
 ```sql
