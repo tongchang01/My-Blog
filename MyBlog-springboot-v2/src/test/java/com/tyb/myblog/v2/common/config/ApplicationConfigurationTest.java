@@ -1,6 +1,8 @@
 package com.tyb.myblog.v2.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tyb.myblog.v2.identity.domain.auth.LoginRateLimiter;
+import com.tyb.myblog.v2.identity.infrastructure.ratelimit.CaffeineLoginRateLimiter;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +24,9 @@ class ApplicationConfigurationTest {
 
     @Autowired
     private Environment environment;
+
+    @Autowired
+    private LoginRateLimiter loginRateLimiter;
 
     @Test
     void configuresJacksonForAsiaTokyoIsoDateTime() throws Exception {
@@ -47,5 +52,10 @@ class ApplicationConfigurationTest {
                 "com.github.xiaoymin.knife4j.spring.configuration.Knife4jAutoConfiguration",
                 getClass().getClassLoader()))
                 .isTrue();
+    }
+
+    @Test
+    void shouldProvideLoginRateLimiter() {
+        assertThat(loginRateLimiter).isInstanceOf(CaffeineLoginRateLimiter.class);
     }
 }
