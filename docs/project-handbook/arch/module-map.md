@@ -104,7 +104,7 @@ common.security JWT implementation ── implements both ports
 
 ## 6. 状态
 
-**当前 V2 实现与本图不完全一致**：旧实现按"common / infrastructure / identity / content / comment / system"6 模块写，stats 未建，common / infrastructure 是两个顶层包。DDL 冻结后按 `roadmap.md` M1 清理 + M2 基础设施补齐 + M3 模块重建。
+**当前 V2 实现状态**：顶级 `infrastructure` 已删除，公共数据库基础设施归入 `common.infrastructure`；当前已建立 `common` 与 identity 安全基座，其余业务模块按 M3 小步重建。
 
 ## 7. 相关文档
 
