@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -53,6 +54,24 @@ class SecurityConfigTest {
     @Test
     void rejectsUnconfiguredApiRoute() throws Exception {
         mockMvc.perform(get("/api/admin/security-probe"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
+    void permitsConfiguredLoginPostWithoutAccessToken() throws Exception {
+        mockMvc.perform(post("/api/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"username":"missing","password":"wrong"}
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10001"));
+    }
+
+    @Test
+    void doesNotPermitUnconfiguredLoginGet() throws Exception {
+        mockMvc.perform(get("/api/auth/login"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("10002"));
     }

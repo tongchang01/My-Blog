@@ -36,6 +36,8 @@ myblog:
     public-endpoints:
       - method: GET
         path: /actuator/health
+      - method: POST
+        path: /api/auth/login
       - method: GET
         path: /api/public/security-probe
       - method: GET
