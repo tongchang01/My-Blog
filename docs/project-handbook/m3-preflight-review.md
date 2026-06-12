@@ -229,7 +229,7 @@ PASSWORD 文章功能落地前必须完成。
 - [x] 登录字段名统一为 `last_login_at`、`last_login_ip`
 - [x] 错误码统一 `10002/10003` 语义
 - [x] 根包 `package-info.java` 删除旧顶层 `infrastructure` 描述
-- [ ] `workflows/build-and-test.md` 与实际环境变量一致
+- [x] `workflows/build-and-test.md` 与实际环境变量一致
 
 文档必须随对应行为修改一起提交。
 
@@ -303,3 +303,4 @@ mvn clean test
 | 2026-06-12 | JWT 配置名已统一 | 代码、YAML 与文档统一使用 `access-token-ttl` / `refresh-token-ttl` |
 | 2026-06-12 | 登录审计字段已统一 | schema、认证流程和安全规则统一使用 `last_login_at` / `last_login_ip` |
 | 2026-06-12 | 根包架构说明已同步 | 删除顶级 `infrastructure` 旧描述，明确公共与业务基础设施的实际归属 |
+| 2026-06-12 | 构建测试 SOP 已同步 | 对齐 profile 环境变量、H2 默认测试与可选 Testcontainers MySQL 验证 |

@@ -6,12 +6,14 @@
 
 - JDK 17（Enforcer 拒绝其它大版本）
 - Maven 3.9.x（Enforcer 暂不接受 Maven 4）
-- 本地 MySQL（开发用，可选；测试不需要）
+- 本地 MySQL 8.x（启动 `local` profile 时需要）
+- Docker（可选；用于 Testcontainers MySQL 方言验证，未启动时对应测试自动跳过）
 - 环境变量：
-  - `MYBLOG_JWT_SECRET`（≥32 字节）— 启动必需
-  - `MYBLOG_DATASOURCE_URL` / `MYBLOG_DATASOURCE_USERNAME` / `MYBLOG_DATASOURCE_PASSWORD`（开发/生产）
+  - `MYBLOG_JWT_SECRET`（≥32 字节）— 启动 `local` / `prod` 必需；`test` profile 使用测试专用值
+  - `MYBLOG_DATASOURCE_URL` — `prod` 必需；`local` 默认连接本机 `myblog_v2_dev`
+  - `MYBLOG_DATASOURCE_USERNAME` / `MYBLOG_DATASOURCE_PASSWORD` — `local` / `prod` 必需
   - `MYBLOG_CORS_ALLOWED_ORIGINS`（生产环境按需设置，多个来源用逗号分隔）
-  - `MYBLOG_WEB_TRUSTED_PROXIES`（使用反向代理时设置，支持单 IP / CIDR）
+  - `MYBLOG_WEB_TRUSTED_PROXIES`（使用反向代理时设置；Spring Boot 直接绑定到 `myblog.web.trusted-proxies`，多个值用逗号分隔）
 
 ## 2. 常用命令
 
@@ -33,6 +35,9 @@ mvn test -Dtest=ArchitectureRulesTest
 
 # 只跑迁移验证
 mvn test -Dtest=FlywayMigrationTest
+
+# 只跑真实 MySQL 迁移验证（需要 Docker）
+mvn test -Dtest=MySqlFlywayMigrationTest
 
 # 只跑某个模块测试
 mvn test -Dtest='com.tyb.myblog.v2.comment.**'
@@ -69,10 +74,10 @@ mvn spring-boot:run -Dspring-boot.run.profiles=prod
 | Profile | 数据库 | Flyway | API 文档 |
 |---------|--------|--------|----------|
 | `local` | V2 开发 MySQL | **关闭** | 开启 |
-| `test`  | H2 内存 | **启动时执行** | 开启 |
+| `test`  | 默认 H2 内存；专项测试使用 Testcontainers MySQL 8.4 | **启动时执行** | 开启 |
 | `prod`  | 生产 MySQL | **启动时执行** | 关闭 |
 
-集成测试默认走 `test` profile，强制 H2。**不**用真实 MySQL 跑自动化测试。
+常规集成测试默认走 `test` profile 和 H2。`MySqlFlywayMigrationTest` 使用 Testcontainers MySQL 8.4 补充真实方言验证；Docker 不可用时该测试自动跳过，不阻塞常规构建。
 
 应用不设置默认 profile。`local` / `prod` 都必须显式激活；数据库账号、密码和 JWT 密钥没有代码默认值，缺失时启动失败。
 
@@ -86,6 +91,7 @@ mvn spring-boot:run -Dspring-boot.run.profiles=prod
 | ArchitectureRulesTest 失败 | 新写代码违反层依赖规则 |
 | Flyway checksum mismatch | 已执行的迁移脚本被改动（不允许）|
 | H2 Syntax error | 写了 MySQL 专属语法，H2 不识别 |
+| Testcontainers 提示找不到 Docker | Docker 未启动；MySQL 专项测试会跳过，需真实方言验证时启动 Docker 后重跑 |
 
 ## 6. 不要做
 
