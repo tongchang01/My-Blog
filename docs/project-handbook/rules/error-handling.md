@@ -121,4 +121,4 @@ public CommentCreateResult createComment(CreateCommentCommand cmd) {
 
 ## 10. 例外
 
-审计失败时（如登录后更新 `last_login_time` 失败），登录接口不签发 token 且返回 500。此为有意为之，见 `security-baseline.md` §8。
+审计失败时（如登录后更新 `last_login_at` 失败），登录接口不签发 token 且返回 500。此为有意为之，见 `security-baseline.md` §8。

@@ -21,7 +21,7 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
                                         │                     │
                                         ▼                     ▼
                             [LoginAuditService]   [RefreshTokenService]
-                            (更新 last_login_time)   (写 t_refresh_token)
+                            (更新 last_login_at)     (写 t_refresh_token)
                                         │
                                         ▼
                        返回 ApiResponse<TokenResponse>
@@ -37,11 +37,11 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 5. **校验密码**：BCrypt 比对，不匹配 → `login_fail_count += 1`，返 `10001`（401）
 6. **签发 access token**：含 `sub / exp / iat / iss / ver / typ="access"`
 7. **签发 refresh token**：随机字符串，SHA-256 哈希后写 `t_refresh_token`（user_id / token_hash / expires_at）
-8. **写审计**：更新 `last_login_time`、`ip_address`，重置 `login_fail_count = 0`
+8. **写审计**：更新 `last_login_at`、`last_login_ip`，重置 `login_fail_count = 0`
 9. **审计失败 → 不签发**：若审计 SQL 失败，登录返回 500 (`99999`)，**不**返回 token（防止系统状态不一致）
 10. **返回**：`{ accessToken, refreshToken, accessExpiresIn: 900, refreshExpiresIn: 604800 }`
 
-登录失败（不存在/密码错/禁用）**不**更新 `last_login_time` / `ip_address` 审计字段。
+登录失败（不存在/密码错/禁用）**不**更新 `last_login_at` / `last_login_ip` 审计字段。
 
 ## 3. Token 结构
 

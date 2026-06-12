@@ -101,8 +101,8 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 ## 7. 登录流程与审计
 
 登录成功后必须：
-- 更新 `t_user_auth.last_login_time`
-- 更新 `t_user_auth.ip_address`
+- 更新 `t_user_auth.last_login_at`
+- 更新 `t_user_auth.last_login_ip`
 - 重置 `login_fail_count = 0`
 
 登录失败、账号不存在、密码错误、禁用用户**都不更新**审计字段（但 `login_fail_count` 按需 +1）。

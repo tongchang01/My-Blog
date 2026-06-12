@@ -88,7 +88,7 @@
 - access token 携带 `typ` claim 区分登录 token 与 PASSWORD 文章解锁 token
 - 白名单 method + path 双维度
 - 登录限流：同 IP+username 5 次/10 分钟冷却（Caffeine）
-- 登录审计：成功才更新 `last_login_time` / `ip_address`，审计失败不签发 token
+- 登录审计：成功才更新 `last_login_at` / `last_login_ip`，审计失败不签发 token
 - 详见 `arch/auth-flow.md`、`rules/security-baseline.md`
 
 ### 3.4 错误处理
