@@ -46,13 +46,15 @@ class SecurityConfigTest {
     @Test
     void rejectsPublicPathWhenHttpMethodIsNotConfigured() throws Exception {
         mockMvc.perform(post("/api/public/security-probe"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
     }
 
     @Test
     void rejectsUnconfiguredApiRoute() throws Exception {
         mockMvc.perform(get("/api/admin/security-probe"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
     }
 
     @Test
@@ -74,6 +76,6 @@ class SecurityConfigTest {
 
         mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("FORBIDDEN"));
+                .andExpect(jsonPath("$.code").value("10003"));
     }
 }

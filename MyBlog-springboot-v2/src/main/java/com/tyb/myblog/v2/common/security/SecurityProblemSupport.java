@@ -36,8 +36,9 @@ public class SecurityProblemSupport {
      * @param response 当前 HTTP 响应
      */
     public void writeUnauthorized(HttpServletResponse response) throws IOException {
-        write(response, HttpServletResponse.SC_UNAUTHORIZED,
-                ApiResponse.fail(ApiErrorCode.AUTHENTICATION_REQUIRED.name(), "用户未登录"));
+        ApiErrorCode errorCode = ApiErrorCode.INVALID_TOKEN;
+        write(response, errorCode.status().value(),
+                ApiResponse.fail(errorCode.code(), errorCode.defaultMessage()));
     }
 
     /**
@@ -46,8 +47,9 @@ public class SecurityProblemSupport {
      * @param response 当前 HTTP 响应
      */
     public void writeForbidden(HttpServletResponse response) throws IOException {
-        write(response, HttpServletResponse.SC_FORBIDDEN,
-                ApiResponse.fail(ApiErrorCode.FORBIDDEN.name(), "权限不足"));
+        ApiErrorCode errorCode = ApiErrorCode.FORBIDDEN;
+        write(response, errorCode.status().value(),
+                ApiResponse.fail(errorCode.code(), errorCode.defaultMessage()));
     }
 
     /**

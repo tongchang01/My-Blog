@@ -12,9 +12,10 @@ class ApiErrorCodeTest {
     @Test
     void mapsAuthenticationFailuresToUnauthorizedAndAuthorizationFailureToForbidden() {
         assertThat(ApiErrorCode.BAD_CREDENTIALS.status()).isEqualTo(HttpStatus.UNAUTHORIZED);
-        assertThat(ApiErrorCode.AUTHENTICATION_REQUIRED.status()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(ApiErrorCode.INVALID_TOKEN.status()).isEqualTo(HttpStatus.UNAUTHORIZED);
         assertThat(ApiErrorCode.FORBIDDEN.status()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(ApiErrorCode.INVALID_TOKEN.code()).isEqualTo("10002");
+        assertThat(ApiErrorCode.FORBIDDEN.code()).isEqualTo("10003");
     }
 
     @Test
@@ -28,6 +29,6 @@ class ApiErrorCodeTest {
     @Test
     void doesNotKeepAmbiguousUnauthorizedErrorCode() {
         assertThat(Arrays.stream(ApiErrorCode.values()).map(Enum::name))
-                .doesNotContain("UNAUTHORIZED");
+                .doesNotContain("UNAUTHORIZED", "AUTHENTICATION_REQUIRED");
     }
 }

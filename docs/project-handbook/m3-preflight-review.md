@@ -119,7 +119,7 @@ infrastructure -> domain port implementation
 
 ### P1-5 JWT 实现不符合冻结方案
 
-- [ ] 收口 JWT 声明、校验和撤销路线
+- [x] 收口 JWT 声明、校验和撤销路线
 
 当前实现没有 `typ`、`ver`，未显式校验 issuer，仍依赖内存撤销，密钥也未校验至少 32 字节。
 
@@ -146,7 +146,7 @@ infrastructure -> domain port implementation
 3. [x] `实现refresh token持久化流程`
 4. [x] `实现token_version持久化校验`
 5. [x] `实现用户Token整体撤销用例`
-6. [ ] `统一认证失败错误码`
+6. [x] `统一认证失败错误码`
 
 ### P1-6 客户端 IP 信任模型不安全
 
@@ -227,7 +227,7 @@ PASSWORD 文章功能落地前必须完成。
 - [ ] `migration/v2-code-reconciliation.md` 更新 JWT 文件处置方案
 - [ ] JWT 配置名统一为 `access-token-ttl` 或 `access-ttl`
 - [ ] 登录字段名统一为 `last_login_at`、`last_login_ip`
-- [ ] 错误码统一 `10002/10003` 语义
+- [x] 错误码统一 `10002/10003` 语义
 - [ ] 根包 `package-info.java` 删除旧顶层 `infrastructure` 描述
 - [ ] `workflows/build-and-test.md` 与实际环境变量一致
 
@@ -277,7 +277,7 @@ mvn clean test
 
 ## 7. M3 准入条件
 
-- [ ] P1-1 至 P1-6 全部关闭
+- [x] P1-1 至 P1-6 全部关闭
 - [x] `mvn clean test` 全部通过
 - [!] V1 已在本地 MySQL 8.0.35 从空 schema 迁移成功；Testcontainers 执行按当前决定暂缓
 - [x] MySQL session 时区验证通过
@@ -297,3 +297,4 @@ mvn clean test
 | 2026-06-10 | P1-6 已关闭 | 默认不信任代理头，仅允许显式可信代理 IP / CIDR 提供客户端地址 |
 | 2026-06-10 | P2-4 已关闭 | Security 探针仅在 local / test profile 注册 |
 | 2026-06-10 | P1-4 已关闭 | token 签发 / 验证端口归 common.auth，identity 与过滤器不依赖对方具体实现 |
+| 2026-06-12 | P1-5 已关闭 | JWT 声明、持久化撤销、刷新令牌用户状态与 `10002/10003` 认证错误码路线已统一 |

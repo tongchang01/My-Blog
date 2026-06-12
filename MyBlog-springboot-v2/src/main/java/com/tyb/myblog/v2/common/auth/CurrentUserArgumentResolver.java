@@ -42,7 +42,7 @@ public class CurrentUserArgumentResolver implements HandlerMethodArgumentResolve
                                   WebDataBinderFactory binderFactory) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !(authentication.getPrincipal() instanceof AuthenticatedPrincipal principal)) {
-            throw new ApiException(ApiErrorCode.AUTHENTICATION_REQUIRED, "用户未登录");
+            throw new ApiException(ApiErrorCode.INVALID_TOKEN);
         }
         return principal;
     }

@@ -18,17 +18,13 @@ public enum ApiErrorCode {
      */
     BAD_CREDENTIALS("10001", HttpStatus.UNAUTHORIZED, "用户名或密码错误"),
     /**
-     * 当前接口需要登录但请求未提供有效身份，对应 HTTP 401。
+     * 未提供 token，或 token 无效、过期、已撤销、版本不匹配，对应 HTTP 401。
      */
-    AUTHENTICATION_REQUIRED("10002", HttpStatus.UNAUTHORIZED, "请先登录"),
-    /**
-     * token 无效、过期或已撤销，对应 HTTP 401。
-     */
-    INVALID_TOKEN("10003", HttpStatus.UNAUTHORIZED, "登录状态已失效"),
+    INVALID_TOKEN("10002", HttpStatus.UNAUTHORIZED, "登录状态已失效"),
     /**
      * 已认证但角色或权限不足，对应 HTTP 403。
      */
-    FORBIDDEN("10004", HttpStatus.FORBIDDEN, "无权执行当前操作"),
+    FORBIDDEN("10003", HttpStatus.FORBIDDEN, "无权执行当前操作"),
     /**
      * 目标资源不存在或不可见，对应 HTTP 404。
      */

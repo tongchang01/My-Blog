@@ -56,6 +56,6 @@ class JwtAuthenticationFilterTest {
         mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.code").value("AUTHENTICATION_REQUIRED"));
+                .andExpect(jsonPath("$.code").value("10002"));
     }
 }
