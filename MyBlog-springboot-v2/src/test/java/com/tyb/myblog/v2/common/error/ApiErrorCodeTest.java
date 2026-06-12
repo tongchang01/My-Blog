@@ -27,6 +27,15 @@ class ApiErrorCodeTest {
     }
 
     @Test
+    void shouldExposeRateLimitError() {
+        assertThat(ApiErrorCode.RATE_LIMITED.code()).isEqualTo("90002");
+        assertThat(ApiErrorCode.RATE_LIMITED.status())
+                .isEqualTo(HttpStatus.TOO_MANY_REQUESTS);
+        assertThat(ApiErrorCode.RATE_LIMITED.defaultMessage())
+                .isEqualTo("请求过于频繁");
+    }
+
+    @Test
     void doesNotKeepAmbiguousUnauthorizedErrorCode() {
         assertThat(Arrays.stream(ApiErrorCode.values()).map(Enum::name))
                 .doesNotContain("UNAUTHORIZED", "AUTHENTICATION_REQUIRED");

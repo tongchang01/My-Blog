@@ -14,6 +14,10 @@ public enum ApiErrorCode {
      */
     VALIDATION_ERROR("90001", HttpStatus.BAD_REQUEST, "参数校验失败"),
     /**
+     * 请求超过基础设施限流阈值，对应 HTTP 429。
+     */
+    RATE_LIMITED("90002", HttpStatus.TOO_MANY_REQUESTS, "请求过于频繁"),
+    /**
      * 用户名或密码错误，对应 HTTP 401。
      */
     BAD_CREDENTIALS("10001", HttpStatus.UNAUTHORIZED, "用户名或密码错误"),

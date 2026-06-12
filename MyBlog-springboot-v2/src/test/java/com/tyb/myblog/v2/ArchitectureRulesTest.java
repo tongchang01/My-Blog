@@ -119,6 +119,17 @@ class ArchitectureRulesTest {
                             "jakarta.servlet..")
                     .allowEmptyShould(true);
 
+    // identity domain 的限流端口不能泄漏缓存实现或 HTTP 错误类型。
+    @ArchTest
+    static final ArchRule identity_domain_does_not_depend_on_rate_limit_implementation =
+            noClasses()
+                    .that().resideInAPackage("..identity.domain..")
+                    .should().dependOnClassesThat()
+                    .resideInAnyPackage(
+                            "com.github.benmanes.caffeine..",
+                            "..common.error..")
+                    .allowEmptyShould(true);
+
     // infrastructure 可以适配 application/domain，但不能反向依赖 HTTP 接入层。
     @ArchTest
     static final ArchRule infrastructure_does_not_depend_on_web =

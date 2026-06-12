@@ -19,6 +19,10 @@ myblog:
   cors:
     allowed-origins:
       - http://localhost:5173
+  ratelimit:
+    login-max-failures: 5
+    login-cooldown: 10m
+    login-maximum-size: 10000
   security:
     jwt:
       issuer: myblog-v2-test

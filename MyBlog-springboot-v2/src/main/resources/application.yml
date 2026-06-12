@@ -30,6 +30,10 @@ mybatis-plus:
 myblog:
   cors:
     allowed-origins: []
+  ratelimit:
+    login-max-failures: 5
+    login-cooldown: 10m
+    login-maximum-size: 10000
   web:
     trusted-proxies: []
   security:
