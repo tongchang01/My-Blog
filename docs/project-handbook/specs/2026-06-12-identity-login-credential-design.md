@@ -88,13 +88,13 @@ boolean matches(String rawPassword, String passwordHash);
 3. 当前是否处于锁定期。
 4. BCrypt 摘要是否匹配。
 
-返回 `LoginCredentialResult`：
+返回密封类型 `LoginCredentialResult`：
 
-- `AUTHENTICATED`
-- `BAD_CREDENTIALS`
-- `LOCKED`
+- `Authenticated(UserAccount account)`：携带已完成校验的账号，供后续 token 与审计编排复用，避免重复查询。
+- `BadCredentials`：不携带账号信息。
+- `Locked`：不携带账号信息。
 
-用户名不存在、GUEST、密码错误均返回 `BAD_CREDENTIALS`。校验器不抛 HTTP 异常，不写数据库，不签发 token。
+用户名不存在、GUEST、密码错误均返回 `BadCredentials`。校验器不抛 HTTP 异常，不写数据库，不签发 token。
 
 ## 4. 持久化边界
 
@@ -113,10 +113,11 @@ boolean matches(String rawPassword, String passwordHash);
 
 - ADMIN 可以继续凭据校验。
 - DEMO 可以继续凭据校验。
-- GUEST 统一返回 `BAD_CREDENTIALS`。
-- 未到 `lockedUntil` 返回 `LOCKED`。
+- GUEST 统一返回 `BadCredentials`。
+- 未到 `lockedUntil` 返回 `Locked`。
 - 锁定时间等于当前时间时视为已解锁。
-- 密码错误返回 `BAD_CREDENTIALS`。
+- 密码错误返回 `BadCredentials`。
+- 成功结果携带同一次查询并完成校验的 `UserAccount`。
 - 未知账号类型数据库值转换失败。
 
 后续持久化测试使用 H2 + Flyway 验证：
