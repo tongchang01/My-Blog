@@ -19,4 +19,22 @@
           AND deleted = 0
     </select>
 
+    <!-- 原子累计密码错误；达到阈值时写入锁定时间并开始新的失败周期。 -->
+    <update id="recordPasswordFailure">
+        UPDATE t_user_auth
+        SET locked_until = CASE
+                WHEN login_fail_count + 1 &gt;= #{maxAttempts} THEN #{lockedUntil}
+                ELSE NULL
+            END,
+            login_fail_count = CASE
+                WHEN login_fail_count + 1 &gt;= #{maxAttempts} THEN 0
+                ELSE login_fail_count + 1
+            END,
+            updated_at = #{failedAt},
+            updated_by = NULL
+        WHERE id = #{userId}
+          AND deleted = 0
+          AND (locked_until IS NULL OR locked_until &lt;= #{failedAt})
+    </update>
+
 </mapper>
