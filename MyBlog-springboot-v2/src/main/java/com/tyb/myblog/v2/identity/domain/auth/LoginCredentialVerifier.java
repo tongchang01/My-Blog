@@ -1,0 +1,45 @@
+package com.tyb.myblog.v2.identity.domain.auth;
+
+import com.tyb.myblog.v2.identity.domain.account.UserAccount;
+import com.tyb.myblog.v2.identity.domain.account.UserAccountRepository;
+import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+/**
+ * 后台登录凭据领域校验器。
+ */
+@RequiredArgsConstructor
+public class LoginCredentialVerifier {
+
+    private final UserAccountRepository repository;
+    private final PasswordHashVerifier passwordHashVerifier;
+
+    /**
+     * 校验后台登录凭据。
+     *
+     * @param username 登录用户名
+     * @param rawPassword 明文密码
+     * @param now 当前业务时间
+     * @return 不包含 HTTP 语义的领域校验结果
+     */
+    public LoginCredentialResult verify(String username, String rawPassword, LocalDateTime now) {
+        Optional<UserAccount> candidate = repository.findActiveByUsername(username);
+        if (candidate.isEmpty()) {
+            return LoginCredentialResult.BadCredentials.INSTANCE;
+        }
+
+        UserAccount account = candidate.orElseThrow();
+        if (!account.canLoginToAdmin()) {
+            return LoginCredentialResult.BadCredentials.INSTANCE;
+        }
+        if (account.isLockedAt(now)) {
+            return LoginCredentialResult.Locked.INSTANCE;
+        }
+
+        return passwordHashVerifier.matches(rawPassword, account.passwordHash())
+                ? new LoginCredentialResult.Authenticated(account)
+                : LoginCredentialResult.BadCredentials.INSTANCE;
+    }
+}
