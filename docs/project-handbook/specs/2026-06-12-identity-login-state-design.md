@@ -245,3 +245,18 @@ WHERE id = :userId
 5. 后续独立设计并实现双 token 登录事务编排与 Controller
 
 每个代码提交必须先完成对应 TDD 红绿循环，再执行定向测试、ArchUnit 和必要的全量回归。
+
+## 9. 实施结果
+
+本设计已按三个独立代码提交落地：
+
+1. `7b68f9c`：定义登录锁定策略与失败记录边界。
+2. `36f2677`：实现登录失败累计与持久化锁定。
+3. `e991a88`：实现登录成功状态更新。
+
+验证结果：
+
+- 领域、配置、H2 持久化和 Spring 上下文定向测试通过。
+- 生产代码未发现 MyBatis SQL 注解，登录状态更新 SQL 均位于 XML Mapper。
+- `mvn clean test` 通过：132 tests，0 failures，0 errors，2 skipped。
+- 当前环境没有可用 Docker，`MySqlFlywayMigrationTest` 和 `MySqlLoginFailureConcurrencyTest` 按既定策略跳过；真实 MySQL 并发语义仍需在 Docker 可用环境补跑。

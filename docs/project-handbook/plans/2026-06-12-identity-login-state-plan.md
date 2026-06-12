@@ -81,7 +81,7 @@
 - Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/domain/auth/LoginLockPolicyTest.java`
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/domain/auth/LoginCredentialVerifierTest.java`
 
-- [ ] **Step 1: 编写密码配置和锁定策略失败测试**
+- [x] **Step 1: 编写密码配置和锁定策略失败测试**
 
 新增 `SecurityPasswordPropertiesTest`：
 
@@ -147,7 +147,7 @@ class LoginLockPolicyTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试并确认 RED**
+- [x] **Step 2: 运行测试并确认 RED**
 
 Run:
 
@@ -157,7 +157,7 @@ mvn '-Dtest=SecurityPasswordPropertiesTest,LoginLockPolicyTest' test
 
 Expected: 测试编译失败，提示 `SecurityPasswordProperties` 和 `LoginLockPolicy` 不存在。
 
-- [ ] **Step 3: 实现配置属性和锁定策略**
+- [x] **Step 3: 实现配置属性和锁定策略**
 
 新增 `SecurityPasswordProperties`：
 
@@ -251,7 +251,7 @@ PasswordEncoder passwordEncoder(SecurityPasswordProperties properties) {
 }
 ```
 
-- [ ] **Step 4: 运行配置与策略测试并确认 GREEN**
+- [x] **Step 4: 运行配置与策略测试并确认 GREEN**
 
 Run:
 
@@ -261,7 +261,7 @@ mvn '-Dtest=SecurityPasswordPropertiesTest,LoginLockPolicyTest,SpringPasswordHas
 
 Expected: 配置、策略、BCrypt 适配器和 Security 配置测试全部通过。
 
-- [ ] **Step 5: 扩展凭据校验失败测试**
+- [x] **Step 5: 扩展凭据校验失败测试**
 
 修改 `LoginCredentialVerifierTest`，为测试类增加：
 
@@ -369,7 +369,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 ```
 
-- [ ] **Step 6: 运行凭据校验测试并确认 RED**
+- [x] **Step 6: 运行凭据校验测试并确认 RED**
 
 Run:
 
@@ -379,7 +379,7 @@ mvn '-Dtest=LoginCredentialVerifierTest' test
 
 Expected: 编译失败，提示 `LoginFailureRecorder`、`LoginStateUpdateException` 或新的构造参数不存在。
 
-- [ ] **Step 7: 实现失败记录端口、异常和校验器分支**
+- [x] **Step 7: 实现失败记录端口、异常和校验器分支**
 
 新增 `LoginFailureRecorder`：
 
@@ -452,7 +452,7 @@ loginFailureRecorder.recordPasswordFailure(
 return LoginCredentialResult.BadCredentials.INSTANCE;
 ```
 
-- [ ] **Step 8: 运行领域、配置与架构测试并确认 GREEN**
+- [x] **Step 8: 运行领域、配置与架构测试并确认 GREEN**
 
 Run:
 
@@ -462,7 +462,7 @@ mvn '-Dtest=LoginCredentialVerifierTest,LoginLockPolicyTest,SecurityPasswordProp
 
 Expected: 新增领域和配置测试通过，27 个架构测试通过。
 
-- [ ] **Step 9: 全量验证并提交**
+- [x] **Step 9: 全量验证并提交**
 
 Run:
 
@@ -493,7 +493,7 @@ git commit -m "定义登录锁定策略与失败记录边界"
 - Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/persistence/DatabaseLoginFailureRecorderTest.java`
 - Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/persistence/MySqlLoginFailureConcurrencyTest.java`
 
-- [ ] **Step 1: 编写 H2 失败累计集成测试**
+- [x] **Step 1: 编写 H2 失败累计集成测试**
 
 新增 `DatabaseLoginFailureRecorderTest`，使用 `@ActiveProfiles("test")`、`@SpringBootTest`，注入 `LoginFailureRecorder` 和 `JdbcTemplate`。`@BeforeEach` 依次清空 `t_refresh_token`、`t_user_auth`。
 
@@ -562,7 +562,7 @@ void rejectsDeletedOrMissingAccount() {
 
 测试辅助查询必须使用 `JdbcTemplate.queryForObject`，测试夹具 SQL 可以写在测试代码；生产 SQL 仍只能写 XML。
 
-- [ ] **Step 2: 运行 H2 集成测试并确认 RED**
+- [x] **Step 2: 运行 H2 集成测试并确认 RED**
 
 Run:
 
@@ -572,7 +572,7 @@ mvn '-Dtest=DatabaseLoginFailureRecorderTest' test
 
 Expected: Spring 注入失败或编译失败，提示没有 `LoginFailureRecorder` 基础设施 Bean。
 
-- [ ] **Step 3: 实现 Mapper、XML 和适配器**
+- [x] **Step 3: 实现 Mapper、XML 和适配器**
 
 在 `UserAccountMapper` 增加：
 
@@ -690,7 +690,7 @@ public class IdentityLoginConfiguration {
 }
 ```
 
-- [ ] **Step 4: 运行 H2 与上下文测试并确认 GREEN**
+- [x] **Step 4: 运行 H2 与上下文测试并确认 GREEN**
 
 Run:
 
@@ -700,7 +700,7 @@ mvn '-Dtest=DatabaseLoginFailureRecorderTest,ApplicationConfigurationTest,LoginC
 
 Expected: 失败累计、Spring 上下文和领域校验测试全部通过。
 
-- [ ] **Step 5: 编写真实 MySQL 并发失败测试**
+- [x] **Step 5: 编写真实 MySQL 并发失败测试**
 
 新增 `MySqlLoginFailureConcurrencyTest`：
 
@@ -782,7 +782,7 @@ class MySqlLoginFailureConcurrencyTest {
 
 补齐上述代码所需的 JUnit、Spring、Testcontainers、并发和集合 import。不得通过 `Thread.sleep` 制造并发。
 
-- [ ] **Step 6: 运行 MySQL 并发测试**
+- [x] **Step 6: 运行 MySQL 并发测试**
 
 Run:
 
@@ -795,7 +795,7 @@ Expected:
 - Docker 可用：1 test，0 failures。
 - Docker 不可用：1 test skipped，构建成功。
 
-- [ ] **Step 7: 执行 SQL 规则、定向和全量验证**
+- [x] **Step 7: 执行 SQL 规则、定向和全量验证**
 
 Run:
 
@@ -814,7 +814,7 @@ Expected:
 - 定向测试和 27 个架构测试通过。
 - 全量测试通过；Docker 不可用时 MySQL 测试允许跳过。
 
-- [ ] **Step 8: 提交失败累计与持久化锁定**
+- [x] **Step 8: 提交失败累计与持久化锁定**
 
 ```powershell
 git add -- 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/persistence/mapper/UserAccountMapper.java' 'MyBlog-springboot-v2/src/main/resources/mapper/identity/UserAccountMapper.xml' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/persistence/repository/MyBatisLoginFailureRecorder.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/config/IdentityLoginConfiguration.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/persistence/DatabaseLoginFailureRecorderTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/persistence/MySqlLoginFailureConcurrencyTest.java'
@@ -836,7 +836,7 @@ git commit -m "实现登录失败累计与持久化锁定"
 - Modify: Task 1 和 Task 2 中引用旧接口名的测试
 - Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/persistence/DatabaseSuccessfulLoginRecorderTest.java`
 
-- [ ] **Step 1: 编写成功状态更新失败测试**
+- [x] **Step 1: 编写成功状态更新失败测试**
 
 新增 `DatabaseSuccessfulLoginRecorderTest`，使用 `@ActiveProfiles("test")`、`@SpringBootTest`，注入最终接口 `LoginStateRecorder` 和 `JdbcTemplate`。
 
@@ -897,7 +897,7 @@ void rejectsDeletedLockedOrMissingAccount() {
 }
 ```
 
-- [ ] **Step 2: 运行成功状态测试并确认 RED**
+- [x] **Step 2: 运行成功状态测试并确认 RED**
 
 Run:
 
@@ -907,7 +907,7 @@ mvn '-Dtest=DatabaseSuccessfulLoginRecorderTest' test
 
 Expected: 编译失败，提示 `recordSuccessfulLogin` 不存在，或最终 `LoginStateRecorder` 类型不存在。
 
-- [ ] **Step 3: 将失败端口演进为完整登录状态端口**
+- [x] **Step 3: 将失败端口演进为完整登录状态端口**
 
 使用 `apply_patch` 移动并改名：
 
@@ -936,7 +936,7 @@ public interface LoginStateRecorder {
 
 同步将 `LoginCredentialVerifier`、`IdentityLoginConfiguration` 和测试中的 `LoginFailureRecorder` 改为 `LoginStateRecorder`。
 
-- [ ] **Step 4: 实现成功更新 Mapper 与 XML**
+- [x] **Step 4: 实现成功更新 Mapper 与 XML**
 
 在 `UserAccountMapper` 增加：
 
@@ -981,7 +981,7 @@ public void recordSuccessfulLogin(
 }
 ```
 
-- [ ] **Step 5: 运行成功状态和失败累计回归**
+- [x] **Step 5: 运行成功状态和失败累计回归**
 
 Run:
 
@@ -991,7 +991,7 @@ mvn '-Dtest=DatabaseSuccessfulLoginRecorderTest,DatabaseLoginFailureRecorderTest
 
 Expected: 成功状态、失败累计、领域校验和 Spring 上下文测试全部通过。
 
-- [ ] **Step 6: 执行规则、架构和全量验证**
+- [x] **Step 6: 执行规则、架构和全量验证**
 
 Run:
 
@@ -1011,7 +1011,7 @@ Expected:
 - 定向测试和 27 个架构测试通过。
 - 全量测试通过；Docker 不可用时 Testcontainers 测试允许跳过。
 
-- [ ] **Step 7: 提交登录成功状态更新**
+- [x] **Step 7: 提交登录成功状态更新**
 
 ```powershell
 git add -- 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/domain/auth/LoginFailureRecorder.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/domain/auth/LoginStateRecorder.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/domain/auth/LoginCredentialVerifier.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/config/IdentityLoginConfiguration.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/persistence/mapper/UserAccountMapper.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/persistence/repository/MyBatisLoginFailureRecorder.java' 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/infrastructure/persistence/repository/MyBatisLoginStateRecorder.java' 'MyBlog-springboot-v2/src/main/resources/mapper/identity/UserAccountMapper.xml' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/domain/auth/LoginCredentialVerifierTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/persistence/DatabaseLoginFailureRecorderTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/persistence/MySqlLoginFailureConcurrencyTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/infrastructure/persistence/DatabaseSuccessfulLoginRecorderTest.java'
@@ -1028,7 +1028,7 @@ git commit -m "实现登录成功状态更新"
 - Modify: `docs/project-handbook/specs/2026-06-12-identity-login-state-design.md`
 - Modify: `docs/project-handbook/plans/2026-06-12-identity-login-state-plan.md`
 
-- [ ] **Step 1: 用新鲜测试结果更新状态**
+- [x] **Step 1: 用新鲜测试结果更新状态**
 
 在所有代码任务完成后重新运行：
 
@@ -1045,13 +1045,13 @@ mvn clean test
 - 下一步设计并实现 Caffeine 登录限流，再进入双 token 登录事务编排与 Controller
 ```
 
-- [ ] **Step 2: 勾选设计和计划验收项**
+- [x] **Step 2: 勾选设计和计划验收项**
 
 在设计文档末尾追加“实施结果”，记录三个代码提交 SHA 和验证命令。
 
 将本计划实际完成的 checkbox 改为 `[x]`，不得提前勾选未执行步骤。
 
-- [ ] **Step 3: 检查并提交文档**
+- [x] **Step 3: 检查并提交文档**
 
 Run:
 
@@ -1075,17 +1075,17 @@ git commit -m "同步登录状态更新实施结果"
 
 ## 最终验收
 
-- [ ] ADMIN、DEMO 密码错误才累计；不存在、GUEST、锁定账号不累计。
-- [ ] 第 1 至第 4 次失败递增计数，第 5 次写入 10 分钟锁定并重置计数。
-- [ ] 锁定期间不执行 BCrypt，也不再次累计。
-- [ ] 锁定到期后的首次失败从 1 开始。
+- [x] ADMIN、DEMO 密码错误才累计；不存在、GUEST、锁定账号不累计。
+- [x] 第 1 至第 4 次失败递增计数，第 5 次写入 10 分钟锁定并重置计数。
+- [x] 锁定期间不执行 BCrypt，也不再次累计。
+- [x] 锁定到期后的首次失败从 1 开始。
 - [ ] MySQL 并发 5 次失败不会丢失更新。
-- [ ] 成功登录写入 `last_login_at` / `last_login_ip`。
-- [ ] 成功登录清空 `login_fail_count` / `locked_until`。
-- [ ] 已删除、并发锁定或不存在账号的状态更新失败。
-- [ ] 状态更新异常不包含用户名、明文密码或密码摘要。
-- [ ] 所有生产 SQL 位于 XML Mapper。
-- [ ] domain 不依赖 Spring、MyBatis、Servlet 或 HTTP 错误类型。
-- [ ] 未引入 Caffeine、Controller 或 token 登录编排。
-- [ ] 每个代码任务都有明确 RED 和 GREEN 证据。
-- [ ] `mvn clean test` 通过，工作区干净。
+- [x] 成功登录写入 `last_login_at` / `last_login_ip`。
+- [x] 成功登录清空 `login_fail_count` / `locked_until`。
+- [x] 已删除、并发锁定或不存在账号的状态更新失败。
+- [x] 状态更新异常不包含用户名、明文密码或密码摘要。
+- [x] 所有生产 SQL 位于 XML Mapper。
+- [x] domain 不依赖 Spring、MyBatis、Servlet 或 HTTP 错误类型。
+- [x] 未引入 Caffeine、Controller 或 token 登录编排。
+- [x] 每个代码任务都有明确 RED 和 GREEN 证据。
+- [x] `mvn clean test` 通过，工作区干净。
