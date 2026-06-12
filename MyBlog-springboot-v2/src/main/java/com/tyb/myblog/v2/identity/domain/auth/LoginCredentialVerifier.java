@@ -15,6 +15,8 @@ public class LoginCredentialVerifier {
 
     private final UserAccountRepository repository;
     private final PasswordHashVerifier passwordHashVerifier;
+    private final LoginFailureRecorder loginFailureRecorder;
+    private final LoginLockPolicy loginLockPolicy;
 
     /**
      * 校验后台登录凭据。
@@ -38,8 +40,16 @@ public class LoginCredentialVerifier {
             return LoginCredentialResult.Locked.INSTANCE;
         }
 
-        return passwordHashVerifier.matches(rawPassword, account.passwordHash())
-                ? new LoginCredentialResult.Authenticated(account)
-                : LoginCredentialResult.BadCredentials.INSTANCE;
+        if (passwordHashVerifier.matches(rawPassword, account.passwordHash())) {
+            return new LoginCredentialResult.Authenticated(account);
+        }
+
+        // 仅对已确认可登录后台的账号累计密码失败，避免为不存在账号或 GUEST 写状态。
+        loginFailureRecorder.recordPasswordFailure(
+                account.id(),
+                now,
+                loginLockPolicy.maxAttempts(),
+                now.plus(loginLockPolicy.lockDuration()));
+        return LoginCredentialResult.BadCredentials.INSTANCE;
     }
 }

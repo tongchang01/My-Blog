@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.common.security;
 
 import com.tyb.myblog.v2.common.config.ApiCorsProperties;
 import com.tyb.myblog.v2.common.config.SecurityJwtProperties;
+import com.tyb.myblog.v2.common.config.SecurityPasswordProperties;
 import com.tyb.myblog.v2.common.config.SecurityPublicEndpointProperties;
 import com.tyb.myblog.v2.common.auth.BearerTokenResolver;
 import com.tyb.myblog.v2.common.auth.token.AccessTokenVerifier;
@@ -36,7 +37,8 @@ import java.util.List;
 @EnableConfigurationProperties({
         ApiCorsProperties.class,
         SecurityPublicEndpointProperties.class,
-        SecurityJwtProperties.class
+        SecurityJwtProperties.class,
+        SecurityPasswordProperties.class
 })
 public class SecurityConfig {
 
@@ -97,8 +99,8 @@ public class SecurityConfig {
      * <p>当前使用 BCrypt，适合保存后台账号密码摘要，禁止明文存储密码。</p>
      */
     @Bean
-    PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    PasswordEncoder passwordEncoder(SecurityPasswordProperties properties) {
+        return new BCryptPasswordEncoder(properties.bcryptStrength());
     }
 
     /**
