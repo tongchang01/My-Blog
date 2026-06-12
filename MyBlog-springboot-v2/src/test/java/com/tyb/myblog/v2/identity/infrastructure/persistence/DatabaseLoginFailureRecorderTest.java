@@ -1,6 +1,6 @@
 package com.tyb.myblog.v2.identity.infrastructure.persistence;
 
-import com.tyb.myblog.v2.identity.domain.auth.LoginFailureRecorder;
+import com.tyb.myblog.v2.identity.domain.auth.LoginStateRecorder;
 import com.tyb.myblog.v2.identity.domain.auth.LoginStateUpdateException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class DatabaseLoginFailureRecorderTest {
 
     @Autowired
-    private LoginFailureRecorder recorder;
+    private LoginStateRecorder recorder;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

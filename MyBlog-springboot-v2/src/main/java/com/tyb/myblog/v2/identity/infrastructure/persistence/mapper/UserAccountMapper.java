@@ -35,4 +35,17 @@ public interface UserAccountMapper extends BaseMapper<UserAccountEntity> {
             @Param("failedAt") LocalDateTime failedAt,
             @Param("maxAttempts") int maxAttempts,
             @Param("lockedUntil") LocalDateTime lockedUntil);
+
+    /**
+     * 写入登录成功审计信息并清理失败状态。
+     *
+     * @param userId 账号 ID
+     * @param loggedInAt 登录成功时间
+     * @param clientIp 客户端 IP
+     * @return 更新行数
+     */
+    int recordSuccessfulLogin(
+            @Param("userId") long userId,
+            @Param("loggedInAt") LocalDateTime loggedInAt,
+            @Param("clientIp") String clientIp);
 }

@@ -3,7 +3,7 @@ package com.tyb.myblog.v2.identity.infrastructure.config;
 import com.tyb.myblog.v2.common.config.SecurityPasswordProperties;
 import com.tyb.myblog.v2.identity.domain.account.UserAccountRepository;
 import com.tyb.myblog.v2.identity.domain.auth.LoginCredentialVerifier;
-import com.tyb.myblog.v2.identity.domain.auth.LoginFailureRecorder;
+import com.tyb.myblog.v2.identity.domain.auth.LoginStateRecorder;
 import com.tyb.myblog.v2.identity.domain.auth.LoginLockPolicy;
 import com.tyb.myblog.v2.identity.domain.auth.PasswordHashVerifier;
 import org.springframework.context.annotation.Bean;
@@ -33,13 +33,13 @@ public class IdentityLoginConfiguration {
     LoginCredentialVerifier loginCredentialVerifier(
             UserAccountRepository repository,
             PasswordHashVerifier passwordHashVerifier,
-            LoginFailureRecorder loginFailureRecorder,
+            LoginStateRecorder loginStateRecorder,
             LoginLockPolicy loginLockPolicy
     ) {
         return new LoginCredentialVerifier(
                 repository,
                 passwordHashVerifier,
-                loginFailureRecorder,
+                loginStateRecorder,
                 loginLockPolicy
         );
     }

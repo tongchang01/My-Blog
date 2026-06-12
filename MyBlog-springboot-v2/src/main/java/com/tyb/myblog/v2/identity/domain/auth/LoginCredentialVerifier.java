@@ -15,7 +15,7 @@ public class LoginCredentialVerifier {
 
     private final UserAccountRepository repository;
     private final PasswordHashVerifier passwordHashVerifier;
-    private final LoginFailureRecorder loginFailureRecorder;
+    private final LoginStateRecorder loginStateRecorder;
     private final LoginLockPolicy loginLockPolicy;
 
     /**
@@ -45,7 +45,7 @@ public class LoginCredentialVerifier {
         }
 
         // 仅对已确认可登录后台的账号累计密码失败，避免为不存在账号或 GUEST 写状态。
-        loginFailureRecorder.recordPasswordFailure(
+        loginStateRecorder.recordPasswordFailure(
                 account.id(),
                 now,
                 loginLockPolicy.maxAttempts(),

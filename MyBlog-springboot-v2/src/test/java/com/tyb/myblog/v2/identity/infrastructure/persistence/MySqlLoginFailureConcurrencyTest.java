@@ -1,6 +1,6 @@
 package com.tyb.myblog.v2.identity.infrastructure.persistence;
 
-import com.tyb.myblog.v2.identity.domain.auth.LoginFailureRecorder;
+import com.tyb.myblog.v2.identity.domain.auth.LoginStateRecorder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ class MySqlLoginFailureConcurrencyTest {
             .withPassword("myblog-test-password");
 
     @Autowired
-    private LoginFailureRecorder recorder;
+    private LoginStateRecorder recorder;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;

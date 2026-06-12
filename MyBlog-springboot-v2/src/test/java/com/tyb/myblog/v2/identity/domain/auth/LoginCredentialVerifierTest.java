@@ -44,7 +44,7 @@ class LoginCredentialVerifierTest {
     void hidesMissingGuestAndWrongPasswordBehindBadCredentials() {
         UserAccountRepository missingRepository = username -> Optional.empty();
         PasswordHashVerifier missingPasswordVerifier = mock(PasswordHashVerifier.class);
-        LoginFailureRecorder missingRecorder = mock(LoginFailureRecorder.class);
+        LoginStateRecorder missingRecorder = mock(LoginStateRecorder.class);
         LoginCredentialVerifier missingVerifier =
                 new LoginCredentialVerifier(
                         missingRepository,
@@ -65,7 +65,7 @@ class LoginCredentialVerifierTest {
     @Test
     void returnsLockedWithoutCheckingPassword() {
         PasswordHashVerifier passwordVerifier = mock(PasswordHashVerifier.class);
-        LoginFailureRecorder recorder = mock(LoginFailureRecorder.class);
+        LoginStateRecorder recorder = mock(LoginStateRecorder.class);
         UserAccount account = account(AccountType.ADMIN, NOW.plusMinutes(1));
         LoginCredentialVerifier verifier = new LoginCredentialVerifier(
                 username -> Optional.of(account),
@@ -81,7 +81,7 @@ class LoginCredentialVerifierTest {
 
     @Test
     void recordsPasswordFailureOnlyForLoginCapableAccount() {
-        LoginFailureRecorder recorder = mock(LoginFailureRecorder.class);
+        LoginStateRecorder recorder = mock(LoginStateRecorder.class);
         PasswordHashVerifier passwordVerifier = mock(PasswordHashVerifier.class);
         UserAccount admin = account(AccountType.ADMIN, null);
         when(passwordVerifier.matches("raw", "hash")).thenReturn(false);
@@ -103,7 +103,7 @@ class LoginCredentialVerifierTest {
 
     @Test
     void doesNotRecordFailureForGuestOrSuccessfulAccount() {
-        LoginFailureRecorder recorder = mock(LoginFailureRecorder.class);
+        LoginStateRecorder recorder = mock(LoginStateRecorder.class);
         PasswordHashVerifier passwordVerifier = mock(PasswordHashVerifier.class);
 
         LoginCredentialVerifier guestVerifier = new LoginCredentialVerifier(
@@ -128,7 +128,7 @@ class LoginCredentialVerifierTest {
 
     @Test
     void propagatesFailureRecordingException() {
-        LoginFailureRecorder recorder = mock(LoginFailureRecorder.class);
+        LoginStateRecorder recorder = mock(LoginStateRecorder.class);
         PasswordHashVerifier passwordVerifier = mock(PasswordHashVerifier.class);
         UserAccount admin = account(AccountType.ADMIN, null);
         when(passwordVerifier.matches("raw", "hash")).thenReturn(false);
@@ -147,7 +147,7 @@ class LoginCredentialVerifierTest {
 
     private LoginCredentialResult verify(UserAccount account, boolean passwordMatches) {
         PasswordHashVerifier passwordVerifier = mock(PasswordHashVerifier.class);
-        LoginFailureRecorder recorder = mock(LoginFailureRecorder.class);
+        LoginStateRecorder recorder = mock(LoginStateRecorder.class);
         when(passwordVerifier.matches("raw", "hash")).thenReturn(passwordMatches);
         LoginCredentialVerifier verifier = new LoginCredentialVerifier(
                 username -> Optional.of(account),

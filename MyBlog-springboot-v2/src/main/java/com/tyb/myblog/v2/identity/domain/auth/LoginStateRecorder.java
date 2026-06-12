@@ -3,9 +3,9 @@ package com.tyb.myblog.v2.identity.domain.auth;
 import java.time.LocalDateTime;
 
 /**
- * 后台登录密码失败状态记录端口。
+ * 后台登录状态记录端口。
  */
-public interface LoginFailureRecorder {
+public interface LoginStateRecorder {
 
     /**
      * 原子记录一次已确认后台账号的密码错误。
@@ -20,4 +20,13 @@ public interface LoginFailureRecorder {
             LocalDateTime failedAt,
             int maxAttempts,
             LocalDateTime lockedUntil);
+
+    /**
+     * 原子记录一次成功登录，并清理密码失败状态。
+     *
+     * @param userId 账号 ID
+     * @param loggedInAt 登录成功时间
+     * @param clientIp 客户端 IP，无法识别时允许为 {@code null}
+     */
+    void recordSuccessfulLogin(long userId, LocalDateTime loggedInAt, String clientIp);
 }

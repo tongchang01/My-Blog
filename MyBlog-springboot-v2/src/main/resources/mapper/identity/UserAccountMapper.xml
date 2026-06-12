@@ -37,4 +37,18 @@
           AND (locked_until IS NULL OR locked_until &lt;= #{failedAt})
     </update>
 
+    <!-- 登录成功后写入审计信息，并清理失败次数和过期锁定状态。 -->
+    <update id="recordSuccessfulLogin">
+        UPDATE t_user_auth
+        SET last_login_at = #{loggedInAt},
+            last_login_ip = #{clientIp},
+            login_fail_count = 0,
+            locked_until = NULL,
+            updated_at = #{loggedInAt},
+            updated_by = #{userId}
+        WHERE id = #{userId}
+          AND deleted = 0
+          AND (locked_until IS NULL OR locked_until &lt;= #{loggedInAt})
+    </update>
+
 </mapper>
