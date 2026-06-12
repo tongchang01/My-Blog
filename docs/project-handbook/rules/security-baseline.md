@@ -33,7 +33,7 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 
 - 类型：JWT（`spring-security-oauth2-jose` 签发）
 - TTL：**15 分钟**（`myblog.security.jwt.access-ttl`）
-- 校验：完全无状态，过滤器层 verify 签名 + exp + ver claim
+- 校验：JWT 本体不保存服务端会话状态；过滤器先校验签名、`exp`、`typ`、`iss` 等声明，再通过持久化端口比对 `ver` 与当前用户 `token_version`
 - Claim：
   - 标准：`sub`（user_id）/ `exp` / `iat` / `iss`
   - 自定义：
@@ -56,8 +56,6 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
   - 管理员强制下线
 - access token 校验时除标准校验外还校验 `token.ver == user.token_version`，不一致 → 401 `10002` token 已失效
 - 撤销跨重启 & 跨实例均生效（**不依赖 Redis**）
-
-🔴 **禁止**：内存态 `TokenRevocationStore`（V1/早期 V2 实现方式，已废弃，详见 `pitfalls.md` P-001）。
 
 ## 4. PASSWORD 文章访问 Token（独立 Token 体系）
 
