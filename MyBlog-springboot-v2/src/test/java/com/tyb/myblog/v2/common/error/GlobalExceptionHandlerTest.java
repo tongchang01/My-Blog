@@ -37,9 +37,11 @@ class GlobalExceptionHandlerTest {
                                 {"title":""}
                                 """))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("90001"))
-                .andExpect(jsonPath("$.message").value("title must not be blank"));
+                .andExpect(jsonPath("$.msg").value("title must not be blank"))
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andExpect(jsonPath("$.success").doesNotExist())
+                .andExpect(jsonPath("$.message").doesNotExist());
     }
 
     @Test
@@ -50,27 +52,27 @@ class GlobalExceptionHandlerTest {
                                 {"title":
                                 """))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("90001"))
-                .andExpect(jsonPath("$.message").value("请求体格式错误"));
+                .andExpect(jsonPath("$.msg").value("请求体格式错误"))
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 
     @Test
     void returnsBusinessEnvelope() throws Exception {
         mockMvc.perform(post("/api/test/errors/business"))
                 .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("90004"))
-                .andExpect(jsonPath("$.message").value("标题重复"));
+                .andExpect(jsonPath("$.msg").value("标题重复"))
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 
     @Test
     void hidesInternalApiExceptionMessage() throws Exception {
         mockMvc.perform(post("/api/test/errors/internal"))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.success").value(false))
                 .andExpect(jsonPath("$.code").value("99999"))
-                .andExpect(jsonPath("$.message").value("系统内部错误"));
+                .andExpect(jsonPath("$.msg").value("系统内部错误"))
+                .andExpect(jsonPath("$.data").isEmpty());
     }
 
     @RestController

@@ -55,7 +55,10 @@ class JwtAuthenticationFilterTest {
 
         mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
                 .andExpect(status().isUnauthorized())
-                .andExpect(jsonPath("$.success").value(false))
-                .andExpect(jsonPath("$.code").value("10002"));
+                .andExpect(jsonPath("$.code").value("10002"))
+                .andExpect(jsonPath("$.msg").value("登录状态已失效"))
+                .andExpect(jsonPath("$.data").isEmpty())
+                .andExpect(jsonPath("$.success").doesNotExist())
+                .andExpect(jsonPath("$.message").doesNotExist());
     }
 }
