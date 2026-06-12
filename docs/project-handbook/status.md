@@ -4,13 +4,13 @@
 > 更新时机：每个里程碑完成后更新。
 > 当前日期：2026-06
 
-## ⚠️ 当前唯一主线：DDL 已冻结，进入 V2 代码清理 + 重建
+## ⚠️ 当前唯一主线：M3 模块重建
 
 **DDL 冻结前的产品规格与 schema 评审已完成**。R5-R7 完成后多处与既有代码冲突（ADR-0015 审计列三件套、ADR-0017 无 FK、R5 模块边界含 stats 与 common-infra、ADR-0018 时区五层、Role 三态枚举等），继续修旧实现 = 返工。
 
 **从现在开始，不再修改 Flyway V1__init.sql；后续 schema 变更走 V2__xxx.sql / V3__xxx.sql。**
 
-M1 旧代码清理与 M2 基础设施补齐已经完成，当前准备进入 M3 模块重建。代码阶段的推进原则：
+M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，当前从 identity 最小纵向切片开始模块重建。代码阶段的推进原则：
 
 - 保留 `common/`、Security、ArchUnit 等横切能力
 - 先补齐审计、时间、i18n、配置与新模块架构守护
@@ -30,7 +30,7 @@ M1 旧代码清理与 M2 基础设施补齐已经完成，当前准备进入 M3 
 | `arch/auth-flow.md`                                                                                      | ✅ 双 token 完整流程                                               |
 | `arch/schema-design.md`                                                                                  | ✅ DDL 已冻结；Flyway V1__init.sql 已生成并烟测通过，后续 schema 变更另起 V2+ 迁移 |
 | `product/use-cases.md` / `product/data-model.md` / `product/business-rules.md` / `product/er-diagram.md` | ✅ 已生成                                                        |
-| Codex review 反馈消化                                                                                        | ✅ P0/P1/P2 已处理                                               |
+| M3 开始前全量审查                                                                                           | ✅ P1 与准入文档项已关闭；剩余 P2 按对应业务首次落地前处理                    |
 
 ## 2. V2 后端代码现状
 
@@ -48,14 +48,14 @@ M1 旧代码清理与 M2 基础设施补齐已经完成，当前准备进入 M3 
 - 已完成：认证 token 端口收口到 `common.auth.token`，JWT 实现与 identity 用例解除具体依赖
 - 已完成：ArchUnit 按 identity / content / comment / system / stats / common-infra 重写，跨模块只允许依赖对方 application 接口
 - 已完成：Maven Enforcer 锁定 Java 17 / Maven 3.9.x，并执行依赖收敛检查
-- M3 尚未开始；下一步拆分 identity 模块的首批任务
-- 当前基线：`mvn clean test` 通过（83 tests，0 failures，1 skipped）
+- M3 已允许进入；下一步实现 identity 后台登录最小纵向切片
+- 当前基线：`mvn clean test` 通过（108 tests，0 failures，0 errors，1 skipped）
 
-**当前处置方案**：M2 已完成，按 identity → system → content → comment → stats / common-infra 顺序重建。
+**当前处置方案**：按 identity → system → content → comment → stats / common-infra 顺序重建。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. 基础设施补齐：BaseEntity / AuditOnlyBase / AuditFieldHandler / Clock Bean / i18n / application.yml / ArchUnit
+1. identity 后台登录最小纵向切片
 2. 按模块重建：identity → system → content → comment → stats / common-infra
 3. 前台 / 后台前端骨架
 

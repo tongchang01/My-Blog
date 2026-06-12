@@ -62,8 +62,6 @@ MyBlog 是一个个人博客系统，包含三块代码：
 
 ## 目录布局（V2 工程内）
 
-> 待补充：实际跑一次 `tree` 后回填
-
 ```
 MyBlog-springboot-v2/
 ├── pom.xml
@@ -85,17 +83,19 @@ cd MyBlog-springboot-v2
 
 mvn clean compile          # 编译
 mvn test                   # 跑测试（含 ArchUnit 守护）
-mvn spring-boot:run        # 本地启动
+mvn spring-boot:run -Dspring-boot.run.profiles=local   # 本地启动
 mvn clean package          # 打包
 ```
 
 ## 环境变量
 
-启动前必须设置（缺失会启动失败）：
+启动 `local` / `prod` 前必须设置：
 
-- `MYBLOG_JWT_SECRET` — JWT 签名密钥
+- `MYBLOG_JWT_SECRET` — JWT 签名密钥（至少 32 字节）
+- `MYBLOG_DATASOURCE_USERNAME` / `MYBLOG_DATASOURCE_PASSWORD` — 数据库账号与密码
+- `MYBLOG_DATASOURCE_URL` — `prod` 必填，`local` 有本机开发库默认 URL
 
-> 完整环境变量清单待补充至 `rules/security-baseline.md`
+完整环境变量和测试 profile 说明见 `workflows/build-and-test.md`。
 
 ## 文档导航
 

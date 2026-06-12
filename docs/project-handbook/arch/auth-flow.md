@@ -60,7 +60,7 @@ payload : {
 ```
 
 - TTL：15 分钟（`myblog.security.jwt.access-token-ttl`）
-- 完全自包含 + `ver` 校验，**不依赖外部撤销存储**
+- JWT 本体不保存服务端会话；认证时通过持久化端口比对 `ver` 与当前 `token_version`，**不依赖独立黑名单**
 - 签名密钥：`MYBLOG_JWT_SECRET` 环境变量，启动时由 `JwtSecretStartupValidator` 校验
 
 ### Refresh Token（不是 JWT）
@@ -185,7 +185,8 @@ POST /api/public/articles/{id}/unlock   Body: { password }
 
 - `AccessTokenIssuer` — identity 应用层使用的访问令牌签发端口
 - `AccessTokenVerifier` — Security 过滤器使用的访问令牌验证端口
-- `JwtTokenService` — common 内部 JWT 编解码实现，实现上述端口（含 typ 区分）
+- `JwtTokenService` — common 内部 JWT 编解码实现，实现 `AccessTokenIssuer` / `AccessTokenDecoder`（含 typ 区分）
+- `PersistentAccessTokenVerifier` — identity 应用层的持久化验证实现，组合 JWT 解码与用户 `token_version` 校验
 - `RefreshTokenService` — refresh token 签发 / 校验 / 撤销 / SHA-256 哈希
 - `ArticleAccessTokenService` — PASSWORD 文章 token 签发 / 校验
 - `JwtAuthenticationFilter` — Authorization header 处理（typ=access）

@@ -64,7 +64,8 @@ com.tyb.myblog.v2
 ```text
 identity.application ──► common.auth.token.AccessTokenIssuer
 common.security filter ──► common.auth.token.AccessTokenVerifier
-common.security JWT implementation ── implements both ports
+common.security JwtTokenService ── implements AccessTokenIssuer / AccessTokenDecoder
+identity.application PersistentAccessTokenVerifier ── implements AccessTokenVerifier
 ```
 
 - identity 拥有登录、refresh token、用户状态、`token_version` 和签发用例

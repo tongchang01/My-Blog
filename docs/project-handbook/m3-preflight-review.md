@@ -6,11 +6,11 @@
 
 ## 1. 审查结论
 
-当前模块方向、技术栈和 14 张表 V1 DDL 可以继续使用，但暂不直接进入 M3。进入前应关闭 6 个 P1 问题；P2 必须在对应业务能力首次落地前完成。
+当前模块方向、技术栈和 14 张表 V1 DDL 已通过 M3 准入复核，允许进入 M3。6 个 P1 问题已关闭；未完成的 P2 继续在对应业务能力首次落地前处理，不阻塞其它模块的小步重建。
 
 当前验证基线：
 
-- `mvn clean test`：68 tests，0 failures，0 errors
+- `mvn clean test`：108 tests，0 failures，0 errors，1 skipped（Docker 未启动时跳过 Testcontainers MySQL）
 - Maven Enforcer：Java、Maven与依赖收敛通过
 - Flyway H2 烟测：14 张表全部创建
 - DDL 静态检查：0 外键、0 `TIMESTAMP`、0 `ON UPDATE`
@@ -283,10 +283,10 @@ mvn clean test
 - [x] MySQL session 时区验证通过
 - [x] JWT 与 identity 依赖方向有代码和 ArchUnit 双重守护
 - [x] prod 缺少密钥或数据库配置时失败启动
-- [ ] 文档中的错误码、配置名、字段名与代码一致
-- [ ] 工作区不存在本轮无关修改
+- [x] 文档中的错误码、配置名、字段名与代码一致
+- [x] 工作区不存在本轮无关修改
 
-全部满足后，将结论改为“允许进入 M3”。M3 仍按小步提交推进，先做 identity 最小纵向切片，不一次性完成整个模块。
+准入条件已满足，允许进入 M3。M3 仍按小步提交推进，先做 identity 最小纵向切片，不一次性完成整个模块。
 
 ## 8. 审查记录
 
@@ -304,3 +304,4 @@ mvn clean test
 | 2026-06-12 | 登录审计字段已统一 | schema、认证流程和安全规则统一使用 `last_login_at` / `last_login_ip` |
 | 2026-06-12 | 根包架构说明已同步 | 删除顶级 `infrastructure` 旧描述，明确公共与业务基础设施的实际归属 |
 | 2026-06-12 | 构建测试 SOP 已同步 | 对齐 profile 环境变量、H2 默认测试与可选 Testcontainers MySQL 验证 |
+| 2026-06-12 | 允许进入 M3 | P1 与文档准入项全部关闭，全量测试通过；剩余 P2 按对应业务能力首次落地前处理 |

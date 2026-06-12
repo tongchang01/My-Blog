@@ -12,7 +12,7 @@
 - **V2 前台 / 后台**：待启动；规格分别在 `frontend-user/` 和 `frontend-admin/`
 - **数据**：V2 不兼容 V1 schema（ADR-0013），一次性导入（见 `migration/`）
 
-当前阶段：**业务规格 + Schema 设计**（DDL 冻结前停止业务层代码改动）。feature-inventory.md ⑳ 项已全部回填决策；下一步走 use-cases → business-rules → data-model → schema-design → Flyway `V1__init.sql`，详见 `status.md` / `roadmap.md`。
+当前阶段：**M3 模块重建**。业务规格、14 张表 schema、Flyway `V1__init.sql`、M1 清理、M2 基础设施和 M3 准入复核均已完成；下一步从 identity 后台登录最小纵向切片开始，详见 `status.md` / `roadmap.md` / `m3-preflight-review.md`。
 
 ## 二、开始任何任务前必读
 
@@ -96,12 +96,12 @@ mvn test -Dtest=ArchitectureRulesTest       # 单跑架构守护
 mvn spring-boot:run -Dspring-boot.run.profiles=local   # 本地启动
 ```
 
-环境变量：`MYBLOG_JWT_SECRET`（≥32 字节）必设，缺失启动失败。详见 `workflows/build-and-test.md`。
+启动 `local` / `prod` 前必须提供数据库账号、密码和 `MYBLOG_JWT_SECRET`（≥32 字节）；完整清单与 profile 差异见 `workflows/build-and-test.md`。
 
 ## 十、当前焦点
 
-- **进行中**：业务规格梳理 — 用户正在标注 `product/feature-inventory.md` 的【V2 决定】列
-- **下一步**（用户标注完成后）：`product/use-cases.md` → `product/data-model.md` → `arch/schema-design.md` → V2 后端业务代码重写
+- **进行中**：M3 模块重建准备已完成
+- **下一步**：identity 后台登录最小纵向切片，按 domain → infrastructure → application → web → 测试拆分提交
 - **并行待启动**：`api-contract/` 接口契约、`frontend-user/` 与 `frontend-admin/` 规格
 
 ## 十一、文档地图
