@@ -22,6 +22,17 @@ public interface UserAccountMapper extends BaseMapper<UserAccountEntity> {
     UserAccountEntity selectActiveByUsername(@Param("username") String username);
 
     /**
+     * 查询未删除、未锁定且允许登录后台的账号快照。
+     *
+     * @param userId 账号 ID
+     * @param now 当前业务时间
+     * @return 可刷新账号实体，不满足条件时返回 {@code null}
+     */
+    UserAccountEntity selectRefreshableById(
+            @Param("userId") long userId,
+            @Param("now") LocalDateTime now);
+
+    /**
      * 原子累计一次密码错误，并在达到阈值时锁定账号。
      *
      * @param userId 账号 ID

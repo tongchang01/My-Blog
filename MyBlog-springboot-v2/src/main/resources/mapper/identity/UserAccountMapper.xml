@@ -19,6 +19,20 @@
           AND deleted = 0
     </select>
 
+    <!-- 刷新会话前重新读取账号状态和最新 token_version。 -->
+    <select id="selectRefreshableById"
+            resultType="com.tyb.myblog.v2.identity.infrastructure.persistence.entity.UserAccountEntity">
+        SELECT id,
+               username,
+               type,
+               token_version
+        FROM t_user_auth
+        WHERE id = #{userId}
+          AND deleted = 0
+          AND type IN (1, 2)
+          AND (locked_until IS NULL OR locked_until &lt;= #{now})
+    </select>
+
     <!-- 原子累计密码错误；达到阈值时写入锁定时间并开始新的失败周期。 -->
     <update id="recordPasswordFailure">
         UPDATE t_user_auth
