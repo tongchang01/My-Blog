@@ -32,6 +32,7 @@ class BackendPropertiesTest {
                 .containsExactly(
                         tuple("GET", "/actuator/health"),
                         tuple("POST", "/api/auth/login"),
+                        tuple("POST", "/api/auth/refresh"),
                         tuple("GET", "/api/public/security-probe"),
                         tuple("GET", "/doc.html"),
                         tuple("GET", "/webjars/**"),

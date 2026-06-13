@@ -77,6 +77,31 @@ class SecurityConfigTest {
     }
 
     @Test
+    void permitsConfiguredRefreshPostWithoutAccessToken() throws Exception {
+        mockMvc.perform(post("/api/auth/refresh")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"refreshToken":"invalid"}
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
+    void doesNotPermitRefreshGet() throws Exception {
+        mockMvc.perform(get("/api/auth/refresh"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
+    void requiresAccessTokenForLogout() throws Exception {
+        mockMvc.perform(post("/api/auth/logout"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
     void returnsForbiddenWhenRoleIsInsufficient() throws Exception {
         jdbcTemplate.update("""
                 insert into t_user_auth (

@@ -51,3 +51,5 @@ myblog:
         path: /actuator/health
       - method: POST
         path: /api/auth/login
+      - method: POST
+        path: /api/auth/refresh

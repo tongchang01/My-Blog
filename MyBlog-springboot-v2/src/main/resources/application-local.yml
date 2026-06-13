@@ -32,6 +32,8 @@ myblog:
         path: /actuator/health
       - method: POST
         path: /api/auth/login
+      - method: POST
+        path: /api/auth/refresh
       - method: GET
         path: /api/public/security-probe
       - method: GET
