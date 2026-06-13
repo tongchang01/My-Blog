@@ -1,5 +1,6 @@
 package com.tyb.myblog.v2.identity.infrastructure.persistence.repository;
 
+import com.tyb.myblog.v2.common.infrastructure.persistence.audit.SecurityContextAuditor;
 import com.tyb.myblog.v2.identity.domain.profile.UserProfile;
 import com.tyb.myblog.v2.identity.domain.profile.UserProfileRepository;
 import com.tyb.myblog.v2.identity.infrastructure.persistence.entity.UserProfileEntity;
@@ -7,6 +8,8 @@ import com.tyb.myblog.v2.identity.infrastructure.persistence.mapper.UserProfileM
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -17,10 +20,18 @@ import java.util.Optional;
 public class MyBatisUserProfileRepository implements UserProfileRepository {
 
     private final UserProfileMapper mapper;
+    private final Clock clock;
+    private final SecurityContextAuditor auditor;
 
     @Override
     public Optional<UserProfile> findActiveByUserId(long userId) {
         return Optional.ofNullable(mapper.selectActiveByUserId(userId))
+                .map(this::toDomain);
+    }
+
+    @Override
+    public Optional<UserProfile> findActiveByUserIdForUpdate(long userId) {
+        return Optional.ofNullable(mapper.selectActiveByUserIdForUpdate(userId))
                 .map(this::toDomain);
     }
 
@@ -31,6 +42,14 @@ public class MyBatisUserProfileRepository implements UserProfileRepository {
             throw new IllegalStateException(
                     "用户资料创建失败，userId=" + profile.userId());
         }
+    }
+
+    @Override
+    public boolean update(UserProfile profile) {
+        return mapper.updateActiveProfile(
+                toEntity(profile),
+                LocalDateTime.now(clock),
+                auditor.currentUserId()) == 1;
     }
 
     private UserProfile toDomain(UserProfileEntity entity) {

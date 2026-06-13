@@ -559,7 +559,7 @@ git commit -m "实现当前用户资料查询"
 
 **提交信息：** `实现用户资料部分更新`
 
-- [ ] **Step 1：写 `PatchValue`、合并和更新服务失败测试**
+- [x] **Step 1：写 `PatchValue`、合并和更新服务失败测试**
 
 `PatchValue` 测试可放入 `CurrentUserProfileUpdateServiceTest`，必须断言：
 
@@ -582,7 +582,7 @@ git commit -m "实现当前用户资料查询"
 - 资料缺失返回 `INTERNAL_ERROR`
 - 更新行数异常返回 `INTERNAL_ERROR`
 
-- [ ] **Step 2：运行测试并确认失败**
+- [x] **Step 2：运行测试并确认失败**
 
 Run:
 
@@ -592,7 +592,7 @@ mvn -Dtest=UserProfileTest,CurrentUserProfileUpdateServiceTest test
 
 Expected: FAIL，原因是 PATCH 类型和更新服务尚不存在。
 
-- [ ] **Step 3：实现 `PatchValue` 和更新命令**
+- [x] **Step 3：实现 `PatchValue` 和更新命令**
 
 ```java
 public record PatchValue<T>(boolean present, T value) {
@@ -665,7 +665,7 @@ public record UpdateCurrentUserProfileCommand(
 }
 ```
 
-- [ ] **Step 4：扩展领域合并能力**
+- [x] **Step 4：扩展领域合并能力**
 
 在 `UserProfile` 增加：
 
@@ -692,7 +692,7 @@ public UserProfile apply(UserProfilePatch patch) {
 
 `UserProfile` 只能依赖同包的领域类型，禁止 import `application`。
 
-- [ ] **Step 5：先补 `UserProfilePatch` 领域类型**
+- [x] **Step 5：先补 `UserProfilePatch` 领域类型**
 
 创建：
 
@@ -732,7 +732,7 @@ public record UserProfilePatch(
 
 在 `UpdateCurrentUserProfileCommand` 增加 `toDomainPatch()`，逐字段把 `PatchValue<String>` 转成 `ProfileFieldPatch`。应用层的泛型 `PatchValue<String>` 只承担 Web/Application 边界表达。
 
-- [ ] **Step 6：扩展仓储的加锁查询和 XML 更新**
+- [x] **Step 6：扩展仓储的加锁查询和 XML 更新**
 
 仓储端口增加：
 
@@ -780,7 +780,7 @@ WHERE user_id = #{profile.userId}
 
 `MyBatisUserProfileRepository` 注入项目 `Clock` 和 `SecurityContextAuditor`，用相同时间源和当前审计用户调用 XML 更新；影响行数为 1 返回 true，否则 false。
 
-- [ ] **Step 7：实现事务更新服务**
+- [x] **Step 7：实现事务更新服务**
 
 `CurrentUserProfileUpdateService.update(AuthenticatedPrincipal principal, UpdateCurrentUserProfileCommand command)`：
 
@@ -812,7 +812,7 @@ public UserProfile update(
 
 `requireAdmin` 使用 `principal.roles().contains("ADMIN")`。DEMO 必须在任何仓储调用前失败。
 
-- [ ] **Step 8：运行 Task 3 测试**
+- [x] **Step 8：运行 Task 3 测试**
 
 Run:
 
@@ -822,7 +822,7 @@ mvn -Dtest=UserProfileTest,CurrentUserProfileUpdateServiceTest,DatabaseUserProfi
 
 Expected: PASS。
 
-- [ ] **Step 9：检查并提交 Task 3**
+- [x] **Step 9：检查并提交 Task 3**
 
 Run:
 

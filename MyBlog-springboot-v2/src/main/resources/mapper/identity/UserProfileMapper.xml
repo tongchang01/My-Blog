@@ -34,4 +34,58 @@
           AND deleted = 0
     </select>
 
+    <!-- 更新前加行锁，保证同一用户资料的读取、合并和写入保持一致。 -->
+    <select id="selectActiveByUserIdForUpdate"
+            resultType="com.tyb.myblog.v2.identity.infrastructure.persistence.entity.UserProfileEntity">
+        SELECT user_id,
+               nickname,
+               avatar_url,
+               bio_zh,
+               bio_ja,
+               bio_en,
+               location,
+               website,
+               email_public,
+               github_url,
+               twitter_url,
+               linkedin_url,
+               zhihu_url,
+               qiita_url,
+               juejin_url,
+               created_at,
+               created_by,
+               updated_at,
+               updated_by,
+               deleted,
+               deleted_at,
+               deleted_by
+        FROM t_user_info
+        WHERE user_id = #{userId}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
+    <!-- 显式更新全部可编辑字段，使前端能够把可选字段清空为 NULL。 -->
+    <update id="updateActiveProfile">
+        UPDATE t_user_info
+        SET nickname = #{profile.nickname},
+            avatar_url = #{profile.avatarUrl},
+            bio_zh = #{profile.bioZh},
+            bio_ja = #{profile.bioJa},
+            bio_en = #{profile.bioEn},
+            location = #{profile.location},
+            website = #{profile.website},
+            email_public = #{profile.emailPublic},
+            github_url = #{profile.githubUrl},
+            twitter_url = #{profile.twitterUrl},
+            linkedin_url = #{profile.linkedinUrl},
+            zhihu_url = #{profile.zhihuUrl},
+            qiita_url = #{profile.qiitaUrl},
+            juejin_url = #{profile.juejinUrl},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE user_id = #{profile.userId}
+          AND deleted = 0
+    </update>
+
 </mapper>

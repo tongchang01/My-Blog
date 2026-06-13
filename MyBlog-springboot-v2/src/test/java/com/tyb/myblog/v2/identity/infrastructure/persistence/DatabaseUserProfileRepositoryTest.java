@@ -12,7 +12,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -116,6 +119,102 @@ class DatabaseUserProfileRepositoryTest {
         assertThat(row.get("CREATED_BY")).isEqualTo(1003L);
         assertThat(row.get("UPDATED_BY")).isEqualTo(1003L);
         assertThat(row.get("DELETED")).isEqualTo(0);
+    }
+
+    @Test
+    @Transactional
+    void shouldReadActiveProfileForUpdate() {
+        insertAccount(1004L, "locked-profile");
+        insertProfile(1004L, 0);
+
+        assertThat(repository.findActiveByUserIdForUpdate(1004L))
+                .contains(UserProfile.create(
+                        1004L,
+                        "TYB",
+                        "https://example.com/avatar.png",
+                        "中文简介",
+                        "日本語紹介",
+                        "English bio",
+                        "Tokyo",
+                        "https://example.com",
+                        "public@example.com",
+                        "https://github.com/tyb",
+                        "https://x.com/tyb",
+                        "https://linkedin.com/in/tyb",
+                        "https://zhihu.com/people/tyb",
+                        "https://qiita.com/tyb",
+                        "https://juejin.cn/user/tyb"));
+    }
+
+    @Test
+    void shouldUpdateAllProfileFieldsAndAuditColumns() {
+        insertAccount(1005L, "updated-profile");
+        insertProfile(1005L, 0);
+        authenticate(1005L);
+        LocalDateTime beforeUpdate = LocalDateTime.now().minusSeconds(1);
+        UserProfile updated = UserProfile.create(
+                1005L,
+                "New Name",
+                null,
+                "新中文简介",
+                null,
+                "New English bio",
+                null,
+                "https://new.example.com",
+                null,
+                "https://github.com/new",
+                null,
+                "https://linkedin.com/in/new",
+                null,
+                "https://qiita.com/new",
+                null);
+
+        assertThat(repository.update(updated)).isTrue();
+
+        Map<String, Object> row = jdbcTemplate.queryForMap(
+                """
+                        SELECT nickname, avatar_url, bio_zh, bio_ja, bio_en,
+                               location, website, email_public, github_url,
+                               twitter_url, linkedin_url, zhihu_url, qiita_url,
+                               juejin_url, updated_at, updated_by
+                        FROM t_user_info
+                        WHERE user_id = ?
+                        """,
+                1005L);
+        assertThat(row.get("NICKNAME")).isEqualTo("New Name");
+        assertThat(row.get("AVATAR_URL")).isNull();
+        assertThat(row.get("BIO_ZH")).isEqualTo("新中文简介");
+        assertThat(row.get("BIO_JA")).isNull();
+        assertThat(row.get("BIO_EN")).isEqualTo("New English bio");
+        assertThat(row.get("LOCATION")).isNull();
+        assertThat(row.get("WEBSITE")).isEqualTo("https://new.example.com");
+        assertThat(row.get("EMAIL_PUBLIC")).isNull();
+        assertThat(row.get("GITHUB_URL")).isEqualTo("https://github.com/new");
+        assertThat(row.get("TWITTER_URL")).isNull();
+        assertThat(row.get("LINKEDIN_URL")).isEqualTo("https://linkedin.com/in/new");
+        assertThat(row.get("ZHIHU_URL")).isNull();
+        assertThat(row.get("QIITA_URL")).isEqualTo("https://qiita.com/new");
+        assertThat(row.get("JUEJIN_URL")).isNull();
+        assertThat(((Timestamp) row.get("UPDATED_AT")).toLocalDateTime())
+                .isAfter(beforeUpdate);
+        assertThat(row.get("UPDATED_BY")).isEqualTo(1005L);
+    }
+
+    @Test
+    void shouldNotUpdateDeletedProfile() {
+        insertAccount(1006L, "deleted-update");
+        insertProfile(1006L, 1);
+        authenticate(1006L);
+
+        boolean updated = repository.update(UserProfile.create(
+                1006L, "New Name", null, null, null, null, null,
+                null, null, null, null, null, null, null, null));
+
+        assertThat(updated).isFalse();
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT nickname FROM t_user_info WHERE user_id = ?",
+                String.class,
+                1006L)).isEqualTo("TYB");
     }
 
     private void insertAccount(long id, String username) {

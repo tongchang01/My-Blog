@@ -70,6 +70,35 @@ public record UserProfile(
                 url(juejinUrl, "掘金链接"));
     }
 
+    /**
+     * 将部分字段补丁合并到当前资料，并复用完整创建规则进行规范化与校验。
+     *
+     * @param patch 用户资料字段补丁
+     * @return 合并并校验后的新资料
+     */
+    public UserProfile apply(UserProfilePatch patch) {
+        return create(
+                userId,
+                value(patch.nickname(), nickname),
+                value(patch.avatarUrl(), avatarUrl),
+                value(patch.bioZh(), bioZh),
+                value(patch.bioJa(), bioJa),
+                value(patch.bioEn(), bioEn),
+                value(patch.location(), location),
+                value(patch.website(), website),
+                value(patch.emailPublic(), emailPublic),
+                value(patch.githubUrl(), githubUrl),
+                value(patch.twitterUrl(), twitterUrl),
+                value(patch.linkedinUrl(), linkedinUrl),
+                value(patch.zhihuUrl(), zhihuUrl),
+                value(patch.qiitaUrl(), qiitaUrl),
+                value(patch.juejinUrl(), juejinUrl));
+    }
+
+    private static String value(ProfileFieldPatch patch, String current) {
+        return patch.present() ? patch.value() : current;
+    }
+
     private static String required(String value, String field, int maxLength) {
         String normalized = optional(value, field, maxLength);
         if (normalized == null) {
