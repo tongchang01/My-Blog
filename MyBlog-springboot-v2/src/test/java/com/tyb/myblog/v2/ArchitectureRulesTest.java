@@ -107,6 +107,14 @@ class ArchitectureRulesTest {
                     .should().dependOnClassesThat().resideInAnyPackage("..web..", "..infrastructure..")
                     .allowEmptyShould(true);
 
+    // application 层只接收与传递应用命令，不能直接绑定 Servlet 请求对象。
+    @ArchTest
+    static final ArchRule application_does_not_depend_on_servlet_api =
+            noClasses()
+                    .that().resideInAPackage("..application..")
+                    .should().dependOnClassesThat().resideInAPackage("jakarta.servlet..")
+                    .allowEmptyShould(true);
+
     // domain 必须保持框架无关，禁止依赖 Web、MyBatis 和 Servlet API。
     @ArchTest
     static final ArchRule domain_does_not_depend_on_framework_apis =
