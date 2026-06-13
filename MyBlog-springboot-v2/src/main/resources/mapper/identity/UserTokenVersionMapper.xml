@@ -4,7 +4,7 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.tyb.myblog.v2.identity.infrastructure.persistence.mapper.UserTokenVersionMapper">
 
-    <!-- 只允许未删除用户通过 token_version 校验。 -->
+    <!-- 只允许未删除账号通过 token_version 校验。 -->
     <select id="selectActiveTokenVersion" resultType="java.lang.Integer">
         SELECT token_version
         FROM t_user_auth
@@ -12,16 +12,7 @@
           AND deleted = 0
     </select>
 
-    <!-- refresh 时只接受未删除且锁定期已结束的后台用户。 -->
-    <select id="selectRefreshableTokenVersion" resultType="java.lang.Integer">
-        SELECT token_version
-        FROM t_user_auth
-        WHERE id = #{userId}
-          AND deleted = 0
-          AND (locked_until IS NULL OR locked_until &lt;= #{now})
-    </select>
-
-    <!-- 撤销用户全部 access token，并保留应用层统一时钟与真实操作者审计信息。 -->
+    <!-- 撤销账号全部 access token，并写入统一时钟和真实操作人。 -->
     <update id="incrementActiveTokenVersion">
         UPDATE t_user_auth
         SET token_version = token_version + 1,

@@ -2,6 +2,8 @@ package com.tyb.myblog.v2.identity.application;
 
 import com.tyb.myblog.v2.common.auth.token.AccessTokenIssuer;
 import com.tyb.myblog.v2.common.auth.token.AccessTokenVerifier;
+import com.tyb.myblog.v2.common.error.ApiException;
+import com.tyb.myblog.v2.identity.application.auth.RefreshSessionApplicationService;
 import com.tyb.myblog.v2.identity.application.token.IssuedRefreshToken;
 import com.tyb.myblog.v2.identity.application.token.RefreshTokenService;
 import com.tyb.myblog.v2.identity.application.token.UserTokenRevocationService;
@@ -15,6 +17,7 @@ import org.springframework.test.context.ActiveProfiles;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @SpringBootTest
@@ -31,6 +34,9 @@ class UserTokenRevocationServiceTest {
 
     @Autowired
     private RefreshTokenService refreshTokenService;
+
+    @Autowired
+    private RefreshSessionApplicationService refreshSessionApplicationService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -57,9 +63,12 @@ class UserTokenRevocationServiceTest {
 
         assertThat(revoked).isTrue();
         assertThat(accessTokenVerifier.verify(accessToken)).isEmpty();
-        assertThat(refreshTokenService.rotate(firstRefreshToken.token())).isEmpty();
-        assertThat(refreshTokenService.rotate(secondRefreshToken.token())).isEmpty();
-        assertThat(refreshTokenService.rotate(otherUserRefreshToken.token())).isPresent();
+        assertThatThrownBy(() -> refreshSessionApplicationService.refresh(
+                firstRefreshToken.token())).isInstanceOf(ApiException.class);
+        assertThatThrownBy(() -> refreshSessionApplicationService.refresh(
+                secondRefreshToken.token())).isInstanceOf(ApiException.class);
+        assertThat(refreshSessionApplicationService.refresh(
+                otherUserRefreshToken.token()).refreshToken()).isNotBlank();
         assertThat(currentTokenVersion(1001L)).isEqualTo(4);
         assertThat(currentTokenVersion(2002L)).isEqualTo(1);
         assertThat(currentUpdatedBy(1001L)).isEqualTo(9001L);

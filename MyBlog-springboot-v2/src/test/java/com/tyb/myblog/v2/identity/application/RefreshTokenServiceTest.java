@@ -2,152 +2,91 @@ package com.tyb.myblog.v2.identity.application;
 
 import com.tyb.myblog.v2.identity.application.token.IssuedRefreshToken;
 import com.tyb.myblog.v2.identity.application.token.RefreshTokenService;
-import org.junit.jupiter.api.BeforeEach;
+import com.tyb.myblog.v2.identity.domain.token.RefreshTokenRecord;
+import com.tyb.myblog.v2.identity.domain.token.RefreshTokenRepository;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.test.context.ActiveProfiles;
+import org.mockito.ArgumentCaptor;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.time.ZoneId;
 import java.util.HexFormat;
+import java.util.Optional;
+
+import com.tyb.myblog.v2.common.config.SecurityJwtProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@ActiveProfiles("test")
-@SpringBootTest
+/**
+ * refresh token 基础能力单元测试。
+ */
 class RefreshTokenServiceTest {
 
-    @Autowired
-    private RefreshTokenService refreshTokenService;
+    private static final Clock CLOCK = Clock.fixed(
+            Instant.parse("2026-06-13T01:00:00Z"),
+            ZoneId.of("Asia/Tokyo"));
+    private static final LocalDateTime NOW = LocalDateTime.now(CLOCK);
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private final RefreshTokenRepository repository =
+            mock(RefreshTokenRepository.class);
+    private final RefreshTokenService service = new RefreshTokenService(
+            repository,
+            new SecurityJwtProperties(
+                    "myblog-v2-test",
+                    "test-secret-test-secret-test-secret-123456",
+                    Duration.ofMinutes(15),
+                    Duration.ofDays(7)),
+            CLOCK);
 
-    @BeforeEach
-    void clearRefreshTokens() {
-        jdbcTemplate.update("delete from t_refresh_token");
-        jdbcTemplate.update("delete from t_user_auth");
-    }
-
-    /**
-     * 验证 refresh token 明文只返回给调用方，数据库仅保存不可逆摘要。
-     */
     @Test
-    void issuesHighEntropyTokenAndStoresOnlySha256Hash() {
-        IssuedRefreshToken issued = refreshTokenService.issue(1001L);
+    void shouldStoreOnlySha256HashWhenIssuingToken() {
+        ArgumentCaptor<RefreshTokenRecord> captor =
+                ArgumentCaptor.forClass(RefreshTokenRecord.class);
 
-        String storedHash = jdbcTemplate.queryForObject(
-                "select token_hash from t_refresh_token where user_id = 1001",
-                String.class);
-        Integer rawTokenCount = jdbcTemplate.queryForObject(
-                "select count(*) from t_refresh_token where token_hash = ?",
-                Integer.class,
-                issued.token());
+        IssuedRefreshToken issued = service.issue(1001L);
 
-        assertThat(issued.token()).hasSizeGreaterThanOrEqualTo(43);
-        assertThat(storedHash).isEqualTo(sha256(issued.token()));
-        assertThat(rawTokenCount).isZero();
-        assertThat(issued.expiresAt()).isAfter(LocalDateTime.now());
+        verify(repository).save(captor.capture());
+        RefreshTokenRecord stored = captor.getValue();
+        assertThat(stored.tokenHash()).isEqualTo(sha256(issued.token()));
+        assertThat(stored.tokenHash()).isNotEqualTo(issued.token());
+        assertThat(stored.expiresAt()).isEqualTo(NOW.plusDays(7));
     }
 
-    /**
-     * 验证同一枚 refresh token 只能成功轮换一次，防止旧 token 重放。
-     */
     @Test
-    void rotatesTokenOnceAndRejectsReusingConsumedToken() {
-        insertUser(1001L, 0);
-        IssuedRefreshToken first = refreshTokenService.issue(1001L);
+    void shouldHashRawTokenWhenLockingActiveRecord() {
+        RefreshTokenRecord record = new RefreshTokenRecord(
+                10L, 1001L, sha256("raw-token"), NOW.plusDays(1), false);
+        when(repository.findActiveForUpdate(sha256("raw-token"), NOW))
+                .thenReturn(Optional.of(record));
 
-        IssuedRefreshToken second = refreshTokenService.rotate(first.token()).orElseThrow();
+        Optional<RefreshTokenRecord> result =
+                service.findActiveForUpdate("raw-token", NOW);
 
-        assertThat(second.token()).isNotEqualTo(first.token());
-        assertThat(refreshTokenService.rotate(first.token())).isEmpty();
-        Integer activeCount = jdbcTemplate.queryForObject(
-                "select count(*) from t_refresh_token where user_id = 1001 and revoked = 0",
-                Integer.class);
-        assertThat(activeCount).isEqualTo(1);
+        assertThat(result).contains(record);
     }
 
-    /**
-     * 验证过期或已撤销的 refresh token 不能继续轮换或重复撤销。
-     */
     @Test
-    void rejectsExpiredOrRevokedToken() {
-        insertUser(1001L, 0);
-        IssuedRefreshToken expired = refreshTokenService.issue(1001L);
-        jdbcTemplate.update(
-                "update t_refresh_token set expires_at = ? where user_id = 1001",
-                LocalDateTime.now().minusMinutes(1));
+    void shouldReturnEmptyWhenActiveRecordDoesNotExist() {
+        when(repository.findActiveForUpdate(sha256("missing"), NOW))
+                .thenReturn(Optional.empty());
 
-        IssuedRefreshToken revoked = refreshTokenService.issue(1001L);
-        assertThat(refreshTokenService.revoke(revoked.token())).isTrue();
-
-        assertThat(refreshTokenService.rotate(expired.token())).isEmpty();
-        assertThat(refreshTokenService.rotate(revoked.token())).isEmpty();
-        assertThat(refreshTokenService.revoke(revoked.token())).isFalse();
+        assertThat(service.findActiveForUpdate("missing", NOW)).isEmpty();
     }
 
-    /**
-     * 验证后台用户被删除后，历史 refresh token 不能再轮换出新 token。
-     */
     @Test
-    void rejectsRotationForDeletedUser() {
-        insertUser(1001L, 0);
-        IssuedRefreshToken issued = refreshTokenService.issue(1001L);
-        jdbcTemplate.update("update t_user_auth set deleted = 1 where id = 1001");
+    void shouldRevokeRecordByPrimaryKey() {
+        when(repository.revoke(10L)).thenReturn(true);
 
-        assertThat(refreshTokenService.rotate(issued.token())).isEmpty();
-        assertThat(activeTokenCount(1001L)).isZero();
-    }
-
-    /**
-     * 验证后台用户仍处于锁定期时，历史 refresh token 不能再轮换出新 token。
-     */
-    @Test
-    void rejectsRotationForLockedUser() {
-        insertUser(1001L, 0);
-        IssuedRefreshToken issued = refreshTokenService.issue(1001L);
-        jdbcTemplate.update(
-                "update t_user_auth set locked_until = ? where id = 1001",
-                LocalDateTime.now().plusMinutes(5));
-
-        assertThat(refreshTokenService.rotate(issued.token())).isEmpty();
-        assertThat(activeTokenCount(1001L)).isZero();
-    }
-
-    /**
-     * 验证 refresh token 服务不暴露绕过 access token 版本递增的批量撤销入口。
-     */
-    @Test
-    void exposesNoRefreshOnlyBulkRevocationOperation() {
-        assertThat(Arrays.stream(RefreshTokenService.class.getDeclaredMethods())
-                .map(method -> method.getName()))
-                .doesNotContain("revokeAllForUser");
-    }
-
-    private void insertUser(long userId, int deleted) {
-        jdbcTemplate.update("""
-                insert into t_user_auth (
-                    id, username, password_hash, type, token_version, deleted
-                ) values (?, ?, ?, ?, 0, ?)
-                """,
-                userId,
-                "admin-" + userId,
-                "$2a$10$test-password-hash",
-                1,
-                deleted);
-    }
-
-    private int activeTokenCount(long userId) {
-        return jdbcTemplate.queryForObject(
-                "select count(*) from t_refresh_token where user_id = ? and revoked = 0",
-                Integer.class,
-                userId);
+        assertThat(service.revoke(10L)).isTrue();
+        verify(repository).revoke(10L);
     }
 
     private String sha256(String value) {
