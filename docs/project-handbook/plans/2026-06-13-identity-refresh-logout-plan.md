@@ -1,12 +1,14 @@
 # 身份认证 Refresh 与全端退出实施计划
 
-> **执行要求：** 按批次顺序实施。每个批次必须先写失败测试，再完成实现、运行该批验证并单独提交；不得把多个批次合并为一个大提交。
+> **状态：已实施（2026-06-13）**
+>
+> 批次提交：`2bf15d9`、`f37ec25`、`67a84f7`、`a6084b2`；文档同步由包含本次修改的提交记录。全量验证：198 tests、0 failures、0 errors、2 skipped。
 
 **目标：** 在现有管理员身份认证基础上，完成 refresh token 轮换和全端退出，使 access token、refresh token、账号状态与 `token_version` 的失效语义一致。
 
 **架构：** refresh 接口采用“无事务编排服务 + 独立事务执行服务”。事务执行服务对旧 refresh token 加行锁，在同一事务内校验账号、撤销旧 token、签发新 refresh token 和 access token。logout 复用现有全端撤销能力，在同一事务内递增 `token_version` 并撤销该账号全部 refresh token。
 
-**技术栈：** Java 21、Spring Boot 3.5、Spring Security、MyBatis、MySQL、H2、JUnit 5、Mockito、AssertJ。
+**技术栈：** Java 17、Spring Boot 3.5、Spring Security、MyBatis、MySQL、H2、JUnit 5、Mockito、AssertJ。
 
 **设计依据：** `docs/project-handbook/specs/2026-06-13-identity-refresh-logout-design.md`
 
@@ -75,7 +77,7 @@ private static final LocalDateTime NOW =
 先运行并确认测试因缺少领域端口或实现而失败：
 
 ```powershell
-.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml -Dtest=DatabaseRefreshableAccountRepositoryTest test
+mvn -f .\MyBlog-springboot-v2\pom.xml -Dtest=DatabaseRefreshableAccountRepositoryTest test
 ```
 
 ### 2.3 新增领域模型
@@ -198,7 +200,7 @@ public class MyBatisRefreshableAccountRepository
 ### 2.6 验证与提交
 
 ```powershell
-.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml -Dtest=DatabaseRefreshableAccountRepositoryTest test
+mvn -f .\MyBlog-springboot-v2\pom.xml -Dtest=DatabaseRefreshableAccountRepositoryTest test
 rg -n "@(Select|Insert|Update|Delete)" MyBlog-springboot-v2/src/main/java
 git diff --check
 git status --short
@@ -272,7 +274,7 @@ public boolean revoke(long tokenId);
 执行：
 
 ```powershell
-.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml -Dtest=RefreshTokenServiceTest test
+mvn -f .\MyBlog-springboot-v2\pom.xml -Dtest=RefreshTokenServiceTest test
 ```
 
 先确认修改后的测试失败，再完成服务收缩。
@@ -298,7 +300,7 @@ public boolean revoke(long tokenId);
 运行并确认缺少实现：
 
 ```powershell
-.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml -Dtest=RefreshSessionApplicationServiceTest,RefreshSessionTransactionServiceTest test
+mvn -f .\MyBlog-springboot-v2\pom.xml "-Dtest=RefreshSessionApplicationServiceTest,RefreshSessionTransactionServiceTest" test
 ```
 
 ### 3.4 实现无事务编排服务
@@ -436,7 +438,7 @@ public class RefreshSessionTransactionService {
 运行：
 
 ```powershell
-.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml -Dtest=RefreshTokenServiceTest,RefreshSessionApplicationServiceTest,RefreshSessionTransactionServiceTest,RefreshSessionTransactionIntegrationTest test
+mvn -f .\MyBlog-springboot-v2\pom.xml "-Dtest=RefreshTokenServiceTest,RefreshSessionApplicationServiceTest,RefreshSessionTransactionServiceTest,RefreshSessionTransactionIntegrationTest" test
 ```
 
 ### 3.7 验证与提交
@@ -534,7 +536,7 @@ public class LogoutApplicationService {
 运行：
 
 ```powershell
-.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml -Dtest=LogoutApplicationServiceTest test
+mvn -f .\MyBlog-springboot-v2\pom.xml -Dtest=LogoutApplicationServiceTest test
 ```
 
 ### 4.3 新增请求 DTO
@@ -620,7 +622,7 @@ POST /api/auth/refresh
 ### 4.6 验证与提交
 
 ```powershell
-.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml -Dtest=LogoutApplicationServiceTest,AuthControllerTest,SecurityConfigTest,BackendPropertiesTest test
+mvn -f .\MyBlog-springboot-v2\pom.xml "-Dtest=LogoutApplicationServiceTest,AuthControllerTest,SecurityConfigTest,BackendPropertiesTest" test
 rg -n "/api/auth/(login|refresh|logout)" MyBlog-springboot-v2/src/main/resources MyBlog-springboot-v2/src/main/java MyBlog-springboot-v2/src/test/java
 rg -n "@(Select|Insert|Update|Delete)" MyBlog-springboot-v2/src/main/java
 git diff --check
@@ -719,8 +721,8 @@ rg -n "com\.aurora\.myblog" MyBlog-springboot-v2/src/main MyBlog-springboot-v2/s
 在工作树根目录执行：
 
 ```powershell
-.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml -Dtest=AuthSessionIntegrationTest,RefreshSessionConcurrencyTest test
-.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml clean test
+mvn -f .\MyBlog-springboot-v2\pom.xml "-Dtest=AuthSessionIntegrationTest,RefreshSessionConcurrencyTest" test
+mvn -f .\MyBlog-springboot-v2\pom.xml clean test
 git diff --check
 git status --short
 ```
@@ -828,18 +830,18 @@ git commit -m "同步refresh与退出实施结果"
 
 ## 7. 最终验收清单
 
-- [ ] `POST /api/auth/refresh` 仅允许 JSON 请求体。
-- [ ] refresh 成功返回与登录一致的 token 字段。
-- [ ] refresh 所有安全失败统一为 HTTP 401、业务码 `10002`。
-- [ ] 同一个旧 refresh token 串行或并发均最多成功一次。
-- [ ] JWT 签发失败时整个轮换事务回滚。
-- [ ] 删除、锁定、`GUEST` 账号不能刷新。
-- [ ] `POST /api/auth/logout` 必须携带有效 access token。
-- [ ] logout 递增 `token_version` 并撤销账号全部 refresh token。
-- [ ] logout 不影响其他账号。
-- [ ] Java 注解中不存在 SQL。
-- [ ] 日志中不存在 token 原文。
-- [ ] 旧 `aurora` 包、旧 `rotate`、旧刷新版本查询均不存在。
-- [ ] `.\MyBlog-springboot-v2\mvnw.cmd -f .\MyBlog-springboot-v2\pom.xml clean test` 通过。
-- [ ] 五个批次分别提交，提交信息为中文。
-- [ ] 认证契约、流程、状态和路线图已同步。
+- [x] `POST /api/auth/refresh` 仅允许 JSON 请求体。
+- [x] refresh 成功返回与登录一致的 token 字段。
+- [x] refresh 所有安全失败统一为 HTTP 401、业务码 `10002`。
+- [x] 同一个旧 refresh token 串行或并发均最多成功一次。
+- [x] JWT 签发失败时整个轮换事务回滚。
+- [x] 删除、锁定、`GUEST` 账号不能刷新。
+- [x] `POST /api/auth/logout` 必须携带有效 access token。
+- [x] logout 递增 `token_version` 并撤销账号全部 refresh token。
+- [x] logout 不影响其他账号。
+- [x] Java 注解中不存在 SQL。
+- [x] 日志中不存在 token 原文。
+- [x] 旧 `aurora` 包、旧 `rotate`、旧刷新版本查询均不存在。
+- [x] `mvn -f .\MyBlog-springboot-v2\pom.xml clean test` 通过。
+- [x] 五个批次分别提交，提交信息为中文。
+- [x] 认证契约、流程、状态和路线图已同步。

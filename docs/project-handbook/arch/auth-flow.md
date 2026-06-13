@@ -108,18 +108,22 @@ t_refresh_token:
 ```
 POST /api/auth/refresh   Body: { refreshToken }
    │
-   ├─ 1. 计算 SHA-256(refreshToken) → 查 t_refresh_token
-   │     - 不存在 / revoked=1 / expires_at < now → 401 (10002)
-   ├─ 2. 查 t_user_auth，校验状态正常
-   ├─ 3. 签发新 access token（带最新 ver）
-   ├─ 4. 轮换：标记旧 refresh token revoked=1，签发新 refresh token
+   ├─ 1. 计算 SHA-256(refreshToken)
+   ├─ 2. SELECT ... FOR UPDATE 锁定仍有效的 t_refresh_token
+   ├─ 3. 重新查询 t_user_auth
+   │     - deleted=0
+   │     - type IN (ADMIN, DEMO)
+   │     - locked_until 为空或已结束
+   ├─ 4. 标记旧 refresh token revoked=1
+   ├─ 5. 持久化新 refresh token
+   ├─ 6. 使用最新 username、role、token_version 签发 access token
    ▼
-   返回 { accessToken, refreshToken?, accessExpiresIn }
+   返回 { accessToken, refreshToken, accessExpiresIn, refreshExpiresIn }
 ```
 
-`RefreshTokenService.rotate(...)` 已采用单次轮换：旧 token 消费后立即撤销，同一明文不能重复换取新 token。
+`RefreshSessionTransactionService` 统一控制行锁、旧 token 撤销、新 refresh token 写入和 access token 签发。JWT 签发抛出运行时异常时，数据库事务整体回滚，旧 refresh token 仍可重试。
 
-> 当前仅有轮换应用能力，`POST /api/auth/refresh` Controller 尚未开放。
+同一旧 refresh token 串行或并发使用时最多一次成功。不存在、过期、已撤销、重放、账号删除、账号锁定和 GUEST 账号统一返回 `401 + 10002`。
 
 ## 6. 登出流程
 
@@ -137,7 +141,7 @@ POST /api/auth/logout   Header: Authorization: Bearer <access>
 
 **强制下线 / 改密** 走同一机制：递增 `token_version` + 撤销 refresh token。
 
-> 当前已有 token version 递增与 refresh token 撤销能力，`POST /api/auth/logout` Controller 尚未开放。
+`POST /api/auth/logout` 已开放，必须携带仍有效的 Bearer access token。Controller 通过 `@CurrentUser AuthenticatedPrincipal` 读取账号 ID，不接受客户端提供的用户 ID。
 
 ## 7. PASSWORD 文章解锁流程
 
@@ -195,6 +199,9 @@ POST /api/public/articles/{id}/unlock   Body: { password }
 - `JwtTokenService` — common 内部 JWT 编解码实现，实现 `AccessTokenIssuer` / `AccessTokenDecoder`（含 typ 区分）
 - `PersistentAccessTokenVerifier` — identity 应用层的持久化验证实现，组合 JWT 解码与用户 `token_version` 校验
 - `RefreshTokenService` — refresh token 签发 / 校验 / 撤销 / SHA-256 哈希
+- `RefreshSessionApplicationService` — refresh 参数校验与统一 `10002` 映射
+- `RefreshSessionTransactionService` — refresh 行锁和单事务轮换
+- `LogoutApplicationService` — 当前认证主体 ID 校验与全端撤销
 - `ArticleAccessTokenService` — PASSWORD 文章 token 签发 / 校验
 - `JwtAuthenticationFilter` — Authorization header 处理（typ=access）
 - `ArticleAccessTokenFilter` — X-Article-Token 处理（typ=article_access）
@@ -216,7 +223,7 @@ identity 不调用过滤器或 Spring Security 具体实现；过滤器后续通
 
 ## 11. 测试覆盖
 
-详见 `../rules/security-baseline.md` §14。
+当前认证会话测试覆盖登录、刷新、旧 token 重放、账号删除/锁定/GUEST、JWT 签发失败回滚、全端退出、账号隔离和 H2 双线程并发轮换。2026-06-13 全量结果为 198 tests、0 failures、0 errors、2 skipped；两个跳过项均为既有 Docker 条件测试。
 
 ## 12. 历史对照
 
