@@ -426,7 +426,7 @@ git commit -m "落地用户资料持久化"
 
 **提交信息：** `实现当前用户资料查询`
 
-- [ ] **Step 1：写当前账号仓储和查询服务失败测试**
+- [x] **Step 1：写当前账号仓储和查询服务失败测试**
 
 `DatabaseCurrentAccountRepositoryTest` 覆盖：
 
@@ -453,7 +453,7 @@ void shouldCombineAccountAndProfile() {
 
 另覆盖主体 ID 为 null、空白、非数字、0、负数；账号缺失；资料缺失。后三类异常断言 `ApiErrorCode.INTERNAL_ERROR`，无效主体 ID 断言 `INVALID_TOKEN`。
 
-- [ ] **Step 2：运行测试并确认失败**
+- [x] **Step 2：运行测试并确认失败**
 
 Run:
 
@@ -463,7 +463,7 @@ mvn -Dtest=DatabaseCurrentAccountRepositoryTest,CurrentUserProfileQueryServiceTe
 
 Expected: FAIL，原因是查询投影、仓储和应用服务尚不存在。
 
-- [ ] **Step 3：实现当前账号投影和 XML 查询**
+- [x] **Step 3：实现当前账号投影和 XML 查询**
 
 领域类型：
 
@@ -498,7 +498,7 @@ UserAccountEntity selectActiveById(@Param("userId") long userId);
 
 `MyBatisCurrentAccountRepository` 把数据库 `type` 通过 `AccountType.fromDatabaseValue` 转为领域枚举。
 
-- [ ] **Step 4：实现查询结果和应用服务**
+- [x] **Step 4：实现查询结果和应用服务**
 
 结果类型：
 
@@ -528,7 +528,7 @@ log.error(
 5. 对外抛 `ApiException(INTERNAL_ERROR)`。
 6. 返回组合结果，不返回密码、token version 或锁定字段。
 
-- [ ] **Step 5：运行 Task 2 测试**
+- [x] **Step 5：运行 Task 2 测试**
 
 Run:
 
@@ -538,7 +538,7 @@ mvn -Dtest=DatabaseCurrentAccountRepositoryTest,CurrentUserProfileQueryServiceTe
 
 Expected: PASS。
 
-- [ ] **Step 6：检查并提交 Task 2**
+- [x] **Step 6：检查并提交 Task 2**
 
 Run:
 

@@ -14,6 +14,14 @@ import java.time.LocalDateTime;
 public interface UserAccountMapper extends BaseMapper<UserAccountEntity> {
 
     /**
+     * 按账号 ID 查询未删除账号的安全投影。
+     *
+     * @param userId 账号 ID
+     * @return 当前账号实体，不存在时返回 {@code null}
+     */
+    UserAccountEntity selectActiveById(@Param("userId") long userId);
+
+    /**
      * 按用户名查询未删除账号。
      *
      * @param username 登录用户名
