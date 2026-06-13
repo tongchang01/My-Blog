@@ -100,7 +100,7 @@
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/error/GlobalExceptionHandlerTest.java`
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/SecurityConfigTest.java`
 
-- [ ] **Step 1: 编写 ApiResponse 冻结契约失败测试**
+- [x] **Step 1: 编写 ApiResponse 冻结契约失败测试**
 
 新增 `ApiResponseTest`：
 
@@ -148,7 +148,7 @@ class ApiResponseTest {
 }
 ```
 
-- [ ] **Step 2: 运行测试并确认 RED**
+- [x] **Step 2: 运行测试并确认 RED**
 
 Run:
 
@@ -158,7 +158,7 @@ mvn '-Dtest=ApiResponseTest' test
 
 Expected: 测试失败，实际 JSON 仍包含 `success/message`，成功码仍为 `OK`。
 
-- [ ] **Step 3: 实现最小 ApiResponse 契约**
+- [x] **Step 3: 实现最小 ApiResponse 契约**
 
 将 `ApiResponse` 改为：
 
@@ -190,7 +190,7 @@ public record ApiResponse<T>(String code, String msg, T data) {
 }
 ```
 
-- [ ] **Step 4: 更新现有 HTTP 响应断言**
+- [x] **Step 4: 更新现有 HTTP 响应断言**
 
 在 `GlobalExceptionHandlerTest`：
 
@@ -211,7 +211,7 @@ public record ApiResponse<T>(String code, String msg, T data) {
 
 检查 `SecurityConfigTest`，若存在 `message` 或 `success` 断言，同步改为 `msg/data`；现有只断言 `code` 的分支保持不动。
 
-- [ ] **Step 5: 运行定向测试并确认 GREEN**
+- [x] **Step 5: 运行定向测试并确认 GREEN**
 
 Run:
 
@@ -221,7 +221,7 @@ mvn '-Dtest=ApiResponseTest,GlobalExceptionHandlerTest,SecurityConfigTest' test
 
 Expected: 三个测试类全部通过。
 
-- [ ] **Step 6: 扫描旧响应字段**
+- [x] **Step 6: 扫描旧响应字段**
 
 Run:
 
@@ -231,7 +231,7 @@ rg -n '\.success\(\)|\.message\(\)|"\$\.success"|"\$\.message"|"OK"' src/main/ja
 
 Expected: 不再发现依赖旧 `ApiResponse` 字段或旧成功码的生产代码和测试；与业务无关的普通字符串命中需人工确认。
 
-- [ ] **Step 7: 提交响应契约批次**
+- [x] **Step 7: 提交响应契约批次**
 
 ```powershell
 git add -- 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/web/ApiResponse.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/web/ApiResponseTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/error/GlobalExceptionHandlerTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/SecurityConfigTest.java'
@@ -252,7 +252,7 @@ git commit -m "纠正统一API响应契约"
 - Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/application/auth/AuthApplicationServiceTest.java`
 - Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/application/auth/LoginSuccessTransactionServiceUnitTest.java`
 
-- [ ] **Step 1: 编写外层登录编排失败测试**
+- [x] **Step 1: 编写外层登录编排失败测试**
 
 `AuthApplicationServiceTest` 使用 Mockito 创建：
 
@@ -326,7 +326,7 @@ void mapsLockedAccountWithoutGrowingCaffeineCount() {
 - `reset` 发生在 `successService.complete(...)` 之前，使用 Mockito `InOrder`。
 - 成功事务异常原样传播，不转换为 `10001`。
 
-- [ ] **Step 2: 运行外层编排测试并确认 RED**
+- [x] **Step 2: 运行外层编排测试并确认 RED**
 
 Run:
 
@@ -336,7 +336,7 @@ mvn '-Dtest=AuthApplicationServiceTest' test
 
 Expected: 编译失败，提示 `LoginCommand`、`AuthApplicationService` 和 `LoginSuccessTransactionService` 不存在。
 
-- [ ] **Step 3: 新增应用命令与结果**
+- [x] **Step 3: 新增应用命令与结果**
 
 `LoginCommand`：
 
@@ -371,7 +371,7 @@ public record LoginTokenResult(
 }
 ```
 
-- [ ] **Step 4: 实现 AuthApplicationService**
+- [x] **Step 4: 实现 AuthApplicationService**
 
 ```java
 package com.tyb.myblog.v2.identity.application.auth;
@@ -435,7 +435,7 @@ public class AuthApplicationService {
 
 同一次登录只读取一次业务时间，并同时传给凭据校验和成功事务，避免出现两个时间点。
 
-- [ ] **Step 5: 编写成功事务服务失败测试**
+- [x] **Step 5: 编写成功事务服务失败测试**
 
 `LoginSuccessTransactionServiceUnitTest` 使用 mock：
 
@@ -479,7 +479,7 @@ assertThat(result).isEqualTo(new LoginTokenResult(
 
 另加 DEMO 测试，断言角色为 `List.of("DEMO")`。
 
-- [ ] **Step 6: 运行成功事务测试并确认 RED**
+- [x] **Step 6: 运行成功事务测试并确认 RED**
 
 Run:
 
@@ -489,7 +489,7 @@ mvn '-Dtest=LoginSuccessTransactionServiceUnitTest' test
 
 Expected: 编译失败，提示 `LoginSuccessTransactionService` 不存在。
 
-- [ ] **Step 7: 实现短成功事务**
+- [x] **Step 7: 实现短成功事务**
 
 ```java
 package com.tyb.myblog.v2.identity.application.auth;
@@ -544,7 +544,7 @@ public class LoginSuccessTransactionService {
 }
 ```
 
-- [ ] **Step 8: 运行应用层测试并确认 GREEN**
+- [x] **Step 8: 运行应用层测试并确认 GREEN**
 
 Run:
 
@@ -554,7 +554,7 @@ mvn '-Dtest=AuthApplicationServiceTest,LoginSuccessTransactionServiceUnitTest,Lo
 
 Expected: 限流、坏凭据、锁定、成功重置、角色和 TTL 测试全部通过。
 
-- [ ] **Step 9: 执行架构和范围扫描**
+- [x] **Step 9: 执行架构和范围扫描**
 
 Run:
 
@@ -571,7 +571,7 @@ Expected:
 - `LoginSuccessTransactionService.complete` 存在 `@Transactional`。
 - 架构测试与 Spring 上下文通过。
 
-- [ ] **Step 10: 提交应用编排批次**
+- [x] **Step 10: 提交应用编排批次**
 
 ```powershell
 git add -- 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/application/auth' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/application/auth/AuthApplicationServiceTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/application/auth/LoginSuccessTransactionServiceUnitTest.java'
@@ -594,7 +594,7 @@ git commit -m "实现双Token登录事务编排"
 - Modify: `MyBlog-springboot-v2/src/test/resources/application-test.yml`
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/SecurityConfigTest.java`
 
-- [ ] **Step 1: 编写 Controller web slice 失败测试**
+- [x] **Step 1: 编写 Controller web slice 失败测试**
 
 使用：
 
@@ -648,7 +648,7 @@ mockMvc.perform(post("/api/auth/login")
 
 全部断言 HTTP 400 + `90001`，且应用服务未被调用。
 
-- [ ] **Step 2: 运行 Controller 测试并确认 RED**
+- [x] **Step 2: 运行 Controller 测试并确认 RED**
 
 Run:
 
@@ -658,7 +658,7 @@ mvn '-Dtest=AuthControllerTest' test
 
 Expected: 编译失败，提示 `AuthController`、`LoginRequest` 或 `LoginTokenVO` 不存在。
 
-- [ ] **Step 3: 实现 LoginRequest**
+- [x] **Step 3: 实现 LoginRequest**
 
 ```java
 package com.tyb.myblog.v2.identity.web;
@@ -684,7 +684,7 @@ public record LoginRequest(
 }
 ```
 
-- [ ] **Step 4: 实现 LoginTokenVO**
+- [x] **Step 4: 实现 LoginTokenVO**
 
 ```java
 package com.tyb.myblog.v2.identity.web;
@@ -707,7 +707,7 @@ public record LoginTokenVO(
 }
 ```
 
-- [ ] **Step 5: 实现 AuthController**
+- [x] **Step 5: 实现 AuthController**
 
 ```java
 package com.tyb.myblog.v2.identity.web;
@@ -760,7 +760,7 @@ public class AuthController {
 }
 ```
 
-- [ ] **Step 6: 运行 Controller 测试并确认 GREEN**
+- [x] **Step 6: 运行 Controller 测试并确认 GREEN**
 
 Run:
 
@@ -770,7 +770,7 @@ mvn '-Dtest=AuthControllerTest' test
 
 Expected: 成功映射、参数校验和非法 JSON 全部通过。
 
-- [ ] **Step 7: 编写登录白名单失败测试**
+- [x] **Step 7: 编写登录白名单失败测试**
 
 在 `SecurityConfigTest` 增加：
 
@@ -796,7 +796,7 @@ void doesNotPermitUnconfiguredLoginGet() throws Exception {
 
 POST 返回 `10001` 证明请求进入 Controller，而不是被 Security 以 `10002` 拒绝。
 
-- [ ] **Step 8: 运行安全测试并确认 RED**
+- [x] **Step 8: 运行安全测试并确认 RED**
 
 Run:
 
@@ -806,7 +806,7 @@ mvn '-Dtest=SecurityConfigTest' test
 
 Expected: `POST /api/auth/login` 返回 `10002`，因为配置尚未公开。
 
-- [ ] **Step 9: 精确配置登录公开端点**
+- [x] **Step 9: 精确配置登录公开端点**
 
 在三个配置文件现有 `public-endpoints` 中增加：
 
@@ -817,7 +817,7 @@ Expected: `POST /api/auth/login` 返回 `10002`，因为配置尚未公开。
 
 不得添加 `/api/auth/**` 通配路径。
 
-- [ ] **Step 10: 运行 web 与安全测试并确认 GREEN**
+- [x] **Step 10: 运行 web 与安全测试并确认 GREEN**
 
 Run:
 
@@ -827,7 +827,7 @@ mvn '-Dtest=AuthControllerTest,SecurityConfigTest,GlobalExceptionHandlerTest' te
 
 Expected: 登录 POST 可匿名进入业务层，登录 GET 仍返回 `10002`。
 
-- [ ] **Step 11: 执行 web 层架构扫描**
+- [x] **Step 11: 执行 web 层架构扫描**
 
 Run:
 
@@ -839,7 +839,7 @@ if ($LASTEXITCODE -eq 1) { Write-Output 'identity web 未依赖持久化实现' 
 
 Expected: web 层没有基础设施、Mapper 或 Repository 依赖。
 
-- [ ] **Step 12: 提交 HTTP 接口批次**
+- [x] **Step 12: 提交 HTTP 接口批次**
 
 ```powershell
 git add -- 'MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/web' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/web/AuthControllerTest.java' 'MyBlog-springboot-v2/src/main/resources/application.yml' 'MyBlog-springboot-v2/src/main/resources/application-local.yml' 'MyBlog-springboot-v2/src/test/resources/application-test.yml' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/SecurityConfigTest.java'
@@ -857,7 +857,7 @@ git commit -m "实现后台双Token登录接口"
 - Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/web/AuthLoginIntegrationTest.java`
 - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`
 
-- [ ] **Step 1: 编写成功事务回滚集成测试**
+- [x] **Step 1: 编写成功事务回滚集成测试**
 
 `LoginSuccessTransactionServiceIntegrationTest`：
 
@@ -935,7 +935,7 @@ assertThatThrownBy(() -> service.complete(account, ip, loggedInAt))
 - `locked_until` 仍为原值。
 - `t_refresh_token` 行数为 0。
 
-- [ ] **Step 2: 运行事务集成测试**
+- [x] **Step 2: 运行事务集成测试**
 
 Run:
 
@@ -945,7 +945,7 @@ mvn '-Dtest=LoginSuccessTransactionServiceIntegrationTest' test
 
 Expected: 成功提交与签发失败回滚测试通过。若回滚测试失败，先检查 `LoginSuccessTransactionService` 是否为独立 Spring Bean 且公开方法带 `@Transactional`。
 
-- [ ] **Step 3: 编写完整 HTTP 登录集成测试**
+- [x] **Step 3: 编写完整 HTTP 登录集成测试**
 
 `AuthLoginIntegrationTest` 使用：
 
@@ -1009,7 +1009,7 @@ MvcResult mvcResult = mockMvc.perform(post("/api/auth/login")
 
 增加 DEMO 成功测试，断言 roles 只包含 `DEMO`。
 
-- [ ] **Step 4: 增加坏凭据、锁定与限流边界测试**
+- [x] **Step 4: 增加坏凭据、锁定与限流边界测试**
 
 完整 HTTP 测试覆盖：
 
@@ -1031,7 +1031,7 @@ String clientIp = "198.51.100." + uniqueHost;
 
 测试不在日志或断言消息中输出密码和 token。
 
-- [ ] **Step 5: 运行完整 HTTP 集成测试**
+- [x] **Step 5: 运行完整 HTTP 集成测试**
 
 Run:
 
@@ -1041,7 +1041,7 @@ mvn '-Dtest=AuthLoginIntegrationTest' test
 
 Expected: ADMIN、DEMO、坏凭据、GUEST、锁定、第 5/6 次边界和成功重置全部通过。
 
-- [ ] **Step 6: 强化架构守护**
+- [x] **Step 6: 强化架构守护**
 
 在 `ArchitectureRulesTest` 增加 application 不依赖 Servlet 的规则：
 
@@ -1056,7 +1056,7 @@ static final ArchRule application_does_not_depend_on_servlet_api =
 
 该规则确保 `HttpServletRequest` 只停留在 web 层，应用层只接收 `LoginCommand.clientIp`。
 
-- [ ] **Step 7: 执行完整定向回归和规则扫描**
+- [x] **Step 7: 执行完整定向回归和规则扫描**
 
 Run:
 
@@ -1076,7 +1076,7 @@ Expected:
 - 无密码或 token 日志。
 - 无空白错误。
 
-- [ ] **Step 8: 执行全量测试**
+- [x] **Step 8: 执行全量测试**
 
 Run:
 
@@ -1091,7 +1091,7 @@ Expected:
 - 只允许现有 `MySqlFlywayMigrationTest` 和 `MySqlLoginFailureConcurrencyTest` 因 Docker 不可用跳过。
 - 记录真实 tests / failures / errors / skipped 数字供 Task 5 使用。
 
-- [ ] **Step 9: 提交集成验收批次**
+- [x] **Step 9: 提交集成验收批次**
 
 ```powershell
 git add -- 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/application/auth/LoginSuccessTransactionServiceIntegrationTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/identity/web/AuthLoginIntegrationTest.java' 'MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java'
@@ -1115,7 +1115,7 @@ git commit -m "补齐后台登录事务与接口验收"
 - Modify: `docs/project-handbook/specs/2026-06-12-identity-login-orchestration-design.md`
 - Modify: `docs/project-handbook/plans/2026-06-12-identity-login-orchestration-plan.md`
 
-- [ ] **Step 1: 获取真实实施证据**
+- [x] **Step 1: 获取真实实施证据**
 
 Run:
 
@@ -1126,7 +1126,7 @@ mvn clean test
 
 记录四个代码提交短 SHA 和 Maven 最终 tests / failures / errors / skipped。不得使用计划中的示例值。
 
-- [ ] **Step 2: 更新 status 与 roadmap**
+- [x] **Step 2: 更新 status 与 roadmap**
 
 `status.md` 明确：
 
@@ -1141,7 +1141,7 @@ mvn clean test
 - 将 identity 条目改为部分完成说明，不能整项勾选成“identity 全部完成”。
 - 明确已完成登录接口，剩余 refresh/logout 与用户资料。
 
-- [ ] **Step 3: 修正认证与响应权威文档**
+- [x] **Step 3: 修正认证与响应权威文档**
 
 `arch/auth-flow.md`：
 
@@ -1155,7 +1155,7 @@ mvn clean test
 - 所有响应示例统一为 `code/msg/data`。
 - 删除 `success`、`message` 和成功码 `OK`。
 
-- [ ] **Step 4: 创建 auth API 契约**
+- [x] **Step 4: 创建 auth API 契约**
 
 `api-contract/auth.md` 至少包含：
 
@@ -1169,7 +1169,7 @@ mvn clean test
 
 把 `api-contract/README.md` 中 auth 状态从“待编写”改为“登录已落地，刷新/登出尚未实现”。
 
-- [ ] **Step 5: 记录设计与计划实施结果**
+- [x] **Step 5: 记录设计与计划实施结果**
 
 在设计文档末尾增加“实施结果”，写入：
 
@@ -1180,7 +1180,7 @@ mvn clean test
 
 勾选本计划实际执行步骤。最终验收只勾选有测试证据的事项。
 
-- [ ] **Step 6: 文档一致性自检**
+- [x] **Step 6: 文档一致性自检**
 
 Run:
 
@@ -1198,7 +1198,7 @@ Expected:
 - 登录契约与实际实现一致。
 - 不命中未决标记，且没有空白错误。
 
-- [ ] **Step 7: 提交实施结果文档**
+- [x] **Step 7: 提交实施结果文档**
 
 ```powershell
 git add -- 'docs/project-handbook/status.md' 'docs/project-handbook/roadmap.md' 'docs/project-handbook/arch/auth-flow.md' 'docs/project-handbook/rules/api-response.md' 'docs/project-handbook/arch/request-flow.md' 'docs/project-handbook/api-contract/auth.md' 'docs/project-handbook/api-contract/README.md' 'docs/project-handbook/specs/2026-06-12-identity-login-orchestration-design.md' 'docs/project-handbook/plans/2026-06-12-identity-login-orchestration-plan.md'
@@ -1211,25 +1211,25 @@ git commit -m "同步后台登录实施结果"
 
 ## 最终验收
 
-- [ ] `ApiResponse` 只序列化 `code/msg/data`。
-- [ ] 成功码固定为字符串 `00000`。
-- [ ] `POST /api/auth/login` 可匿名访问，其他未配置方法不被公开。
-- [ ] 用户名 trim 后使用 `Locale.ROOT` 小写，密码保持原样。
-- [ ] 限流发生在账号查询和 BCrypt 之前。
-- [ ] 未知账号、GUEST、错误密码和锁定账号均返回 `401 + 10001`。
-- [ ] 第 5 次错误返回 `10001`，第 6 次返回 `429 + 90002`。
-- [ ] 登录成功清除 Caffeine 当前 key。
-- [ ] 登录成功更新审计并清理数据库失败状态。
-- [ ] refresh token 明文只返回一次，数据库只保存 SHA-256。
-- [ ] access token 包含正确的 user id、username、role 和 token version。
-- [ ] ADMIN 与 DEMO 分别获得正确角色。
-- [ ] access token 签发失败时成功审计和 refresh token 写入一起回滚。
-- [ ] 外层 `AuthApplicationService` 不开启长事务。
-- [ ] `LoginSuccessTransactionService` 是独立 Spring Bean 并使用短事务。
-- [ ] web 不依赖 Mapper、Repository 实现或 identity infrastructure。
-- [ ] application 不依赖 Servlet API。
-- [ ] domain 不依赖 HTTP、Spring、Caffeine 或 `ApiErrorCode`。
-- [ ] 不新增 SQL 注解、Entity、Flyway、Redis、验证码、refresh/logout Controller。
-- [ ] 不记录密码、密码摘要、access token 或 refresh token。
-- [ ] 定向测试、ArchUnit、全量 `mvn clean test` 和 `git diff --check` 通过。
-- [ ] 实施结果按五个小批次分别提交，工作区干净。
+- [x] `ApiResponse` 只序列化 `code/msg/data`。
+- [x] 成功码固定为字符串 `00000`。
+- [x] `POST /api/auth/login` 可匿名访问，其他未配置方法不被公开。
+- [x] 用户名 trim 后使用 `Locale.ROOT` 小写，密码保持原样。
+- [x] 限流发生在账号查询和 BCrypt 之前。
+- [x] 未知账号、GUEST、错误密码和锁定账号均返回 `401 + 10001`。
+- [x] 第 5 次错误返回 `10001`，第 6 次返回 `429 + 90002`。
+- [x] 登录成功清除 Caffeine 当前 key。
+- [x] 登录成功更新审计并清理数据库失败状态。
+- [x] refresh token 明文只返回一次，数据库只保存 SHA-256。
+- [x] access token 包含正确的 user id、username、role 和 token version。
+- [x] ADMIN 与 DEMO 分别获得正确角色。
+- [x] access token 签发失败时成功审计和 refresh token 写入一起回滚。
+- [x] 外层 `AuthApplicationService` 不开启长事务。
+- [x] `LoginSuccessTransactionService` 是独立 Spring Bean 并使用短事务。
+- [x] web 不依赖 Mapper、Repository 实现或 identity infrastructure。
+- [x] application 不依赖 Servlet API。
+- [x] domain 不依赖 HTTP、Spring、Caffeine 或 `ApiErrorCode`。
+- [x] 不新增 SQL 注解、Entity、Flyway、Redis、验证码、refresh/logout Controller。
+- [x] 不记录密码、密码摘要、access token 或 refresh token。
+- [x] 定向测试、ArchUnit、全量 `mvn clean test` 和 `git diff --check` 通过。
+- [x] 实施结果按五个小批次分别提交，工作区干净。

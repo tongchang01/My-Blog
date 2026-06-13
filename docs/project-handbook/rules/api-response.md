@@ -77,7 +77,7 @@
 | 前缀 | 用途 | 鉴权 |
 |------|------|------|
 | `/api/public/**` | 前台公开接口 | `permitAll()` |
-| `/api/auth/**` | 登录 / 刷新 / 登出 | `permitAll()` |
+| `/api/auth/**` | 认证接口 | 逐项按 `method + path` 配置；当前仅公开 `POST /api/auth/login` |
 | `/api/admin/** GET` | 后台读 | 默认 ADMIN+DEMO；敏感读单独标 ADMIN |
 | `/api/admin/** POST/PUT/DELETE/PATCH` | 后台写 | 仅 ADMIN |
 | `/actuator/**` | 运维（Spring Boot Actuator） | 仅 health 公开 |

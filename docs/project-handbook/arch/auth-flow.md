@@ -14,34 +14,37 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
                                         ▼
                             [AuthApplicationService]
                                         │
-                  ┌─────────────────────┼─────────────────────┐
-                  ▼                     ▼                     ▼
-        [UserAuthRepository]   [PasswordEncoder]    [JwtTokenService]
-        (校验用户存在 + 密码)   (BCrypt 校验)         (签发 access)
-                                        │                     │
-                                        ▼                     ▼
-                            [LoginAuditService]   [RefreshTokenService]
-                            (更新 last_login_at)     (写 t_refresh_token)
+                  ├─ Caffeine 前置限流
+                  ├─ LoginCredentialVerifier
+                  │    ├─ UserAccountRepository
+                  │    ├─ BCrypt
+                  │    └─ LoginStateRecorder（失败累计 / 锁定）
+                  │
+                  ▼
+                    [LoginSuccessTransactionService]
+                  审计 → refresh token → access token
+                  （任一步失败时数据库变更整体回滚）
                                         │
                                         ▼
                        返回 ApiResponse<TokenResponse>
-                       { accessToken, refreshToken, expiresIn }
+                       { accessToken, refreshToken,
+                         accessExpiresIn, refreshExpiresIn }
 ```
 
 ## 2. 登录流程详解
 
 1. **入口**：`POST /api/auth/login`，Body：`{ username, password }`
-2. **限流前置**：同 IP + 同 username 在 10 分钟窗口内失败 5 次 → 429 `90002`
-3. **校验账号**：从 `t_user_auth` 查用户，不存在 → `10001` 用户名或密码错误（401）
-4. **校验状态**：账号被禁用 / `locked_until > now` → 403
-5. **校验密码**：BCrypt 比对，不匹配 → `login_fail_count += 1`，返 `10001`（401）
-6. **签发 access token**：含 `sub / exp / iat / iss / ver / typ="access"`
-7. **签发 refresh token**：随机字符串，SHA-256 哈希后写 `t_refresh_token`（user_id / token_hash / expires_at）
-8. **写审计**：更新 `last_login_at`、`last_login_ip`，重置 `login_fail_count = 0`
-9. **审计失败 → 不签发**：若审计 SQL 失败，登录返回 500 (`99999`)，**不**返回 token（防止系统状态不一致）
+2. **规范化用户名**：trim 后使用 `Locale.ROOT` 小写；密码保持原样
+3. **限流前置**：同 IP + 同规范化 username 连续失败 5 次后，第 6 次请求返回 429 `90002`
+4. **校验账号与类型**：未知账号或 GUEST → `401 + 10001`
+5. **校验锁定**：`locked_until > now` → `401 + 10001`，不暴露锁定状态
+6. **校验密码**：BCrypt 不匹配时累计数据库失败状态和 Caffeine 失败次数，返回 `401 + 10001`
+7. **凭据成功**：清除当前 Caffeine 限流键
+8. **成功短事务**：按固定顺序写成功审计 → 签发并持久化 refresh token → 签发 access token
+9. **事务失败**：任一步抛出运行时异常，成功审计和 refresh token 写入一起回滚，返回 `500 + 99999`
 10. **返回**：`{ accessToken, refreshToken, accessExpiresIn: 900, refreshExpiresIn: 604800 }`
 
-登录失败（不存在/密码错/禁用）**不**更新 `last_login_at` / `last_login_ip` 审计字段。
+登录失败（未知账号、GUEST、密码错误、锁定）**不**更新 `last_login_at` / `last_login_ip`。
 
 ## 3. Token 结构
 
@@ -109,12 +112,14 @@ POST /api/auth/refresh   Body: { refreshToken }
    │     - 不存在 / revoked=1 / expires_at < now → 401 (10002)
    ├─ 2. 查 t_user_auth，校验状态正常
    ├─ 3. 签发新 access token（带最新 ver）
-   ├─ 4.（可选）轮换：标记旧 refresh token revoked=1，签发新 refresh token
+   ├─ 4. 轮换：标记旧 refresh token revoked=1，签发新 refresh token
    ▼
    返回 { accessToken, refreshToken?, accessExpiresIn }
 ```
 
-> 是否轮换 refresh token：DDL 阶段决定（默认轮换 = 更安全；不轮换 = 实现简单）。
+`RefreshTokenService.rotate(...)` 已采用单次轮换：旧 token 消费后立即撤销，同一明文不能重复换取新 token。
+
+> 当前仅有轮换应用能力，`POST /api/auth/refresh` Controller 尚未开放。
 
 ## 6. 登出流程
 
@@ -131,6 +136,8 @@ POST /api/auth/logout   Header: Authorization: Bearer <access>
 ```
 
 **强制下线 / 改密** 走同一机制：递增 `token_version` + 撤销 refresh token。
+
+> 当前已有 token version 递增与 refresh token 撤销能力，`POST /api/auth/logout` Controller 尚未开放。
 
 ## 7. PASSWORD 文章解锁流程
 
@@ -202,9 +209,10 @@ common.security.JwtAuthenticationFilter -> common.auth.token.AccessTokenVerifier
 
 identity 不调用过滤器或 Spring Security 具体实现；过滤器后续通过验证端口完成
 `token_version` 校验，不直接依赖 identity infrastructure。
-- `AuthApplicationService` — 登录 / 刷新 / 登出用例编排
+- `AuthApplicationService` — 当前负责后台登录外层编排
+- `LoginSuccessTransactionService` — 登录成功审计、refresh token 持久化和 access token 签发的短事务
 - `LoginRateLimiter` — 登录限流（Caffeine）
-- `LoginAuditService` / `t_user_auth` — 审计
+- `LoginStateRecorder` / `t_user_auth` — 失败累计、锁定和成功审计
 
 ## 11. 测试覆盖
 

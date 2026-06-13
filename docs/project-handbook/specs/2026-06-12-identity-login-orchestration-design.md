@@ -460,3 +460,31 @@ myblog:
 - 不记录密码和 token。
 - 不新增 SQL 注解、Flyway 迁移、Redis、验证码、refresh/logout Controller。
 - 全量测试、ArchUnit、规则扫描和 `git diff --check` 通过。
+
+## 15. 实施结果
+
+实施日期：2026-06-12 至 2026-06-13。
+
+代码批次：
+
+| 提交 | 内容 |
+|---|---|
+| `2245a79` | 纠正统一API响应契约 |
+| `e368c0e` | 实现双Token登录事务编排 |
+| `30fd4a1` | 实现后台双Token登录接口 |
+| `3baf968` | 补齐后台登录事务与接口验收 |
+
+最终实现与本设计一致：
+
+- `POST /api/auth/login` 已按精确 method + path 白名单开放。
+- 响应固定为 `code/msg/data`，成功码为 `00000`。
+- ADMIN / DEMO 成功登录后获得 access token 和 refresh token。
+- 未知账号、GUEST、密码错误和持久化锁定统一映射为 `401 + 10001`。
+- 同一 IP + 规范化用户名第 1 至第 5 次失败返回 `10001`，第 6 次返回 `429 + 90002`。
+- 成功短事务按审计、refresh token、access token 顺序执行；access token 签发失败时数据库变更整体回滚。
+- refresh token 明文只在响应中返回，数据库仅保存 SHA-256。
+- application 层新增 ArchUnit 规则，禁止依赖 Servlet API。
+
+最终执行 `mvn clean test`：169 tests，0 failures，0 errors，2 skipped。跳过项为 Docker 不可用时的既有 `MySqlFlywayMigrationTest` 和 `MySqlLoginFailureConcurrencyTest`。
+
+本轮没有实现 refresh / logout / 当前用户资料 Controller，也没有新增 Entity、SQL 注解、Flyway 迁移、Redis 或验证码。

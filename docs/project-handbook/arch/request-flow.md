@@ -56,7 +56,7 @@
    └─ 其它未捕获           → INTERNAL_ERROR（500），不暴露堆栈
    │
    ▼
-ApiResponse {code, message, data:null}
+ApiResponse {code, msg, data:null}
 ```
 
 详见 `../rules/error-handling.md`。
