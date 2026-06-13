@@ -112,7 +112,7 @@
 
 **提交信息：** `落地用户资料持久化`
 
-- [ ] **Step 1：先写 `UserProfile` 领域测试**
+- [x] **Step 1：先写 `UserProfile` 领域测试**
 
 创建 `UserProfileTest`，至少覆盖：
 
@@ -140,7 +140,7 @@ void shouldRejectBlankNickname() {
 
 再覆盖昵称 65 字符、简介 5001 字符、公开邮箱格式错误、非 HTTP/HTTPS URL。
 
-- [ ] **Step 2：运行领域测试并确认失败**
+- [x] **Step 2：运行领域测试并确认失败**
 
 Run:
 
@@ -150,7 +150,7 @@ mvn -Dtest=UserProfileTest test
 
 Expected: FAIL，原因是 `UserProfile` 尚不存在。
 
-- [ ] **Step 3：实现 `UserProfile` 和只读仓储端口**
+- [x] **Step 3：实现 `UserProfile` 和只读仓储端口**
 
 `UserProfile` 使用 record，字段必须与 schema 一一对应：
 
@@ -282,7 +282,7 @@ public interface UserProfileRepository {
 }
 ```
 
-- [ ] **Step 4：运行领域测试并确认通过**
+- [x] **Step 4：运行领域测试并确认通过**
 
 Run:
 
@@ -292,7 +292,7 @@ mvn -Dtest=UserProfileTest test
 
 Expected: PASS。
 
-- [ ] **Step 5：写迁移和仓储失败测试**
+- [x] **Step 5：写迁移和仓储失败测试**
 
 在 `FlywayMigrationTest` 增加断言：迁移版本数量为 2，并验证 V2 不会凭空创建账号。
 
@@ -310,7 +310,7 @@ Expected: PASS。
 
 清理顺序必须先 `DELETE FROM t_user_info`，再删 `t_user_auth`。
 
-- [ ] **Step 6：运行迁移和仓储测试并确认失败**
+- [x] **Step 6：运行迁移和仓储测试并确认失败**
 
 Run:
 
@@ -320,7 +320,7 @@ mvn -Dtest=FlywayMigrationTest,MySqlFlywayMigrationTest,DatabaseUserProfileRepos
 
 Expected: FAIL，原因是 V2 迁移、Entity、Mapper 和仓储实现尚不存在。Docker 未运行时 MySQL 测试允许按现有条件跳过。
 
-- [ ] **Step 7：实现 V2 数据补齐迁移**
+- [x] **Step 7：实现 V2 数据补齐迁移**
 
 `V2__backfill_user_info.sql` 内容：
 
@@ -352,7 +352,7 @@ WHERE ua.deleted = 0
 
 说明：首次部署仍应由运维 SQL在同一事务中同时插入账号和资料；V2 仅修复升级时已经存在的账号。
 
-- [ ] **Step 8：实现 Entity、XML Mapper 和仓储**
+- [x] **Step 8：实现 Entity、XML Mapper 和仓储**
 
 `UserProfileEntity`：
 
@@ -394,7 +394,7 @@ UserProfileEntity selectActiveByUserId(@Param("userId") long userId);
 - `insert` 使用 `mapper.insert(entity)`，依赖现有 `AuditFieldHandler`
 - 插入行数不是 1 时抛出 `IllegalStateException("用户资料创建失败，userId=" + userId)`
 
-- [ ] **Step 9：运行 Task 1 测试**
+- [x] **Step 9：运行 Task 1 测试**
 
 Run:
 
@@ -404,7 +404,7 @@ mvn -Dtest=UserProfileTest,FlywayMigrationTest,MySqlFlywayMigrationTest,Database
 
 Expected: PASS；Docker 不可用时仅 Testcontainers 用例跳过。
 
-- [ ] **Step 10：检查并提交 Task 1**
+- [x] **Step 10：检查并提交 Task 1**
 
 Run:
 

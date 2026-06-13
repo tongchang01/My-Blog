@@ -56,6 +56,32 @@ class FlywayMigrationTest {
     }
 
     @Test
+    void appliesTwoMigrationsWithoutCreatingAccounts() {
+        Integer migrationCount = jdbcTemplate.queryForObject(
+                """
+                        select count(*)
+                        from "flyway_schema_history"
+                        where "success" = true
+                          and "version" is not null
+                        """,
+                Integer.class);
+        String latestVersion = jdbcTemplate.queryForObject(
+                "select max(\"version\") from \"flyway_schema_history\" where \"success\" = true",
+                String.class);
+        Integer userCount = jdbcTemplate.queryForObject(
+                "select count(*) from t_user_auth",
+                Integer.class);
+        Integer profileCount = jdbcTemplate.queryForObject(
+                "select count(*) from t_user_info",
+                Integer.class);
+
+        assertThat(migrationCount).isEqualTo(2);
+        assertThat(latestVersion).isEqualTo("2");
+        assertThat(userCount).isZero();
+        assertThat(profileCount).isZero();
+    }
+
+    @Test
     void createsNewCommentSchemaColumns() {
         Integer columnCount = jdbcTemplate.queryForObject(
                 """
