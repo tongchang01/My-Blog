@@ -843,7 +843,7 @@ git commit -m "实现用户资料部分更新"
 
 **提交信息：** `开放当前用户资料接口`
 
-- [ ] **Step 1：写 Controller 失败测试**
+- [x] **Step 1：写 Controller 失败测试**
 
 `CurrentUserControllerTest` 使用 `@WebMvcTest(CurrentUserController.class)`、`addFilters = false` 和 `GlobalExceptionHandler`，覆盖：
 
@@ -856,7 +856,7 @@ git commit -m "实现用户资料部分更新"
 - PATCH nickname 空白返回 `400 + 90001`
 - 应用服务返回 `FORBIDDEN` 时响应 `403 + 10003`
 
-- [ ] **Step 2：写 Security 失败测试**
+- [x] **Step 2：写 Security 失败测试**
 
 在 `SecurityConfigTest` 增加：
 
@@ -873,7 +873,7 @@ Security 配置增加精确 matcher：
 
 该规则放在 `.anyRequest().authenticated()` 前。
 
-- [ ] **Step 3：运行 Web 和 Security 测试并确认失败**
+- [x] **Step 3：运行 Web 和 Security 测试并确认失败**
 
 Run:
 
@@ -883,7 +883,7 @@ mvn -Dtest=CurrentUserControllerTest,SecurityConfigTest test
 
 Expected: FAIL，原因是 Controller、DTO 和精确权限规则尚不存在。
 
-- [ ] **Step 4：实现 presence-aware 请求 DTO**
+- [x] **Step 4：实现 presence-aware 请求 DTO**
 
 `UpdateCurrentUserProfileRequest` 使用 Lombok `@Getter`，每个字段初始化为 absent：
 
@@ -978,7 +978,7 @@ public class UpdateCurrentUserProfileRequest {
 
 这些 setter 不能用 Lombok 自动生成，因为 Jackson 是否调用 setter 就是 presence 信息。
 
-- [ ] **Step 5：实现 VO 和 Controller**
+- [x] **Step 5：实现 VO 和 Controller**
 
 `UserProfileVO` 与 `UserProfile` 字段一致但不暴露 `userId`。
 
@@ -1023,7 +1023,7 @@ public class CurrentUserController {
 
 空对象校验由 `UpdateCurrentUserProfileCommand.hasAnyPresentField()` 在应用层完成。Jackson setter 抛出的未知字段异常应被包装为 `HttpMessageNotReadableException`，由现有全局处理器映射为 `90001`。
 
-- [ ] **Step 6：运行 Web 和 Security 测试**
+- [x] **Step 6：运行 Web 和 Security 测试**
 
 Run:
 
@@ -1033,7 +1033,7 @@ mvn -Dtest=CurrentUserControllerTest,SecurityConfigTest test
 
 Expected: PASS。
 
-- [ ] **Step 7：写完整 HTTP 集成测试**
+- [x] **Step 7：写完整 HTTP 集成测试**
 
 `CurrentUserProfileIntegrationTest` 使用真实 Spring context、MockMvc、H2、JWT 登录链路：
 
@@ -1049,7 +1049,7 @@ Expected: PASS。
 6. 删除 ADMIN 的资料行后 GET 返回 `500 + 99999`。
 7. 无 token GET 返回 `401 + 10002`。
 
-- [ ] **Step 8：运行 Task 4 验收测试**
+- [x] **Step 8：运行 Task 4 验收测试**
 
 Run:
 
@@ -1059,7 +1059,7 @@ mvn -Dtest=CurrentUserControllerTest,SecurityConfigTest,CurrentUserProfileIntegr
 
 Expected: PASS。
 
-- [ ] **Step 9：检查并提交 Task 4**
+- [x] **Step 9：检查并提交 Task 4**
 
 Run:
 

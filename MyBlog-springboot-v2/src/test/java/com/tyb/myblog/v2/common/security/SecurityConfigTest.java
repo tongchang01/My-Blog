@@ -14,6 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,6 +36,7 @@ class SecurityConfigTest {
     @BeforeEach
     void clearUsers() {
         jdbcTemplate.update("delete from t_refresh_token");
+        jdbcTemplate.update("delete from t_user_info");
         jdbcTemplate.update("delete from t_user_auth");
     }
 
@@ -103,23 +105,95 @@ class SecurityConfigTest {
 
     @Test
     void returnsForbiddenWhenRoleIsInsufficient() throws Exception {
+        String token = token(1001L, "demo", 2, "DEMO");
+
+        mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("10003"));
+    }
+
+    @Test
+    void permitsAdminToPatchCurrentProfile() throws Exception {
+        String token = token(1001L, "admin", 1, "ADMIN");
+
+        mockMvc.perform(patch("/api/auth/me/profile")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nickname":"Admin"}
+                                """))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void forbidsDemoFromPatchingCurrentProfile() throws Exception {
+        String token = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(patch("/api/auth/me/profile")
+                        .header("Authorization", "Bearer " + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"nickname":"Demo"}
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("10003"));
+    }
+
+    @Test
+    void permitsAdminAndDemoToReadCurrentProfile() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(get("/api/auth/me")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/auth/me")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void requiresAuthenticationForCurrentProfileEndpoints() throws Exception {
+        mockMvc.perform(get("/api/auth/me"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+        mockMvc.perform(patch("/api/auth/me/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    private String token(
+            long id,
+            String username,
+            int type,
+            String role
+    ) {
         jdbcTemplate.update("""
                 insert into t_user_auth (
                     id, username, password_hash, type, token_version, deleted
                 ) values (?, ?, ?, ?, ?, ?)
                 """,
-                1001L,
-                "demo",
+                id,
+                username,
                 "$2a$10$test-password-hash",
-                2,
+                type,
                 0,
                 0);
-        String token = tokenService
-                .issueAccessToken("1001", "demo@example.com", List.of("DEMO"), 0)
+        jdbcTemplate.update("""
+                insert into t_user_info (
+                    user_id, nickname, deleted
+                ) values (?, ?, 0)
+                """,
+                id,
+                username);
+        return tokenService
+                .issueAccessToken(
+                        Long.toString(id),
+                        username,
+                        List.of(role),
+                        0)
                 .accessToken();
-
-        mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("10003"));
     }
 }

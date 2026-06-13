@@ -63,6 +63,10 @@ public class SecurityConfig {
                             authorize.requestMatchers(endpoint.httpMethod(), endpoint.path()).permitAll());
                     authorize
                             .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                            .requestMatchers(
+                                    HttpMethod.PATCH,
+                                    "/api/auth/me/profile")
+                            .hasRole("ADMIN")
                             .requestMatchers("/api/admin/**").hasRole("ADMIN")
                             .anyRequest().authenticated();
                 })
