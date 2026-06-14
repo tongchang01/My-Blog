@@ -405,7 +405,7 @@ git commit -m "补齐修改密码持久化能力"
 
 **提交信息：** `实现修改密码事务`
 
-- [ ] **Step 1：写应用服务失败测试**
+- [x] **Step 1：写应用服务失败测试**
 
 `ChangePasswordApplicationServiceTest` 使用 Mockito，覆盖：
 
@@ -439,7 +439,7 @@ verify(repository).updatePasswordAndIncrementTokenVersion(
 verify(refreshTokenRepository).revokeAllByUserId(1001L);
 ```
 
-- [ ] **Step 2：运行应用服务测试并确认 RED**
+- [x] **Step 2：运行应用服务测试并确认 RED**
 
 Run:
 
@@ -449,7 +449,7 @@ mvn -Dtest=ChangePasswordApplicationServiceTest test
 
 Expected: FAIL，原因是命令和应用服务尚不存在。
 
-- [ ] **Step 3：实现命令**
+- [x] **Step 3：实现命令**
 
 ```java
 /**
@@ -465,7 +465,7 @@ public record ChangePasswordCommand(
 }
 ```
 
-- [ ] **Step 4：实现事务应用服务**
+- [x] **Step 4：实现事务应用服务**
 
 实现要点：
 
@@ -536,7 +536,7 @@ private void requireAdmin(AuthenticatedPrincipal principal) {
 
 主体 ID 非正整数映射 `INVALID_TOKEN`。命令或字段为 null、当前密码空、密码长度非法均映射 `VALIDATION_ERROR`。日志只允许 userId，不允许密码或摘要。
 
-- [ ] **Step 5：运行单元测试并确认 GREEN**
+- [x] **Step 5：运行单元测试并确认 GREEN**
 
 Run:
 
@@ -546,7 +546,7 @@ mvn -Dtest=ChangePasswordApplicationServiceTest test
 
 Expected: PASS。
 
-- [ ] **Step 6：写事务回滚失败测试**
+- [x] **Step 6：写事务回滚失败测试**
 
 `ChangePasswordTransactionIntegrationTest`：
 
@@ -573,7 +573,7 @@ assertThat(account.get("TOKEN_VERSION")).isEqualTo(3);
 assertThat(activeRefreshTokenCount()).isEqualTo(1);
 ```
 
-- [ ] **Step 7：运行事务测试并确认 GREEN**
+- [x] **Step 7：运行事务测试并确认 GREEN**
 
 Run:
 
@@ -583,7 +583,7 @@ mvn -Dtest=ChangePasswordApplicationServiceTest,ChangePasswordTransactionIntegra
 
 Expected: PASS，并证明服务由 Spring 代理执行事务。
 
-- [ ] **Step 8：提交 Task 2**
+- [x] **Step 8：提交 Task 2**
 
 Run:
 
