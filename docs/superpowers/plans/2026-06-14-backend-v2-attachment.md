@@ -103,7 +103,7 @@
 
 ### Step 1：写领域失败测试
 
-- [ ] 新建 `AttachmentTest.java`，覆盖：
+- [x] 新建 `AttachmentTest.java`，覆盖：
 
 ```java
 @Test
@@ -144,7 +144,7 @@ void createsValidatedAttachment() {
 
 ### Step 2：写仓储失败测试
 
-- [ ] 新建 `DatabaseAttachmentRepositoryTest.java`，每个测试前执行：
+- [x] 新建 `DatabaseAttachmentRepositoryTest.java`，每个测试前执行：
 
 ```java
 @BeforeEach
@@ -165,7 +165,7 @@ void clearAttachments() {
 
 ### Step 3：运行测试确认 RED
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=AttachmentTest,DatabaseAttachmentRepositoryTest" test
@@ -175,7 +175,7 @@ mvn "-Dtest=AttachmentTest,DatabaseAttachmentRepositoryTest" test
 
 ### Step 4：实现领域类型
 
-- [ ] 新建 `StorageType.java`：
+- [x] 新建 `StorageType.java`：
 
 ```java
 public enum StorageType {
@@ -193,7 +193,7 @@ public enum StorageType {
 }
 ```
 
-- [ ] 新建 `Attachment.java`，核心签名固定为：
+- [x] 新建 `Attachment.java`，核心签名固定为：
 
 ```java
 public record Attachment(
@@ -217,7 +217,7 @@ public record Attachment(
 }
 ```
 
-- [ ] 新建 `NewAttachment.java`，字段与 `Attachment` 的存储业务字段一致但不含 ID 和审计：
+- [x] 新建 `NewAttachment.java`，字段与 `Attachment` 的存储业务字段一致但不含 ID 和审计：
 
 ```java
 public record NewAttachment(
@@ -239,9 +239,9 @@ public record NewAttachment(
 }
 ```
 
-- [ ] 使用 package-private `AttachmentValidation` 集中实现字段规范化，保留中文异常消息。
+- [x] 使用 package-private `AttachmentValidation` 集中实现字段规范化，保留中文异常消息。
 
-- [ ] 新建：
+- [x] 新建：
 
 ```java
 public record AttachmentLookup(Attachment attachment, boolean deleted) {
@@ -261,7 +261,7 @@ public record AttachmentPage(
 
 ### Step 5：实现 Repository、Entity 与 XML
 
-- [ ] 新建 `AttachmentRepository.java`：
+- [x] 新建 `AttachmentRepository.java`：
 
 ```java
 public interface AttachmentRepository {
@@ -273,9 +273,9 @@ public interface AttachmentRepository {
 }
 ```
 
-- [ ] 新建 `AttachmentEntity extends BaseEntity`，完整映射 `t_attachment` 业务列并为字段写中文注释。
+- [x] 新建 `AttachmentEntity extends BaseEntity`，完整映射 `t_attachment` 业务列并为字段写中文注释。
 
-- [ ] 新建 `AttachmentMapper extends BaseMapper<AttachmentEntity>`：
+- [x] 新建 `AttachmentMapper extends BaseMapper<AttachmentEntity>`：
 
 ```java
 AttachmentEntity selectActiveById(@Param("id") long id);
@@ -290,7 +290,7 @@ int restoreDeleted(
         @Param("updatedBy") long updatedBy);
 ```
 
-- [ ] `AttachmentMapper.xml` 必须显式包含完整列清单。关键 SQL 固定为：
+- [x] `AttachmentMapper.xml` 必须显式包含完整列清单。关键 SQL 固定为：
 
 ```xml
 <select id="selectByHashIncludingDeleted"
@@ -323,7 +323,7 @@ int restoreDeleted(
 
 XML 前写中文注释说明 hash 查询故意绕过逻辑删除过滤。
 
-- [ ] `MyBatisAttachmentRepository`：
+- [x] `MyBatisAttachmentRepository`：
 
   - page/size 转 offset 时使用 `Math.multiplyExact((long) page - 1, size)`。
   - `insert` 用 Mapper `insert(entity)`，确认影响 1 行且生成正 ID，再转回领域。
@@ -332,7 +332,7 @@ XML 前写中文注释说明 hash 查询故意绕过逻辑删除过滤。
 
 ### Step 6：运行定向测试确认 GREEN
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=AttachmentTest,DatabaseAttachmentRepositoryTest,ArchitectureRulesTest" test
@@ -342,7 +342,7 @@ mvn "-Dtest=AttachmentTest,DatabaseAttachmentRepositoryTest,ArchitectureRulesTes
 
 ### Step 7：静态检查并提交
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 rg -n "@(Select|Update|Insert|Delete)" MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system
@@ -351,7 +351,7 @@ git diff --check
 
 预期：无注解 SQL，diff 检查无输出。
 
-- [ ] 提交：
+- [x] 提交：
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/storage/StorageType.java MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system MyBlog-springboot-v2/src/main/resources/mapper/system/AttachmentMapper.xml MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/system docs/superpowers/plans/2026-06-14-backend-v2-attachment.md

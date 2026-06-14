@@ -1,0 +1,20 @@
+package com.tyb.myblog.v2.system.domain.attachment;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+/**
+ * 附件持久化端口。
+ */
+public interface AttachmentRepository {
+
+    Optional<Attachment> findActiveById(long id);
+
+    Optional<AttachmentLookup> findByHashIncludingDeleted(String hashSha256);
+
+    AttachmentPage findActivePage(int page, int size);
+
+    Attachment insert(NewAttachment attachment);
+
+    boolean restoreDeleted(long id, LocalDateTime updatedAt, long updatedBy);
+}
