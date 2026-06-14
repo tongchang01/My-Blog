@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -78,6 +80,30 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.fail(
                         ApiErrorCode.VALIDATION_ERROR.code(),
                         "请求方法不支持"));
+    }
+
+    /**
+     * 处理超过统一附件大小限制的 multipart 请求。
+     */
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    ResponseEntity<ApiResponse<Void>> handleMaxUploadSizeException(
+            MaxUploadSizeExceededException exception) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail(
+                        ApiErrorCode.VALIDATION_ERROR.code(),
+                        "上传文件不能超过10 MiB"));
+    }
+
+    /**
+     * 处理缺少 multipart 文件字段的请求。
+     */
+    @ExceptionHandler(MissingServletRequestPartException.class)
+    ResponseEntity<ApiResponse<Void>> handleMissingRequestPartException(
+            MissingServletRequestPartException exception) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail(
+                        ApiErrorCode.VALIDATION_ERROR.code(),
+                        "缺少上传文件"));
     }
 
     /**

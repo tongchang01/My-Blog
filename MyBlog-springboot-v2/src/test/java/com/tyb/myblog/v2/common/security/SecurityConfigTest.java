@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -41,6 +42,7 @@ class SecurityConfigTest {
 
     @BeforeEach
     void clearUsers() {
+        jdbcTemplate.update("delete from t_attachment");
         jdbcTemplate.update("delete from t_refresh_token");
         jdbcTemplate.update("delete from t_user_info");
         jdbcTemplate.update("delete from t_user_auth");
@@ -122,6 +124,24 @@ class SecurityConfigTest {
         mockMvc.perform(get("/api/admin/security-probe").header("Authorization", "Bearer " + token))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("10003"));
+    }
+
+    @Test
+    void permitsOnlyAdminToUploadAttachment() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(multipart("/api/admin/attachments"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+        mockMvc.perform(multipart("/api/admin/attachments")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("10003"));
+        mockMvc.perform(multipart("/api/admin/attachments")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
     }
 
     @Test
