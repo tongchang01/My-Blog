@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.system.infrastructure.persistence.mapper.SiteConfigMapper">
+
+    <!-- 站点配置固定为 id=1，只读取未软删除的完整配置和审计字段。 -->
+    <select id="selectActive"
+            resultType="com.tyb.myblog.v2.system.infrastructure.persistence.entity.SiteConfigEntity">
+        SELECT id,
+               site_title_zh,
+               site_title_ja,
+               site_title_en,
+               site_subtitle_zh,
+               site_subtitle_ja,
+               site_subtitle_en,
+               about_md_zh,
+               about_md_ja,
+               about_md_en,
+               logo_url,
+               favicon_url,
+               icp_no,
+               spotify_playlist_id,
+               created_at,
+               created_by,
+               updated_at,
+               updated_by,
+               deleted,
+               deleted_at,
+               deleted_by
+        FROM t_site_config
+        WHERE id = 1
+          AND deleted = 0
+    </select>
+
+    <!-- 更新前锁定固定配置行，保证完整 PUT 不与另一个更新交叉写入。 -->
+    <select id="selectActiveForUpdate"
+            resultType="com.tyb.myblog.v2.system.infrastructure.persistence.entity.SiteConfigEntity">
+        SELECT id,
+               site_title_zh,
+               site_title_ja,
+               site_title_en,
+               site_subtitle_zh,
+               site_subtitle_ja,
+               site_subtitle_en,
+               about_md_zh,
+               about_md_ja,
+               about_md_en,
+               logo_url,
+               favicon_url,
+               icp_no,
+               spotify_playlist_id,
+               created_at,
+               created_by,
+               updated_at,
+               updated_by,
+               deleted,
+               deleted_at,
+               deleted_by
+        FROM t_site_config
+        WHERE id = 1
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
+    <!-- PUT 使用完整覆盖，显式写入全部业务字段以支持清空可选配置。 -->
+    <update id="updateActive">
+        UPDATE t_site_config
+        SET site_title_zh = #{config.siteTitleZh},
+            site_title_ja = #{config.siteTitleJa},
+            site_title_en = #{config.siteTitleEn},
+            site_subtitle_zh = #{config.siteSubtitleZh},
+            site_subtitle_ja = #{config.siteSubtitleJa},
+            site_subtitle_en = #{config.siteSubtitleEn},
+            about_md_zh = #{config.aboutMdZh},
+            about_md_ja = #{config.aboutMdJa},
+            about_md_en = #{config.aboutMdEn},
+            logo_url = #{config.logoUrl},
+            favicon_url = #{config.faviconUrl},
+            icp_no = #{config.icpNo},
+            spotify_playlist_id = #{config.spotifyPlaylistId},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = 1
+          AND deleted = 0
+    </update>
+
+</mapper>

@@ -87,7 +87,7 @@
 
 ### Step 1：写领域模型失败测试
 
-- [ ] 新建 `SiteConfigTest.java`，覆盖：
+- [x] 新建 `SiteConfigTest.java`，覆盖：
 
 ```java
 @Test
@@ -137,7 +137,7 @@ void normalizesEditableFields() {
 
 ### Step 2：写数据库读取失败测试
 
-- [ ] 新建 `DatabaseSiteConfigRepositoryTest.java`。
+- [x] 新建 `DatabaseSiteConfigRepositoryTest.java`。
 
 测试前显式恢复固定配置行，避免测试之间互相污染：
 
@@ -173,7 +173,7 @@ void resetSiteConfig() {
 
 ### Step 3：运行测试确认 RED
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=SiteConfigTest,DatabaseSiteConfigRepositoryTest" test
@@ -183,7 +183,7 @@ mvn "-Dtest=SiteConfigTest,DatabaseSiteConfigRepositoryTest" test
 
 ### Step 4：实现领域模型
 
-- [ ] 新建 `SiteLanguage.java`：
+- [x] 新建 `SiteLanguage.java`：
 
 ```java
 public enum SiteLanguage {
@@ -214,7 +214,7 @@ public enum SiteLanguage {
 }
 ```
 
-- [ ] 新建 `SiteConfig.java`，签名固定为：
+- [x] 新建 `SiteConfig.java`，签名固定为：
 
 ```java
 public record SiteConfig(
@@ -300,7 +300,7 @@ public String aboutMd(SiteLanguage language)
 
 ### Step 5：实现仓储读取
 
-- [ ] 新建 `SiteConfigRepository.java`：
+- [x] 新建 `SiteConfigRepository.java`：
 
 ```java
 public interface SiteConfigRepository {
@@ -315,7 +315,7 @@ public interface SiteConfigRepository {
 
 本 Task 先实现两个查询；`update` 可返回 `UnsupportedOperationException` 吗？不允许。Mapper 和仓储应同时声明完整更新方法，但本 Task 不调用它；XML 更新在 Task 4 落地。为保持生产代码始终可运行，本 Task 的仓储 `update` 先调用 Mapper 的完整方法，Task 1 就把 XML UPDATE 写好并由 Task 4 补写入测试。
 
-- [ ] 新建 `SiteConfigEntity.java`：
+- [x] 新建 `SiteConfigEntity.java`：
 
 ```java
 @Getter
@@ -328,7 +328,7 @@ public class SiteConfigEntity extends AuditOnlyBase {
 }
 ```
 
-- [ ] 新建 `SiteConfigMapper.java`：
+- [x] 新建 `SiteConfigMapper.java`：
 
 ```java
 @Mapper
@@ -342,7 +342,7 @@ public interface SiteConfigMapper extends BaseMapper<SiteConfigEntity> {
 }
 ```
 
-- [ ] 新建 `SiteConfigMapper.xml`。
+- [x] 新建 `SiteConfigMapper.xml`。
 
 查询固定条件：
 
@@ -383,7 +383,7 @@ WHERE id = 1
 
 XML 前添加中文注释，说明固定单行、软删除过滤和行锁用途。
 
-- [ ] 新建 `MyBatisSiteConfigRepository.java`：
+- [x] 新建 `MyBatisSiteConfigRepository.java`：
 
 ```java
 @Repository
@@ -417,7 +417,7 @@ public class MyBatisSiteConfigRepository implements SiteConfigRepository {
 
 ### Step 6：运行定向测试确认 GREEN
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=SiteConfigTest,DatabaseSiteConfigRepositoryTest,ArchitectureRulesTest" test
@@ -427,7 +427,7 @@ mvn "-Dtest=SiteConfigTest,DatabaseSiteConfigRepositoryTest,ArchitectureRulesTes
 
 ### Step 7：静态检查并提交
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 rg -n "@(Select|Update|Insert|Delete)" MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system
@@ -436,7 +436,7 @@ git diff --check
 
 预期：无注解 SQL，`git diff --check` 无输出。
 
-- [ ] 提交：
+- [x] 提交：
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system MyBlog-springboot-v2/src/main/resources/mapper/system MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/system docs/superpowers/plans/2026-06-14-backend-v2-site-config.md
