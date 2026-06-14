@@ -900,7 +900,7 @@ git commit -m "补齐修改密码集成验收"
 
 **提交信息：** `完成identity模块收尾`
 
-- [ ] **Step 1：更新认证接口契约**
+- [x] **Step 1：更新认证接口契约**
 
 `api-contract/auth.md`：
 
@@ -911,7 +911,7 @@ git commit -m "补齐修改密码集成验收"
 - 从“尚未开放”删除修改密码。
 - 更新权限矩阵。
 
-- [ ] **Step 2：更新认证流程和安全基线**
+- [x] **Step 2：更新认证流程和安全基线**
 
 `arch/auth-flow.md`：
 
@@ -925,7 +925,7 @@ git commit -m "补齐修改密码集成验收"
 - 明确新密码不 trim、长度 8 至 128、不能与当前密码相同。
 - 明确改密事务和日志红线。
 
-- [ ] **Step 3：更新状态和路线图**
+- [x] **Step 3：更新状态和路线图**
 
 `status.md`：
 
@@ -945,7 +945,7 @@ git commit -m "补齐修改密码集成验收"
 - 将 identity 改密缺口标记关闭。
 - 如 MySQL 并发测试因 Docker 不可用跳过，保留准确说明。
 
-- [ ] **Step 4：更新设计和计划实施证据**
+- [x] **Step 4：更新设计和计划实施证据**
 
 先执行：
 
@@ -957,7 +957,7 @@ git log -4 --format="%h %s"
 
 Task 5 自身 SHA 无法在提交前写入正文，因此设计文档只记录四个代码实施提交，并明确文档收尾由当前提交承载，不伪造 SHA。
 
-- [ ] **Step 5：运行全量验证**
+- [x] **Step 5：运行全量验证**
 
 Run:
 
@@ -973,7 +973,7 @@ Expected:
 - 0 failures，0 errors。
 - Docker 不可用时仅条件化 Testcontainers 测试 skipped。
 
-- [ ] **Step 6：最终静态审查**
+- [x] **Step 6：最终静态审查**
 
 Run:
 
@@ -991,7 +991,7 @@ Expected:
 - 无敏感密码日志。
 - 提交前只有本轮文档和计划勾选变更。
 
-- [ ] **Step 7：提交 Task 5**
+- [x] **Step 7：提交 Task 5**
 
 将所有 Task 标记完成，然后：
 
@@ -1000,7 +1000,7 @@ git add docs/project-handbook docs/superpowers/specs/2026-06-14-backend-v2-chang
 git commit -m "完成identity模块收尾"
 ```
 
-- [ ] **Step 8：最终确认**
+- [x] **Step 8：最终确认**
 
 Run:
 

@@ -139,11 +139,27 @@ POST /api/auth/logout   Header: Authorization: Bearer <access>
    返回 200
 ```
 
-**强制下线 / 改密** 走同一机制：递增 `token_version` + 撤销 refresh token。
-
 `POST /api/auth/logout` 已开放，必须携带仍有效的 Bearer access token。Controller 通过 `@CurrentUser AuthenticatedPrincipal` 读取账号 ID，不接受客户端提供的用户 ID。
 
-## 7. PASSWORD 文章解锁流程
+## 7. 修改密码流程
+
+```
+PUT /api/auth/me/password   Header: Authorization: Bearer <access>
+                            Body: { currentPassword, newPassword }
+   │
+   ├─ 1. 仅允许 ADMIN，用户 ID 只取自当前认证主体
+   ├─ 2. SELECT t_user_auth ... FOR UPDATE 锁定当前账号
+   ├─ 3. BCrypt 校验当前密码；校验新密码不与当前密码相同
+   ├─ 4. BCrypt 生成新 password_hash
+   ├─ 5. 单条 UPDATE 原子更新 password_hash 并令 token_version + 1
+   ├─ 6. 撤销当前账号全部 refresh token
+   ▼
+   返回 200，不签发新 token，客户端重新登录
+```
+
+账号加锁、密码更新、token version 递增和 refresh token 全撤销处于同一事务；任一步失败时整体回滚。账号行锁还保证两个使用相同旧密码的并发改密请求最多一个成功。
+
+## 8. PASSWORD 文章解锁流程
 
 ```
 POST /api/public/articles/{id}/unlock   Body: { password }
@@ -178,11 +194,11 @@ POST /api/public/articles/{id}/unlock   Body: { password }
 - access token 不能用作文章解锁凭证
 - article access token 不能用作身份凭证（不含 `sub`）
 
-## 8. 安全白名单
+## 9. 安全白名单
 
 配置：`application.yml` → `myblog.security.public-endpoints`，必须以 `HTTP method + path` 双维度声明（详见 `../rules/security-baseline.md` §6）。
 
-## 9. 客户端 IP 提取
+## 10. 客户端 IP 提取
 
 登录、评论限流和审计必须共用 `ClientIpResolver`：
 
@@ -192,7 +208,7 @@ POST /api/public/articles/{id}/unlock   Body: { password }
 
 空白返回 `null`，不写入伪造值。`ip_source`（归属地）**V2 不解析**（R2 #16）。
 
-## 10. 关键代码路径（V2 目标）
+## 11. 关键代码路径（V2 目标）
 
 - `AccessTokenIssuer` — identity 应用层使用的访问令牌签发端口
 - `AccessTokenVerifier` — Security 过滤器使用的访问令牌验证端口
@@ -202,6 +218,9 @@ POST /api/public/articles/{id}/unlock   Body: { password }
 - `RefreshSessionApplicationService` — refresh 参数校验与统一 `10002` 映射
 - `RefreshSessionTransactionService` — refresh 行锁和单事务轮换
 - `LogoutApplicationService` — 当前认证主体 ID 校验与全端撤销
+- `ChangePasswordApplicationService` — 当前 ADMIN 改密、会话失效与事务编排
+- `PasswordHashService` — 登录与改密共用的 BCrypt 校验 / 摘要端口
+- `PasswordAccountRepository` — 改密账号行锁读取与密码、token version 原子更新端口
 - `ArticleAccessTokenService` — PASSWORD 文章 token 签发 / 校验
 - `JwtAuthenticationFilter` — Authorization header 处理（typ=access）
 - `ArticleAccessTokenFilter` — X-Article-Token 处理（typ=article_access）
@@ -221,11 +240,11 @@ identity 不调用过滤器或 Spring Security 具体实现；过滤器后续通
 - `LoginRateLimiter` — 登录限流（Caffeine）
 - `LoginStateRecorder` / `t_user_auth` — 失败累计、锁定和成功审计
 
-## 11. 测试覆盖
+## 12. 测试覆盖
 
-当前认证会话测试覆盖登录、刷新、旧 token 重放、账号删除/锁定/GUEST、JWT 签发失败回滚、全端退出、账号隔离和 H2 双线程并发轮换。2026-06-13 全量结果为 198 tests、0 failures、0 errors、2 skipped；两个跳过项均为既有 Docker 条件测试。
+当前认证会话测试覆盖登录、刷新、旧 token 重放、账号删除/锁定/GUEST、JWT 签发失败回滚、全端退出、改密事务回滚、账号隔离、H2 双线程并发轮换和并发改密。2026-06-14 全量结果为 288 tests、0 failures、0 errors、4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试。
 
-## 12. 历史对照
+## 13. 历史对照
 
 V1 / 早期 V2 的实现差异：
 

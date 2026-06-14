@@ -76,6 +76,12 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 - 使用 **BCrypt**（Spring Security 标配，强度配 `myblog.security.password.bcrypt-strength`）
 - 🔴 禁止明文存储、禁止可逆加密
 - 🔴 禁止在日志、异常、响应中输出密码字段
+- 当前用户改密仅允许 ADMIN，用户 ID 只取自认证主体，不接受客户端指定
+- 当前密码和新密码均不 trim；当前密码必填且最长 128 字符，新密码长度为 8 至 128 字符
+- 改密必须验证当前密码，新密码不能与当前密码相同
+- 改密时使用 `SELECT ... FOR UPDATE` 锁定账号，避免并发请求使用同一旧密码重复成功
+- `password_hash` 更新、`token_version + 1` 和 refresh token 全撤销必须处于同一事务，任一步失败时整体回滚
+- 改密成功后不签发新 token，客户端必须清理本地会话并重新登录
 - PASSWORD 文章密码：前端 HTTPS 传明文 → 后端 `BCrypt.matches(rawPassword, storedHash)` 校验
 
 ## 6. 安全白名单

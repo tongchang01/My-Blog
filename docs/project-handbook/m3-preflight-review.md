@@ -279,14 +279,14 @@ mvn clean test
 
 - [x] P1-1 至 P1-6 全部关闭
 - [x] `mvn clean test` 全部通过
-- [!] V1 已在本地 MySQL 8.0.35 从空 schema 迁移成功；Testcontainers 执行按当前决定暂缓
+- [!] V1 已在本地 MySQL 8.0.35 从空 schema 迁移成功；Testcontainers MySQL 测试已接入，当前 Docker 不可用时条件跳过
 - [x] MySQL session 时区验证通过
 - [x] JWT 与 identity 依赖方向有代码和 ArchUnit 双重守护
 - [x] prod 缺少密钥或数据库配置时失败启动
 - [x] 文档中的错误码、配置名、字段名与代码一致
 - [x] 工作区不存在本轮无关修改
 
-准入条件已满足，允许进入 M3。M3 仍按小步提交推进，先做 identity 最小纵向切片，不一次性完成整个模块。
+准入条件已满足，允许进入 M3。identity 后端纵向切片已收尾，下一步仍按小步提交推进 system 模块。
 
 ## 8. 审查记录
 
@@ -305,3 +305,4 @@ mvn clean test
 | 2026-06-12 | 根包架构说明已同步 | 删除顶级 `infrastructure` 旧描述，明确公共与业务基础设施的实际归属 |
 | 2026-06-12 | 构建测试 SOP 已同步 | 对齐 profile 环境变量、H2 默认测试与可选 Testcontainers MySQL 验证 |
 | 2026-06-12 | 允许进入 M3 | P1 与文档准入项全部关闭，全量测试通过；剩余 P2 按对应业务能力首次落地前处理 |
+| 2026-06-14 | identity 后端收尾 | 当前用户改密已落地；密码、token version 与 refresh 撤销同事务，H2 并发通过；MySQL 条件测试因 Docker 不可用跳过 |
