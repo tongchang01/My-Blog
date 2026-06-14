@@ -30,6 +30,15 @@ public interface UserAccountMapper extends BaseMapper<UserAccountEntity> {
     UserAccountEntity selectActiveByUsername(@Param("username") String username);
 
     /**
+     * 锁定并读取未删除账号的改密字段。
+     *
+     * @param userId 账号 ID
+     * @return 改密账号实体，不存在时返回 {@code null}
+     */
+    UserAccountEntity selectActivePasswordAccountForUpdate(
+            @Param("userId") long userId);
+
+    /**
      * 查询未删除、未锁定且允许登录后台的账号快照。
      *
      * @param userId 账号 ID
@@ -67,4 +76,19 @@ public interface UserAccountMapper extends BaseMapper<UserAccountEntity> {
             @Param("userId") long userId,
             @Param("loggedInAt") LocalDateTime loggedInAt,
             @Param("clientIp") String clientIp);
+
+    /**
+     * 原子更新密码摘要并递增 token version。
+     *
+     * @param userId 账号 ID
+     * @param passwordHash 新密码摘要
+     * @param updatedAt 更新时间
+     * @param updatedBy 操作人 ID
+     * @return 更新行数
+     */
+    int updatePasswordAndIncrementTokenVersion(
+            @Param("userId") long userId,
+            @Param("passwordHash") String passwordHash,
+            @Param("updatedAt") LocalDateTime updatedAt,
+            @Param("updatedBy") Long updatedBy);
 }

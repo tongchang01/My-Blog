@@ -14,7 +14,7 @@ import java.util.Optional;
 public class LoginCredentialVerifier {
 
     private final UserAccountRepository repository;
-    private final PasswordHashVerifier passwordHashVerifier;
+    private final PasswordHashService passwordHashService;
     private final LoginStateRecorder loginStateRecorder;
     private final LoginLockPolicy loginLockPolicy;
 
@@ -40,7 +40,7 @@ public class LoginCredentialVerifier {
             return LoginCredentialResult.Locked.INSTANCE;
         }
 
-        if (passwordHashVerifier.matches(rawPassword, account.passwordHash())) {
+        if (passwordHashService.matches(rawPassword, account.passwordHash())) {
             return new LoginCredentialResult.Authenticated(account);
         }
 

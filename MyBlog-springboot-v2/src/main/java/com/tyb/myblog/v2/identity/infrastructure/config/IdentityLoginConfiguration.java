@@ -5,7 +5,7 @@ import com.tyb.myblog.v2.identity.domain.account.UserAccountRepository;
 import com.tyb.myblog.v2.identity.domain.auth.LoginCredentialVerifier;
 import com.tyb.myblog.v2.identity.domain.auth.LoginStateRecorder;
 import com.tyb.myblog.v2.identity.domain.auth.LoginLockPolicy;
-import com.tyb.myblog.v2.identity.domain.auth.PasswordHashVerifier;
+import com.tyb.myblog.v2.identity.domain.auth.PasswordHashService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -32,13 +32,13 @@ public class IdentityLoginConfiguration {
     @Bean
     LoginCredentialVerifier loginCredentialVerifier(
             UserAccountRepository repository,
-            PasswordHashVerifier passwordHashVerifier,
+            PasswordHashService passwordHashService,
             LoginStateRecorder loginStateRecorder,
             LoginLockPolicy loginLockPolicy
     ) {
         return new LoginCredentialVerifier(
                 repository,
-                passwordHashVerifier,
+                passwordHashService,
                 loginStateRecorder,
                 loginLockPolicy
         );

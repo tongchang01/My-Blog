@@ -103,7 +103,7 @@
 
 **提交信息：** `补齐修改密码持久化能力`
 
-- [ ] **Step 1：先写密码摘要服务失败测试**
+- [x] **Step 1：先写密码摘要服务失败测试**
 
 将旧 `SpringPasswordHashVerifierTest` 替换为 `SpringPasswordHashServiceTest`：
 
@@ -126,7 +126,7 @@ class SpringPasswordHashServiceTest {
 
 同步把 `LoginCredentialVerifierTest` 中的 mock 类型由 `PasswordHashVerifier` 改为尚不存在的 `PasswordHashService`，保持既有登录行为断言不变。
 
-- [ ] **Step 2：运行密码测试并确认 RED**
+- [x] **Step 2：运行密码测试并确认 RED**
 
 Run:
 
@@ -136,7 +136,7 @@ mvn -Dtest=SpringPasswordHashServiceTest,LoginCredentialVerifierTest test
 
 Expected: FAIL，原因是 `PasswordHashService` 和 `SpringPasswordHashService` 尚不存在。
 
-- [ ] **Step 3：实现统一密码摘要端口**
+- [x] **Step 3：实现统一密码摘要端口**
 
 创建：
 
@@ -190,7 +190,7 @@ rg -n "PasswordHashVerifier|SpringPasswordHashVerifier" MyBlog-springboot-v2/src
 
 Expected: 无输出。
 
-- [ ] **Step 4：运行密码与登录领域测试并确认 GREEN**
+- [x] **Step 4：运行密码与登录领域测试并确认 GREEN**
 
 Run:
 
@@ -200,7 +200,7 @@ mvn -Dtest=SpringPasswordHashServiceTest,LoginCredentialVerifierTest test
 
 Expected: PASS。
 
-- [ ] **Step 5：写改密账号仓储失败测试**
+- [x] **Step 5：写改密账号仓储失败测试**
 
 `DatabasePasswordAccountRepositoryTest` 使用 `@SpringBootTest`、`@ActiveProfiles("test")` 和真实 H2 Mapper，覆盖：
 
@@ -243,7 +243,7 @@ void updatesPasswordAndIncrementsTokenVersionWithAudit() {
 
 测试 SQL 只用于测试数据准备和断言；生产 SQL 必须在 XML。
 
-- [ ] **Step 6：运行仓储测试并确认 RED**
+- [x] **Step 6：运行仓储测试并确认 RED**
 
 Run:
 
@@ -253,7 +253,7 @@ mvn -Dtest=DatabasePasswordAccountRepositoryTest test
 
 Expected: FAIL，原因是领域投影、端口和仓储实现尚不存在。
 
-- [ ] **Step 7：实现领域投影与仓储端口**
+- [x] **Step 7：实现领域投影与仓储端口**
 
 创建：
 
@@ -291,7 +291,7 @@ public interface PasswordAccountRepository {
 }
 ```
 
-- [ ] **Step 8：扩展 Mapper 和 XML**
+- [x] **Step 8：扩展 Mapper 和 XML**
 
 `UserAccountMapper` 增加：
 
@@ -333,7 +333,7 @@ int updatePasswordAndIncrementTokenVersion(
 </update>
 ```
 
-- [ ] **Step 9：实现持久化适配器**
+- [x] **Step 9：实现持久化适配器**
 
 `MyBatisPasswordAccountRepository`：
 
@@ -371,7 +371,7 @@ public class MyBatisPasswordAccountRepository
 }
 ```
 
-- [ ] **Step 10：运行 Task 1 测试**
+- [x] **Step 10：运行 Task 1 测试**
 
 Run:
 
@@ -381,7 +381,7 @@ mvn -Dtest=SpringPasswordHashServiceTest,LoginCredentialVerifierTest,DatabasePas
 
 Expected: PASS。
 
-- [ ] **Step 11：规则检查并提交 Task 1**
+- [x] **Step 11：规则检查并提交 Task 1**
 
 Run:
 

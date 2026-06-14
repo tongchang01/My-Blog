@@ -15,6 +15,18 @@
           AND deleted = 0
     </select>
 
+    <!-- 修改密码前锁定未删除账号，保证并发旧密码请求最多一个成功。 -->
+    <select id="selectActivePasswordAccountForUpdate"
+            resultType="com.tyb.myblog.v2.identity.infrastructure.persistence.entity.UserAccountEntity">
+        SELECT id,
+               type,
+               password_hash
+        FROM t_user_auth
+        WHERE id = #{userId}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
     <!-- 登录校验只读取未删除账号所需的凭据和状态字段。 -->
     <select id="selectActiveByUsername"
             resultType="com.tyb.myblog.v2.identity.infrastructure.persistence.entity.UserAccountEntity">
@@ -74,6 +86,17 @@
         WHERE id = #{userId}
           AND deleted = 0
           AND (locked_until IS NULL OR locked_until &lt;= #{loggedInAt})
+    </update>
+
+    <!-- 原子更新密码摘要并递增 token_version，使历史 access token 立即失效。 -->
+    <update id="updatePasswordAndIncrementTokenVersion">
+        UPDATE t_user_auth
+        SET password_hash = #{passwordHash},
+            token_version = token_version + 1,
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{userId}
+          AND deleted = 0
     </update>
 
 </mapper>
