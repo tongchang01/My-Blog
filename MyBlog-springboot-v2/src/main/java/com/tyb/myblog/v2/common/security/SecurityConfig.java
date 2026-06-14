@@ -71,6 +71,10 @@ public class SecurityConfig {
                                     HttpMethod.PATCH,
                                     "/api/auth/me/profile")
                             .hasRole("ADMIN")
+                            .requestMatchers(
+                                    HttpMethod.GET,
+                                    "/api/admin/site-config")
+                            .hasAnyRole("ADMIN", "DEMO")
                             .requestMatchers("/api/admin/**").hasRole("ADMIN")
                             .anyRequest().authenticated();
                 })

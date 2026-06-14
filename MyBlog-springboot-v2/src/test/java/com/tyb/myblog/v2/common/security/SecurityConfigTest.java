@@ -158,6 +158,26 @@ class SecurityConfigTest {
     }
 
     @Test
+    void permitsAdminAndDemoToReadSiteConfig() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(get("/api/admin/site-config")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/site-config")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void requiresAuthenticationForAdminSiteConfigRead() throws Exception {
+        mockMvc.perform(get("/api/admin/site-config"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
     void requiresAuthenticationForCurrentProfileEndpoints() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
                 .andExpect(status().isUnauthorized())

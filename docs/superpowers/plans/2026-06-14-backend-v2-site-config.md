@@ -617,7 +617,7 @@ git commit -m "开放公开站点配置查询"
 
 ### Step 1：写后台查询应用服务失败测试
 
-- [ ] 新建 `AdminSiteConfigQueryServiceTest.java`，覆盖：
+- [x] 新建 `AdminSiteConfigQueryServiceTest.java`，覆盖：
 
 - ADMIN 返回完整配置。
 - DEMO 返回完整配置。
@@ -633,12 +633,12 @@ public AdminSiteConfigResult query(AuthenticatedPrincipal principal)
 
 ### Step 2：写 Web 与 Security 失败测试
 
-- [ ] 新建 `AdminSiteConfigControllerTest.java`，mock 应用服务，覆盖：
+- [x] 新建 `AdminSiteConfigControllerTest.java`，mock 应用服务，覆盖：
 
 - GET 返回完整 13 字段和 `updatedAt`、`updatedBy`。
 - Controller 把 `AuthenticatedPrincipal` 原样传给应用服务。
 
-- [ ] 扩展 `SecurityConfigTest.java`：
+- [x] 扩展 `SecurityConfigTest.java`：
 
 ```java
 @Test
@@ -657,7 +657,7 @@ void requiresAuthenticationForAdminSiteConfigRead() throws Exception {
 
 ### Step 3：运行测试确认 RED
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=AdminSiteConfigQueryServiceTest,AdminSiteConfigControllerTest,SecurityConfigTest" test
@@ -667,7 +667,7 @@ mvn "-Dtest=AdminSiteConfigQueryServiceTest,AdminSiteConfigControllerTest,Securi
 
 ### Step 4：实现后台结果和查询服务
 
-- [ ] 新建 `AdminSiteConfigResult.java`，包含：
+- [x] 新建 `AdminSiteConfigResult.java`，包含：
 
 ```java
 public record AdminSiteConfigResult(
@@ -708,7 +708,7 @@ public record AdminSiteConfigResult(
 }
 ```
 
-- [ ] 新建 `AdminSiteConfigQueryService.java`：
+- [x] 新建 `AdminSiteConfigQueryService.java`：
 
 ```java
 @Slf4j
@@ -731,9 +731,9 @@ public class AdminSiteConfigQueryService {
 
 ### Step 5：实现后台 Controller
 
-- [ ] 新建 `AdminSiteConfigVO.java`，字段与 `AdminSiteConfigResult` 一致，提供 `from(result)`。
+- [x] 新建 `AdminSiteConfigVO.java`，字段与 `AdminSiteConfigResult` 一致，提供 `from(result)`。
 
-- [ ] 新建 `AdminSiteConfigController.java`：
+- [x] 新建 `AdminSiteConfigController.java`：
 
 ```java
 @Tag(name = "后台站点配置", description = "站点配置读取与维护")
@@ -755,7 +755,7 @@ public class AdminSiteConfigController {
 
 ### Step 6：增加 DEMO 精确只读规则
 
-- [ ] 在 `SecurityConfig.java` 的 `/api/admin/**` 通用规则之前增加：
+- [x] 在 `SecurityConfig.java` 的 `/api/admin/**` 通用规则之前增加：
 
 ```java
 .requestMatchers(
@@ -774,7 +774,7 @@ public class AdminSiteConfigController {
 
 ### Step 7：运行测试确认 GREEN
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=AdminSiteConfigQueryServiceTest,AdminSiteConfigControllerTest,SecurityConfigTest,ArchitectureRulesTest" test
@@ -784,7 +784,7 @@ mvn "-Dtest=AdminSiteConfigQueryServiceTest,AdminSiteConfigControllerTest,Securi
 
 ### Step 8：提交 Task 3
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 git diff --check
