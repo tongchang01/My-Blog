@@ -209,6 +209,9 @@ PASSWORD 文章功能落地前必须完成。
 
 `@TableLogic` 默认只保证逻辑删除标记，不自动满足项目定义的软删三件套。
 
+- [x] 友链标准业务表已建立显式软删除路径。
+- 后续标准业务表复用同一规则，禁止通用 delete 方法。
+
 ### P2-6 依赖版本与构建可重复性
 
 - [ ] MyBatis-Plus 3.5.12 评估升级到当前 3.5.x
@@ -286,8 +289,8 @@ mvn clean test
 - [x] 文档中的错误码、配置名、字段名与代码一致
 - [x] 工作区不存在本轮无关修改
 
-准入条件已满足，允许进入 M3。identity 已收尾，system 的 `t_site_config`、`t_attachment`
-已完成，下一步按小步提交推进 `t_friend_link`。
+准入条件已满足，允许进入 M3。identity 与 system 已收尾，下一步按小步提交推进
+content 模块规格与纵向切片设计。
 
 ## 8. 审查记录
 
@@ -309,3 +312,4 @@ mvn clean test
 | 2026-06-14 | identity 后端收尾 | 当前用户改密已落地；密码、token version 与 refresh 撤销同事务，H2 并发通过；MySQL 条件测试因 Docker 不可用跳过 |
 | 2026-06-14 | system 站点配置纵向切片 | `t_site_config` 公开读取、后台读取和 ADMIN 全量更新已落地；未新增 Flyway，H2 行锁并发测试通过；全量 329 tests 通过，4 个 Docker 条件测试跳过 |
 | 2026-06-14 | system 附件纵向切片 | `t_attachment` 图片上传、去重恢复、LOCAL/S3、后台分页与详情已落地；真实 LOCAL 并发上传收敛为一行一个对象，下一步进入 `t_friend_link` |
+| 2026-06-14 | system 友链纵向切片 | `t_friend_link` 公开读取、后台 CRUD、状态、批量排序和显式软删除已落地；三项 H2 行锁并发场景通过，下一步进入 content |

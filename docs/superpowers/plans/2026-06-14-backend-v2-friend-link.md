@@ -10,6 +10,14 @@
 
 ---
 
+## 实施记录
+
+- Task 1：`b44ea6a` 建立友链领域与持久化查询
+- Task 2：`fa0fc53` 实现公开与后台友链查询
+- Task 3：`b3be042` 实现友链新增与编辑
+- Task 4：`b51a1e8` 实现友链状态排序与软删除
+- Task 5：完整 HTTP、OpenAPI 和文档已完成；`mvn clean test` 通过（426 tests，0 failures，0 errors，4 skipped）。
+
 ## 0. 执行约束
 
 - 在 worktree `E:\My-Blog\.worktrees\backend-v2-refactor` 中执行。
@@ -1905,5 +1913,5 @@ git log -7 --oneline
 - [ ] 分页为 records/total/page/size。
 - [ ] OpenAPI 不暴露 Entity、SubmittedField 或删除审计字段。
 - [ ] system 友链不跨模块访问 content/comment。
-- [ ] 五个实现 Task 分别形成中文本地提交。
-- [ ] 全量 Maven、Enforcer、ArchUnit 和 `git diff --check` 通过。
+- [x] 五个实现 Task 分别形成中文本地提交。
+- [x] 全量 Maven、Enforcer、ArchUnit 和 `git diff --check` 通过。

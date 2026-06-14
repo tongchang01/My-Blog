@@ -69,14 +69,17 @@ M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，iden
 - LOCAL 与 AWS S3 通过统一存储端口切换；S3 使用默认凭证链，不配置静态凭证或对象 ACL
 - 相同 hash 的 active 附件直接复用，deleted 附件恢复原记录；物理对象缺失返回内部错误
 - 真实 H2 / JWT / LOCAL 集成测试已覆盖上传、去重、恢复、权限、非法图片和并发收敛；并发结果为一行一个对象
-- 当前基线：`mvn clean test` 通过（378 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
+- `t_friend_link` 纵向切片已完成：匿名读取 VISIBLE 友链，ADMIN / DEMO 后台只读，ADMIN 新增、完整编辑、状态、批量排序和显式软删除
+- 友链 URL 允许重复；写入只接受绝对 HTTP/HTTPS 地址；批量排序 1..100 项并在目标缺失时整体回滚
+- 友链更新、状态、排序和删除均使用 active 行锁；软删除完整写入删除和更新审计五字段
+- 当前基线：`mvn clean test` 通过（426 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
 
-**当前处置方案**：identity 已收尾，system 的 `t_site_config`、`t_attachment` 已完成，继续按 `t_friend_link` → content → comment → stats / common-infra 推进。
+**当前处置方案**：identity 与 system 已收尾，下一步进入 content 模块规格与纵向切片设计，再按 comment → stats / common-infra 推进。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. 设计并实现 system 的 `t_friend_link` 纵向切片
-2. 进入 content → comment → stats / common-infra
+1. 设计并实现 content 模块首个纵向切片
+2. 进入 comment → stats / common-infra
 3. 前台 / 后台前端骨架
 
 ## 4. 相关文档
