@@ -451,7 +451,7 @@ git commit -m "建立站点配置领域与持久化读取"
 
 ### Step 1：写应用服务失败测试
 
-- [ ] 新建 `PublicSiteConfigQueryServiceTest.java`。
+- [x] 新建 `PublicSiteConfigQueryServiceTest.java`。
 
 覆盖：
 
@@ -478,7 +478,7 @@ void returnsRequestedLanguageWithFieldLevelChineseFallback() {
 
 ### Step 2：写 Controller 与匿名访问失败测试
 
-- [ ] 新建 `PublicSiteConfigControllerTest.java`，使用 `@SpringBootTest + @AutoConfigureMockMvc` 或项目现有测试方式。
+- [x] 新建 `PublicSiteConfigControllerTest.java`，使用 `@SpringBootTest + @AutoConfigureMockMvc` 或项目现有测试方式。
 
 覆盖：
 
@@ -490,7 +490,7 @@ void returnsRequestedLanguageWithFieldLevelChineseFallback() {
 
 ### Step 3：运行测试确认 RED
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=PublicSiteConfigQueryServiceTest,PublicSiteConfigControllerTest" test
@@ -500,7 +500,7 @@ mvn "-Dtest=PublicSiteConfigQueryServiceTest,PublicSiteConfigControllerTest" tes
 
 ### Step 4：实现公开查询应用层
 
-- [ ] 新建 `PublicSiteConfigResult.java`：
+- [x] 新建 `PublicSiteConfigResult.java`：
 
 ```java
 public record PublicSiteConfigResult(
@@ -515,7 +515,7 @@ public record PublicSiteConfigResult(
 }
 ```
 
-- [ ] 新建 `PublicSiteConfigQueryService.java`：
+- [x] 新建 `PublicSiteConfigQueryService.java`：
 
 ```java
 @Slf4j
@@ -556,9 +556,9 @@ public class PublicSiteConfigQueryService {
 
 ### Step 5：实现公开 Web 接口
 
-- [ ] 新建 `PublicSiteConfigVO.java`，字段与 `PublicSiteConfigResult` 完全一致，并提供 `from(result)`。
+- [x] 新建 `PublicSiteConfigVO.java`，字段与 `PublicSiteConfigResult` 完全一致，并提供 `from(result)`。
 
-- [ ] 新建 `PublicSiteConfigController.java`：
+- [x] 新建 `PublicSiteConfigController.java`：
 
 ```java
 @Tag(name = "公开站点配置", description = "前台公开站点信息")
@@ -580,7 +580,7 @@ public class PublicSiteConfigController {
 
 ### Step 6：开放精确匿名白名单
 
-- [ ] 在 `application.yml` 和 `application-test.yml` 的 `public-endpoints` 增加：
+- [x] 在 `application.yml` 和 `application-test.yml` 的 `public-endpoints` 增加：
 
 ```yaml
 - method: GET
@@ -591,7 +591,7 @@ public class PublicSiteConfigController {
 
 ### Step 7：运行测试确认 GREEN
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=PublicSiteConfigQueryServiceTest,PublicSiteConfigControllerTest,SecurityConfigTest" test
@@ -601,7 +601,7 @@ mvn "-Dtest=PublicSiteConfigQueryServiceTest,PublicSiteConfigControllerTest,Secu
 
 ### Step 8：提交 Task 2
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 git diff --check

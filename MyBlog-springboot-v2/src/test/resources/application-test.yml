@@ -41,6 +41,8 @@ myblog:
       - method: POST
         path: /api/auth/refresh
       - method: GET
+        path: /api/public/site-config
+      - method: GET
         path: /api/public/security-probe
       - method: GET
         path: /doc.html

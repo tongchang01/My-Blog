@@ -53,3 +53,5 @@ myblog:
         path: /api/auth/login
       - method: POST
         path: /api/auth/refresh
+      - method: GET
+        path: /api/public/site-config
