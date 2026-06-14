@@ -4,6 +4,8 @@ import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
+import com.tyb.myblog.v2.identity.application.auth.ChangePasswordApplicationService;
+import com.tyb.myblog.v2.identity.application.auth.ChangePasswordCommand;
 import com.tyb.myblog.v2.identity.application.profile.CurrentUserProfileQueryService;
 import com.tyb.myblog.v2.identity.application.profile.CurrentUserProfileResult;
 import com.tyb.myblog.v2.identity.application.profile.CurrentUserProfileUpdateService;
@@ -31,6 +33,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,6 +53,9 @@ class CurrentUserControllerTest {
 
     @MockitoBean
     private CurrentUserProfileUpdateService updateService;
+
+    @MockitoBean
+    private ChangePasswordApplicationService changePasswordService;
 
     private AuthenticatedPrincipal principal;
     private UserProfile profile;
@@ -205,8 +211,95 @@ class CurrentUserControllerTest {
                 .andExpect(jsonPath("$.code").value("10003"));
     }
 
+    @Test
+    void changesCurrentAdminPassword() throws Exception {
+        mockMvc.perform(put("/api/auth/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "currentPassword":"old-password",
+                                  "newPassword":"new-password"
+                                }
+                                """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("00000"))
+                .andExpect(jsonPath("$.data").isEmpty());
+
+        verify(changePasswordService).change(
+                principal,
+                new ChangePasswordCommand(
+                        "old-password",
+                        "new-password"));
+    }
+
+    @Test
+    void rejectsInvalidChangePasswordRequest() throws Exception {
+        assertPasswordValidationFailure("""
+                {"currentPassword":"","newPassword":"new-password"}
+                """);
+        assertPasswordValidationFailure("""
+                {"currentPassword":"old-password","newPassword":"short"}
+                """);
+        assertPasswordValidationFailure(
+                "{\"currentPassword\":\"old-password\",\"newPassword\":\""
+                        + "x".repeat(129)
+                        + "\"}");
+        assertPasswordValidationFailure("""
+                {"currentPassword":"old-password","newPassword":
+                """);
+
+        verifyNoInteractions(changePasswordService);
+    }
+
+    @Test
+    void mapsWrongCurrentPassword() throws Exception {
+        org.mockito.Mockito.doThrow(
+                        new ApiException(ApiErrorCode.BAD_CREDENTIALS))
+                .when(changePasswordService)
+                .change(eq(principal), any());
+
+        mockMvc.perform(put("/api/auth/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "currentPassword":"wrong-password",
+                                  "newPassword":"new-password"
+                                }
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10001"));
+    }
+
+    @Test
+    void mapsChangePasswordForbiddenError() throws Exception {
+        org.mockito.Mockito.doThrow(
+                        new ApiException(ApiErrorCode.FORBIDDEN))
+                .when(changePasswordService)
+                .change(eq(principal), any());
+
+        mockMvc.perform(put("/api/auth/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "currentPassword":"old-password",
+                                  "newPassword":"new-password"
+                                }
+                                """))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("10003"));
+    }
+
     private void assertValidationFailure(String content) throws Exception {
         mockMvc.perform(patch("/api/auth/me/profile")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(content))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
+    }
+
+    private void assertPasswordValidationFailure(String content)
+            throws Exception {
+        mockMvc.perform(put("/api/auth/me/password")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(content))
                 .andExpect(status().isBadRequest())

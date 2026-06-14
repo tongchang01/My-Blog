@@ -10,12 +10,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,6 +34,9 @@ class SecurityConfigTest {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @BeforeEach
     void clearUsers() {
@@ -164,6 +169,53 @@ class SecurityConfigTest {
                 .andExpect(jsonPath("$.code").value("10002"));
     }
 
+    @Test
+    void permitsOnlyAdminToChangeCurrentPassword() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+        String request = """
+                {
+                  "currentPassword":"old-password",
+                  "newPassword":"new-password"
+                }
+                """;
+
+        mockMvc.perform(put("/api/auth/me/password")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/auth/me/password")
+                        .header("Authorization", "Bearer " + demoToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(request))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("10003"));
+    }
+
+    @Test
+    void requiresAuthenticationAndExactMethodForChangePassword()
+            throws Exception {
+        mockMvc.perform(put("/api/auth/me/password")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "currentPassword":"old-password",
+                                  "newPassword":"new-password"
+                                }
+                                """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+        mockMvc.perform(post("/api/auth/me/password")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isMethodNotAllowed());
+        mockMvc.perform(patch("/api/auth/me/password")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isMethodNotAllowed());
+    }
+
     private String token(
             long id,
             String username,
@@ -177,7 +229,7 @@ class SecurityConfigTest {
                 """,
                 id,
                 username,
-                "$2a$10$test-password-hash",
+                passwordEncoder.encode("old-password"),
                 type,
                 0,
                 0);

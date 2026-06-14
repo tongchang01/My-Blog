@@ -3,15 +3,18 @@ package com.tyb.myblog.v2.identity.web;
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.auth.CurrentUser;
 import com.tyb.myblog.v2.common.web.ApiResponse;
+import com.tyb.myblog.v2.identity.application.auth.ChangePasswordApplicationService;
 import com.tyb.myblog.v2.identity.application.profile.CurrentUserProfileQueryService;
 import com.tyb.myblog.v2.identity.application.profile.CurrentUserProfileUpdateService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +30,7 @@ public class CurrentUserController {
 
     private final CurrentUserProfileQueryService queryService;
     private final CurrentUserProfileUpdateService updateService;
+    private final ChangePasswordApplicationService changePasswordService;
 
     /**
      * 查询当前登录账号及完整个人资料。
@@ -56,5 +60,18 @@ public class CurrentUserController {
     ) {
         return ApiResponse.ok(UserProfileVO.from(
                 updateService.update(principal, request.toCommand())));
+    }
+
+    /**
+     * 修改当前 ADMIN 账号密码，并使该账号全部会话失效。
+     */
+    @Operation(summary = "修改当前用户密码")
+    @PutMapping("/password")
+    public ApiResponse<Void> changePassword(
+            @CurrentUser AuthenticatedPrincipal principal,
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        changePasswordService.change(principal, request.toCommand());
+        return ApiResponse.ok(null);
     }
 }

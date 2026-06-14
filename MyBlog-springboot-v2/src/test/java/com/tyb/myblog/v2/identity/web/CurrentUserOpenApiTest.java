@@ -79,4 +79,48 @@ class CurrentUserOpenApiTest {
         assertThat(root.at("/components/schemas/PatchValueString")
                 .isMissingNode()).isTrue();
     }
+
+    @Test
+    void documentsChangePasswordAsWriteOnlyPutRequest()
+            throws Exception {
+        String content = mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        JsonNode root = objectMapper.readTree(content);
+        JsonNode path = root.at("/paths/~1api~1auth~1me~1password");
+
+        assertThat(path.has("put")).isTrue();
+        assertThat(path.has("post")).isFalse();
+        assertThat(path.has("patch")).isFalse();
+
+        String requestSchemaRef = path.at(
+                        "/put/requestBody/content/application~1json/schema/$ref")
+                .asText();
+        assertThat(requestSchemaRef).startsWith("#/components/schemas/");
+        JsonNode schema = root.path("components")
+                .path("schemas")
+                .path(requestSchemaRef.substring(
+                        requestSchemaRef.lastIndexOf('/') + 1));
+
+        assertThat(schema.path("required"))
+                .extracting(JsonNode::asText)
+                .containsExactlyInAnyOrder(
+                        "currentPassword",
+                        "newPassword");
+        assertThat(schema.path("properties").fieldNames())
+                .toIterable()
+                .containsExactlyInAnyOrder(
+                        "currentPassword",
+                        "newPassword");
+        for (String field : List.of("currentPassword", "newPassword")) {
+            JsonNode property = schema.path("properties").path(field);
+            assertThat(property.path("type").asText()).isEqualTo("string");
+            assertThat(property.path("writeOnly").asBoolean()).isTrue();
+            assertThat(property.has("example")).isFalse();
+            assertThat(property.has("default")).isFalse();
+        }
+        assertThat(content).doesNotContain("passwordHash", "tokenVersion");
+    }
 }

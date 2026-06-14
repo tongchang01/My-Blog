@@ -604,7 +604,7 @@ git commit -m "实现修改密码事务"
 
 **提交信息：** `开放当前用户修改密码接口`
 
-- [ ] **Step 1：写 Controller 失败测试**
+- [x] **Step 1：写 Controller 失败测试**
 
 扩展 `CurrentUserControllerTest`，新增 `@MockitoBean ChangePasswordApplicationService`，覆盖：
 
@@ -639,7 +639,7 @@ void changesCurrentAdminPassword() throws Exception {
 - 应用服务抛 `BAD_CREDENTIALS` 时返回 `401 + 10001`。
 - 应用服务抛 `FORBIDDEN` 时返回 `403 + 10003`。
 
-- [ ] **Step 2：写 Security 失败测试**
+- [x] **Step 2：写 Security 失败测试**
 
 扩展 `SecurityConfigTest`：
 
@@ -648,7 +648,7 @@ void changesCurrentAdminPassword() throws Exception {
 - 未认证 PUT 返回 `401 + 10002`。
 - POST/PATCH 同一路径不因 PUT 规则而放行。
 
-- [ ] **Step 3：写 OpenAPI 失败测试**
+- [x] **Step 3：写 OpenAPI 失败测试**
 
 扩展 `CurrentUserOpenApiTest`：
 
@@ -658,7 +658,7 @@ void changesCurrentAdminPassword() throws Exception {
 - schema 不包含 `passwordHash`、`tokenVersion`。
 - 不包含明文密码 example/default。
 
-- [ ] **Step 4：运行 Web 测试并确认 RED**
+- [x] **Step 4：运行 Web 测试并确认 RED**
 
 Run:
 
@@ -668,7 +668,7 @@ mvn -Dtest=CurrentUserControllerTest,SecurityConfigTest,CurrentUserOpenApiTest t
 
 Expected: FAIL，原因是请求 DTO、Controller 方法和 PUT 权限规则尚不存在。
 
-- [ ] **Step 5：实现请求 DTO**
+- [x] **Step 5：实现请求 DTO**
 
 ```java
 /**
@@ -698,7 +698,7 @@ public record ChangePasswordRequest(
 
 禁止添加 `example` 或 `defaultValue`。
 
-- [ ] **Step 6：扩展 Controller**
+- [x] **Step 6：扩展 Controller**
 
 注入 `ChangePasswordApplicationService` 并增加：
 
@@ -716,7 +716,7 @@ public ApiResponse<Void> changePassword(
 }
 ```
 
-- [ ] **Step 7：增加精确安全规则**
+- [x] **Step 7：增加精确安全规则**
 
 在 profile PATCH 规则前增加：
 
@@ -729,7 +729,7 @@ public ApiResponse<Void> changePassword(
 
 不得加入 public endpoint 配置。
 
-- [ ] **Step 8：运行 Web 测试并确认 GREEN**
+- [x] **Step 8：运行 Web 测试并确认 GREEN**
 
 Run:
 
@@ -739,7 +739,7 @@ mvn -Dtest=CurrentUserControllerTest,SecurityConfigTest,CurrentUserOpenApiTest t
 
 Expected: PASS。
 
-- [ ] **Step 9：提交 Task 3**
+- [x] **Step 9：提交 Task 3**
 
 Run:
 
