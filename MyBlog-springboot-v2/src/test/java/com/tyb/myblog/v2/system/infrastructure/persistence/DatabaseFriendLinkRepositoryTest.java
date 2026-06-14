@@ -14,6 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -105,6 +106,42 @@ class DatabaseFriendLinkRepositoryTest {
 
         assertThatThrownBy(() -> repository.findActiveById(101L))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void updatesAllBusinessFieldsAndAudit() {
+        insert(101L, 1, 0, false);
+        FriendLink current = repository.findActiveById(101L)
+                .orElseThrow();
+        FriendLink updated = current.replace(
+                "Updated",
+                "https://updated.example.com",
+                null,
+                null,
+                30,
+                FriendLinkStatus.HIDDEN);
+        LocalDateTime now =
+                LocalDateTime.of(2026, 6, 14, 13, 0);
+
+        assertThat(repository.update(
+                updated, now, 2001L)).isTrue();
+
+        assertThat(jdbcTemplate.queryForMap("""
+                SELECT name, url, avatar_url, description,
+                       sort_order, status, updated_by
+                FROM t_friend_link WHERE id = 101
+                """))
+                .containsEntry("NAME", "Updated")
+                .containsEntry("URL", "https://updated.example.com")
+                .containsEntry("AVATAR_URL", null)
+                .containsEntry("DESCRIPTION", null)
+                .containsEntry("SORT_ORDER", 30)
+                .containsEntry("STATUS", 2)
+                .containsEntry("UPDATED_BY", 2001L);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT updated_at FROM t_friend_link WHERE id = 101",
+                LocalDateTime.class))
+                .isEqualTo(now);
     }
 
     private void insert(

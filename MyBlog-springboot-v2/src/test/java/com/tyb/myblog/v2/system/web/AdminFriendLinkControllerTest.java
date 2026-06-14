@@ -3,8 +3,10 @@ package com.tyb.myblog.v2.system.web;
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkPageResult;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkCreateService;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkQueryService;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkResult;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkUpdateService;
 import com.tyb.myblog.v2.system.domain.friendlink.FriendLinkStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +24,11 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,6 +42,12 @@ class AdminFriendLinkControllerTest {
 
     @MockitoBean
     private FriendLinkQueryService queryService;
+
+    @MockitoBean
+    private FriendLinkCreateService createService;
+
+    @MockitoBean
+    private FriendLinkUpdateService updateService;
 
     private AuthenticatedPrincipal principal;
 
@@ -96,6 +108,75 @@ class AdminFriendLinkControllerTest {
                         .value(1001));
     }
 
+    @Test
+    void createsAndUpdatesCompleteFriendLink() throws Exception {
+        when(createService.create(
+                org.mockito.ArgumentMatchers.eq(principal),
+                org.mockito.ArgumentMatchers.any()))
+                .thenReturn(result());
+        when(updateService.update(
+                org.mockito.ArgumentMatchers.eq(principal),
+                org.mockito.ArgumentMatchers.eq(10L),
+                org.mockito.ArgumentMatchers.any()))
+                .thenReturn(result());
+
+        mockMvc.perform(post("/api/admin/friend-links")
+                        .contentType(
+                                org.springframework.http.MediaType
+                                        .APPLICATION_JSON)
+                        .content(completeRequest()))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/admin/friend-links/10")
+                        .contentType(
+                                org.springframework.http.MediaType
+                                        .APPLICATION_JSON)
+                        .content(completeRequest()))
+                .andExpect(status().isOk());
+
+        verify(createService).create(
+                org.mockito.ArgumentMatchers.eq(principal),
+                org.mockito.ArgumentMatchers.argThat(command ->
+                        command.avatarUrl() == null
+                                && command.description() == null));
+        verify(updateService).update(
+                org.mockito.ArgumentMatchers.eq(principal),
+                org.mockito.ArgumentMatchers.eq(10L),
+                org.mockito.ArgumentMatchers.argThat(command ->
+                        command.status()
+                                == FriendLinkStatus.HIDDEN));
+    }
+
+    @Test
+    void rejectsMissingUnknownAndInvalidEnumFields() throws Exception {
+        mockMvc.perform(post("/api/admin/friend-links")
+                        .contentType(
+                                org.springframework.http.MediaType
+                                        .APPLICATION_JSON)
+                        .content(requestWithoutStatus()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
+        mockMvc.perform(put("/api/admin/friend-links/10")
+                        .contentType(
+                                org.springframework.http.MediaType
+                                        .APPLICATION_JSON)
+                        .content(completeRequest().replace(
+                                "\"status\":\"HIDDEN\"",
+                                "\"status\":\"HIDDEN\","
+                                        + "\"unknown\":true")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
+        mockMvc.perform(post("/api/admin/friend-links")
+                        .contentType(
+                                org.springframework.http.MediaType
+                                        .APPLICATION_JSON)
+                        .content(completeRequest().replace(
+                                "\"HIDDEN\"", "\"ARCHIVED\"")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
+
+        verifyNoInteractions(createService, updateService);
+    }
+
     private FriendLinkResult result() {
         return new FriendLinkResult(
                 10L,
@@ -109,5 +190,30 @@ class AdminFriendLinkControllerTest {
                 1001L,
                 LocalDateTime.of(2026, 6, 14, 12, 30),
                 1001L);
+    }
+
+    private String completeRequest() {
+        return """
+                {
+                  "name":"Example",
+                  "url":"https://example.com",
+                  "avatarUrl":null,
+                  "description":null,
+                  "sortOrder":10,
+                  "status":"HIDDEN"
+                }
+                """;
+    }
+
+    private String requestWithoutStatus() {
+        return """
+                {
+                  "name":"Example",
+                  "url":"https://example.com",
+                  "avatarUrl":null,
+                  "description":null,
+                  "sortOrder":10
+                }
+                """;
     }
 }

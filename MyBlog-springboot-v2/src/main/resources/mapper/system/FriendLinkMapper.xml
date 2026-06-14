@@ -83,4 +83,19 @@
         FOR UPDATE
     </select>
 
+    <!-- PUT 完整覆盖全部业务字段，并显式刷新更新审计。 -->
+    <update id="updateActive">
+        UPDATE t_friend_link
+        SET name = #{link.name},
+            url = #{link.url},
+            avatar_url = #{link.avatarUrl},
+            description = #{link.description},
+            sort_order = #{link.sortOrder},
+            status = #{link.status},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{link.id}
+          AND deleted = 0
+    </update>
+
 </mapper>
