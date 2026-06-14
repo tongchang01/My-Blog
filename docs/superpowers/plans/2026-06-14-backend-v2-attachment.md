@@ -658,7 +658,7 @@ git commit -m "建立附件存储抽象与本地实现"
 
 ### Step 1：增加 AWS SDK 依赖
 
-- [ ] 在 `pom.xml` properties 增加：
+- [x] 在 `pom.xml` properties 增加：
 
 ```xml
 <aws.sdk.version>2.46.9</aws.sdk.version>
@@ -691,7 +691,7 @@ git commit -m "建立附件存储抽象与本地实现"
 
 ### Step 2：写 S3 adapter 失败测试
 
-- [ ] 新建 `S3StorageServiceTest.java`，mock `S3Client`，覆盖：
+- [x] 新建 `S3StorageServiceTest.java`，mock `S3Client`，覆盖：
 
 ```java
 verify(s3Client).putObject(
@@ -716,7 +716,7 @@ verify(s3Client).putObject(
 
 ### Step 3：写 S3 bean 配置失败测试
 
-- [ ] 扩展 `StoragePropertiesTest`：
+- [x] 通过 `StoragePropertiesTest` 和运行配置测试覆盖 S3 配置边界：
 
 - `type=S3` 且配置完整时创建 `S3Client`、`S3StorageService`。
 - client 使用 `Region.of(region)` 和 `DefaultCredentialsProvider.create()`。
@@ -726,7 +726,7 @@ verify(s3Client).putObject(
 
 ### Step 4：运行测试确认 RED
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=S3StorageServiceTest,StoragePropertiesTest" test
@@ -736,7 +736,7 @@ mvn "-Dtest=S3StorageServiceTest,StoragePropertiesTest" test
 
 ### Step 5：实现 S3 bean 配置
 
-- [ ] `S3StorageConfiguration` 使用条件：
+- [x] `S3StorageConfiguration` 使用条件：
 
 - 当前 type 为 S3，或 S3 三项配置完整时启用。
 - `S3Client.builder().region(...).credentialsProvider(DefaultCredentialsProvider.create()).build()`。
@@ -745,7 +745,7 @@ mvn "-Dtest=S3StorageServiceTest,StoragePropertiesTest" test
 
 ### Step 6：实现 `S3StorageService`
 
-- [ ] `store` 固定使用：
+- [x] `store` 固定使用：
 
 ```java
 PutObjectRequest request = PutObjectRequest.builder()
@@ -757,11 +757,11 @@ PutObjectRequest request = PutObjectRequest.builder()
 s3Client.putObject(request, RequestBody.fromFile(command.source()));
 ```
 
-- [ ] `exists` 使用 `headObject`；只把 404/NoSuchKey 映射为 false。
+- [x] `exists` 使用 `headObject`；只把 404/NoSuchKey 映射为 false。
 
-- [ ] `delete` 使用 `deleteObject`。
+- [x] `delete` 使用 `deleteObject`。
 
-- [ ] catch `S3Exception` 时日志仅写：
+- [x] catch `S3Exception` 时日志仅写：
 
 ```java
 log.error(
@@ -776,7 +776,7 @@ log.error(
 
 ### Step 7：配置生产环境
 
-- [ ] `application-prod.yml` 增加：
+- [x] `application-prod.yml` 增加：
 
 ```yaml
 myblog:
@@ -793,7 +793,7 @@ myblog:
 
 ### Step 8：运行定向测试确认 GREEN
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=S3StorageServiceTest,StoragePropertiesTest,StorageServiceRegistryTest,RuntimeProfileConfigurationTest,ArchitectureRulesTest" test
@@ -803,7 +803,7 @@ mvn "-Dtest=S3StorageServiceTest,StoragePropertiesTest,StorageServiceRegistryTes
 
 ### Step 9：依赖和安全检查并提交
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn dependency:tree "-Dincludes=software.amazon.awssdk"
@@ -813,7 +813,7 @@ git diff --check
 
 预期：业务显式依赖只有 S3 模块；没有静态凭证和 ACL。
 
-- [ ] 提交：
+- [x] 提交：
 
 ```powershell
 git add MyBlog-springboot-v2/pom.xml MyBlog-springboot-v2/src/main MyBlog-springboot-v2/src/test MyBlog-springboot-v2/src/main/resources/application-prod.yml docs/superpowers/plans/2026-06-14-backend-v2-attachment.md

@@ -23,6 +23,13 @@ management:
         include: health
 
 myblog:
+  storage:
+    type: ${MYBLOG_STORAGE_TYPE:S3}
+    max-file-size: 10MB
+    s3:
+      region: ${MYBLOG_STORAGE_S3_REGION}
+      bucket: ${MYBLOG_STORAGE_S3_BUCKET}
+      public-base-url: ${MYBLOG_STORAGE_S3_PUBLIC_BASE_URL}
   cors:
     allowed-origins: ${MYBLOG_CORS_ALLOWED_ORIGINS:}
   security:
