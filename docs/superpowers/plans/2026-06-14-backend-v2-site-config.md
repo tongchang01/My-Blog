@@ -1093,9 +1093,16 @@ git commit -m "实现站点配置全量更新"
 
 **提交信息：** `完成站点配置纵向切片`
 
+Task 1 至 Task 4 实施提交：
+
+1. `a8f1194 建立站点配置领域与持久化读取`
+2. `a44a375 开放公开站点配置查询`
+3. `369dae1 开放后台站点配置读取`
+4. `3d69de3 实现站点配置全量更新`
+
 ### Step 1：写完整 HTTP 集成测试
 
-- [ ] 新建 `SiteConfigIntegrationTest.java`，使用真实 Spring context、H2、JWT 登录和 MockMvc。
+- [x] 新建 `SiteConfigIntegrationTest.java`，使用真实 Spring context、H2、JWT 登录和 MockMvc。
 
 覆盖一个完整流程：
 
@@ -1111,7 +1118,7 @@ git commit -m "实现站点配置全量更新"
 
 ### Step 2：写 OpenAPI 契约测试
 
-- [ ] 新建 `SiteConfigOpenApiTest.java`。
+- [x] 新建 `SiteConfigOpenApiTest.java`。
 
 覆盖：
 
@@ -1125,7 +1132,7 @@ git commit -m "实现站点配置全量更新"
 
 ### Step 3：运行集成测试确认 RED 或暴露边界遗漏
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=SiteConfigIntegrationTest,SiteConfigOpenApiTest" test
@@ -1135,7 +1142,7 @@ mvn "-Dtest=SiteConfigIntegrationTest,SiteConfigOpenApiTest" test
 
 ### Step 4：补齐接口契约文档
 
-- [ ] 新建 `docs/project-handbook/api-contract/site-config.md`，记录：
+- [x] 新建 `docs/project-handbook/api-contract/site-config.md`，记录：
 
 - 三个 HTTP 接口。
 - 公开语言参数和逐字段 fallback。
@@ -1146,30 +1153,30 @@ mvn "-Dtest=SiteConfigIntegrationTest,SiteConfigOpenApiTest" test
 - 固定配置行缺失属于内部错误。
 - 关于我返回 Markdown 原文，前端使用安全渲染管线。
 
-- [ ] 修改 `api-contract/README.md`，加入 `site-config.md` 索引。
+- [x] 修改 `api-contract/README.md`，加入 `site-config.md` 索引。
 
 ### Step 5：更新项目状态
 
-- [ ] 修改 `status.md`：
+- [x] 修改 `status.md`：
 
 - 记录 system 模块已建立。
 - 记录公开读取、后台读取、ADMIN 全量更新和并发保证。
 - 写入最终 Maven 测试数字。
 - 下一步改为 system 的 `t_attachment` 纵向切片。
 
-- [ ] 修改 `roadmap.md`：
+- [x] 修改 `roadmap.md`：
 
 - system 保持未完成。
 - 在 system 项描述中标记 `t_site_config` 已完成，剩余 `t_attachment`、`t_friend_link`。
 
-- [ ] 修改 `m3-preflight-review.md`：
+- [x] 修改 `m3-preflight-review.md`：
 
 - 增加 2026-06-14 站点配置纵向切片记录。
 - 说明无新 Flyway、H2 并发通过、Docker 条件测试状态。
 
 ### Step 6：更新设计和计划实施证据
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 git log -4 --format="%h %s"
@@ -1184,7 +1191,7 @@ git log -4 --format="%h %s"
 
 ### Step 7：运行全量验证
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 git diff --check
@@ -1202,7 +1209,7 @@ mvn clean test
 
 ### Step 8：最终静态审查
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 rg -n "@(Select|Update|Insert|Delete)" MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system
@@ -1220,7 +1227,7 @@ git status --short
 
 ### Step 9：提交 Task 5
 
-- [ ] 将所有 Task 步骤标记完成，然后提交：
+- [x] 将所有 Task 步骤标记完成，然后提交：
 
 ```powershell
 git add MyBlog-springboot-v2/src/test docs/project-handbook docs/superpowers/specs/2026-06-14-backend-v2-site-config-design.md docs/superpowers/plans/2026-06-14-backend-v2-site-config.md
@@ -1229,7 +1236,7 @@ git commit -m "完成站点配置纵向切片"
 
 ### Step 10：最终确认
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 git status --short
@@ -1245,20 +1252,20 @@ git log -5 --oneline
 
 ## 完成标准
 
-- [ ] `system` 四层模块真实建立并通过 ArchUnit。
-- [ ] `GET /api/public/site-config?lang=zh|ja|en` 匿名可用。
-- [ ] 日英展示字段为空时逐字段回退中文。
-- [ ] `GET /api/admin/site-config` 允许 ADMIN、DEMO。
-- [ ] `PUT /api/admin/site-config` 仅允许 ADMIN。
-- [ ] PUT 的 13 个业务字段必须全部出现。
-- [ ] 可选字段支持 null / 空白清空。
-- [ ] Markdown 原文保留，纯空白清空，单语最大 50,000。
-- [ ] URL 仅接受绝对 HTTP / HTTPS。
-- [ ] Spotify ID 只接受字母、数字、下划线、连字符。
-- [ ] 更新使用固定行锁和完整单条 XML UPDATE。
-- [ ] 并发 PUT 不产生字段混合。
-- [ ] 固定配置行缺失不自动补建，返回 `500 + 99999`。
-- [ ] 无新增 Flyway、注解 SQL、配置缓存和 Markdown 渲染依赖。
-- [ ] OpenAPI 不暴露内部 presence 类型和审计删除字段。
-- [ ] 五个 Task 分别形成中文本地提交。
-- [ ] 全量 Maven 测试和 `git diff --check` 通过。
+- [x] `system` 四层模块真实建立并通过 ArchUnit。
+- [x] `GET /api/public/site-config?lang=zh|ja|en` 匿名可用。
+- [x] 日英展示字段为空时逐字段回退中文。
+- [x] `GET /api/admin/site-config` 允许 ADMIN、DEMO。
+- [x] `PUT /api/admin/site-config` 仅允许 ADMIN。
+- [x] PUT 的 13 个业务字段必须全部出现。
+- [x] 可选字段支持 null / 空白清空。
+- [x] Markdown 原文保留，纯空白清空，单语最大 50,000。
+- [x] URL 仅接受绝对 HTTP / HTTPS。
+- [x] Spotify ID 只接受字母、数字、下划线、连字符。
+- [x] 更新使用固定行锁和完整单条 XML UPDATE。
+- [x] 并发 PUT 不产生字段混合。
+- [x] 固定配置行缺失不自动补建，返回 `500 + 99999`。
+- [x] 无新增 Flyway、注解 SQL、配置缓存和 Markdown 渲染依赖。
+- [x] OpenAPI 不暴露内部 presence 类型和审计删除字段。
+- [x] 五个 Task 分别形成中文本地提交。
+- [x] 全量 Maven 测试和 `git diff --check` 通过。

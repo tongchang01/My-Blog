@@ -1,6 +1,6 @@
 # Backend V2 站点配置设计
 
-> **状态：已确认，待实施（2026-06-14）**
+> **状态：已实施（2026-06-14）**
 
 ## 1. 目标
 
@@ -261,6 +261,14 @@ SQL 只写在 Mapper XML 中，不使用 `@Select`、`@Update` 等注解 SQL。
 
 每批执行 RED、GREEN、定向回归和中文提交。
 
+实施提交：
+
+1. `a8f1194 建立站点配置领域与持久化读取`
+2. `a44a375 开放公开站点配置查询`
+3. `369dae1 开放后台站点配置读取`
+4. `3d69de3 实现站点配置全量更新`
+5. 集成契约与文档收尾由本轮最终提交承载
+
 ## 11. 验收标准
 
 - 三个接口按约定开放且权限正确。
@@ -274,3 +282,10 @@ SQL 只写在 Mapper XML 中，不使用 `@Select`、`@Update` 等注解 SQL。
 - 没有新增 Flyway、注解 SQL、配置缓存或 Markdown 渲染依赖。
 - 新代码有必要的中文业务注释。
 - 全量 Maven 测试和 `git diff --check` 通过。
+
+## 12. 实施验证
+
+- `mvn clean test`：329 tests，0 failures，0 errors，4 skipped。
+- 4 个 skipped 均为 Docker 不可用时的 Testcontainers MySQL 条件测试。
+- H2 行锁并发、真实 JWT HTTP 流程、Security 权限和 OpenAPI 契约均通过。
+- system 模块无注解 SQL、无配置正文日志，presence 类型未越过 Web 层。

@@ -10,7 +10,7 @@
 
 当前验证基线：
 
-- `mvn clean test`：108 tests，0 failures，0 errors，1 skipped（Docker 未启动时跳过 Testcontainers MySQL）
+- `mvn clean test`：329 tests，0 failures，0 errors，4 skipped（Docker 不可用时跳过 Testcontainers MySQL 条件测试）
 - Maven Enforcer：Java、Maven与依赖收敛通过
 - Flyway H2 烟测：14 张表全部创建
 - DDL 静态检查：0 外键、0 `TIMESTAMP`、0 `ON UPDATE`
@@ -286,7 +286,7 @@ mvn clean test
 - [x] 文档中的错误码、配置名、字段名与代码一致
 - [x] 工作区不存在本轮无关修改
 
-准入条件已满足，允许进入 M3。identity 后端纵向切片已收尾，下一步仍按小步提交推进 system 模块。
+准入条件已满足，允许进入 M3。identity 已收尾，system 的 `t_site_config` 已完成，下一步按小步提交推进 `t_attachment`。
 
 ## 8. 审查记录
 
@@ -306,3 +306,4 @@ mvn clean test
 | 2026-06-12 | 构建测试 SOP 已同步 | 对齐 profile 环境变量、H2 默认测试与可选 Testcontainers MySQL 验证 |
 | 2026-06-12 | 允许进入 M3 | P1 与文档准入项全部关闭，全量测试通过；剩余 P2 按对应业务能力首次落地前处理 |
 | 2026-06-14 | identity 后端收尾 | 当前用户改密已落地；密码、token version 与 refresh 撤销同事务，H2 并发通过；MySQL 条件测试因 Docker 不可用跳过 |
+| 2026-06-14 | system 站点配置纵向切片 | `t_site_config` 公开读取、后台读取和 ADMIN 全量更新已落地；未新增 Flyway，H2 行锁并发测试通过；全量 329 tests 通过，4 个 Docker 条件测试跳过 |
