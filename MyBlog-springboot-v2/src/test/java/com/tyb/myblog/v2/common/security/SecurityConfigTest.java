@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -43,6 +44,12 @@ class SecurityConfigTest {
         jdbcTemplate.update("delete from t_refresh_token");
         jdbcTemplate.update("delete from t_user_info");
         jdbcTemplate.update("delete from t_user_auth");
+        jdbcTemplate.update("delete from t_site_config");
+        jdbcTemplate.update("""
+                insert into t_site_config (
+                    id, site_title_zh, deleted
+                ) values (1, 'MyBlog', 0)
+                """);
     }
 
     @Test
@@ -178,6 +185,44 @@ class SecurityConfigTest {
     }
 
     @Test
+    void permitsOnlyAdminToUpdateSiteConfig() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(put("/api/admin/site-config")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(siteConfigRequest()))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/admin/site-config")
+                        .header("Authorization", "Bearer " + demoToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(siteConfigRequest()))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("10003"));
+        mockMvc.perform(put("/api/admin/site-config")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(siteConfigRequest()))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
+    void doesNotExtendDemoReadPermissionToOtherMethods() throws Exception {
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(post("/api/admin/site-config")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(patch("/api/admin/site-config")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(delete("/api/admin/site-config")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void requiresAuthenticationForCurrentProfileEndpoints() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
                 .andExpect(status().isUnauthorized())
@@ -267,5 +312,25 @@ class SecurityConfigTest {
                         List.of(role),
                         0)
                 .accessToken();
+    }
+
+    private String siteConfigRequest() {
+        return """
+                {
+                  "siteTitleZh":"MyBlog",
+                  "siteTitleJa":null,
+                  "siteTitleEn":"My Blog",
+                  "siteSubtitleZh":"中文副标题",
+                  "siteSubtitleJa":null,
+                  "siteSubtitleEn":null,
+                  "aboutMdZh":"# 关于我",
+                  "aboutMdJa":null,
+                  "aboutMdEn":null,
+                  "logoUrl":"https://example.com/logo.png",
+                  "faviconUrl":null,
+                  "icpNo":null,
+                  "spotifyPlaylistId":"playlist_123"
+                }
+                """;
     }
 }

@@ -800,7 +800,7 @@ git commit -m "开放后台站点配置读取"
 
 ### Step 1：写更新应用服务失败测试
 
-- [ ] 新建 `SiteConfigUpdateServiceTest.java`，覆盖：
+- [x] 新建 `SiteConfigUpdateServiceTest.java`，覆盖：
 
 - ADMIN 成功更新并返回重新读取的数据库结果。
 - DEMO 返回 `FORBIDDEN`。
@@ -822,7 +822,7 @@ Clock clock = Clock.fixed(
 
 ### Step 2：写请求 presence 和 Controller 失败测试
 
-- [ ] 在 `AdminSiteConfigControllerTest.java` 增加：
+- [x] 在 `AdminSiteConfigControllerTest.java` 增加：
 
 - 13 个字段全部出现时调用更新服务。
 - 任意一个字段缺失返回 `400 + 90001`。
@@ -852,7 +852,7 @@ Clock clock = Clock.fixed(
 
 ### Step 3：写 Repository 更新测试
 
-- [ ] 扩展 `DatabaseSiteConfigRepositoryTest.java`：
+- [x] 扩展 `DatabaseSiteConfigRepositoryTest.java`：
 
 - 完整更新 13 个字段。
 - null 字段真实写为 SQL NULL。
@@ -861,7 +861,7 @@ Clock clock = Clock.fixed(
 
 ### Step 4：写并发失败测试
 
-- [ ] 新建 `SiteConfigUpdateConcurrencyTest.java`。
+- [x] 新建 `SiteConfigUpdateConcurrencyTest.java`。
 
 参考已有 `CurrentUserProfileUpdateConcurrencyTest`，使用：
 
@@ -875,7 +875,7 @@ Clock clock = Clock.fixed(
 
 ### Step 5：运行测试确认 RED
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=SiteConfigUpdateServiceTest,AdminSiteConfigControllerTest,DatabaseSiteConfigRepositoryTest,SiteConfigUpdateConcurrencyTest" test
@@ -885,7 +885,7 @@ mvn "-Dtest=SiteConfigUpdateServiceTest,AdminSiteConfigControllerTest,DatabaseSi
 
 ### Step 6：实现更新命令
 
-- [ ] 新建 `UpdateSiteConfigCommand.java`：
+- [x] 新建 `UpdateSiteConfigCommand.java`：
 
 ```java
 public record UpdateSiteConfigCommand(
@@ -927,7 +927,7 @@ public record UpdateSiteConfigCommand(
 
 ### Step 7：实现事务更新服务
 
-- [ ] 新建 `SiteConfigUpdateService.java`：
+- [x] 新建 `SiteConfigUpdateService.java`：
 
 ```java
 @Slf4j
@@ -976,7 +976,7 @@ public class SiteConfigUpdateService {
 
 ### Step 8：实现 PUT presence 请求
 
-- [ ] 新建 `SubmittedField.java`：
+- [x] 新建 `SubmittedField.java`：
 
 ```java
 record SubmittedField<T>(boolean present, T value) {
@@ -992,7 +992,7 @@ record SubmittedField<T>(boolean present, T value) {
 
 该类型保持 package-private，只服务 system Web 请求解析。
 
-- [ ] 新建 `UpdateSiteConfigRequest.java`：
+- [x] 新建 `UpdateSiteConfigRequest.java`：
 
 - 13 个字段都初始化为 `SubmittedField.absent()`。
 - 每个字段有一个 `@JsonSetter`，写为 `SubmittedField.of(value)`。
@@ -1009,7 +1009,7 @@ throw new ApiException(
 
 检查通过后构造只含普通字符串的 `UpdateSiteConfigCommand`。
 
-- [ ] 新建 `UpdateSiteConfigOpenApiRequest.java`。
+- [x] 新建 `UpdateSiteConfigOpenApiRequest.java`。
 
 `siteTitleZh`：
 
@@ -1031,7 +1031,7 @@ String siteTitleJa
 
 ### Step 9：扩展后台 Controller
 
-- [ ] 在 `AdminSiteConfigController` 注入 `SiteConfigUpdateService`，增加：
+- [x] 在 `AdminSiteConfigController` 注入 `SiteConfigUpdateService`，增加：
 
 ```java
 @Operation(
@@ -1051,7 +1051,7 @@ public ApiResponse<AdminSiteConfigVO> update(
 
 ### Step 10：补 Security 更新边界测试
 
-- [ ] 扩展 `SecurityConfigTest`：
+- [x] 扩展 `SecurityConfigTest`：
 
 - ADMIN PUT 返回业务层结果。
 - DEMO PUT 返回 `403 + 10003`。
@@ -1060,7 +1060,7 @@ public ApiResponse<AdminSiteConfigVO> update(
 
 ### Step 11：运行定向回归确认 GREEN
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=SiteConfigTest,DatabaseSiteConfigRepositoryTest,SiteConfigUpdateServiceTest,SiteConfigUpdateConcurrencyTest,AdminSiteConfigControllerTest,SecurityConfigTest,ArchitectureRulesTest" test
@@ -1070,7 +1070,7 @@ mvn "-Dtest=SiteConfigTest,DatabaseSiteConfigRepositoryTest,SiteConfigUpdateServ
 
 ### Step 12：静态检查并提交
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 rg -n "@(Select|Update|Insert|Delete)" MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system
@@ -1080,7 +1080,7 @@ git diff --check
 
 预期：无注解 SQL，无配置正文日志，diff 检查通过。
 
-- [ ] 提交：
+- [x] 提交：
 
 ```powershell
 git add MyBlog-springboot-v2/src/main MyBlog-springboot-v2/src/test docs/superpowers/plans/2026-06-14-backend-v2-site-config.md

@@ -4,6 +4,7 @@ import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
 import com.tyb.myblog.v2.system.application.siteconfig.AdminSiteConfigQueryService;
 import com.tyb.myblog.v2.system.application.siteconfig.AdminSiteConfigResult;
+import com.tyb.myblog.v2.system.application.siteconfig.SiteConfigUpdateService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,8 +21,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,6 +41,9 @@ class AdminSiteConfigControllerTest {
 
     @MockitoBean
     private AdminSiteConfigQueryService queryService;
+
+    @MockitoBean
+    private SiteConfigUpdateService updateService;
 
     private AuthenticatedPrincipal principal;
 
@@ -84,6 +90,93 @@ class AdminSiteConfigControllerTest {
                 .andExpect(jsonPath("$.data.updatedBy").value(1001));
 
         verify(queryService).query(principal);
+    }
+
+    @Test
+    void acceptsCompletePutAndPreservesExplicitNullAndBlankValues()
+            throws Exception {
+        when(updateService.update(
+                org.mockito.ArgumentMatchers.eq(principal),
+                org.mockito.ArgumentMatchers.any()))
+                .thenReturn(result());
+
+        mockMvc.perform(put("/api/admin/site-config")
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .content(completeRequest()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("00000"));
+
+        verify(updateService).update(
+                org.mockito.ArgumentMatchers.eq(principal),
+                org.mockito.ArgumentMatchers.argThat(command ->
+                        "MyBlog".equals(command.siteTitleZh())
+                                && command.siteTitleJa() == null
+                                && " ".equals(command.siteSubtitleJa())
+                                && command.faviconUrl() == null));
+    }
+
+    @Test
+    void rejectsPutWhenAnyRequiredJsonFieldIsMissing() throws Exception {
+        mockMvc.perform(put("/api/admin/site-config")
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .content(requestWithoutSpotifyPlaylistId()))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
+
+        verifyNoInteractions(updateService);
+    }
+
+    @Test
+    void rejectsUnknownPutField() throws Exception {
+        mockMvc.perform(put("/api/admin/site-config")
+                        .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+                        .content(completeRequest().replace(
+                                "\"spotifyPlaylistId\":\"playlist_123\"",
+                                "\"spotifyPlaylistId\":\"playlist_123\","
+                                        + "\"unknown\":\"value\"")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
+
+        verifyNoInteractions(updateService);
+    }
+
+    private String completeRequest() {
+        return """
+                {
+                  "siteTitleZh":"MyBlog",
+                  "siteTitleJa":null,
+                  "siteTitleEn":"My Blog",
+                  "siteSubtitleZh":"中文副标题",
+                  "siteSubtitleJa":" ",
+                  "siteSubtitleEn":null,
+                  "aboutMdZh":"# 关于我",
+                  "aboutMdJa":null,
+                  "aboutMdEn":null,
+                  "logoUrl":"https://example.com/logo.png",
+                  "faviconUrl":null,
+                  "icpNo":null,
+                  "spotifyPlaylistId":"playlist_123"
+                }
+                """;
+    }
+
+    private String requestWithoutSpotifyPlaylistId() {
+        return """
+                {
+                  "siteTitleZh":"MyBlog",
+                  "siteTitleJa":null,
+                  "siteTitleEn":"My Blog",
+                  "siteSubtitleZh":"中文副标题",
+                  "siteSubtitleJa":" ",
+                  "siteSubtitleEn":null,
+                  "aboutMdZh":"# 关于我",
+                  "aboutMdJa":null,
+                  "aboutMdEn":null,
+                  "logoUrl":"https://example.com/logo.png",
+                  "faviconUrl":null,
+                  "icpNo":null
+                }
+                """;
     }
 
     private AdminSiteConfigResult result() {

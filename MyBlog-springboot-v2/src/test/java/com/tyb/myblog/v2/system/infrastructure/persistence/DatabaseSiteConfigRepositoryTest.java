@@ -85,6 +85,60 @@ class DatabaseSiteConfigRepositoryTest {
         assertThat(locked).isEmpty();
     }
 
+    @Test
+    void fullyUpdatesBusinessAndAuditFieldsIncludingSqlNull() {
+        LocalDateTime updatedAt = LocalDateTime.of(2026, 6, 14, 12, 0);
+        SiteConfig updated = SiteConfig.create(
+                1L,
+                "新标题",
+                null,
+                "New title",
+                "新副标题",
+                null,
+                null,
+                "# 新的关于我",
+                null,
+                null,
+                "https://example.com/new-logo.png",
+                null,
+                null,
+                "new_playlist",
+                UPDATED_AT,
+                1001L);
+
+        assertThat(repository.update(updated, updatedAt, 2002L)).isTrue();
+
+        assertThat(repository.findActive()).contains(
+                SiteConfig.create(
+                        1L,
+                        "新标题",
+                        null,
+                        "New title",
+                        "新副标题",
+                        null,
+                        null,
+                        "# 新的关于我",
+                        null,
+                        null,
+                        "https://example.com/new-logo.png",
+                        null,
+                        null,
+                        "new_playlist",
+                        updatedAt,
+                        2002L));
+    }
+
+    @Test
+    void refusesToUpdateDeletedConfiguration() {
+        jdbcTemplate.update(
+                "UPDATE t_site_config SET deleted = 1 WHERE id = 1");
+
+        assertThat(repository.update(
+                expected(),
+                LocalDateTime.of(2026, 6, 14, 12, 0),
+                2002L)).isFalse();
+    }
+
     private SiteConfig expected() {
         return SiteConfig.create(
                 1L,
