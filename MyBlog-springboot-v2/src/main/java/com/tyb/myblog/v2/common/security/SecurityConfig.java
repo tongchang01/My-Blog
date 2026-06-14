@@ -75,6 +75,11 @@ public class SecurityConfig {
                                     HttpMethod.GET,
                                     "/api/admin/site-config")
                             .hasAnyRole("ADMIN", "DEMO")
+                            .requestMatchers(
+                                    HttpMethod.GET,
+                                    "/api/admin/attachments",
+                                    "/api/admin/attachments/*")
+                            .hasAnyRole("ADMIN", "DEMO")
                             .requestMatchers("/api/admin/**").hasRole("ADMIN")
                             .anyRequest().authenticated();
                 })

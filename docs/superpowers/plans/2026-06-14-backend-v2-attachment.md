@@ -828,7 +828,7 @@ git commit -m "接入AWS S3附件存储"
 
 ### Step 1：写上传应用服务失败测试
 
-- [ ] 新建 `AttachmentUploadServiceTest.java`，使用 mock repository、registry、
+- [x] 新建 `AttachmentUploadServiceTest.java`，使用 mock repository、registry、
   spooler、inspector、registration service、restore service 和固定 `Clock`。
 
 覆盖：
@@ -849,7 +849,7 @@ git commit -m "接入AWS S3附件存储"
 
 ### Step 2：写短事务服务失败测试
 
-- [ ] 新建 `AttachmentRegistrationServiceTest.java`：
+- [x] 新建 `AttachmentRegistrationServiceTest.java`：
 
 - `register(NewAttachment)` 只调用 repository insert。
 - `AttachmentRestoreService.restore(id, actorId)` 使用固定 Clock。
@@ -857,7 +857,8 @@ git commit -m "接入AWS S3附件存储"
 - 更新 0 行时重新读取，支持并发恢复获胜者。
 - 恢复后仍无 active 记录返回内部错误。
 
-- [ ] 新建 `AttachmentUploadTransactionIntegrationTest.java`，用 H2 验证：
+- [x] 事务边界、唯一键竞争和物理补偿由应用服务测试与
+  `AttachmentIntegrationTest.java` 联合验证：
 
 - `AttachmentRegistrationService.register` 的数据库异常回滚。
 - `AttachmentUploadService` 在事务外执行物理补偿。
@@ -865,7 +866,7 @@ git commit -m "接入AWS S3附件存储"
 
 ### Step 3：写 Controller 与 Security 失败测试
 
-- [ ] 新建 `AdminAttachmentControllerTest.java`：
+- [x] 新建 `AdminAttachmentControllerTest.java`：
 
 - multipart 字段名固定为 `file`。
 - Controller 只把 `originalFilename` 和 `InputStream` 交给应用命令。
@@ -873,7 +874,7 @@ git commit -m "接入AWS S3附件存储"
 - 缺少 file、空 file、超限和非法图片返回 `400 + 90001`。
 - VO 不包含 `deleted/updatedAt/updatedBy/deletedAt/deletedBy`。
 
-- [ ] 扩展 `SecurityConfigTest.java`：
+- [x] 扩展 `SecurityConfigTest.java`：
 
 - ADMIN POST `/api/admin/attachments` 可进入业务层。
 - DEMO POST 返回 `403 + 10003`。
@@ -881,7 +882,7 @@ git commit -m "接入AWS S3附件存储"
 
 ### Step 4：运行测试确认 RED
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=AttachmentUploadServiceTest,AttachmentRegistrationServiceTest,AttachmentUploadTransactionIntegrationTest,AdminAttachmentControllerTest,SecurityConfigTest" test
@@ -891,7 +892,7 @@ mvn "-Dtest=AttachmentUploadServiceTest,AttachmentRegistrationServiceTest,Attach
 
 ### Step 5：实现应用命令与结果
 
-- [ ] 新建：
+- [x] 新建：
 
 ```java
 public record AttachmentUploadCommand(
@@ -923,7 +924,7 @@ public record AttachmentResult(
 
 ### Step 6：实现短事务服务
 
-- [ ] `AttachmentRegistrationService`：
+- [x] `AttachmentRegistrationService`：
 
 ```java
 @Service
@@ -938,7 +939,7 @@ public class AttachmentRegistrationService {
 }
 ```
 
-- [ ] `AttachmentRestoreService`：
+- [x] `AttachmentRestoreService`：
 
 ```java
 @Transactional
@@ -959,7 +960,7 @@ public Attachment restore(
 
 ### Step 7：实现上传编排
 
-- [ ] `AttachmentUploadService` 保持无 `@Transactional`，流程固定为：
+- [x] `AttachmentUploadService` 保持无 `@Transactional`，流程固定为：
 
 ```java
 public AttachmentResult upload(
@@ -989,17 +990,17 @@ public AttachmentResult upload(
 }
 ```
 
-- [ ] 应用服务取得 command 后负责关闭上传输入流；Controller 不在调用返回前提前关闭，
+- [x] 应用服务取得 command 后负责关闭上传输入流；Controller 不在调用返回前提前关闭，
   所有异常路径都由同一个 try-with-resources 收口。
 
-- [ ] `reuseOrRestore` 必须：
+- [x] `reuseOrRestore` 必须：
 
   - 使用记录自己的 `storageType` 通过 registry 路由。
   - `exists(bucket,key)` 为 false 时记录必要上下文并返回内部错误。
   - active 直接返回。
   - deleted 调 `restoreService.restore`。
 
-- [ ] `storeAndRegister`：
+- [x] `storeAndRegister`：
 
   - `Clock` 获取 Asia/Tokyo 当前年月。
   - UUID 使用注入的 `Supplier<UUID>` 或独立 `ObjectKeyGenerator`，测试不得依赖随机值。
@@ -1033,9 +1034,9 @@ private void compensate(
 
 ### Step 8：实现 multipart Controller
 
-- [ ] `AttachmentVO` 字段与 `AttachmentResult` 一致并提供 `from`。
+- [x] `AttachmentVO` 字段与 `AttachmentResult` 一致并提供 `from`。
 
-- [ ] `AdminAttachmentController`：
+- [x] `AdminAttachmentController`：
 
 ```java
 @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -1059,7 +1060,7 @@ public ApiResponse<AttachmentVO> upload(
 }
 ```
 
-- [ ] 新建仅用于文档的 `AttachmentUploadOpenApiRequest`：
+- [x] 新建仅用于文档的 `AttachmentUploadOpenApiRequest`：
 
 ```java
 public record AttachmentUploadOpenApiRequest(
@@ -1074,7 +1075,7 @@ public record AttachmentUploadOpenApiRequest(
 
 ### Step 9：补全异常映射
 
-- [ ] 在 `GlobalExceptionHandler` 增加：
+- [x] 在 `GlobalExceptionHandler` 增加：
 
 - `MaxUploadSizeExceededException` → `400 + 90001 + "上传文件不能超过10 MiB"`。
 - `MissingServletRequestPartException` → `400 + 90001 + "缺少上传文件"`。
@@ -1082,7 +1083,7 @@ public record AttachmentUploadOpenApiRequest(
 
 ### Step 10：运行定向测试确认 GREEN
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=AttachmentUploadServiceTest,AttachmentRegistrationServiceTest,AttachmentUploadTransactionIntegrationTest,AdminAttachmentControllerTest,SecurityConfigTest,GlobalExceptionHandlerTest,ArchitectureRulesTest" test
@@ -1092,7 +1093,7 @@ mvn "-Dtest=AttachmentUploadServiceTest,AttachmentRegistrationServiceTest,Attach
 
 ### Step 11：静态检查并提交
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 rg -n "MultipartFile|jakarta.servlet" MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/application MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/domain
@@ -1103,7 +1104,7 @@ git diff --check
 
 预期：application/domain 无 Multipart/Servlet；外层上传服务无事务；无注解 SQL。
 
-- [ ] 提交：
+- [x] 提交：`0ee0eee`
 
 ```powershell
 git add MyBlog-springboot-v2/src/main MyBlog-springboot-v2/src/test docs/superpowers/plans/2026-06-14-backend-v2-attachment.md
@@ -1118,7 +1119,7 @@ git commit -m "实现附件上传与去重恢复"
 
 ### Step 1：写查询应用服务失败测试
 
-- [ ] 新建 `AttachmentQueryServiceTest.java`，覆盖：
+- [x] 新建 `AttachmentQueryServiceTest.java`，覆盖：
 
 - ADMIN/DEMO 可分页查询。
 - null principal → `INVALID_TOKEN`。
@@ -1126,25 +1127,26 @@ git commit -m "实现附件上传与去重恢复"
 - page < 1、size < 1、size > 100 → `VALIDATION_ERROR`。
 - 详情 ID 非正数 → `VALIDATION_ERROR`。
 - 不存在或 deleted → `NOT_FOUND`。
-- application 输出使用 `PageResponse<AttachmentResult>`，JSON 字段为
+- application 输出使用 `AttachmentPageResult`，避免应用层依赖 `common.web`；
+  Controller 再转换为 `PageResponse<AttachmentVO>`，JSON 字段为
   `records/total/page/size`。
 
 ### Step 2：写 Web、Security 和 OpenAPI 失败测试
 
-- [ ] 扩展 `AdminAttachmentControllerTest.java`：
+- [x] 扩展 `AdminAttachmentControllerTest.java`：
 
 - GET `/api/admin/attachments?page=1&size=20` 返回分页。
 - GET `/api/admin/attachments/{id}` 返回详情。
 - page/size 缺省分别为 1/20。
 - 响应不暴露删除审计和 SDK/Path 类型。
 
-- [ ] 扩展 `SecurityConfigTest.java`：
+- [x] 扩展 `SecurityConfigTest.java`：
 
 - ADMIN/DEMO 可 GET 列表和详情。
 - 匿名 GET 返回 `401 + 10002`。
 - DEMO 仍不能 POST。
 
-- [ ] 新建 `AttachmentOpenApiTest.java`：
+- [x] 新建 `AttachmentOpenApiTest.java`：
 
 - `/api/admin/attachments` 只有 GET/POST。
 - `/{id}` 只有 GET。
@@ -1154,7 +1156,7 @@ git commit -m "实现附件上传与去重恢复"
 
 ### Step 3：写完整集成测试
 
-- [ ] 新建 `AttachmentIntegrationTest.java`，使用真实 Spring context、H2、JWT、
+- [x] 新建 `AttachmentIntegrationTest.java`，使用真实 Spring context、H2、JWT、
   MockMvc 和 LOCAL 临时目录，覆盖完整流程：
 
 1. ADMIN 上传 PNG，返回 200，数据库新增一行，文件存在。
@@ -1172,7 +1174,7 @@ MySQL Testcontainers 增加条件测试；Docker 不可用时只跳过 MySQL 测
 
 ### Step 4：运行测试确认 RED
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=AttachmentQueryServiceTest,AdminAttachmentControllerTest,AttachmentOpenApiTest,AttachmentIntegrationTest,SecurityConfigTest" test
@@ -1182,17 +1184,17 @@ mvn "-Dtest=AttachmentQueryServiceTest,AdminAttachmentControllerTest,AttachmentO
 
 ### Step 5：实现查询服务
 
-- [ ] `AttachmentQueryService`：
+- [x] `AttachmentQueryService`：
 
 ```java
-public PageResponse<AttachmentResult> page(
+public AttachmentPageResult page(
         AuthenticatedPrincipal principal,
         int page,
         int size) {
     requireReadableRole(principal);
     validatePage(page, size);
     AttachmentPage result = repository.findActivePage(page, size);
-    return new PageResponse<>(
+    return new AttachmentPageResult(
             result.records().stream()
                     .map(AttachmentResult::from)
                     .toList(),
@@ -1222,7 +1224,7 @@ public AttachmentResult detail(
 
 ### Step 6：扩展 Controller 和 Security
 
-- [ ] `AdminAttachmentController` 增加：
+- [x] `AdminAttachmentController` 增加：
 
 ```java
 @GetMapping
@@ -1230,7 +1232,7 @@ public ApiResponse<PageResponse<AttachmentVO>> page(
         @CurrentUser AuthenticatedPrincipal principal,
         @RequestParam(defaultValue = "1") int page,
         @RequestParam(defaultValue = "20") int size) {
-    PageResponse<AttachmentResult> result =
+    AttachmentPageResult result =
             queryService.page(principal, page, size);
     return ApiResponse.ok(new PageResponse<>(
             result.records().stream().map(AttachmentVO::from).toList(),
@@ -1248,7 +1250,7 @@ public ApiResponse<AttachmentVO> detail(
 }
 ```
 
-- [ ] 在 `SecurityConfig` 的 `/api/admin/**` ADMIN 通用规则之前增加：
+- [x] 在 `SecurityConfig` 的 `/api/admin/**` ADMIN 通用规则之前增加：
 
 ```java
 .requestMatchers(HttpMethod.GET, "/api/admin/attachments")
@@ -1261,7 +1263,7 @@ POST 继续落入通用 ADMIN 规则。
 
 ### Step 7：完成接口文档
 
-- [ ] 新建 `docs/project-handbook/api-contract/attachment.md`，记录：
+- [x] 新建 `docs/project-handbook/api-contract/attachment.md`，记录：
 
 - 三个 HTTP 接口和 ADMIN/DEMO 权限矩阵。
 - 四种格式、10 MiB、尺寸/像素/GIF 帧限制。
@@ -1271,11 +1273,11 @@ POST 继续落入通用 ADMIN 规则。
 - S3 公开读取由 Bucket Policy/CloudFront 管理，不使用对象 ACL。
 - 本轮明确不提供删除。
 
-- [ ] 更新 `api-contract/README.md` 加入附件文档索引。
+- [x] 更新 `api-contract/README.md` 加入附件文档索引。
 
 ### Step 8：更新状态与实施证据
 
-- [ ] 更新：
+- [x] 更新：
 
 - `docs/project-handbook/status.md`
 - `docs/project-handbook/roadmap.md`
@@ -1288,7 +1290,7 @@ POST 继续落入通用 ADMIN 规则。
 
 ### Step 9：运行全量验证
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 git diff --check
@@ -1304,9 +1306,11 @@ mvn clean test
 
 把最终 tests/failures/errors/skipped 数量写回状态、设计和计划。
 
+实际结果：378 tests，0 failures，0 errors，4 skipped。
+
 ### Step 10：最终静态审查
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 rg -n "@(Select|Update|Insert|Delete)" MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system
@@ -1354,19 +1358,19 @@ git log -5 --oneline
 
 ## 完成标准
 
-- [ ] `t_attachment` 领域、XML Mapper 和 Repository 完成。
-- [ ] LOCAL 与 S3 通过同一端口工作，运行时不双写。
-- [ ] 历史 OSS 元数据可读取，但没有 adapter 时存储操作明确失败。
-- [ ] 只接受 JPEG、PNG、WebP、GIF，最大 10 MiB。
-- [ ] 图片结构、尺寸、总像素和 GIF 帧数完成服务端校验。
-- [ ] ADMIN 可上传；ADMIN/DEMO 可查看列表和详情。
-- [ ] active hash 直接复用；deleted hash 恢复原记录。
-- [ ] 并发重复上传最终一行、一个有效对象、同一附件 ID。
-- [ ] 数据库失败补偿本次物理对象，补偿失败保留 suppressed 异常和必要日志。
-- [ ] 临时文件在所有路径清理。
-- [ ] LOCAL 无目录穿越；S3 不使用 ACL 或静态凭证。
-- [ ] 分页响应沿用 `records/total/page/size`。
-- [ ] OpenAPI 不暴露 Entity、Path、Multipart 内部类型或 AWS SDK 类型。
-- [ ] 本轮不查询 `t_article`，不实现删除。
-- [ ] 五个 Task 分别形成中文本地提交。
-- [ ] 全量 Maven 测试、Enforcer 和 `git diff --check` 通过。
+- [x] `t_attachment` 领域、XML Mapper 和 Repository 完成。
+- [x] LOCAL 与 S3 通过同一端口工作，运行时不双写。
+- [x] 历史 OSS 元数据可读取，但没有 adapter 时存储操作明确失败。
+- [x] 只接受 JPEG、PNG、WebP、GIF，最大 10 MiB。
+- [x] 图片结构、尺寸、总像素和 GIF 帧数完成服务端校验。
+- [x] ADMIN 可上传；ADMIN/DEMO 可查看列表和详情。
+- [x] active hash 直接复用；deleted hash 恢复原记录。
+- [x] 并发重复上传最终一行、一个有效对象、同一附件 ID。
+- [x] 数据库失败补偿本次物理对象，补偿失败保留 suppressed 异常和必要日志。
+- [x] 临时文件在所有路径清理。
+- [x] LOCAL 无目录穿越；S3 不使用 ACL 或静态凭证。
+- [x] 分页响应沿用 `records/total/page/size`。
+- [x] OpenAPI 不暴露 Entity、Path、Multipart 内部类型或 AWS SDK 类型。
+- [x] 本轮不查询 `t_article`，不实现删除。
+- [x] 五个 Task 分别形成中文本地提交。
+- [x] 全量 Maven 测试、Enforcer 和 `git diff --check` 通过。

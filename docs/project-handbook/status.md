@@ -64,14 +64,19 @@ M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，iden
 - identity 后端模块已完成
 - system 模块已建立四层结构，`t_site_config` 纵向切片已完成：匿名三语公开读取、ADMIN / DEMO 后台完整读取、ADMIN 全量更新
 - 站点配置 PUT 要求 13 个业务字段全部出现；字段规范化、固定行异常、XML 完整更新、行锁串行和 OpenAPI presence 隔离均已验收
-- 当前基线：`mvn clean test` 通过（329 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
+- `t_attachment` 纵向切片已完成：ADMIN 上传，ADMIN / DEMO 分页和详情查询，响应使用 `records/total/page/size`
+- 附件只接受 JPEG、PNG、WebP、GIF，最大 10 MiB；服务端识别真实格式并限制尺寸、总像素与 GIF 帧数
+- LOCAL 与 AWS S3 通过统一存储端口切换；S3 使用默认凭证链，不配置静态凭证或对象 ACL
+- 相同 hash 的 active 附件直接复用，deleted 附件恢复原记录；物理对象缺失返回内部错误
+- 真实 H2 / JWT / LOCAL 集成测试已覆盖上传、去重、恢复、权限、非法图片和并发收敛；并发结果为一行一个对象
+- 当前基线：`mvn clean test` 通过（378 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
 
-**当前处置方案**：identity 已收尾，system 的 `t_site_config` 已完成，继续按 `t_attachment` → `t_friend_link` → content → comment → stats / common-infra 推进。
+**当前处置方案**：identity 已收尾，system 的 `t_site_config`、`t_attachment` 已完成，继续按 `t_friend_link` → content → comment → stats / common-infra 推进。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. 设计并实现 system 的 `t_attachment` 纵向切片
-2. 继续完成 system 的 `t_friend_link`，再进入 content → comment → stats / common-infra
+1. 设计并实现 system 的 `t_friend_link` 纵向切片
+2. 进入 content → comment → stats / common-infra
 3. 前台 / 后台前端骨架
 
 ## 4. 相关文档

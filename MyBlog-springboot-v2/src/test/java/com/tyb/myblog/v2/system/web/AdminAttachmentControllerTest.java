@@ -3,6 +3,8 @@ package com.tyb.myblog.v2.system.web;
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
 import com.tyb.myblog.v2.common.storage.StorageType;
+import com.tyb.myblog.v2.system.application.attachment.AttachmentPageResult;
+import com.tyb.myblog.v2.system.application.attachment.AttachmentQueryService;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentResult;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentUploadService;
 import org.junit.jupiter.api.AfterEach;
@@ -26,6 +28,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,6 +42,9 @@ class AdminAttachmentControllerTest {
 
     @MockitoBean
     private AttachmentUploadService uploadService;
+
+    @MockitoBean
+    private AttachmentQueryService queryService;
 
     private AuthenticatedPrincipal principal;
 
@@ -86,6 +92,34 @@ class AdminAttachmentControllerTest {
         mockMvc.perform(multipart("/api/admin/attachments"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("90001"));
+    }
+
+    @Test
+    void returnsPagedAttachmentsWithDefaultParameters() throws Exception {
+        when(queryService.page(principal, 1, 20))
+                .thenReturn(new AttachmentPageResult(
+                        List.of(result()), 1, 1, 20));
+
+        mockMvc.perform(get("/api/admin/attachments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].id").value(10))
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.page").value(1))
+                .andExpect(jsonPath("$.data.size").value(20))
+                .andExpect(jsonPath("$.data.records[0].deleted")
+                        .doesNotExist());
+    }
+
+    @Test
+    void returnsAttachmentDetail() throws Exception {
+        when(queryService.detail(principal, 10L))
+                .thenReturn(result());
+
+        mockMvc.perform(get("/api/admin/attachments/10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(10))
+                .andExpect(jsonPath("$.data.objectKey")
+                        .value("attachments/a.png"));
     }
 
     private AttachmentResult result() {

@@ -145,6 +145,27 @@ class SecurityConfigTest {
     }
 
     @Test
+    void permitsAdminAndDemoToReadAttachments() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+        insertAttachment(10L);
+
+        mockMvc.perform(get("/api/admin/attachments")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/attachments")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/attachments/10")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(10));
+        mockMvc.perform(get("/api/admin/attachments"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
     void permitsAdminToPatchCurrentProfile() throws Exception {
         String token = token(1001L, "admin", 1, "ADMIN");
 
@@ -352,5 +373,22 @@ class SecurityConfigTest {
                   "spotifyPlaylistId":"playlist_123"
                 }
                 """;
+    }
+
+    private void insertAttachment(long id) {
+        jdbcTemplate.update("""
+                insert into t_attachment (
+                    id, storage_type, bucket, object_key, public_url,
+                    content_type, file_size, width, height,
+                    original_filename, hash_sha256,
+                    created_at, created_by, updated_at, updated_by, deleted
+                ) values (?, 'LOCAL', 'local', ?, ?, 'image/png',
+                    128, 2, 3, 'cover.png', ?,
+                    current_timestamp, 1001, current_timestamp, 1001, 0)
+                """,
+                id,
+                "attachments/2026/06/" + id + ".png",
+                "http://localhost/media/" + id + ".png",
+                Long.toHexString(id).repeat(64).substring(0, 64));
     }
 }
