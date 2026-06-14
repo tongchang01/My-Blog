@@ -144,6 +144,60 @@ class DatabaseFriendLinkRepositoryTest {
                 .isEqualTo(now);
     }
 
+    @Test
+    void updatesStatusAndSortOrderOnlyForActiveRows() {
+        insert(101L, 1, 0, false);
+        insert(102L, 1, 0, true);
+        LocalDateTime now =
+                LocalDateTime.of(2026, 6, 14, 13, 0);
+
+        assertThat(repository.updateStatus(
+                101L, FriendLinkStatus.HIDDEN, now, 2001L))
+                .isTrue();
+        assertThat(repository.updateStatus(
+                102L, FriendLinkStatus.HIDDEN, now, 2001L))
+                .isFalse();
+        assertThat(repository.updateSortOrder(
+                101L, 30, now, 2001L)).isTrue();
+        assertThat(repository.updateSortOrder(
+                102L, 30, now, 2001L)).isFalse();
+        assertThat(jdbcTemplate.queryForMap("""
+                SELECT status, sort_order, updated_by
+                FROM t_friend_link WHERE id = 101
+                """))
+                .containsEntry("STATUS", 2)
+                .containsEntry("SORT_ORDER", 30)
+                .containsEntry("UPDATED_BY", 2001L);
+    }
+
+    @Test
+    void softDeletesWithCompleteAuditFieldsOnlyOnce() {
+        insert(101L, 1, 0, false);
+        LocalDateTime now =
+                LocalDateTime.of(2026, 6, 14, 13, 0);
+
+        assertThat(repository.softDelete(
+                101L, now, 2001L)).isTrue();
+        assertThat(repository.softDelete(
+                101L, now, 2001L)).isFalse();
+
+        assertThat(jdbcTemplate.queryForMap("""
+                SELECT deleted, deleted_by, updated_by
+                FROM t_friend_link WHERE id = 101
+                """))
+                .containsEntry("DELETED", 1)
+                .containsEntry("DELETED_BY", 2001L)
+                .containsEntry("UPDATED_BY", 2001L);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT deleted_at FROM t_friend_link WHERE id = 101",
+                LocalDateTime.class)).isEqualTo(now);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT updated_at FROM t_friend_link WHERE id = 101",
+                LocalDateTime.class)).isEqualTo(now);
+        assertThat(repository.findActiveById(101L)).isEmpty();
+        assertThat(repository.findPublicVisible()).isEmpty();
+    }
+
     private void insert(
             long id,
             int status,

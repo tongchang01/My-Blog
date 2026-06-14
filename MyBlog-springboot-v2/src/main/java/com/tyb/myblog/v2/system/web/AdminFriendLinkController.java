@@ -8,6 +8,9 @@ import com.tyb.myblog.v2.system.application.friendlink.FriendLinkPageResult;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkCreateService;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkQueryService;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkUpdateService;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkStatusService;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkSortService;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkDeleteService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -17,6 +20,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,6 +38,9 @@ public class AdminFriendLinkController {
     private final FriendLinkQueryService queryService;
     private final FriendLinkCreateService createService;
     private final FriendLinkUpdateService updateService;
+    private final FriendLinkStatusService statusService;
+    private final FriendLinkSortService sortService;
+    private final FriendLinkDeleteService deleteService;
 
     @GetMapping
     public ApiResponse<PageResponse<AdminFriendLinkVO>> page(
@@ -90,5 +98,37 @@ public class AdminFriendLinkController {
         return ApiResponse.ok(AdminFriendLinkVO.from(
                 updateService.update(
                         principal, id, request.toCommand())));
+    }
+
+    @PatchMapping("/{id:\\d+}/status")
+    public ApiResponse<AdminFriendLinkVO> updateStatus(
+            @CurrentUser AuthenticatedPrincipal principal,
+            @PathVariable long id,
+            @org.springframework.web.bind.annotation.RequestBody
+            UpdateFriendLinkStatusRequest request) {
+        return ApiResponse.ok(AdminFriendLinkVO.from(
+                statusService.update(
+                        principal, id, request.toCommand())));
+    }
+
+    @PutMapping("/sort-orders")
+    public ApiResponse<java.util.List<AdminFriendLinkVO>>
+            updateSortOrders(
+                    @CurrentUser AuthenticatedPrincipal principal,
+                    @org.springframework.web.bind.annotation.RequestBody
+                    UpdateFriendLinkSortOrdersRequest request) {
+        return ApiResponse.ok(sortService.update(
+                        principal, request.toCommand())
+                .stream()
+                .map(AdminFriendLinkVO::from)
+                .toList());
+    }
+
+    @DeleteMapping("/{id:\\d+}")
+    public ApiResponse<Void> delete(
+            @CurrentUser AuthenticatedPrincipal principal,
+            @PathVariable long id) {
+        deleteService.delete(principal, id);
+        return ApiResponse.ok(null);
     }
 }

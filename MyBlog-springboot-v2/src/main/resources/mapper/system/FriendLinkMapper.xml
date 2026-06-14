@@ -98,4 +98,34 @@
           AND deleted = 0
     </update>
 
+    <update id="updateStatus">
+        UPDATE t_friend_link
+        SET status = #{status},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <update id="updateSortOrder">
+        UPDATE t_friend_link
+        SET sort_order = #{sortOrder},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <!-- 软删除必须完整写入删除和更新审计，禁止调用通用 delete。 -->
+    <update id="softDelete">
+        UPDATE t_friend_link
+        SET deleted = 1,
+            deleted_at = #{deletedAt},
+            deleted_by = #{deletedBy},
+            updated_at = #{deletedAt},
+            updated_by = #{deletedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
 </mapper>

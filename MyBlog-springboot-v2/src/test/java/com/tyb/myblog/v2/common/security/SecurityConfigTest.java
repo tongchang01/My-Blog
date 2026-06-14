@@ -190,6 +190,32 @@ class SecurityConfigTest {
     }
 
     @Test
+    void permitsOnlyAdminToMutateFriendLinks() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+        insertFriendLink(10L);
+
+        mockMvc.perform(patch("/api/admin/friend-links/10/status")
+                        .header("Authorization", "Bearer " + demoToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"HIDDEN\"}"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/admin/friend-links/sort-orders")
+                        .header("Authorization", "Bearer " + demoToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"items\":[]}"))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(delete("/api/admin/friend-links/10")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(patch("/api/admin/friend-links/10/status")
+                        .header("Authorization", "Bearer " + adminToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"HIDDEN\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void permitsAdminToPatchCurrentProfile() throws Exception {
         String token = token(1001L, "admin", 1, "ADMIN");
 

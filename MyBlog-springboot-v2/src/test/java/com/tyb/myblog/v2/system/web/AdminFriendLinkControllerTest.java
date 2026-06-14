@@ -7,6 +7,9 @@ import com.tyb.myblog.v2.system.application.friendlink.FriendLinkCreateService;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkQueryService;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkResult;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkUpdateService;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkStatusService;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkSortService;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkDeleteService;
 import com.tyb.myblog.v2.system.domain.friendlink.FriendLinkStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,6 +32,8 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,6 +53,15 @@ class AdminFriendLinkControllerTest {
 
     @MockitoBean
     private FriendLinkUpdateService updateService;
+
+    @MockitoBean
+    private FriendLinkStatusService statusService;
+
+    @MockitoBean
+    private FriendLinkSortService sortService;
+
+    @MockitoBean
+    private FriendLinkDeleteService deleteService;
 
     private AuthenticatedPrincipal principal;
 
@@ -175,6 +189,38 @@ class AdminFriendLinkControllerTest {
                 .andExpect(jsonPath("$.code").value("90001"));
 
         verifyNoInteractions(createService, updateService);
+    }
+
+    @Test
+    void updatesStatusSortOrdersAndDeletes() throws Exception {
+        when(statusService.update(
+                org.mockito.ArgumentMatchers.eq(principal),
+                org.mockito.ArgumentMatchers.eq(10L),
+                org.mockito.ArgumentMatchers.any()))
+                .thenReturn(result());
+        when(sortService.update(
+                org.mockito.ArgumentMatchers.eq(principal),
+                org.mockito.ArgumentMatchers.any()))
+                .thenReturn(List.of(result()));
+
+        mockMvc.perform(patch("/api/admin/friend-links/10/status")
+                        .contentType(
+                                org.springframework.http.MediaType
+                                        .APPLICATION_JSON)
+                        .content("{\"status\":\"HIDDEN\"}"))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/admin/friend-links/sort-orders")
+                        .contentType(
+                                org.springframework.http.MediaType
+                                        .APPLICATION_JSON)
+                        .content("""
+                                {"items":[{"id":10,"sortOrder":1}]}
+                                """))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/admin/friend-links/10"))
+                .andExpect(status().isOk());
+
+        verify(deleteService).delete(principal, 10L);
     }
 
     private FriendLinkResult result() {
