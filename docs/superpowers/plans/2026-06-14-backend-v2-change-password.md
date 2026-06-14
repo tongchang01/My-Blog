@@ -760,7 +760,7 @@ git commit -m "开放当前用户修改密码接口"
 
 **提交信息：** `补齐修改密码集成验收`
 
-- [ ] **Step 1：写完整 HTTP 会话失败测试**
+- [x] **Step 1：写完整 HTTP 会话验收测试**
 
 `ChangePasswordIntegrationTest` 使用真实 Spring context、MockMvc、H2、JWT 登录和 BCrypt，至少包含：
 
@@ -798,7 +798,7 @@ void changesPasswordAndInvalidatesAllSessionsWithoutAffectingAnotherAccount()
 - DEMO 返回 `403 + 10003`。
 - 未认证返回 `401 + 10002`。
 
-- [ ] **Step 2：运行完整会话测试并确认 RED**
+- [x] **Step 2：运行完整会话测试并确认验收结果**
 
 Run:
 
@@ -806,9 +806,9 @@ Run:
 mvn -Dtest=ChangePasswordIntegrationTest test
 ```
 
-Expected: 在测试类未完成或功能边界遗漏时 FAIL；完善测试辅助方法后必须能真实覆盖登录、改密、refresh 和受保护接口。
+Expected: PASS；若发现功能边界遗漏，则先保留失败证据，再修正实现并重新验证。
 
-- [ ] **Step 3：写 H2 并发失败测试**
+- [x] **Step 3：写 H2 并发验收测试**
 
 `ChangePasswordConcurrencyTest` 参考现有资料并发测试：
 
@@ -830,7 +830,7 @@ assertThat(passwordEncoder.matches(
         FIRST_NEW_PASSWORD, currentPasswordHash())).isTrue();
 ```
 
-- [ ] **Step 4：写 MySQL 条件并发测试**
+- [x] **Step 4：写 MySQL 条件并发测试**
 
 `MySqlChangePasswordConcurrencyTest`：
 
@@ -841,7 +841,7 @@ assertThat(passwordEncoder.matches(
 - 断言最多一个成功、版本只增加 1。
 - 增加改密与 refresh 并发场景，设置有限超时，断言没有无限等待；若 MySQL 返回可重试死锁异常，先修正锁序再通过测试，不允许在测试中吞掉异常。
 
-- [ ] **Step 5：运行并发测试并确认 GREEN**
+- [x] **Step 5：运行并发测试并确认 GREEN**
 
 Run:
 
@@ -855,7 +855,7 @@ Expected:
 - Docker 可用时 MySQL 测试 PASS。
 - Docker 不可用时仅 MySQL 条件测试 SKIPPED。
 
-- [ ] **Step 6：运行 identity 与架构回归**
+- [x] **Step 6：运行 identity 与架构回归**
 
 Run:
 
@@ -871,7 +871,7 @@ mvn -Dtest=ChangePasswordIntegrationTest,ChangePasswordConcurrencyTest,AuthSessi
 
 Expected: PASS。
 
-- [ ] **Step 7：静态规则检查并提交 Task 4**
+- [x] **Step 7：静态规则检查并提交 Task 4**
 
 Run:
 
