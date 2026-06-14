@@ -1,7 +1,7 @@
 # 认证接口契约
 
 > 本文档是前后端对接认证接口的事实源。
-> 当前开放后台登录、refresh token 轮换和全端退出；当前用户资料接口尚未开放。
+> 当前开放后台登录、refresh token 轮换、全端退出和当前用户资料查询 / 编辑。
 
 ## 1. 通用约定
 
@@ -88,7 +88,7 @@ Content-Type: application/json
 }
 ```
 
-账号 username、role 和 `token_version` 会在刷新时重新读取，新的 access token 不沿用旧 JWT 中的账号快照。
+账号 username、type 和 `token_version` 会在刷新时重新读取，新的 access token 不沿用旧 JWT 中的账号快照。
 
 ## 4. 全端退出
 
@@ -117,7 +117,103 @@ Authorization: Bearer <access-token>
 
 缺少、无效或已失效的 access token 返回 HTTP 401、业务码 `10002`。
 
-## 5. 限流边界
+## 5. 查询当前用户资料
+
+```http
+GET /api/auth/me
+Authorization: Bearer <access-token>
+```
+
+ADMIN 和 DEMO 均可查询自己的账号与资料。接口不接受客户端传入的用户 ID。
+
+成功时返回 HTTP 200：
+
+```json
+{
+  "code": "00000",
+  "msg": "success",
+  "data": {
+    "id": 1001,
+    "username": "admin",
+    "type": "ADMIN",
+    "profile": {
+      "nickname": "TYB",
+      "avatarUrl": null,
+      "bioZh": "中文简介",
+      "bioJa": null,
+      "bioEn": null,
+      "location": "Tokyo",
+      "website": "https://example.com",
+      "emailPublic": null,
+      "githubUrl": null,
+      "twitterUrl": null,
+      "linkedinUrl": null,
+      "zhihuUrl": null,
+      "qiitaUrl": null,
+      "juejinUrl": null
+    }
+  }
+}
+```
+
+响应不会返回密码摘要、`tokenVersion`、登录失败次数、锁定时间或 refresh token。
+
+## 6. 编辑当前用户资料
+
+```http
+PATCH /api/auth/me/profile
+Authorization: Bearer <access-token>
+Content-Type: application/json
+```
+
+仅 ADMIN 可调用。DEMO 调用返回 `403 + 10003`。
+
+请求示例：
+
+```json
+{
+  "nickname": "TYB",
+  "bioZh": "新的中文简介",
+  "twitterUrl": null
+}
+```
+
+PATCH 字段语义：
+
+| 请求状态 | 行为 |
+|---|---|
+| 字段未出现 | 保持原值 |
+| 字段出现且有值 | 规范化并更新 |
+| 可选字段为 `null` 或空白字符串 | 清空为数据库 `NULL` |
+
+`nickname` 未出现时保持原值；出现时 trim 后必须非空。空请求体对象和未知字段均返回参数错误。
+
+| 字段 | 限制 |
+|---|---|
+| `nickname` | 必填，最长 64 字符 |
+| `avatarUrl` / `website` / 各社交链接 | 可空，最长 255 字符，仅 HTTP / HTTPS |
+| `bioZh` / `bioJa` / `bioEn` | 可空，各最长 5000 字符 |
+| `location` | 可空，最长 64 字符 |
+| `emailPublic` | 可空，最长 128 字符，必须为邮箱格式 |
+
+成功后返回更新后的完整 profile 对象。
+
+| 场景 | HTTP | code |
+|---|---:|---|
+| access token 缺失或失效 | 401 | `10002` |
+| DEMO 尝试编辑 | 403 | `10003` |
+| 字段非法、空 PATCH、未知字段或 JSON 非法 | 400 | `90001` |
+| 账号 / 资料数据不完整或更新异常 | 500 | `99999` |
+
+## 7. 权限矩阵
+
+| 操作 | ADMIN | DEMO |
+|---|---|---|
+| 登录、refresh、全端退出 | 允许 | 允许 |
+| 查询本人账号与资料 | 允许 | 允许 |
+| 编辑本人资料 | 允许 | 禁止 |
+
+## 8. 限流边界
 
 - 登录限流键为可信客户端 IP + 规范化用户名。
 - 连续第 1 至第 5 次坏凭据返回 `401 + 10001`。
@@ -125,9 +221,8 @@ Authorization: Bearer <access-token>
 - 凭据验证成功后清除当前限流键。
 - refresh 和 logout 本轮不新增独立限流器。
 
-## 6. 尚未开放
+## 9. 尚未开放
 
-- 当前用户资料查询
 - 修改密码
 - 单设备会话管理
 - Cookie 模式 token

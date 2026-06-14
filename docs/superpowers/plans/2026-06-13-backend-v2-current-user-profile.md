@@ -1080,7 +1080,7 @@ git commit -m "开放当前用户资料接口"
 
 **提交信息：** `同步当前用户资料实施结果`
 
-- [ ] **Step 1：更新 API 契约**
+- [x] **Step 1：更新 API 契约**
 
 在 `api-contract/auth.md`：
 
@@ -1096,7 +1096,7 @@ git commit -m "开放当前用户资料接口"
 ✅ 登录 / 刷新 / 全端退出 / 当前用户资料已落地；修改密码尚未实现
 ```
 
-- [ ] **Step 2：更新 status 和 roadmap**
+- [x] **Step 2：更新 status 和 roadmap**
 
 `status.md`：
 
@@ -1109,7 +1109,7 @@ git commit -m "开放当前用户资料接口"
 - 把 identity 当前用户资料部分标记完成。
 - identity 仍因修改密码未完成而保持未完成，除非项目决策明确把修改密码后置。
 
-- [ ] **Step 3：运行静态检查和全量测试**
+- [x] **Step 3：运行静态检查和全量测试**
 
 Run:
 
@@ -1125,7 +1125,7 @@ Expected:
 - 0 failures，0 errors。
 - Docker 不可用时仅现有条件化 Testcontainers 测试 skipped；Docker 可用时必须执行并通过。
 
-- [ ] **Step 4：确认 SQL 和注释规则**
+- [x] **Step 4：确认 SQL 和注释规则**
 
 Run:
 
@@ -1146,7 +1146,7 @@ Expected:
 - 更新 SQL 包含 `deleted = 0`
 - nullable 字段可以被更新为 SQL `NULL`
 
-- [ ] **Step 5：勾选计划并提交文档**
+- [x] **Step 5：勾选计划并提交文档**
 
 将本计划全部 Task 标记完成，然后：
 
@@ -1155,7 +1155,7 @@ git add docs/project-handbook docs/superpowers/plans/2026-06-13-backend-v2-curre
 git commit -m "同步当前用户资料实施结果"
 ```
 
-- [ ] **Step 6：最终确认**
+- [x] **Step 6：最终确认**
 
 Run:
 

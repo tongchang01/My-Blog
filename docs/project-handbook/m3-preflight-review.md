@@ -213,7 +213,7 @@ PASSWORD 文章功能落地前必须完成。
 
 - [ ] MyBatis-Plus 3.5.12 评估升级到当前 3.5.x
 - [ ] springdoc 2.8.8 升级到当前 2.8.x
-- [ ] 验证 Knife4j 4.5.0 与所选 springdoc
+- [x] 验证 Knife4j 4.5.0 与 springdoc 2.8.8：默认 customizer 存在方法签名冲突，已用项目侧兼容适配器替换并通过 `/v3/api-docs` 契约测试
 - [ ] 增加 Maven Wrapper
 - [ ] 上线前增加依赖漏洞扫描
 
