@@ -135,14 +135,18 @@ public interface StorageService {
 }
 ```
 
-`StorageType` 定义在 `common.storage`，固定为 `LOCAL`、`S3`。附件领域引用该
-稳定枚举，`common` 不得反向依赖 `system`。
+`StorageType` 定义在 `common.storage`，固定为 `LOCAL`、`S3`、`OSS`。附件领域
+引用该稳定枚举，`common` 不得反向依赖 `system`。本轮只实现 `LOCAL`、`S3`
+adapter；历史 `OSS` 记录可以读取和展示，但需要执行 `exists/delete` 时明确失败，
+不能错误路由到其它后端。
 
 再由 `StorageServiceRegistry`：
 
 - 根据 `myblog.storage.type` 选择新上传的目标实现。
 - 根据数据库中的 `storageType` 路由已有对象的后续操作。
 - 未注册的存储类型在启动或调用时安全失败。
+- 当前上传目标的配置必须完整；非当前后端只有在配置完整时才注册，因此迁移期可同时
+  保留 LOCAL 与 S3 的读取、补偿能力，但不要求所有环境配置两个后端。
 
 本轮虽然不开放删除接口，`delete` 仍用于数据库写入失败后的物理文件补偿。
 
@@ -376,12 +380,12 @@ WHERE id = #{id}
 GET /api/admin/attachments?page=1&size=20
 ```
 
-响应沿用项目分页约定：
+响应沿用项目现有 `PageResponse` 约定：
 
 ```json
 {
   "total": 1,
-  "list": [],
+  "records": [],
   "page": 1,
   "size": 20
 }
