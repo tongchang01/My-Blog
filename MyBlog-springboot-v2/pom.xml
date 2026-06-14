@@ -20,6 +20,7 @@
         <java.version>17</java.version>
         <archunit.version>1.4.1</archunit.version>
         <maven-enforcer-plugin.version>3.6.3</maven-enforcer-plugin.version>
+        <twelvemonkeys.version>3.13.1</twelvemonkeys.version>
     </properties>
 
     <dependencies>
@@ -61,6 +62,11 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>com.twelvemonkeys.imageio</groupId>
+            <artifactId>imageio-webp</artifactId>
+            <version>${twelvemonkeys.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.ben-manes.caffeine</groupId>

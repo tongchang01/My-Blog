@@ -51,7 +51,7 @@
 ### LOCAL adapter
 
 - `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/infrastructure/storage/local/LocalStorageService.java`
-- `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/infrastructure/storage/local/LocalStorageWebConfiguration.java`
+- `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/storage/web/LocalStorageWebConfiguration.java`
 
 ### S3 adapter
 
@@ -366,7 +366,7 @@ git commit -m "建立附件领域与持久化查询"
 
 ### Step 1：增加图片依赖并写配置失败测试
 
-- [ ] 在 `pom.xml` properties 增加：
+- [x] 在 `pom.xml` properties 增加：
 
 ```xml
 <twelvemonkeys.version>3.13.1</twelvemonkeys.version>
@@ -382,7 +382,7 @@ git commit -m "建立附件领域与持久化查询"
 </dependency>
 ```
 
-- [ ] 新建 `StoragePropertiesTest.java`，用 `ApplicationContextRunner` 覆盖：
+- [x] 新建 `StoragePropertiesTest.java`，覆盖：
 
 - LOCAL 当前后端要求 root、bucket alias、public base URL。
 - S3 当前后端要求 region、bucket、public base URL。
@@ -394,7 +394,7 @@ git commit -m "建立附件领域与持久化查询"
 
 ### Step 2：写 spool 与图片识别失败测试
 
-- [ ] 新建 `UploadSpoolerTest.java`，使用 `@TempDir` 覆盖：
+- [x] 新建 `UploadSpoolerTest.java`，使用 `@TempDir` 覆盖：
 
 ```java
 @Test
@@ -412,7 +412,7 @@ void spoolsAndHashesWithinLimit() throws Exception {
 
 再覆盖空输入、读取到 `limit + 1` 立即删除临时文件并抛校验异常、输入流异常仍清理。
 
-- [ ] 新建 `ImageInspectorTest.java`：
+- [x] 新建 `ImageInspectorTest.java`：
 
 - 用测试资源或运行时生成 JPEG、PNG、GIF。
 - 增加最小合法 WebP fixture 到
@@ -424,7 +424,7 @@ void spoolsAndHashesWithinLimit() throws Exception {
 
 ### Step 3：写 LOCAL 与 Registry 失败测试
 
-- [ ] 新建 `LocalStorageServiceTest.java`，使用 `@TempDir` 覆盖：
+- [x] 新建 `LocalStorageServiceTest.java`，使用 `@TempDir` 覆盖：
 
 - 写入后字节一致，返回 `LOCAL/bucket/objectKey/publicUrl`。
 - 中间目录自动创建。
@@ -433,7 +433,7 @@ void spoolsAndHashesWithinLimit() throws Exception {
 - `../`、绝对路径、规范化后越出 root 的 key 拒绝。
 - 写入失败不保留最终文件或临时文件。
 
-- [ ] 新建 `StorageServiceRegistryTest.java`：
+- [x] 新建 `StorageServiceRegistryTest.java`：
 
 - 当前 type 选择上传目标。
 - 按指定 `StorageType` 路由。
@@ -442,7 +442,7 @@ void spoolsAndHashesWithinLimit() throws Exception {
 
 ### Step 4：运行测试确认 RED
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=StoragePropertiesTest,UploadSpoolerTest,ImageInspectorTest,LocalStorageServiceTest,StorageServiceRegistryTest" test
@@ -452,7 +452,7 @@ mvn "-Dtest=StoragePropertiesTest,UploadSpoolerTest,ImageInspectorTest,LocalStor
 
 ### Step 5：实现稳定存储端口
 
-- [ ] 新建：
+- [x] 新建：
 
 ```java
 public record StoreObjectCommand(
@@ -483,9 +483,9 @@ public interface StorageService {
 }
 ```
 
-- [ ] `StorageOperationException extends RuntimeException` 只保存稳定中文消息和 cause。
+- [x] `StorageOperationException extends RuntimeException` 只保存稳定中文消息和 cause。
 
-- [ ] `StorageServiceRegistry` 构造时将 `List<StorageService>` 收口为
+- [x] `StorageServiceRegistry` 构造时将 `List<StorageService>` 收口为
   `EnumMap<StorageType, StorageService>`：
 
 ```java
@@ -504,7 +504,7 @@ public StorageService required(StorageType type) {
 
 ### Step 6：实现配置、spool 和图片识别
 
-- [ ] `StorageProperties` 使用 `@ConfigurationProperties("myblog.storage")`，结构固定为：
+- [x] `StorageProperties` 使用 `@ConfigurationProperties("myblog.storage")`，结构固定为：
 
 ```java
 public class StorageProperties {
@@ -520,11 +520,11 @@ public class StorageProperties {
 
 `S3`：`String region`、`String bucket`、`URI publicBaseUrl`。
 
-- [ ] `StorageConfiguration` 提供 `StorageProperties`、`UploadSpooler`、
+- [x] `StorageConfiguration` 提供 `StorageProperties`、`UploadSpooler`、
   `ImageInspector` 和 `StorageServiceRegistry` bean，并执行条件校验。当前后端必须有
   adapter；非当前后端只在配置完整时注册。
 
-- [ ] `SpooledUpload implements AutoCloseable`：
+- [x] `SpooledUpload implements AutoCloseable`：
 
 ```java
 public record SpooledUpload(Path path, long size, String sha256)
@@ -536,7 +536,7 @@ public record SpooledUpload(Path path, long size, String sha256)
 }
 ```
 
-- [ ] `UploadSpooler.spool(InputStream input, long maxBytes)`：
+- [x] `UploadSpooler.spool(InputStream input, long maxBytes)`：
 
   - `Files.createTempFile("myblog-upload-", ".tmp")`。
   - 单次读取 8 KiB。
@@ -544,7 +544,7 @@ public record SpooledUpload(Path path, long size, String sha256)
   - 超限或异常时 `deleteIfExists`。
   - 空文件抛 `IllegalArgumentException("上传文件不能为空")`。
 
-- [ ] `ImageFormat` 固定：
+- [x] `ImageFormat` 固定：
 
 ```java
 JPEG("image/jpeg", "jpg"),
@@ -553,7 +553,7 @@ WEBP("image/webp", "webp"),
 GIF("image/gif", "gif");
 ```
 
-- [ ] `ImageInspector.inspect(Path)`：
+- [x] `ImageInspector.inspect(Path)`：
 
   - 使用 `ImageIO.createImageInputStream` 和首个 `ImageReader`。
   - 将 reader format name 映射到四种白名单格式。
@@ -564,7 +564,7 @@ GIF("image/gif", "gif");
 
 ### Step 7：实现 LOCAL adapter 和只读映射
 
-- [ ] `LocalStorageService`：
+- [x] `LocalStorageService`：
 
   - 构造时把 root 转绝对规范路径并创建目录。
   - `resolveObjectKey` 将 `/` 分段解析，拒绝空段、`.`、`..` 和绝对路径。
@@ -575,7 +575,7 @@ GIF("image/gif", "gif");
   - `publicUrl = baseUrl + "/" + objectKey`。
   - bucket 参数必须等于配置 alias。
 
-- [ ] `LocalStorageWebConfiguration implements WebMvcConfigurer`：
+- [x] `LocalStorageWebConfiguration implements WebMvcConfigurer`：
 
 ```java
 registry.addResourceHandler("/media/**")
@@ -587,7 +587,7 @@ registry.addResourceHandler("/media/**")
 
 ### Step 8：配置各 profile
 
-- [ ] `application.yml` 增加：
+- [x] `application.yml` 增加：
 
 ```yaml
 spring:
@@ -601,7 +601,7 @@ myblog:
     max-file-size: 10MB
 ```
 
-- [ ] `application-local.yml` 增加：
+- [x] `application-local.yml` 增加：
 
 ```yaml
 myblog:
@@ -619,12 +619,12 @@ myblog:
 
 保留已有 public endpoints，不能覆盖丢失。
 
-- [ ] `application-test.yml` 配置稳定测试临时根和 `/media/**` GET 白名单；集成测试
+- [x] `application-test.yml` 配置稳定测试临时根和 `/media/**` GET 白名单；集成测试
   在 `@BeforeEach` 清空附件目录。
 
 ### Step 9：运行定向测试确认 GREEN
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 mvn "-Dtest=StoragePropertiesTest,UploadSpoolerTest,ImageInspectorTest,LocalStorageServiceTest,StorageServiceRegistryTest,ApplicationConfigurationTest,ArchitectureRulesTest" test
@@ -634,7 +634,7 @@ mvn "-Dtest=StoragePropertiesTest,UploadSpoolerTest,ImageInspectorTest,LocalStor
 
 ### Step 10：静态检查并提交
 
-- [ ] 执行：
+- [x] 执行：
 
 ```powershell
 rg -n "access.?key|secret.?key|public-read" MyBlog-springboot-v2/src/main MyBlog-springboot-v2/src/test
@@ -643,7 +643,7 @@ git diff --check
 
 预期：没有硬编码 AWS 凭证或 `public-read`。
 
-- [ ] 提交：
+- [x] 提交：
 
 ```powershell
 git add MyBlog-springboot-v2/pom.xml MyBlog-springboot-v2/src/main MyBlog-springboot-v2/src/test MyBlog-springboot-v2/src/test/resources docs/superpowers/plans/2026-06-14-backend-v2-attachment.md

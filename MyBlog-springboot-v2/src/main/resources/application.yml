@@ -1,6 +1,10 @@
 spring:
   application:
     name: myblog-v2
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
   jackson:
     time-zone: Asia/Tokyo
     date-format: yyyy-MM-dd'T'HH:mm:ss
@@ -28,6 +32,13 @@ mybatis-plus:
     map-underscore-to-camel-case: true
 
 myblog:
+  storage:
+    type: LOCAL
+    max-file-size: 10MB
+    local:
+      root: ${MYBLOG_STORAGE_LOCAL_ROOT:${java.io.tmpdir}/myblog-v2/uploads}
+      bucket-alias: local
+      public-base-url: ${MYBLOG_STORAGE_LOCAL_PUBLIC_BASE_URL:http://localhost:8080/media}
   cors:
     allowed-origins: []
   ratelimit:

@@ -17,6 +17,12 @@ knife4j:
   enable: true
 
 myblog:
+  storage:
+    type: LOCAL
+    local:
+      root: ${MYBLOG_STORAGE_LOCAL_ROOT:${user.home}/.myblog-v2/uploads}
+      bucket-alias: local
+      public-base-url: ${MYBLOG_STORAGE_LOCAL_PUBLIC_BASE_URL:http://localhost:8080/media}
   cors:
     allowed-origins:
       - http://localhost:5173
@@ -44,3 +50,5 @@ myblog:
         path: /v3/api-docs/**
       - method: GET
         path: /swagger-ui/**
+      - method: GET
+        path: /media/**
