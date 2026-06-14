@@ -66,3 +66,5 @@ myblog:
         path: /api/auth/refresh
       - method: GET
         path: /api/public/site-config
+      - method: GET
+        path: /api/public/friend-links

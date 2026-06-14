@@ -1,0 +1,113 @@
+package com.tyb.myblog.v2.system.web;
+
+import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
+import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkPageResult;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkQueryService;
+import com.tyb.myblog.v2.system.application.friendlink.FriendLinkResult;
+import com.tyb.myblog.v2.system.domain.friendlink.FriendLinkStatus;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(AdminFriendLinkController.class)
+@AutoConfigureMockMvc(addFilters = false)
+@Import(GlobalExceptionHandler.class)
+class AdminFriendLinkControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockitoBean
+    private FriendLinkQueryService queryService;
+
+    private AuthenticatedPrincipal principal;
+
+    @BeforeEach
+    void setUp() {
+        principal = new AuthenticatedPrincipal(
+                "1001", "admin", List.of("ADMIN"));
+        SecurityContextHolder.getContext().setAuthentication(
+                UsernamePasswordAuthenticationToken.authenticated(
+                        principal, null, List.of()));
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    void returnsPagedLinksWithDefaultParameters() throws Exception {
+        when(queryService.adminPage(principal, 1, 20))
+                .thenReturn(new FriendLinkPageResult(
+                        List.of(result()), 1, 1, 20));
+
+        mockMvc.perform(get("/api/admin/friend-links"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].id")
+                        .value(10))
+                .andExpect(jsonPath("$.data.records[0].status")
+                        .value("VISIBLE"))
+                .andExpect(jsonPath("$.data.records[0].sortOrder")
+                        .value(10))
+                .andExpect(jsonPath("$.data.records[0].createdAt")
+                        .value("2026-06-14T12:00:00"))
+                .andExpect(jsonPath("$.data.records[0].updatedAt")
+                        .value("2026-06-14T12:30:00"))
+                .andExpect(jsonPath("$.data.records[0].deleted")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.records[0].deletedAt")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.total").value(1))
+                .andExpect(jsonPath("$.data.page").value(1))
+                .andExpect(jsonPath("$.data.size").value(20));
+    }
+
+    @Test
+    void returnsFriendLinkDetail() throws Exception {
+        when(queryService.adminDetail(principal, 10L))
+                .thenReturn(result());
+
+        mockMvc.perform(get("/api/admin/friend-links/10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(10))
+                .andExpect(jsonPath("$.data.name")
+                        .value("Example"))
+                .andExpect(jsonPath("$.data.createdBy")
+                        .value(1001))
+                .andExpect(jsonPath("$.data.updatedBy")
+                        .value(1001));
+    }
+
+    private FriendLinkResult result() {
+        return new FriendLinkResult(
+                10L,
+                "Example",
+                "https://example.com",
+                "https://example.com/logo.png",
+                "介绍",
+                10,
+                FriendLinkStatus.VISIBLE,
+                LocalDateTime.of(2026, 6, 14, 12, 0),
+                1001L,
+                LocalDateTime.of(2026, 6, 14, 12, 30),
+                1001L);
+    }
+}

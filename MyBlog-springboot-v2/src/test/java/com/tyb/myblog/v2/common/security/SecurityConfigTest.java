@@ -42,6 +42,7 @@ class SecurityConfigTest {
 
     @BeforeEach
     void clearUsers() {
+        jdbcTemplate.update("delete from t_friend_link");
         jdbcTemplate.update("delete from t_attachment");
         jdbcTemplate.update("delete from t_refresh_token");
         jdbcTemplate.update("delete from t_user_info");
@@ -163,6 +164,29 @@ class SecurityConfigTest {
         mockMvc.perform(get("/api/admin/attachments"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
+    void permitsPublicAndAuthorizedFriendLinkReads() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+        insertFriendLink(10L);
+
+        mockMvc.perform(get("/api/public/friend-links"))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/friend-links"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/admin/friend-links")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/friend-links/10")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/admin/friend-links")
+                        .header("Authorization", "Bearer " + demoToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -390,5 +414,19 @@ class SecurityConfigTest {
                 "attachments/2026/06/" + id + ".png",
                 "http://localhost/media/" + id + ".png",
                 Long.toHexString(id).repeat(64).substring(0, 64));
+    }
+
+    private void insertFriendLink(long id) {
+        jdbcTemplate.update("""
+                insert into t_friend_link (
+                    id, name, url, sort_order, status,
+                    created_at, created_by, updated_at, updated_by,
+                    deleted
+                ) values (?, 'Example', ?, 0, 1,
+                    current_timestamp, 1001,
+                    current_timestamp, 1001, 0)
+                """,
+                id,
+                "https://example.com/" + id);
     }
 }

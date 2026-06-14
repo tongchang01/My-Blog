@@ -80,6 +80,11 @@ public class SecurityConfig {
                                     "/api/admin/attachments",
                                     "/api/admin/attachments/*")
                             .hasAnyRole("ADMIN", "DEMO")
+                            .requestMatchers(
+                                    HttpMethod.GET,
+                                    "/api/admin/friend-links",
+                                    "/api/admin/friend-links/*")
+                            .hasAnyRole("ADMIN", "DEMO")
                             .requestMatchers("/api/admin/**").hasRole("ADMIN")
                             .anyRequest().authenticated();
                 })
