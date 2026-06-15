@@ -313,3 +313,4 @@ content 模块规格与纵向切片设计。
 | 2026-06-14 | system 站点配置纵向切片 | `t_site_config` 公开读取、后台读取和 ADMIN 全量更新已落地；未新增 Flyway，H2 行锁并发测试通过；全量 329 tests 通过，4 个 Docker 条件测试跳过 |
 | 2026-06-14 | system 附件纵向切片 | `t_attachment` 图片上传、去重恢复、LOCAL/S3、后台分页与详情已落地；真实 LOCAL 并发上传收敛为一行一个对象，下一步进入 `t_friend_link` |
 | 2026-06-14 | system 友链纵向切片 | `t_friend_link` 公开读取、后台 CRUD、状态、批量排序和显式软删除已落地；三项 H2 行锁并发场景通过，下一步进入 content |
+| 2026-06-15 | content 分类标签纵向切片 | `t_category`、`t_tag` 三语公开读取、后台管理、永久 slug 唯一、分类排序和引用保护软删除已落地；MapStruct、真实 HTTP、OpenAPI 和三项并发场景通过，下一步进入文章切片 |

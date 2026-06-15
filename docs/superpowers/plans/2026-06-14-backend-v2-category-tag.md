@@ -1,5 +1,10 @@
 # Backend V2 分类与标签纵向切片 Implementation Plan
 
+> **实施状态：已完成（2026-06-15）**
+>
+> 五个实施批次均已执行 RED → GREEN、定向回归、静态检查和中文本地提交。
+> 最终验证：`mvn clean test` 通过，485 tests，0 failures，0 errors，4 skipped。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 在 `content` 模块按五个小批次完成分类和标签的公开读取、后台管理、slug 唯一、分类排序、引用保护软删除及完整契约测试。

@@ -72,13 +72,18 @@ M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，iden
 - `t_friend_link` 纵向切片已完成：匿名读取 VISIBLE 友链，ADMIN / DEMO 后台只读，ADMIN 新增、完整编辑、状态、批量排序和显式软删除
 - 友链 URL 允许重复；写入只接受绝对 HTTP/HTTPS 地址；批量排序 1..100 项并在目标缺失时整体回滚
 - 友链更新、状态、排序和删除均使用 active 行锁；软删除完整写入删除和更新审计五字段
-- 当前基线：`mvn clean test` 通过（426 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
+- content 分类标签纵向切片已完成：匿名按 `zh/ja/en` 读取并 fallback 中文，ADMIN / DEMO 后台只读，ADMIN 新增、完整编辑、分类排序和引用保护软删除
+- 分类与标签 slug 在领域层规范化并永久唯一；数据库唯一索引处理并发兜底，冲突统一返回 `409 + 90004`
+- 分类批量排序按升序 ID 锁定，任一目标缺失或更新异常时整体回滚；标签不提供排序接口
+- active 文章引用阻止分类和标签删除；已删除文章不阻止删除，软删除完整写入五个审计字段
+- MapStruct 1.6.3 已用于 persistence 与 web 的机械映射，业务规则保持显式
+- 当前基线：`mvn clean test` 通过（485 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
 
-**当前处置方案**：identity 与 system 已收尾，下一步进入 content 模块规格与纵向切片设计，再按 comment → stats / common-infra 推进。
+**当前处置方案**：identity、system 与 content 分类标签已收尾，下一步设计并实现文章纵向切片，再按 comment → stats / common-infra 推进。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. 设计并实现 content 模块首个纵向切片
+1. 设计并实现 content 文章纵向切片
 2. 进入 comment → stats / common-infra
 3. 前台 / 后台前端骨架
 
