@@ -93,8 +93,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, nextTick, onMounted, Ref, ref } from 'vue'
+<script setup lang="ts">
+import { computed, nextTick, onMounted, Ref, ref } from 'vue'
 import PostStats from '@/components/Post/PostStats.vue'
 import LinkBox from '@/components/Link/LinkBox.vue'
 import LinkCard from '@/components/Link/LinkCard.vue'
@@ -110,66 +110,42 @@ import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import usePageTitle from '@/hooks/usePageTitle'
 import useJumpToEle from '@/hooks/useJumpToEle'
 import useCommentPlugin from '@/hooks/useCommentPlugin'
-import ObSkeleton from '@/components/LoadingSkeleton/Skeleton.vue'
 
 interface PostStatsExpose extends Ref<InstanceType<typeof PostStats>> {
   getCommentCount(): void
   getPostView(): void
 }
 
-export default defineComponent({
-  name: 'ARLinks',
-  components: {
-    ObSkeleton,
-    PostStats,
-    LinkBox,
-    LinkCard,
-    LinkCategoryList,
-    LinkList,
-    Comment,
-    Breadcrumbs
-  },
-  setup() {
-    const articleStore = useArticleStore()
-    const appStore = useAppStore()
-    const pageData = ref(new Page<Link[] | Record<string, Link[]>>())
-    const postStatsRef = ref<PostStatsExpose>()
-    const route = useRoute()
-    const { t } = useI18n()
-    const { pageTitle, updateTitle } = usePageTitle()
-    const { jumpToEle } = useJumpToEle()
-    const { enabledCommentPlugin } = useCommentPlugin()
+const articleStore = useArticleStore()
+const appStore = useAppStore()
+const pageData = ref(new Page<Link[] | Record<string, Link[]>>())
+const postStatsRef = ref<PostStatsExpose>()
+const route = useRoute()
+const { t } = useI18n()
+const { pageTitle, updateTitle } = usePageTitle()
+const { jumpToEle } = useJumpToEle()
+const { enabledCommentPlugin } = useCommentPlugin()
 
-    const fetchArticle = async () => {
-      pageData.value = await articleStore.fetchArticle('links')
-      updateTitle(appStore.locale)
-      await nextTick()
-      postStatsRef.value?.getCommentCount()
-      postStatsRef.value?.getPostView()
-    }
+const fetchArticle = async () => {
+  pageData.value = await articleStore.fetchArticle('links')
+  updateTitle(appStore.locale)
+  await nextTick()
+  postStatsRef.value?.getCommentCount()
+  postStatsRef.value?.getPostView()
+}
 
-    const jumpToContent = () => {
-      jumpToEle('content')
-    }
+const jumpToContent = () => {
+  jumpToEle('content')
+}
 
-    onMounted(fetchArticle)
+onMounted(fetchArticle)
 
-    return {
-      currentPath: computed(() => route.path),
-      pluginConfigs: computed(() => appStore.themeConfig.plugins),
-      gradientBackground: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      }),
-      enabledComment: computed(
-        () =>
-          pageData.value.comments && enabledCommentPlugin.value.plugin !== ''
-      ),
-      pageTitle,
-      jumpToContent,
-      postStatsRef,
-      pageData,
-      t
-    }
-  }
+const currentPath = computed(() => route.path)
+const pluginConfigs = computed(() => appStore.themeConfig.plugins)
+const gradientBackground = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
 })
+const enabledComment = computed(
+  () => pageData.value.comments && enabledCommentPlugin.value.plugin !== ''
+)
 </script>
