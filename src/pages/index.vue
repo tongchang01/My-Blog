@@ -95,8 +95,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import { Feature, FeatureList } from '@/components/Feature'
 import { ArticleCard, HorizontalArticle } from '@/components/ArticleCard'
 import { MainTitle } from '@/components/Title'
@@ -112,168 +112,133 @@ import SvgIcon from '@/components/SvgIcon/index.vue'
 import usePageTitle from '@/hooks/usePageTitle'
 import Sticky from '@/components/Sticky.vue'
 
-export default defineComponent({
-  name: 'ARHome',
-  components: {
-    Feature,
-    FeatureList,
-    ArticleCard,
-    HorizontalArticle,
-    MainTitle,
-    Sidebar,
-    TagBox,
-    Paginator,
-    RecentComment,
-    Profile,
-    SvgIcon,
-    Sticky
-  },
-  setup() {
-    useMetaStore().setTitle('home')
-    const postStore = usePostStore()
-    const appStore = useAppStore()
-    const categoryStore = useCategoryStore()
-    const { updateTitleByText } = usePageTitle()
-    const { t } = useI18n()
-    const DEFAULT_PAGE_SIZE = 12
+useMetaStore().setTitle('home')
+const postStore = usePostStore()
+const appStore = useAppStore()
+const categoryStore = useCategoryStore()
+const { updateTitleByText } = usePageTitle()
+const { t } = useI18n()
+const DEFAULT_PAGE_SIZE = 12
 
-    /** Variables Section */
+/** Variables Section */
 
-    const topFeature = ref(new FeaturePosts().top_feature)
-    const featurePosts = ref(new FeaturePosts().features)
-    const posts = ref(new PostList())
-    const expanderClass = ref({
-      'tab-expander': true,
-      expanded: false
+const topFeature = ref(new FeaturePosts().top_feature)
+const featurePosts = ref(new FeaturePosts().features)
+const posts = ref(new PostList())
+const expanderClass = ref({
+  'tab-expander': true,
+  expanded: false
+})
+const tabClass = ref({
+  tab: true,
+  'expanded-tab': false
+})
+const activeTab = ref('')
+const articleOffset = ref(0)
+const pagination = ref({
+  pageSize: DEFAULT_PAGE_SIZE,
+  pageTotal: 0,
+  page: 1
+})
+
+/** Function section */
+
+const fetchPostData = async () => {
+  posts.value = new PostList()
+  await postStore.fetchPostsList(pagination.value.page).then(() => {
+    posts.value = postStore.posts
+    pagination.value.pageTotal = postStore.posts.total
+  })
+}
+
+const fetchSlugData = async (slug: string) => {
+  posts.value = new PostList()
+  await postStore
+    .fetchPostsByCategory(
+      slug,
+      pagination.value.page,
+      pagination.value.pageSize
+    )
+    .then(postList => {
+      posts.value = postList
+      pagination.value.pageTotal = postList.total
     })
-    const tabClass = ref({
-      tab: true,
-      'expanded-tab': false
-    })
-    const activeTab = ref('')
-    const articleOffset = ref(0)
-    const pagination = ref({
-      pageSize: DEFAULT_PAGE_SIZE,
-      pageTotal: 0,
-      page: 1
-    })
+}
 
-    /** Function section */
+const fetchData = async () => {
+  await postStore.fetchFeaturePosts().then(() => {
+    topFeature.value = postStore.featurePosts.top_feature
+    featurePosts.value = postStore.featurePosts.features
+  })
 
-    const fetchData = async () => {
-      await postStore.fetchFeaturePosts().then(() => {
-        topFeature.value = postStore.featurePosts.top_feature
-        featurePosts.value = postStore.featurePosts.features
-      })
+  await fetchPostData()
+  await categoryStore.fetchCategories()
+  updateTitleByText(appStore.themeConfig.site.subtitle)
 
-      await fetchPostData()
-      await categoryStore.fetchCategories()
-      updateTitleByText(appStore.themeConfig.site.subtitle)
+  const articleListEl = document.getElementById('article-list')
+  // 150 is the height of the header element
+  articleOffset.value =
+    articleListEl && articleListEl instanceof HTMLElement
+      ? articleListEl.offsetTop
+      : 0
+}
 
-      const articleListEl = document.getElementById('article-list')
-      // 150 is the height of the header element
-      articleOffset.value =
-        articleListEl && articleListEl instanceof HTMLElement
-          ? articleListEl.offsetTop
-          : 0
-    }
+onMounted(fetchData)
 
-    onMounted(fetchData)
+const expandHandler = () => {
+  expanderClass.value.expanded = !expanderClass.value.expanded
+  tabClass.value['expanded-tab'] = !tabClass.value['expanded-tab']
+}
 
-    const expandHandler = () => {
-      expanderClass.value.expanded = !expanderClass.value.expanded
-      tabClass.value['expanded-tab'] = !tabClass.value['expanded-tab']
-    }
+const backToArticleTop = () => {
+  window.scrollTo({
+    top: articleOffset.value,
+    behavior: 'smooth'
+  })
+}
 
-    const handleTabChange = (slug: string) => {
-      activeTab.value = slug
-      backToArticleTop()
-      if (slug !== '') {
-        fetchSlugData(slug)
-      } else {
-        fetchPostData()
-      }
-    }
-
-    const backToArticleTop = () => {
-      window.scrollTo({
-        top: articleOffset.value,
-        behavior: 'smooth'
-      })
-    }
-
-    const activeTabStyle = (slug: string) => {
-      if (slug === activeTab.value)
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      return {}
-    }
-
-    const fetchPostData = async () => {
-      posts.value = new PostList()
-      await postStore.fetchPostsList(pagination.value.page).then(() => {
-        posts.value = postStore.posts
-        pagination.value.pageTotal = postStore.posts.total
-      })
-    }
-
-    const fetchSlugData = async (slug: string) => {
-      posts.value = new PostList()
-      await postStore
-        .fetchPostsByCategory(
-          slug,
-          pagination.value.page,
-          pagination.value.pageSize
-        )
-        .then(postList => {
-          posts.value = postList
-          pagination.value.pageTotal = postList.total
-        })
-    }
-
-    const pageChangeHandler = async (page: number) => {
-      pagination.value.page = page
-      backToArticleTop()
-
-      if (activeTab.value) {
-        await fetchSlugData(activeTab.value)
-      } else {
-        await fetchPostData()
-      }
-    }
-
-    return {
-      endEleId: computed(() =>
-        appStore.themeConfig.footerLinks.data.length > 0
-          ? 'footer-link'
-          : 'footer'
-      ),
-      gradientText: computed(
-        () => appStore.themeConfig.theme.background_gradient_style
-      ),
-      gradientBackground: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      }),
-      themeConfig: computed(() => appStore.themeConfig),
-      categories: computed(() => {
-        if (categoryStore.isLoaded && categoryStore.categories.length === 0) {
-          return null
-        }
-        return categoryStore.categories
-      }),
-      expanderClass,
-      tabClass,
-      expandHandler,
-      handleTabChange,
-      topFeature,
-      featurePosts,
-      posts,
-      activeTabStyle,
-      activeTab,
-      pagination,
-      pageChangeHandler,
-      t
-    }
+const handleTabChange = (slug: string) => {
+  activeTab.value = slug
+  backToArticleTop()
+  if (slug !== '') {
+    fetchSlugData(slug)
+  } else {
+    fetchPostData()
   }
+}
+
+const activeTabStyle = (slug: string) => {
+  if (slug === activeTab.value)
+    return { background: appStore.themeConfig.theme.header_gradient_css }
+  return {}
+}
+
+const pageChangeHandler = async (page: number) => {
+  pagination.value.page = page
+  backToArticleTop()
+
+  if (activeTab.value) {
+    await fetchSlugData(activeTab.value)
+  } else {
+    await fetchPostData()
+  }
+}
+
+const endEleId = computed(() =>
+  appStore.themeConfig.footerLinks.data.length > 0 ? 'footer-link' : 'footer'
+)
+const gradientText = computed(
+  () => appStore.themeConfig.theme.background_gradient_style
+)
+const gradientBackground = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
+})
+const themeConfig = computed(() => appStore.themeConfig)
+const categories = computed(() => {
+  if (categoryStore.isLoaded && categoryStore.categories.length === 0) {
+    return null
+  }
+  return categoryStore.categories
 })
 </script>
 
