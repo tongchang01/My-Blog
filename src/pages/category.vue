@@ -19,20 +19,12 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 import { Sidebar } from '@/components/Sidebar'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import usePageTitle from '@/hooks/usePageTitle'
 
-export default defineComponent({
-  name: 'ArCategory',
-  components: { Sidebar, Breadcrumbs },
-  setup() {
-    const { pageTitle } = usePageTitle()
-    return { pageTitle }
-  }
-})
+const { pageTitle } = usePageTitle()
 </script>
 
 <style lang="scss" scoped></style>

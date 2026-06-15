@@ -30,8 +30,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onBeforeMount, onUnmounted } from 'vue'
+<script setup lang="ts">
+import { computed, onBeforeMount, onUnmounted } from 'vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useI18n } from 'vue-i18n'
 import { useTagStore } from '@/stores/tag'
@@ -41,35 +41,25 @@ import SvgIcon from '@/components/SvgIcon/index.vue'
 import defaultCover from '@/assets/default-cover.jpg'
 import usePageTitle from '@/hooks/usePageTitle'
 
-export default defineComponent({
-  name: 'ArTag',
-  components: { Breadcrumbs, TagList, TagItem, SvgIcon },
-  setup() {
-    const commonStore = useCommonStore()
-    const { t } = useI18n()
-    const tagStore = useTagStore()
-    const { pageTitle, updateTitle } = usePageTitle()
+const commonStore = useCommonStore()
+const { t } = useI18n()
+const tagStore = useTagStore()
+const { pageTitle, updateTitle } = usePageTitle()
 
-    const fetchData = async () => {
-      await tagStore.fetchAllTags()
-      updateTitle()
-      commonStore.setHeaderImage(defaultCover)
-    }
+const tags = computed(() => {
+  if (tagStore.isLoaded && tagStore.tags.length === 0) return null
+  return tagStore.tags
+})
 
-    onBeforeMount(fetchData)
-    onUnmounted(() => {
-      commonStore.resetHeaderImage()
-    })
+const fetchData = async () => {
+  await tagStore.fetchAllTags()
+  updateTitle()
+  commonStore.setHeaderImage(defaultCover)
+}
 
-    return {
-      pageTitle,
-      tags: computed(() => {
-        if (tagStore.isLoaded && tagStore.tags.length === 0) return null
-        return tagStore.tags
-      }),
-      t
-    }
-  }
+onBeforeMount(fetchData)
+onUnmounted(() => {
+  commonStore.resetHeaderImage()
 })
 </script>
 
