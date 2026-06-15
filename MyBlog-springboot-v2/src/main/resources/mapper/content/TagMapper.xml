@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.content.infrastructure.persistence.mapper.TagMapper">
+
+    <sql id="tagColumns">
+        id,
+        name_zh,
+        name_ja,
+        name_en,
+        slug,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by,
+        deleted,
+        deleted_at,
+        deleted_by
+    </sql>
+
+    <!-- 标签没有人工排序字段，按中文名称和 ID 保证稳定顺序。 -->
+    <select id="selectAllActive"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.TagEntity">
+        SELECT <include refid="tagColumns"/>
+        FROM t_tag
+        WHERE deleted = 0
+        ORDER BY name_zh ASC, id ASC
+    </select>
+
+    <select id="selectActiveById"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.TagEntity">
+        SELECT <include refid="tagColumns"/>
+        FROM t_tag
+        WHERE id = #{id}
+          AND deleted = 0
+    </select>
+
+    <!-- 编辑和删除前锁定 active 标签。 -->
+    <select id="selectActiveByIdForUpdate"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.TagEntity">
+        SELECT <include refid="tagColumns"/>
+        FROM t_tag
+        WHERE id = #{id}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
+    <!-- 唯一检查必须包含软删除数据，删除后的 slug 不允许复用。 -->
+    <select id="selectBySlugIncludingDeleted"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.TagEntity">
+        SELECT <include refid="tagColumns"/>
+        FROM t_tag
+        WHERE slug = #{slug}
+    </select>
+
+</mapper>

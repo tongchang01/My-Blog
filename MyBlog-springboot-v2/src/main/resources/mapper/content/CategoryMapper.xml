@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.content.infrastructure.persistence.mapper.CategoryMapper">
+
+    <sql id="categoryColumns">
+        id,
+        name_zh,
+        name_ja,
+        name_en,
+        slug,
+        sort_order,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by,
+        deleted,
+        deleted_at,
+        deleted_by
+    </sql>
+
+    <!-- 分类公开和后台基础列表均只读取 active 数据。 -->
+    <select id="selectAllActive"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.CategoryEntity">
+        SELECT <include refid="categoryColumns"/>
+        FROM t_category
+        WHERE deleted = 0
+        ORDER BY sort_order ASC, id ASC
+    </select>
+
+    <select id="selectActiveById"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.CategoryEntity">
+        SELECT <include refid="categoryColumns"/>
+        FROM t_category
+        WHERE id = #{id}
+          AND deleted = 0
+    </select>
+
+    <!-- 写操作前锁定 active 分类，避免编辑、排序和删除交叉覆盖。 -->
+    <select id="selectActiveByIdForUpdate"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.CategoryEntity">
+        SELECT <include refid="categoryColumns"/>
+        FROM t_category
+        WHERE id = #{id}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
+    <!-- 固定按 ID 升序锁定批量排序目标，降低并发死锁风险。 -->
+    <select id="selectActiveByIdsForUpdate"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.CategoryEntity">
+        SELECT <include refid="categoryColumns"/>
+        FROM t_category
+        WHERE deleted = 0
+          AND id IN
+        <foreach collection="ids"
+                 item="id"
+                 open="("
+                 separator=","
+                 close=")">
+            #{id}
+        </foreach>
+        ORDER BY id ASC
+        FOR UPDATE
+    </select>
+
+    <!-- 唯一检查必须包含软删除数据，删除后的 slug 不允许复用。 -->
+    <select id="selectBySlugIncludingDeleted"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.CategoryEntity">
+        SELECT <include refid="categoryColumns"/>
+        FROM t_category
+        WHERE slug = #{slug}
+    </select>
+
+</mapper>
