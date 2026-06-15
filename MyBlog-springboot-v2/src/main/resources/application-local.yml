@@ -45,6 +45,10 @@ myblog:
       - method: GET
         path: /api/public/friend-links
       - method: GET
+        path: /api/public/categories
+      - method: GET
+        path: /api/public/tags
+      - method: GET
         path: /doc.html
       - method: GET
         path: /webjars/**

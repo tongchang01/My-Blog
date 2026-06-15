@@ -85,6 +85,13 @@ public class SecurityConfig {
                                     "/api/admin/friend-links",
                                     "/api/admin/friend-links/*")
                             .hasAnyRole("ADMIN", "DEMO")
+                            .requestMatchers(
+                                    HttpMethod.GET,
+                                    "/api/admin/categories",
+                                    "/api/admin/categories/*",
+                                    "/api/admin/tags",
+                                    "/api/admin/tags/*")
+                            .hasAnyRole("ADMIN", "DEMO")
                             .requestMatchers("/api/admin/**").hasRole("ADMIN")
                             .anyRequest().authenticated();
                 })

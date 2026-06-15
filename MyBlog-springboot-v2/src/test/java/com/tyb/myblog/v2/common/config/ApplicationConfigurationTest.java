@@ -58,4 +58,14 @@ class ApplicationConfigurationTest {
     void shouldProvideLoginRateLimiter() {
         assertThat(loginRateLimiter).isInstanceOf(CaffeineLoginRateLimiter.class);
     }
+
+    @Test
+    void configuresCategoryAndTagPublicEndpoints() {
+        assertThat(environment.getProperty(
+                "myblog.security.public-endpoints[5].path"))
+                .isEqualTo("/api/public/categories");
+        assertThat(environment.getProperty(
+                "myblog.security.public-endpoints[6].path"))
+                .isEqualTo("/api/public/tags");
+    }
 }

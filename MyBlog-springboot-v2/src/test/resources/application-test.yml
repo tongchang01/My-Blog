@@ -52,6 +52,10 @@ myblog:
       - method: GET
         path: /api/public/friend-links
       - method: GET
+        path: /api/public/categories
+      - method: GET
+        path: /api/public/tags
+      - method: GET
         path: /api/public/security-probe
       - method: GET
         path: /doc.html

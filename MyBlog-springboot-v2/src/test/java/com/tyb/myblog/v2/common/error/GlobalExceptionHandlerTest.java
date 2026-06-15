@@ -9,10 +9,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,6 +61,15 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void returnsValidationEnvelopeWhenRequiredQueryParameterIsMissing() throws Exception {
+        mockMvc.perform(get("/api/test/errors/query-parameter"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"))
+                .andExpect(jsonPath("$.msg").value("缺少必填请求参数: lang"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
     void returnsBusinessEnvelope() throws Exception {
         mockMvc.perform(post("/api/test/errors/business"))
                 .andExpect(status().isConflict())
@@ -80,6 +92,10 @@ class GlobalExceptionHandlerTest {
 
         @PostMapping("/api/test/errors/validation")
         void validate(@Valid @RequestBody TitleRequest request) {
+        }
+
+        @GetMapping("/api/test/errors/query-parameter")
+        void queryParameter(@RequestParam String lang) {
         }
 
         @PostMapping("/api/test/errors/business")

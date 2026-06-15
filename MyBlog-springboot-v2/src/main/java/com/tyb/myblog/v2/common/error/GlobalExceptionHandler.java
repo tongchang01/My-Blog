@@ -9,6 +9,7 @@ import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -53,6 +54,21 @@ public class GlobalExceptionHandler {
                 .orElse("request validation failed");
         return ResponseEntity.badRequest()
                 .body(ApiResponse.fail(ApiErrorCode.VALIDATION_ERROR.code(), message));
+    }
+
+    /**
+     * 处理缺少必填查询参数的请求。
+     *
+     * @param exception 缺少请求参数异常
+     * @return 统一参数校验错误响应
+     */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    ResponseEntity<ApiResponse<Void>> handleMissingRequestParameterException(
+            MissingServletRequestParameterException exception) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail(
+                        ApiErrorCode.VALIDATION_ERROR.code(),
+                        "缺少必填请求参数: " + exception.getParameterName()));
     }
 
     /**

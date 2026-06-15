@@ -42,6 +42,10 @@ class SecurityConfigTest {
 
     @BeforeEach
     void clearUsers() {
+        jdbcTemplate.update("delete from t_article_tag");
+        jdbcTemplate.update("delete from t_article");
+        jdbcTemplate.update("delete from t_category");
+        jdbcTemplate.update("delete from t_tag");
         jdbcTemplate.update("delete from t_friend_link");
         jdbcTemplate.update("delete from t_attachment");
         jdbcTemplate.update("delete from t_refresh_token");
@@ -213,6 +217,35 @@ class SecurityConfigTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"status\":\"HIDDEN\"}"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void permitsPublicAndAuthorizedCategoryTagReads() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(get("/api/public/categories")
+                        .queryParam("lang", "zh"))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/public/tags")
+                        .queryParam("lang", "zh"))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/categories"))
+                .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/api/admin/categories")
+                        .header("Authorization",
+                                "Bearer " + demoToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/tags")
+                        .header("Authorization",
+                                "Bearer " + adminToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/api/admin/categories")
+                        .header("Authorization",
+                                "Bearer " + demoToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isForbidden());
     }
 
     @Test
