@@ -46,6 +46,24 @@
         FOR UPDATE
     </select>
 
+    <!-- 按固定顺序锁定文章写入涉及的有效标签，避免并发事务出现锁顺序分歧。 -->
+    <select id="selectActiveByIdsForUpdate"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.TagEntity">
+        SELECT <include refid="tagColumns"/>
+        FROM t_tag
+        WHERE deleted = 0
+          AND id IN
+        <foreach collection="ids"
+                 item="id"
+                 open="("
+                 separator=","
+                 close=")">
+            #{id}
+        </foreach>
+        ORDER BY id ASC
+        FOR UPDATE
+    </select>
+
     <!-- 唯一检查必须包含软删除数据，删除后的 slug 不允许复用。 -->
     <select id="selectBySlugIncludingDeleted"
             resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.TagEntity">

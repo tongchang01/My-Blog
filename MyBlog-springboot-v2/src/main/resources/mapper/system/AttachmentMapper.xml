@@ -34,6 +34,33 @@
           AND deleted = 0
     </select>
 
+    <!-- 其它模块写入结构化引用前锁定 active 附件，避免校验后被并发删除。 -->
+    <select id="selectActiveByIdForUpdate"
+            resultType="com.tyb.myblog.v2.system.infrastructure.persistence.entity.AttachmentEntity">
+        SELECT <include refid="attachmentColumns"/>
+        FROM t_attachment
+        WHERE id = #{id}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
+    <!-- 其它模块批量解析附件公开地址，避免逐条查询。 -->
+    <select id="selectActiveByIds"
+            resultType="com.tyb.myblog.v2.system.infrastructure.persistence.entity.AttachmentEntity">
+        SELECT <include refid="attachmentColumns"/>
+        FROM t_attachment
+        WHERE deleted = 0
+          AND id IN
+        <foreach collection="ids"
+                 item="id"
+                 open="("
+                 separator=","
+                 close=")">
+            #{id}
+        </foreach>
+        ORDER BY id ASC
+    </select>
+
     <!-- 去重必须读取软删除记录，故意不添加 deleted 条件。 -->
     <select id="selectByHashIncludingDeleted"
             resultType="com.tyb.myblog.v2.system.infrastructure.persistence.entity.AttachmentEntity">

@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.system.domain.attachment;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -9,6 +10,10 @@ import java.util.Optional;
 public interface AttachmentRepository {
 
     Optional<Attachment> findActiveById(long id);
+
+    Optional<Attachment> findActiveByIdForUpdate(long id);
+
+    List<Attachment> findActiveByIds(List<Long> ids);
 
     Optional<AttachmentLookup> findByHashIncludingDeleted(String hashSha256);
 

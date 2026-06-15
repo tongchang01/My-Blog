@@ -94,6 +94,10 @@ class DatabaseCategoryTagRepositoryTest {
         assertThat(tagRepository.findActiveById(202L)).isEmpty();
         assertThat(tagRepository.findActiveByIdForUpdate(201L))
                 .isPresent();
+        assertThat(tagRepository.findActiveByIdsForUpdate(
+                List.of(202L, 201L)))
+                .extracting(Tag::id)
+                .containsExactly(201L);
     }
 
     @Test

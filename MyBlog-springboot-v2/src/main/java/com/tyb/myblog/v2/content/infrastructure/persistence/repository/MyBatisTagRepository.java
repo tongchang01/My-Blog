@@ -46,6 +46,16 @@ public class MyBatisTagRepository implements TagRepository {
     }
 
     @Override
+    public List<Tag> findActiveByIdsForUpdate(List<Long> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+        return mapper.selectActiveByIdsForUpdate(ids).stream()
+                .map(mapping::toDomain)
+                .toList();
+    }
+
+    @Override
     public Optional<Tag> findBySlugIncludingDeleted(String slug) {
         return Optional.ofNullable(
                         mapper.selectBySlugIncludingDeleted(slug))

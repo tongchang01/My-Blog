@@ -16,6 +16,11 @@ public interface AttachmentMapper extends BaseMapper<AttachmentEntity> {
 
     AttachmentEntity selectActiveById(@Param("id") long id);
 
+    AttachmentEntity selectActiveByIdForUpdate(@Param("id") long id);
+
+    List<AttachmentEntity> selectActiveByIds(
+            @Param("ids") List<Long> ids);
+
     AttachmentEntity selectByHashIncludingDeleted(@Param("hash") String hash);
 
     List<AttachmentEntity> selectActivePage(

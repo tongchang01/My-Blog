@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -27,6 +28,22 @@ public class MyBatisAttachmentRepository implements AttachmentRepository {
     public Optional<Attachment> findActiveById(long id) {
         return Optional.ofNullable(mapper.selectActiveById(id))
                 .map(this::toDomain);
+    }
+
+    @Override
+    public Optional<Attachment> findActiveByIdForUpdate(long id) {
+        return Optional.ofNullable(mapper.selectActiveByIdForUpdate(id))
+                .map(this::toDomain);
+    }
+
+    @Override
+    public List<Attachment> findActiveByIds(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return List.of();
+        }
+        return mapper.selectActiveByIds(ids).stream()
+                .map(this::toDomain)
+                .toList();
     }
 
     @Override

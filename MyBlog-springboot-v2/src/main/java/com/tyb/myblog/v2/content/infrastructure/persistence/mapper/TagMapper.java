@@ -20,6 +20,9 @@ public interface TagMapper extends BaseMapper<TagEntity> {
 
     TagEntity selectActiveByIdForUpdate(@Param("id") long id);
 
+    List<TagEntity> selectActiveByIdsForUpdate(
+            @Param("ids") List<Long> ids);
+
     TagEntity selectBySlugIncludingDeleted(
             @Param("slug") String slug);
 

@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.content.infrastructure.persistence.mapper.ArticleMapper">
+
+    <sql id="articleColumns">
+        id,
+        title_zh,
+        title_ja,
+        title_en,
+        summary_zh,
+        summary_ja,
+        summary_en,
+        body,
+        category_id,
+        author_id,
+        slug,
+        status,
+        access_password,
+        publish_at,
+        cover_attachment_id,
+        comment_count,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by,
+        deleted,
+        deleted_at,
+        deleted_by
+    </sql>
+
+    <select id="selectActiveById"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity">
+        SELECT <include refid="articleColumns"/>
+        FROM t_article
+        WHERE id = #{id}
+          AND deleted = 0
+    </select>
+
+    <!-- 编辑、删除等写操作前锁定 active 文章，避免并发覆盖。 -->
+    <select id="selectActiveByIdForUpdate"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity">
+        SELECT <include refid="articleColumns"/>
+        FROM t_article
+        WHERE id = #{id}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
+    <!-- 恢复前只锁定已软删除文章。 -->
+    <select id="selectDeletedByIdForUpdate"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity">
+        SELECT <include refid="articleColumns"/>
+        FROM t_article
+        WHERE id = #{id}
+          AND deleted = 1
+        FOR UPDATE
+    </select>
+
+    <select id="selectTagIds" resultType="long">
+        SELECT tag_id
+        FROM t_article_tag
+        WHERE article_id = #{articleId}
+        ORDER BY tag_id ASC
+    </select>
+
+    <!-- 完整更新文章业务字段，评论数只回写聚合中已有值。 -->
+    <update id="updateActive">
+        UPDATE t_article
+        SET title_zh = #{article.titleZh},
+            title_ja = #{article.titleJa},
+            title_en = #{article.titleEn},
+            summary_zh = #{article.summaryZh},
+            summary_ja = #{article.summaryJa},
+            summary_en = #{article.summaryEn},
+            body = #{article.body},
+            category_id = #{article.categoryId},
+            author_id = #{article.authorId},
+            slug = #{article.slug},
+            status = #{article.status},
+            access_password = #{article.accessPassword},
+            publish_at = #{article.publishAt},
+            cover_attachment_id = #{article.coverAttachmentId},
+            comment_count = #{article.commentCount},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{article.id}
+          AND deleted = 0
+    </update>
+
+    <!-- 关联表无独立审计和软删字段，文章编辑时允许物理替换。 -->
+    <delete id="deleteTagRelations">
+        DELETE FROM t_article_tag
+        WHERE article_id = #{articleId}
+    </delete>
+
+    <insert id="insertTagRelation">
+        INSERT INTO t_article_tag (article_id, tag_id)
+        VALUES (#{articleId}, #{tagId})
+    </insert>
+
+</mapper>

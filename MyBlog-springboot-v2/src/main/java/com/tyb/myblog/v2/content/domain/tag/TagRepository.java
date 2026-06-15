@@ -15,6 +15,8 @@ public interface TagRepository {
 
     Optional<Tag> findActiveByIdForUpdate(long id);
 
+    List<Tag> findActiveByIdsForUpdate(List<Long> ids);
+
     Optional<Tag> findBySlugIncludingDeleted(String slug);
 
     Tag insert(NewTag tag);
