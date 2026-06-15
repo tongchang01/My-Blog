@@ -23,4 +23,11 @@ public interface TagRepository {
             Tag tag,
             LocalDateTime updatedAt,
             long updatedBy);
+
+    boolean hasActiveArticleReference(long tagId);
+
+    boolean softDelete(
+            long id,
+            LocalDateTime deletedAt,
+            long deletedBy);
 }

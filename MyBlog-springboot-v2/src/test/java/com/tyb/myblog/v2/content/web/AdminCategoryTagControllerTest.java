@@ -3,13 +3,18 @@ package com.tyb.myblog.v2.content.web;
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
 import com.tyb.myblog.v2.content.application.category.CategoryCreateService;
+import com.tyb.myblog.v2.content.application.category.CategoryDeleteService;
 import com.tyb.myblog.v2.content.application.category.CategoryQueryService;
 import com.tyb.myblog.v2.content.application.category.CategoryResult;
+import com.tyb.myblog.v2.content.application.category.CategorySortItem;
+import com.tyb.myblog.v2.content.application.category.CategorySortService;
 import com.tyb.myblog.v2.content.application.category.CategoryUpdateService;
 import com.tyb.myblog.v2.content.application.category.CreateCategoryCommand;
 import com.tyb.myblog.v2.content.application.category.UpdateCategoryCommand;
+import com.tyb.myblog.v2.content.application.category.UpdateCategorySortOrdersCommand;
 import com.tyb.myblog.v2.content.application.tag.CreateTagCommand;
 import com.tyb.myblog.v2.content.application.tag.TagCreateService;
+import com.tyb.myblog.v2.content.application.tag.TagDeleteService;
 import com.tyb.myblog.v2.content.application.tag.TagQueryService;
 import com.tyb.myblog.v2.content.application.tag.TagResult;
 import com.tyb.myblog.v2.content.application.tag.TagUpdateService;
@@ -33,6 +38,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -59,6 +65,12 @@ class AdminCategoryTagControllerTest {
     private CategoryUpdateService categoryUpdateService;
 
     @MockitoBean
+    private CategorySortService categorySortService;
+
+    @MockitoBean
+    private CategoryDeleteService categoryDeleteService;
+
+    @MockitoBean
     private TagQueryService tagService;
 
     @MockitoBean
@@ -66,6 +78,9 @@ class AdminCategoryTagControllerTest {
 
     @MockitoBean
     private TagUpdateService tagUpdateService;
+
+    @MockitoBean
+    private TagDeleteService tagDeleteService;
 
     @MockitoBean
     private CategoryWebMapping categoryMapping;
@@ -297,6 +312,34 @@ class AdminCategoryTagControllerTest {
                                 }
                                 """.formatted("a".repeat(65))))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void sortsCategoriesOnStaticPathAndDeletesByNumericIdentity()
+            throws Exception {
+        mockMvc.perform(put("/api/admin/categories/sort-orders")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "items":[
+                                    {"id":101,"sortOrder":0},
+                                    {"id":102,"sortOrder":10}
+                                  ]
+                                }
+                                """))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/admin/categories/101"))
+                .andExpect(status().isOk());
+        mockMvc.perform(delete("/api/admin/tags/201"))
+                .andExpect(status().isOk());
+
+        verify(categorySortService).update(
+                principal,
+                new UpdateCategorySortOrdersCommand(List.of(
+                        new CategorySortItem(101L, 0),
+                        new CategorySortItem(102L, 10))));
+        verify(categoryDeleteService).delete(principal, 101L);
+        verify(tagDeleteService).delete(principal, 201L);
     }
 
     private AdminCategoryVO categoryVO(CategoryResult result) {

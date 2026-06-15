@@ -173,6 +173,59 @@ class DatabaseCategoryTagRepositoryTest {
                 });
     }
 
+    @Test
+    void detectsOnlyActiveArticleReferencesAndSoftDeletesWithAudit() {
+        insertCategory(101L, "Backend", "backend", 10, false);
+        insertTag(201L, "Java", "java", false);
+        insertArticle(301L, 101L, false);
+        jdbcTemplate.update("""
+                INSERT INTO t_article_tag (article_id, tag_id)
+                VALUES (?, ?)
+                """, 301L, 201L);
+
+        assertThat(categoryRepository
+                .hasActiveArticleReference(101L)).isTrue();
+        assertThat(tagRepository
+                .hasActiveArticleReference(201L)).isTrue();
+
+        jdbcTemplate.update("""
+                UPDATE t_article
+                SET deleted = 1,
+                    deleted_at = '2026-06-15 11:00:00',
+                    deleted_by = 1001
+                WHERE id = ?
+                """, 301L);
+        assertThat(categoryRepository
+                .hasActiveArticleReference(101L)).isFalse();
+        assertThat(tagRepository
+                .hasActiveArticleReference(201L)).isFalse();
+
+        LocalDateTime deletedAt =
+                LocalDateTime.of(2026, 6, 15, 12, 0);
+        assertThat(categoryRepository.softDelete(
+                101L, deletedAt, 2001L)).isTrue();
+        assertThat(tagRepository.softDelete(
+                201L, deletedAt, 2001L)).isTrue();
+        assertThat(jdbcTemplate.queryForMap("""
+                SELECT deleted, deleted_at, deleted_by,
+                       updated_at, updated_by
+                FROM t_category
+                WHERE id = ?
+                """, 101L))
+                .containsEntry("DELETED", 1)
+                .containsEntry("DELETED_BY", 2001L)
+                .containsEntry("UPDATED_BY", 2001L);
+        assertThat(jdbcTemplate.queryForMap("""
+                SELECT deleted, deleted_at, deleted_by,
+                       updated_at, updated_by
+                FROM t_tag
+                WHERE id = ?
+                """, 201L))
+                .containsEntry("DELETED", 1)
+                .containsEntry("DELETED_BY", 2001L)
+                .containsEntry("UPDATED_BY", 2001L);
+    }
+
     private void insertCategory(
             long id,
             String nameZh,
@@ -216,6 +269,32 @@ class DatabaseCategoryTagRepositoryTest {
                 id,
                 nameZh,
                 slug,
+                deleted ? 1 : 0,
+                deleted ? "2026-06-15 11:00:00" : null,
+                deleted ? 1001L : null);
+    }
+
+    private void insertArticle(
+            long id,
+            long categoryId,
+            boolean deleted) {
+        jdbcTemplate.update("""
+                INSERT INTO t_article (
+                    id, title_zh, category_id, author_id,
+                    slug, status, comment_count,
+                    created_at, created_by, updated_at, updated_by,
+                    deleted, deleted_at, deleted_by
+                ) VALUES (
+                    ?, '文章', ?, 1001,
+                    ?, 2, 0,
+                    '2026-06-15 10:00:00', 1001,
+                    '2026-06-15 10:00:00', 1001,
+                    ?, ?, ?
+                )
+                """,
+                id,
+                categoryId,
+                "article-" + id,
                 deleted ? 1 : 0,
                 deleted ? "2026-06-15 11:00:00" : null,
                 deleted ? 1001L : null);

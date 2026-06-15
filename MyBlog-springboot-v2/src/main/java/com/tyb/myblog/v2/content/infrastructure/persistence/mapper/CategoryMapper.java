@@ -30,4 +30,18 @@ public interface CategoryMapper extends BaseMapper<CategoryEntity> {
             @Param("category") CategoryEntity category,
             @Param("updatedAt") LocalDateTime updatedAt,
             @Param("updatedBy") long updatedBy);
+
+    int updateSortOrder(
+            @Param("id") long id,
+            @Param("sortOrder") int sortOrder,
+            @Param("updatedAt") LocalDateTime updatedAt,
+            @Param("updatedBy") long updatedBy);
+
+    boolean existsActiveArticleReference(
+            @Param("categoryId") long categoryId);
+
+    int softDelete(
+            @Param("id") long id,
+            @Param("deletedAt") LocalDateTime deletedAt,
+            @Param("deletedBy") long deletedBy);
 }

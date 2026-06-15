@@ -94,4 +94,27 @@ public class MyBatisCategoryRepository
             throw new ContentSlugConflictException();
         }
     }
+
+    @Override
+    public boolean updateSortOrder(
+            long id,
+            int sortOrder,
+            LocalDateTime updatedAt,
+            long updatedBy) {
+        return mapper.updateSortOrder(
+                id, sortOrder, updatedAt, updatedBy) == 1;
+    }
+
+    @Override
+    public boolean hasActiveArticleReference(long categoryId) {
+        return mapper.existsActiveArticleReference(categoryId);
+    }
+
+    @Override
+    public boolean softDelete(
+            long id,
+            LocalDateTime deletedAt,
+            long deletedBy) {
+        return mapper.softDelete(id, deletedAt, deletedBy) == 1;
+    }
 }

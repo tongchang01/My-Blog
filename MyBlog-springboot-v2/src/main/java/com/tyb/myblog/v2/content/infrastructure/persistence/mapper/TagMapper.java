@@ -27,4 +27,12 @@ public interface TagMapper extends BaseMapper<TagEntity> {
             @Param("tag") TagEntity tag,
             @Param("updatedAt") LocalDateTime updatedAt,
             @Param("updatedBy") long updatedBy);
+
+    boolean existsActiveArticleReference(
+            @Param("tagId") long tagId);
+
+    int softDelete(
+            @Param("id") long id,
+            @Param("deletedAt") LocalDateTime deletedAt,
+            @Param("deletedBy") long deletedBy);
 }

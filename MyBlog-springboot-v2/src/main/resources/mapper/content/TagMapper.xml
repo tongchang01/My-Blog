@@ -67,4 +67,30 @@
           AND deleted = 0
     </update>
 
+    <!-- 删除标签前判断是否仍被未删除文章引用。
+         关联表无软删列，因此联结文章表过滤 active 文章。 -->
+    <select id="existsActiveArticleReference"
+            resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM t_article_tag article_tag
+            INNER JOIN t_article article
+                ON article.id = article_tag.article_id
+            WHERE article_tag.tag_id = #{tagId}
+              AND article.deleted = 0
+        )
+    </select>
+
+    <!-- 显式软删除同时写入删除和更新审计字段。 -->
+    <update id="softDelete">
+        UPDATE t_tag
+        SET deleted = 1,
+            deleted_at = #{deletedAt},
+            deleted_by = #{deletedBy},
+            updated_at = #{deletedAt},
+            updated_by = #{deletedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
 </mapper>

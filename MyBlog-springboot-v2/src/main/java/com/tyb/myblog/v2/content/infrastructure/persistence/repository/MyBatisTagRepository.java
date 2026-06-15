@@ -81,4 +81,17 @@ public class MyBatisTagRepository implements TagRepository {
             throw new ContentSlugConflictException();
         }
     }
+
+    @Override
+    public boolean hasActiveArticleReference(long tagId) {
+        return mapper.existsActiveArticleReference(tagId);
+    }
+
+    @Override
+    public boolean softDelete(
+            long id,
+            LocalDateTime deletedAt,
+            long deletedBy) {
+        return mapper.softDelete(id, deletedAt, deletedBy) == 1;
+    }
 }

@@ -25,4 +25,17 @@ public interface CategoryRepository {
             Category category,
             LocalDateTime updatedAt,
             long updatedBy);
+
+    boolean updateSortOrder(
+            long id,
+            int sortOrder,
+            LocalDateTime updatedAt,
+            long updatedBy);
+
+    boolean hasActiveArticleReference(long categoryId);
+
+    boolean softDelete(
+            long id,
+            LocalDateTime deletedAt,
+            long deletedBy);
 }

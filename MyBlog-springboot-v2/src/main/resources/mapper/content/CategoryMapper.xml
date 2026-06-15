@@ -87,4 +87,38 @@
           AND deleted = 0
     </update>
 
+    <!-- 批量排序逐行更新，事务边界由应用服务统一控制。 -->
+    <update id="updateSortOrder">
+        UPDATE t_category
+        SET sort_order = #{sortOrder},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <!-- 删除分类前判断是否仍被未删除文章引用。
+         只判断引用完整性，不复制文章公开可见性规则。 -->
+    <select id="existsActiveArticleReference"
+            resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM t_article
+            WHERE category_id = #{categoryId}
+              AND deleted = 0
+        )
+    </select>
+
+    <!-- 显式软删除同时写入删除和更新审计字段。 -->
+    <update id="softDelete">
+        UPDATE t_category
+        SET deleted = 1,
+            deleted_at = #{deletedAt},
+            deleted_by = #{deletedBy},
+            updated_at = #{deletedAt},
+            updated_by = #{deletedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
 </mapper>
