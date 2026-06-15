@@ -62,15 +62,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  computed,
-  defineComponent,
-  onBeforeMount,
-  onUnmounted,
-  ref,
-  watch
-} from 'vue'
+<script setup lang="ts">
+import { computed, onBeforeMount, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { Sidebar, TagBox, CategoryBox } from '@/components/Sidebar'
 import Paginator from '@/components/Paginator.vue'
@@ -81,112 +74,94 @@ import { usePostStore } from '@/stores/post'
 import { useMetaStore } from '@/stores/meta'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 
-export default defineComponent({
-  name: 'ArResult',
-  components: {
-    Sidebar,
-    TagBox,
-    Paginator,
-    ArticleCard,
-    CategoryBox,
-    SvgIcon
-  },
-  setup() {
-    const { t } = useI18n()
-    const route = useRoute()
-    const postStore = usePostStore()
-    const metaStore = useMetaStore()
-    const pageType = ref('search')
+const { t } = useI18n()
+const route = useRoute()
+const postStore = usePostStore()
+const metaStore = useMetaStore()
+const pageType = ref('search')
 
-    const isFetched = ref(false)
-    const posts = ref(new SpecificPostsList())
-    const pagination = ref({
-      pageSize: 12,
-      pageTotal: 0,
-      page: 1
-    })
-    const queryTagKey = 'aurora-query-tag'
-    const queryCategoryKey = 'aurora-query-category'
-    const queryTag = ref()
-    const queryCategory = ref()
-
-    const initPage = () => {
-      if (queryTag.value) {
-        fetchPostByTag()
-      } else if (queryCategory.value) {
-        fetchPostByCategory()
-      }
-
-      window.scrollTo({
-        top: 0
-      })
-
-      metaStore.setTitle('search')
-    }
-
-    const fetchPostByTag = () => {
-      isFetched.value = false
-      postStore.fetchPostsByTag(queryTag.value).then(response => {
-        isFetched.value = true
-        posts.value = response
-        pagination.value.pageTotal = response.total
-      })
-    }
-
-    const fetchPostByCategory = () => {
-      isFetched.value = false
-      postStore.fetchPostsByCategory(queryCategory.value).then(response => {
-        isFetched.value = true
-        posts.value = response
-        pagination.value.pageTotal = response.total
-      })
-    }
-
-    const pageChangeHandler = () => {
-      queryCategory.value = ''
-      queryTag.value = ''
-      const { tag, category } = route.query
-
-      if (category) {
-        queryCategory.value = category
-      } else if (tag) {
-        queryTag.value = tag
-      }
-
-      if (tag || category) {
-        initPage()
-      }
-    }
-
-    watch(
-      () => route.query,
-      () => {
-        pageChangeHandler()
-      }
-    )
-
-    onBeforeMount(() => {
-      pageChangeHandler()
-    })
-
-    onUnmounted(() => {
-      localStorage.removeItem(queryTagKey)
-      localStorage.removeItem(queryCategoryKey)
-    })
-
-    return {
-      isLoading: computed(() => !isFetched.value),
-      isEmpty: computed(() => posts.value.data.length === 0 && isFetched.value),
-      categoryTitle: computed(() => queryCategory.value),
-      tagTitle: computed(() => queryTag.value),
-      posts,
-      pageType,
-      pagination,
-      pageChangeHandler,
-      t
-    }
-  }
+const isFetched = ref(false)
+const posts = ref(new SpecificPostsList())
+const pagination = ref({
+  pageSize: 12,
+  pageTotal: 0,
+  page: 1
 })
+const queryTagKey = 'aurora-query-tag'
+const queryCategoryKey = 'aurora-query-category'
+const queryTag = ref()
+const queryCategory = ref()
+
+const fetchPostByTag = () => {
+  isFetched.value = false
+  postStore.fetchPostsByTag(queryTag.value).then(response => {
+    isFetched.value = true
+    posts.value = response
+    pagination.value.pageTotal = response.total
+  })
+}
+
+const fetchPostByCategory = () => {
+  isFetched.value = false
+  postStore.fetchPostsByCategory(queryCategory.value).then(response => {
+    isFetched.value = true
+    posts.value = response
+    pagination.value.pageTotal = response.total
+  })
+}
+
+const initPage = () => {
+  if (queryTag.value) {
+    fetchPostByTag()
+  } else if (queryCategory.value) {
+    fetchPostByCategory()
+  }
+
+  window.scrollTo({
+    top: 0
+  })
+
+  metaStore.setTitle('search')
+}
+
+const pageChangeHandler = () => {
+  queryCategory.value = ''
+  queryTag.value = ''
+  const { tag, category } = route.query
+
+  if (category) {
+    queryCategory.value = category
+  } else if (tag) {
+    queryTag.value = tag
+  }
+
+  if (tag || category) {
+    initPage()
+  }
+}
+
+watch(
+  () => route.query,
+  () => {
+    pageChangeHandler()
+  }
+)
+
+onBeforeMount(() => {
+  pageChangeHandler()
+})
+
+onUnmounted(() => {
+  localStorage.removeItem(queryTagKey)
+  localStorage.removeItem(queryCategoryKey)
+})
+
+const isLoading = computed(() => !isFetched.value)
+const isEmpty = computed(
+  () => posts.value.data.length === 0 && isFetched.value
+)
+const categoryTitle = computed(() => queryCategory.value)
+const tagTitle = computed(() => queryTag.value)
 </script>
 
 <style lang="scss" scoped></style>
