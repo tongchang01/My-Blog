@@ -54,4 +54,17 @@
         WHERE slug = #{slug}
     </select>
 
+    <!-- 完整编辑标签业务字段，并同步更新审计信息。 -->
+    <update id="updateActive">
+        UPDATE t_tag
+        SET name_zh = #{tag.nameZh},
+            name_ja = #{tag.nameJa},
+            name_en = #{tag.nameEn},
+            slug = #{tag.slug},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{tag.id}
+          AND deleted = 0
+    </update>
+
 </mapper>

@@ -73,4 +73,18 @@
         WHERE slug = #{slug}
     </select>
 
+    <!-- 完整编辑分类业务字段，并同步更新审计信息。 -->
+    <update id="updateActive">
+        UPDATE t_category
+        SET name_zh = #{category.nameZh},
+            name_ja = #{category.nameJa},
+            name_en = #{category.nameEn},
+            slug = #{category.slug},
+            sort_order = #{category.sortOrder},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{category.id}
+          AND deleted = 0
+    </update>
+
 </mapper>

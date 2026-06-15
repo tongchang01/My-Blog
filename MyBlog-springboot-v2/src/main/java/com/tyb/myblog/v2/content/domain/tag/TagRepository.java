@@ -1,5 +1,6 @@
 package com.tyb.myblog.v2.content.domain.tag;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,4 +18,9 @@ public interface TagRepository {
     Optional<Tag> findBySlugIncludingDeleted(String slug);
 
     Tag insert(NewTag tag);
+
+    boolean update(
+            Tag tag,
+            LocalDateTime updatedAt,
+            long updatedBy);
 }

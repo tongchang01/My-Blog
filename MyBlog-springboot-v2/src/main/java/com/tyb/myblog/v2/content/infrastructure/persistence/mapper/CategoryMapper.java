@@ -5,6 +5,7 @@ import com.tyb.myblog.v2.content.infrastructure.persistence.entity.CategoryEntit
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -24,4 +25,9 @@ public interface CategoryMapper extends BaseMapper<CategoryEntity> {
 
     CategoryEntity selectBySlugIncludingDeleted(
             @Param("slug") String slug);
+
+    int updateActive(
+            @Param("category") CategoryEntity category,
+            @Param("updatedAt") LocalDateTime updatedAt,
+            @Param("updatedBy") long updatedBy);
 }

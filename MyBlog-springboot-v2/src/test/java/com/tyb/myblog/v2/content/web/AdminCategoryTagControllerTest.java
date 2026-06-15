@@ -2,10 +2,18 @@ package com.tyb.myblog.v2.content.web;
 
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
+import com.tyb.myblog.v2.content.application.category.CategoryCreateService;
 import com.tyb.myblog.v2.content.application.category.CategoryQueryService;
 import com.tyb.myblog.v2.content.application.category.CategoryResult;
+import com.tyb.myblog.v2.content.application.category.CategoryUpdateService;
+import com.tyb.myblog.v2.content.application.category.CreateCategoryCommand;
+import com.tyb.myblog.v2.content.application.category.UpdateCategoryCommand;
+import com.tyb.myblog.v2.content.application.tag.CreateTagCommand;
+import com.tyb.myblog.v2.content.application.tag.TagCreateService;
 import com.tyb.myblog.v2.content.application.tag.TagQueryService;
 import com.tyb.myblog.v2.content.application.tag.TagResult;
+import com.tyb.myblog.v2.content.application.tag.TagUpdateService;
+import com.tyb.myblog.v2.content.application.tag.UpdateTagCommand;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +29,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -41,7 +53,19 @@ class AdminCategoryTagControllerTest {
     private CategoryQueryService categoryService;
 
     @MockitoBean
+    private CategoryCreateService categoryCreateService;
+
+    @MockitoBean
+    private CategoryUpdateService categoryUpdateService;
+
+    @MockitoBean
     private TagQueryService tagService;
+
+    @MockitoBean
+    private TagCreateService tagCreateService;
+
+    @MockitoBean
+    private TagUpdateService tagUpdateService;
 
     @MockitoBean
     private CategoryWebMapping categoryMapping;
@@ -130,6 +154,176 @@ class AdminCategoryTagControllerTest {
         mockMvc.perform(get("/api/admin/tags/201"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(201));
+    }
+
+    @Test
+    void createsAndFullyUpdatesCategory() throws Exception {
+        CategoryResult result = categoryResult();
+        when(categoryCreateService.create(
+                any(), any(CreateCategoryCommand.class)))
+                .thenReturn(result);
+        when(categoryUpdateService.update(
+                any(), any(Long.class), any(UpdateCategoryCommand.class)))
+                .thenReturn(result);
+        when(categoryMapping.toAdminVO(result))
+                .thenReturn(categoryVO(result));
+
+        String body = """
+                {
+                  "nameZh":"后端",
+                  "nameJa":null,
+                  "nameEn":"Backend",
+                  "slug":"backend",
+                  "sortOrder":10
+                }
+                """;
+        mockMvc.perform(post("/api/admin/categories")
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.slug").value("backend"));
+        mockMvc.perform(put("/api/admin/categories/101")
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk());
+
+        verify(categoryCreateService).create(
+                principal,
+                new CreateCategoryCommand(
+                        "后端", null, "Backend", "backend", 10));
+        verify(categoryUpdateService).update(
+                principal,
+                101L,
+                new UpdateCategoryCommand(
+                        "后端", null, "Backend", "backend", 10));
+    }
+
+    @Test
+    void createsAndFullyUpdatesTagWithExplicitNullNames()
+            throws Exception {
+        TagResult result = tagResult();
+        when(tagCreateService.create(
+                any(), any(CreateTagCommand.class)))
+                .thenReturn(result);
+        when(tagUpdateService.update(
+                any(), any(Long.class), any(UpdateTagCommand.class)))
+                .thenReturn(result);
+        when(tagMapping.toAdminVO(result)).thenReturn(tagVO(result));
+
+        String body = """
+                {
+                  "nameZh":"Java",
+                  "nameJa":null,
+                  "nameEn":null,
+                  "slug":"java"
+                }
+                """;
+        mockMvc.perform(post("/api/admin/tags")
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/admin/tags/201")
+                        .contentType("application/json")
+                        .content(body))
+                .andExpect(status().isOk());
+
+        verify(tagUpdateService).update(
+                principal,
+                201L,
+                new UpdateTagCommand("Java", null, null, "java"));
+    }
+
+    @Test
+    void rejectsMissingUnknownAndInvalidCategoryFields()
+            throws Exception {
+        mockMvc.perform(post("/api/admin/categories")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "nameZh":"后端",
+                                  "nameJa":null,
+                                  "nameEn":null,
+                                  "slug":"backend"
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/admin/categories")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "nameZh":"后端",
+                                  "nameJa":null,
+                                  "nameEn":null,
+                                  "slug":"backend",
+                                  "sortOrder":10,
+                                  "unknown":true
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/admin/categories")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "nameZh":"后端",
+                                  "nameJa":null,
+                                  "nameEn":null,
+                                  "slug":"invalid_slug",
+                                  "sortOrder":-1
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void rejectsMissingAndOverlongTagFields() throws Exception {
+        mockMvc.perform(put("/api/admin/tags/201")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "nameZh":"Java",
+                                  "nameJa":null,
+                                  "slug":"java"
+                                }
+                                """))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/api/admin/tags")
+                        .contentType("application/json")
+                        .content("""
+                                {
+                                  "nameZh":"%s",
+                                  "nameJa":null,
+                                  "nameEn":null,
+                                  "slug":"java"
+                                }
+                                """.formatted("a".repeat(65))))
+                .andExpect(status().isBadRequest());
+    }
+
+    private AdminCategoryVO categoryVO(CategoryResult result) {
+        return new AdminCategoryVO(
+                result.id(),
+                result.nameZh(),
+                result.nameJa(),
+                result.nameEn(),
+                result.slug(),
+                result.sortOrder(),
+                result.createdAt(),
+                result.createdBy(),
+                result.updatedAt(),
+                result.updatedBy());
+    }
+
+    private AdminTagVO tagVO(TagResult result) {
+        return new AdminTagVO(
+                result.id(),
+                result.nameZh(),
+                result.nameJa(),
+                result.nameEn(),
+                result.slug(),
+                result.createdAt(),
+                result.createdBy(),
+                result.updatedAt(),
+                result.updatedBy());
     }
 
     private CategoryResult categoryResult() {

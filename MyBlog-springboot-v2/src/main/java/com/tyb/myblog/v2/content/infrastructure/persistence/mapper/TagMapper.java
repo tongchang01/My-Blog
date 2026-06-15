@@ -5,6 +5,7 @@ import com.tyb.myblog.v2.content.infrastructure.persistence.entity.TagEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -21,4 +22,9 @@ public interface TagMapper extends BaseMapper<TagEntity> {
 
     TagEntity selectBySlugIncludingDeleted(
             @Param("slug") String slug);
+
+    int updateActive(
+            @Param("tag") TagEntity tag,
+            @Param("updatedAt") LocalDateTime updatedAt,
+            @Param("updatedBy") long updatedBy);
 }

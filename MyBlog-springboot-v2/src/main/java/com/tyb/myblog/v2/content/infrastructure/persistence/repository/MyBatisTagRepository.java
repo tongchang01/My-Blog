@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,5 +65,20 @@ public class MyBatisTagRepository implements TagRepository {
             throw new ContentSlugConflictException();
         }
         return mapping.toDomain(entity);
+    }
+
+    @Override
+    public boolean update(
+            Tag tag,
+            LocalDateTime updatedAt,
+            long updatedBy) {
+        try {
+            return mapper.updateActive(
+                    mapping.toEntity(tag),
+                    updatedAt,
+                    updatedBy) == 1;
+        } catch (DuplicateKeyException exception) {
+            throw new ContentSlugConflictException();
+        }
     }
 }

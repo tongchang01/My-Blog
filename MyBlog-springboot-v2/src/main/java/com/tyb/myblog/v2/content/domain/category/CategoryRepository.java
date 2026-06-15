@@ -1,5 +1,6 @@
 package com.tyb.myblog.v2.content.domain.category;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +20,9 @@ public interface CategoryRepository {
     Optional<Category> findBySlugIncludingDeleted(String slug);
 
     Category insert(NewCategory category);
+
+    boolean update(
+            Category category,
+            LocalDateTime updatedAt,
+            long updatedBy);
 }

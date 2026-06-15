@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -133,6 +134,43 @@ class DatabaseCategoryTagRepositoryTest {
                 """, tag.id()))
                 .containsEntry("CREATED_BY", 1001L)
                 .containsEntry("UPDATED_BY", 1001L);
+    }
+
+    @Test
+    void fullyUpdatesActiveRowsAndAuditUsers() {
+        insertCategory(101L, "Backend", "backend", 10, false);
+        insertTag(201L, "Java", "java", false);
+        LocalDateTime updatedAt =
+                LocalDateTime.of(2026, 6, 15, 12, 0);
+
+        Category category = categoryRepository.findActiveById(101L)
+                .orElseThrow()
+                .replace("服务端", null, null, "server", 20);
+        Tag tag = tagRepository.findActiveById(201L)
+                .orElseThrow()
+                .replace("Java 17", null, null, "java-17");
+
+        assertThat(categoryRepository.update(
+                category, updatedAt, 2001L)).isTrue();
+        assertThat(tagRepository.update(
+                tag, updatedAt, 2001L)).isTrue();
+        assertThat(categoryRepository.findActiveById(101L))
+                .get()
+                .satisfies(updated -> {
+                    assertThat(updated.name().zh()).isEqualTo("服务端");
+                    assertThat(updated.name().ja()).isNull();
+                    assertThat(updated.slug().value()).isEqualTo("server");
+                    assertThat(updated.sortOrder()).isEqualTo(20);
+                    assertThat(updated.updatedAt()).isEqualTo(updatedAt);
+                    assertThat(updated.updatedBy()).isEqualTo(2001L);
+                });
+        assertThat(tagRepository.findActiveById(201L))
+                .get()
+                .satisfies(updated -> {
+                    assertThat(updated.name().zh()).isEqualTo("Java 17");
+                    assertThat(updated.slug().value()).isEqualTo("java-17");
+                    assertThat(updated.updatedBy()).isEqualTo(2001L);
+                });
     }
 
     private void insertCategory(

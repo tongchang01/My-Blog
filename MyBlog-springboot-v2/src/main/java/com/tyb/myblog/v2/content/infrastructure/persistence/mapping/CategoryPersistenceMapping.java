@@ -42,4 +42,13 @@ public interface CategoryPersistenceMapping {
     @Mapping(target = "deletedAt", ignore = true)
     @Mapping(target = "deletedBy", ignore = true)
     CategoryEntity toEntity(NewCategory category);
+
+    @Mapping(target = "nameZh", source = "name.zh")
+    @Mapping(target = "nameJa", source = "name.ja")
+    @Mapping(target = "nameEn", source = "name.en")
+    @Mapping(target = "slug", source = "slug.value")
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
+    @Mapping(target = "deletedBy", ignore = true)
+    CategoryEntity toEntity(Category category);
 }

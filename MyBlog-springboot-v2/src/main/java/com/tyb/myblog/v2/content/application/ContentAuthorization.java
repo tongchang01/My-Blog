@@ -36,7 +36,7 @@ public class ContentAuthorization {
         try {
             long id = Long.parseLong(principal.id());
             if (id <= 0) {
-                throw new NumberFormatException();
+                throw new ApiException(ApiErrorCode.FORBIDDEN);
             }
             return id;
         } catch (NumberFormatException exception) {
