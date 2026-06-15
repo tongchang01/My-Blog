@@ -56,10 +56,10 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Archives } from '@/models/Post.class'
 import { usePostStore } from '@/stores/post'
-import { defineComponent, onBeforeMount, onUnmounted, ref } from 'vue'
+import { onBeforeMount, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import Paginator from '@/components/Paginator.vue'
@@ -67,51 +67,37 @@ import { useCommonStore } from '@/stores/common'
 import defaultCover from '@/assets/default-cover.jpg'
 import usePageTitle from '@/hooks/usePageTitle'
 
-export default defineComponent({
-  name: 'ArArchives',
-  components: { Breadcrumbs, Paginator },
-  setup() {
-    const commonStore = useCommonStore()
-    const postStore = usePostStore()
-    const { t } = useI18n()
-    const archives = ref(new Archives().data)
-    const pagination = ref({
-      pageTotal: 0,
-      page: 1
-    })
-    const { pageTitle, updateTitle } = usePageTitle()
+const commonStore = useCommonStore()
+const postStore = usePostStore()
+const { t } = useI18n()
+const archives = ref(new Archives().data)
+const pagination = ref({
+  pageTotal: 0,
+  page: 1
+})
+const { pageTitle, updateTitle } = usePageTitle()
 
-    const fetchData = async () => {
-      const data = await postStore.fetchArchives(pagination.value.page)
+const fetchData = async () => {
+  const data = await postStore.fetchArchives(pagination.value.page)
 
-      pagination.value.pageTotal = data.total
-      archives.value = data.data
-      commonStore.setHeaderImage(defaultCover)
-      updateTitle()
-    }
+  pagination.value.pageTotal = data.total
+  archives.value = data.data
+  commonStore.setHeaderImage(defaultCover)
+  updateTitle()
+}
 
-    const pageChangeHandler = (page: number) => {
-      pagination.value.page = page
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      })
-      fetchData()
-    }
+const pageChangeHandler = (page: number) => {
+  pagination.value.page = page
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+  fetchData()
+}
 
-    onBeforeMount(fetchData)
-    onUnmounted(() => {
-      commonStore.resetHeaderImage()
-    })
-
-    return {
-      pageTitle,
-      pageChangeHandler,
-      pagination,
-      archives,
-      t
-    }
-  }
+onBeforeMount(fetchData)
+onUnmounted(() => {
+  commonStore.resetHeaderImage()
 })
 </script>
 
