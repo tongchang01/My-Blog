@@ -176,11 +176,19 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Sidebar, Toc, Profile } from '@/components/Sidebar'
 import { Post } from '@/models/Post.class'
 import { usePostStore } from '@/stores/post'
-import { Ref, computed, defineComponent, nextTick, ref, watch } from 'vue'
+import {
+  Ref,
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch
+} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import Comment from '@/components/Comment.vue'
@@ -189,7 +197,6 @@ import { ArticleCard } from '@/components/ArticleCard'
 import { useMetaStore } from '@/stores/meta'
 import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
-import SvgIcon, { SvgTypes } from '@/components/SvgIcon/index.vue'
 import PostStats from '@/components/Post/PostStats.vue'
 import useCommentPlugin from '@/hooks/useCommentPlugin'
 import useLightBox from '@/hooks/useLightBox'
@@ -199,110 +206,85 @@ interface PostStatsExpose extends Ref<InstanceType<typeof PostStats>> {
   getPostView(): void
 }
 
-export default defineComponent({
-  name: 'ARPost',
-  components: {
-    Sidebar,
-    Toc,
-    Comment,
-    SubTitle,
-    ArticleCard,
-    Profile,
-    SvgIcon,
-    PostStats
-  },
-  setup() {
-    const metaStore = useMetaStore()
-    const postStore = usePostStore()
-    const appStore = useAppStore()
-    const commonStore = useCommonStore()
-    const route = useRoute()
-    const router = useRouter()
-    const { t } = useI18n()
-    const post = ref(new Post())
-    const loading = ref(true)
-    const postStatsRef = ref<PostStatsExpose>()
-    const { enabledCommentPlugin } = useCommentPlugin()
-    const { initializeLightBox } = useLightBox()
+const metaStore = useMetaStore()
+const postStore = usePostStore()
+const appStore = useAppStore()
+const commonStore = useCommonStore()
+const route = useRoute()
+const router = useRouter()
+const { t } = useI18n()
+const post = ref(new Post())
+const loading = ref(true)
+const postStatsRef = ref<PostStatsExpose>()
+const { enabledCommentPlugin } = useCommentPlugin()
+const { initializeLightBox } = useLightBox()
 
-    const fetchData = async () => {
-      loading.value = true
-      post.value = new Post()
-      window.scrollTo({
-        top: 0
-      })
-      let slug = String(route.params.slug)
-      slug = slug.indexOf(',') ? slug.replace(/[,]+/g, '/') : slug
-      await postStore.fetchPost(slug).then(response => {
-        post.value = response
-        metaStore.setTitle(post.value.title)
-        commonStore.setHeaderImage(response.cover)
-        loading.value = false
-      })
-      if (appStore.hexoConfig.writing.highlight.enable) {
-        // eslint-disable-next-line no-console
-        console.warn('[Aurora Config Error]: Please turn off [Hightlightjs].')
-      }
-      if (appStore.hexoConfig.writing.prismjs.enable) {
-        // eslint-disable-next-line no-console
-        console.warn('[Aurora Config Error]: Please turn off [prismjs]. ')
-      }
-      await nextTick()
-      initializeLightBox()
-      postStatsRef.value?.getCommentCount()
-      postStatsRef.value?.getPostView()
-    }
+const fetchData = async () => {
+  loading.value = true
+  post.value = new Post()
+  window.scrollTo({
+    top: 0
+  })
+  let slug = String(route.params.slug)
+  slug = slug.indexOf(',') ? slug.replace(/[,]+/g, '/') : slug
+  await postStore.fetchPost(slug).then(response => {
+    post.value = response
+    metaStore.setTitle(post.value.title)
+    commonStore.setHeaderImage(response.cover)
+    loading.value = false
+  })
+  if (appStore.hexoConfig.writing.highlight.enable) {
+    // eslint-disable-next-line no-console
+    console.warn('[Aurora Config Error]: Please turn off [Hightlightjs].')
+  }
+  if (appStore.hexoConfig.writing.prismjs.enable) {
+    // eslint-disable-next-line no-console
+    console.warn('[Aurora Config Error]: Please turn off [prismjs]. ')
+  }
+  await nextTick()
+  initializeLightBox()
+  postStatsRef.value?.getCommentCount()
+  postStatsRef.value?.getPostView()
+}
 
-    watch(
-      () => route.params,
-      toParams => {
-        if (toParams.slug && route.fullPath.indexOf('#') === -1) fetchData()
-      }
-    )
+watch(
+  () => route.params,
+  toParams => {
+    if (toParams.slug && route.fullPath.indexOf('#') === -1) fetchData()
+  }
+)
 
-    const handleAuthorClick = (link: string) => {
-      if (link === '') link = window.location.href
-      window.location.href = link
-    }
+const handleAuthorClick = (link: string) => {
+  if (link === '') link = window.location.href
+  window.location.href = link
+}
 
-    const navigateToTag = (slug: string) => {
-      router.push({ name: 'post-search', query: { tag: slug } })
-    }
+const navigateToTag = (slug: string) => {
+  router.push({ name: 'post-search', query: { tag: slug } })
+}
 
-    const navigateToCategory = (slug: string) => {
-      router.push({ name: 'post-search', query: { category: slug } })
-    }
+const navigateToCategory = (slug: string) => {
+  router.push({ name: 'post-search', query: { category: slug } })
+}
 
-    return {
-      avatarClasses: computed(() => {
-        return {
-          'hover:opacity-50 cursor-pointer': true,
-          [appStore.themeConfig.theme.profile_shape]: true
-        }
-      }),
-      isMobile: computed(() => commonStore.isMobile),
-      currentPath: computed(() => route.path),
-      pluginConfigs: computed(() => appStore.themeConfig.plugins),
-      enabledComment: computed(
-        () => post.value.comments && enabledCommentPlugin.value.plugin !== ''
-      ),
-      postStatsRef,
-      SvgTypes,
-      commonStore,
-      fetchData,
-      handleAuthorClick,
-      navigateToTag,
-      navigateToCategory,
-      loading,
-      post,
-      t
-    }
-  },
-  mounted() {
-    this.fetchData()
-  },
-  beforeUnmount() {
-    this.commonStore.resetHeaderImage()
+onMounted(() => {
+  fetchData()
+})
+
+onBeforeUnmount(() => {
+  commonStore.resetHeaderImage()
+})
+
+const avatarClasses = computed(() => {
+  return {
+    'hover:opacity-50 cursor-pointer': true,
+    [appStore.themeConfig.theme.profile_shape]: true
   }
 })
+const isMobile = computed(() => commonStore.isMobile)
+const currentPath = computed(() => route.path)
+const pluginConfigs = computed(() => appStore.themeConfig.plugins)
+const enabledComment = computed(
+  () => post.value.comments && enabledCommentPlugin.value.plugin !== ''
+)
 </script>
