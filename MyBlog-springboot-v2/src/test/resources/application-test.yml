@@ -56,6 +56,10 @@ myblog:
       - method: GET
         path: /api/public/tags
       - method: GET
+        path: /api/public/articles
+      - method: GET
+        path: /api/public/articles/**
+      - method: GET
         path: /api/public/security-probe
       - method: GET
         path: /doc.html
@@ -67,3 +71,6 @@ myblog:
         path: /swagger-ui/**
       - method: GET
         path: /media/**
+  content:
+    article-publish:
+      enabled: false

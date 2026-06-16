@@ -61,6 +61,49 @@ public class MyBatisArticleRepository implements ArticleRepository {
     }
 
     @Override
+    public boolean softDelete(
+            long id,
+            LocalDateTime deletedAt,
+            long deletedBy) {
+        return mapper.softDelete(id, deletedAt, deletedBy) == 1;
+    }
+
+    @Override
+    public boolean restore(
+            long id,
+            LocalDateTime updatedAt,
+            long updatedBy) {
+        return mapper.restore(id, updatedAt, updatedBy) == 1;
+    }
+
+    @Override
+    public List<Article> findDueScheduledForUpdate(
+            LocalDateTime now,
+            int limit) {
+        return mapper.selectDueScheduledForUpdate(now, limit)
+                .stream()
+                .map(entity -> mapping.toDomain(
+                        entity,
+                        mapper.selectTagIds(entity.getId())))
+                .toList();
+    }
+
+    @Override
+    public boolean updateStatus(
+            long id,
+            com.tyb.myblog.v2.content.domain.article.ArticleStatus expected,
+            com.tyb.myblog.v2.content.domain.article.ArticleStatus target,
+            LocalDateTime updatedAt,
+            Long updatedBy) {
+        return mapper.updateStatus(
+                id,
+                expected,
+                target,
+                updatedAt,
+                updatedBy) == 1;
+    }
+
+    @Override
     public void replaceTags(long articleId, List<Long> tagIds) {
         mapper.deleteTagRelations(articleId);
         if (tagIds == null) {

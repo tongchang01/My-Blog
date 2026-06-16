@@ -3,6 +3,7 @@ package com.tyb.myblog.v2.content.web;
 import com.tyb.myblog.v2.common.web.PageResponse;
 import com.tyb.myblog.v2.content.application.article.AdminArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.AdminArticlePageResult;
+import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticlePageResult;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePageItem;
@@ -83,6 +84,17 @@ public class ArticleWebMapping {
                 result.locked());
     }
 
+    public PageResponse<DeletedArticlePageItemVO> toDeletedPage(
+            DeletedArticlePageResult result) {
+        return new PageResponse<>(
+                result.records().stream()
+                        .map(this::toDeletedPageItem)
+                        .toList(),
+                result.total(),
+                result.page(),
+                result.size());
+    }
+
     private AdminArticlePageItemVO toAdminPageItem(
             AdminArticlePageItem item) {
         return new AdminArticlePageItemVO(
@@ -125,5 +137,18 @@ public class ArticleWebMapping {
                 item.tags(),
                 item.createdAt(),
                 item.locked());
+    }
+
+    private DeletedArticlePageItemVO toDeletedPageItem(
+            DeletedArticlePageResult.Item item) {
+        return new DeletedArticlePageItemVO(
+                item.id(),
+                item.titleZh(),
+                item.titleJa(),
+                item.titleEn(),
+                item.status(),
+                item.categoryId(),
+                item.deletedAt(),
+                item.deletedBy());
     }
 }

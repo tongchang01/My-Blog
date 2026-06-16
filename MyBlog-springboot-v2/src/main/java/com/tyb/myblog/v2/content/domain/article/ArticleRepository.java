@@ -22,5 +22,26 @@ public interface ArticleRepository {
             LocalDateTime updatedAt,
             Long updatedBy);
 
+    boolean softDelete(
+            long id,
+            LocalDateTime deletedAt,
+            long deletedBy);
+
+    boolean restore(
+            long id,
+            LocalDateTime updatedAt,
+            long updatedBy);
+
+    List<Article> findDueScheduledForUpdate(
+            LocalDateTime now,
+            int limit);
+
+    boolean updateStatus(
+            long id,
+            ArticleStatus expected,
+            ArticleStatus target,
+            LocalDateTime updatedAt,
+            Long updatedBy);
+
     void replaceTags(long articleId, List<Long> tagIds);
 }

@@ -10,4 +10,6 @@ public interface AdminArticleQueryRepository {
     AdminArticlePage findActivePage(AdminArticleCriteria criteria);
 
     Optional<AdminArticleDetail> findActiveDetail(long id);
+
+    DeletedArticlePage findDeletedPage(int page, int size);
 }

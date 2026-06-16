@@ -7,10 +7,14 @@ import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
 import com.tyb.myblog.v2.content.application.article.AdminArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.AdminArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.ArticleCreateService;
+import com.tyb.myblog.v2.content.application.article.ArticleDeleteService;
 import com.tyb.myblog.v2.content.application.article.ArticleQueryService;
+import com.tyb.myblog.v2.content.application.article.ArticleRestoreService;
 import com.tyb.myblog.v2.content.application.article.ArticleResult;
 import com.tyb.myblog.v2.content.application.article.ArticleUpdateService;
 import com.tyb.myblog.v2.content.application.article.CreateArticleCommand;
+import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
+import com.tyb.myblog.v2.content.application.article.DeletedArticleQueryService;
 import com.tyb.myblog.v2.content.application.article.UpdateArticleCommand;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
@@ -30,8 +34,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -57,6 +63,15 @@ class AdminArticleControllerTest {
 
     @MockitoBean
     private ArticleUpdateService updateService;
+
+    @MockitoBean
+    private ArticleDeleteService deleteService;
+
+    @MockitoBean
+    private ArticleRestoreService restoreService;
+
+    @MockitoBean
+    private DeletedArticleQueryService deletedQueryService;
 
     private AuthenticatedPrincipal principal;
 
@@ -195,6 +210,43 @@ class AdminArticleControllerTest {
                         .content(writeBody()))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("10003"));
+    }
+
+    @Test
+    void deletesRestoresAndReadsRecycleBin() throws Exception {
+        doNothing().when(deleteService).delete(principal, 100L);
+        when(deletedQueryService.page(principal, 1, 20))
+                .thenReturn(new DeletedArticlePageResult(
+                        List.of(new DeletedArticlePageResult.Item(
+                                100L,
+                                "标题",
+                                null,
+                                null,
+                                ArticleStatus.PUBLISHED,
+                                10L,
+                                LocalDateTime.of(2026, 6, 16, 12, 0),
+                                1001L)),
+                        1,
+                        1,
+                        20));
+        when(restoreService.restore(principal, 100L))
+                .thenReturn(articleResult());
+        when(queryService.adminDetail(principal, 100L))
+                .thenReturn(detail());
+
+        mockMvc.perform(delete("/api/admin/articles/100"))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/articles/recycle-bin"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].id").value(100))
+                .andExpect(jsonPath("$.data.records[0].deletedBy")
+                        .value(1001));
+        mockMvc.perform(post("/api/admin/articles/100/restore"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value(100));
+
+        verify(deleteService).delete(principal, 100L);
+        verify(restoreService).restore(principal, 100L);
     }
 
     private String writeBody() {

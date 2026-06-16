@@ -6,9 +6,12 @@ import com.tyb.myblog.v2.content.domain.article.AdminArticlePage;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.DeletedArticlePage;
+import com.tyb.myblog.v2.content.domain.article.DeletedArticlePageItem;
 import com.tyb.myblog.v2.content.infrastructure.persistence.mapper.ArticleMapper;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticleDetailRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.DeletedArticlePageRow;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -41,6 +44,19 @@ public class MyBatisAdminArticleQueryRepository
     public Optional<AdminArticleDetail> findActiveDetail(long id) {
         return Optional.ofNullable(mapper.selectAdminDetail(id))
                 .map(this::toDetail);
+    }
+
+    @Override
+    public DeletedArticlePage findDeletedPage(int page, int size) {
+        long offset = (long) (page - 1) * size;
+        return new DeletedArticlePage(
+                mapper.selectDeletedPage(offset, size)
+                        .stream()
+                        .map(this::toDeletedItem)
+                        .toList(),
+                mapper.countDeletedPage(),
+                page,
+                size);
     }
 
     private AdminArticlePageItem toPageItem(
@@ -92,5 +108,18 @@ public class MyBatisAdminArticleQueryRepository
                 row.getCreatedBy(),
                 row.getUpdatedAt(),
                 row.getUpdatedBy());
+    }
+
+    private DeletedArticlePageItem toDeletedItem(
+            DeletedArticlePageRow row) {
+        return new DeletedArticlePageItem(
+                row.getId(),
+                row.getTitleZh(),
+                row.getTitleJa(),
+                row.getTitleEn(),
+                ArticleStatus.fromDatabase(row.getStatus()),
+                row.getCategoryId(),
+                row.getDeletedAt(),
+                row.getDeletedBy());
     }
 }

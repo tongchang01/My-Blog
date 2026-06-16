@@ -72,3 +72,11 @@ myblog:
         path: /api/public/categories
       - method: GET
         path: /api/public/tags
+      - method: GET
+        path: /api/public/articles
+      - method: GET
+        path: /api/public/articles/**
+  content:
+    article-publish:
+      enabled: true
+      cron: "0 * * * * *"

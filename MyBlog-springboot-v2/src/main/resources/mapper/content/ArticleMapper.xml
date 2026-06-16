@@ -294,6 +294,43 @@
         ORDER BY at.article_id ASC, t.id ASC
     </select>
 
+    <!-- 回收站只读查询，固定按删除时间倒序保证分页稳定。 -->
+    <select id="selectDeletedPage"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.DeletedArticlePageRow">
+        SELECT
+            id,
+            title_zh,
+            title_ja,
+            title_en,
+            status,
+            category_id,
+            deleted_at,
+            deleted_by
+        FROM t_article
+        WHERE deleted = 1
+        ORDER BY deleted_at DESC, id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countDeletedPage" resultType="long">
+        SELECT COUNT(*)
+        FROM t_article
+        WHERE deleted = 1
+    </select>
+
+    <!-- 固定批量和顺序锁定到期定时文章，多实例并发时由行锁串行领取。 -->
+    <select id="selectDueScheduledForUpdate"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity">
+        SELECT <include refid="articleColumns"/>
+        FROM t_article
+        WHERE deleted = 0
+          AND status = 5
+          AND publish_at <![CDATA[<=]]> #{now}
+        ORDER BY publish_at ASC, id ASC
+        LIMIT #{limit}
+        FOR UPDATE
+    </select>
+
     <!-- 完整更新文章业务字段，评论数只回写聚合中已有值。 -->
     <update id="updateActive">
         UPDATE t_article
@@ -316,6 +353,41 @@
             updated_by = #{updatedBy}
         WHERE id = #{article.id}
           AND deleted = 0
+    </update>
+
+    <!-- 显式软删除文章，保留 t_article_tag 供回收站恢复。 -->
+    <update id="softDelete">
+        UPDATE t_article
+        SET deleted = 1,
+            deleted_at = #{deletedAt},
+            deleted_by = #{deletedBy},
+            updated_at = #{deletedAt},
+            updated_by = #{deletedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <!-- 恢复前已由应用层重新校验全部逻辑引用。 -->
+    <update id="restore">
+        UPDATE t_article
+        SET deleted = 0,
+            deleted_at = NULL,
+            deleted_by = NULL,
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+          AND deleted = 1
+    </update>
+
+    <!-- 定时发布使用期望状态条件更新，避免并发重复发布。 -->
+    <update id="updateStatus">
+        UPDATE t_article
+        SET status = #{target.databaseValue},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+          AND status = #{expected.databaseValue}
     </update>
 
     <!-- 关联表无独立审计和软删字段，文章编辑时允许物理替换。 -->

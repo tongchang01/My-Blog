@@ -49,6 +49,10 @@ myblog:
       - method: GET
         path: /api/public/tags
       - method: GET
+        path: /api/public/articles
+      - method: GET
+        path: /api/public/articles/**
+      - method: GET
         path: /doc.html
       - method: GET
         path: /webjars/**
@@ -58,3 +62,7 @@ myblog:
         path: /swagger-ui/**
       - method: GET
         path: /media/**
+  content:
+    article-publish:
+      enabled: true
+      cron: "0 * * * * *"
