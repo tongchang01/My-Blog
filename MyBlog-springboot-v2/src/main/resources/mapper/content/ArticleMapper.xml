@@ -171,6 +171,129 @@
           AND a.deleted = 0
     </select>
 
+    <sql id="publicArticleWhere">
+        a.deleted = 0
+        AND a.status IN (2, 4)
+        AND a.publish_at <![CDATA[<=]]> #{query.now}
+        <if test="query.categoryId != null">
+          AND a.category_id = #{query.categoryId}
+        </if>
+        <if test="query.tagId != null">
+          AND EXISTS (
+              SELECT 1
+              FROM t_article_tag filter_at
+              WHERE filter_at.article_id = a.id
+                AND filter_at.tag_id = #{query.tagId}
+          )
+        </if>
+        <if test="query.keyword != null and query.keyword != ''">
+          AND (
+              a.title_zh LIKE CONCAT('%', #{query.keyword}, '%')
+              OR a.title_ja LIKE CONCAT('%', #{query.keyword}, '%')
+              OR a.title_en LIKE CONCAT('%', #{query.keyword}, '%')
+              OR a.summary_zh LIKE CONCAT('%', #{query.keyword}, '%')
+              OR a.summary_ja LIKE CONCAT('%', #{query.keyword}, '%')
+              OR a.summary_en LIKE CONCAT('%', #{query.keyword}, '%')
+          )
+        </if>
+        <if test="query.archiveFrom != null">
+          AND a.publish_at <![CDATA[>=]]> #{query.archiveFrom}
+        </if>
+        <if test="query.archiveTo != null">
+          AND a.publish_at <![CDATA[<]]> #{query.archiveTo}
+        </if>
+    </sql>
+
+    <!-- 公开文章列表只返回 PUBLISHED/PASSWORD 元数据，不读取正文和密码哈希。 -->
+    <select id="selectPublicPage"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticlePageRow">
+        SELECT
+            a.id,
+            a.title_zh,
+            a.title_ja,
+            a.title_en,
+            a.summary_zh,
+            a.summary_ja,
+            a.summary_en,
+            a.category_id,
+            c.name_zh AS category_name_zh,
+            c.name_ja AS category_name_ja,
+            c.name_en AS category_name_en,
+            a.slug,
+            a.status,
+            a.publish_at,
+            a.cover_attachment_id,
+            a.comment_count,
+            a.created_at
+        FROM t_article a
+        LEFT JOIN t_category c
+            ON c.id = a.category_id
+           AND c.deleted = 0
+        WHERE <include refid="publicArticleWhere"/>
+        ORDER BY a.publish_at DESC, a.id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countPublicPage" resultType="long">
+        SELECT COUNT(*)
+        FROM t_article a
+        WHERE <include refid="publicArticleWhere"/>
+    </select>
+
+    <!-- 公开详情允许读取 PASSWORD 元数据，由应用层统一返回 403，避免正文访问策略分散。 -->
+    <select id="selectPublicDetail"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticleDetailRow">
+        SELECT
+            a.id,
+            a.title_zh,
+            a.title_ja,
+            a.title_en,
+            a.summary_zh,
+            a.summary_ja,
+            a.summary_en,
+            a.body,
+            a.category_id,
+            c.name_zh AS category_name_zh,
+            c.name_ja AS category_name_ja,
+            c.name_en AS category_name_en,
+            a.slug,
+            a.status,
+            a.publish_at,
+            a.cover_attachment_id,
+            a.comment_count,
+            a.created_at
+        FROM t_article a
+        LEFT JOIN t_category c
+            ON c.id = a.category_id
+           AND c.deleted = 0
+        WHERE a.id = #{id}
+          AND a.deleted = 0
+          AND a.status IN (2, 4)
+          AND a.publish_at <![CDATA[<=]]> #{now}
+    </select>
+
+    <!-- 标签按文章批量读取，避免公开列表出现 N+1 查询。 -->
+    <select id="selectPublicArticleTags"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagRow">
+        SELECT
+            at.article_id,
+            t.id,
+            t.name_zh,
+            t.name_ja,
+            t.name_en,
+            t.slug
+        FROM t_article_tag at
+        INNER JOIN t_tag t
+            ON t.id = at.tag_id
+           AND t.deleted = 0
+        WHERE at.article_id IN
+        <foreach collection="articleIds" item="articleId"
+                 open="(" separator="," close=")">
+            #{articleId}
+        </foreach>
+        ORDER BY at.article_id ASC, t.id ASC
+    </select>
+
     <!-- 完整更新文章业务字段，评论数只回写聚合中已有值。 -->
     <update id="updateActive">
         UPDATE t_article

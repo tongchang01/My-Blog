@@ -2,9 +2,13 @@ package com.tyb.myblog.v2.content.infrastructure.persistence.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleCriteria;
+import com.tyb.myblog.v2.content.domain.article.PublicArticleCriteria;
 import com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticleDetailRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticleDetailRow;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticlePageRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -33,6 +37,20 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
     long countAdminPage(@Param("query") AdminArticleCriteria query);
 
     AdminArticleDetailRow selectAdminDetail(@Param("id") long id);
+
+    List<PublicArticlePageRow> selectPublicPage(
+            @Param("query") PublicArticleCriteria query,
+            @Param("offset") long offset,
+            @Param("size") int size);
+
+    long countPublicPage(@Param("query") PublicArticleCriteria query);
+
+    PublicArticleDetailRow selectPublicDetail(
+            @Param("id") long id,
+            @Param("now") LocalDateTime now);
+
+    List<ArticleTagRow> selectPublicArticleTags(
+            @Param("articleIds") List<Long> articleIds);
 
     int updateActive(
             @Param("article") ArticleEntity article,
