@@ -8,6 +8,8 @@
 
 当前模块方向、技术栈和 14 张表 V1 DDL 已通过 M3 准入复核，允许进入 M3。6 个 P1 问题已关闭；未完成的 P2 继续在对应业务能力首次落地前处理，不阻塞其它模块的小步重建。
 
+2026-06-16 复核：content/article 首个复杂内容模块已按 M3 约束落地。实现未修改冻结 V1 DDL，复杂 SQL 保持 Mapper XML，content 通过 system application 端口校验附件引用，未直接读取 `t_attachment`，OpenAPI 由契约 DTO 输出并有测试守护。
+
 当前验证基线：
 
 - `mvn clean test`：378 tests，0 failures，0 errors，4 skipped（Docker 不可用时跳过 Testcontainers MySQL 条件测试）

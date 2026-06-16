@@ -8,6 +8,8 @@
 
 **DDL 冻结前的产品规格与 schema 评审已完成**。R5-R7 完成后多处与既有代码冲突（ADR-0015 审计列三件套、ADR-0017 无 FK、R5 模块边界含 stats 与 common-infra、ADR-0018 时区五层、Role 三态枚举等），继续修旧实现 = 返工。
 
+**2026-06-16 更新：content/article 文章核心纵向切片已完成。** 后台文章 CRUD、公开文章列表与详情、密码文章隐藏、软删除回收站、恢复引用校验、定时发布、OpenAPI 契约守护和集成测试均已落地。
+
 **从现在开始，不再修改 Flyway V1__init.sql；后续 schema 变更走 V2__xxx.sql / V3__xxx.sql。**
 
 M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，identity 与 system 的首个纵向切片已落地。代码阶段的推进原则：

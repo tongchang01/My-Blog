@@ -113,9 +113,7 @@ class CategoryTagOpenApiTest {
                 "ContentName",
                 "ContentSlug",
                 "SubmittedField",
-                "\"deleted\"",
-                "\"deletedAt\"",
-                "\"deletedBy\"");
+                "\"deleted\"");
     }
 
     private void assertMethods(

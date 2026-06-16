@@ -28,6 +28,7 @@ api-contract 是后端与前端的**单一事实源**。前后端任何一方想
 | `attachment.md` | 图片上传、去重恢复、LOCAL/S3、后台列表与详情 | ✅ 已落地 |
 | `friend-link.md` | 公开友链、后台 CRUD、状态、排序和软删除 | ✅ 已落地 |
 | `category-tag.md` | 分类标签三语读取、后台管理、排序和引用保护删除 | ✅ 已落地 |
+| `article.md` | 后台文章管理、公开查询、回收站、恢复和定时发布 | ✅ 已落地 |
 | `endpoints-public.md` | 前台公开接口（文章列表、详情、评论提交等） | ⏳ |
 | `endpoints-admin.md` | 后台管理接口（按业务模块分组） | ⏳ |
 | `dto-glossary.md` | 公共 DTO 字段含义（ArticleVO / CommentVO 等） | ⏳ |

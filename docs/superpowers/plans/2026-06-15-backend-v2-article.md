@@ -2295,3 +2295,25 @@ Expected：
 - [ ] 冻结的 V1 DDL 未修改，不新增数据库外键。
 - [ ] 五个实施批次分别形成中文本地提交。
 - [ ] Maven、Enforcer、ArchUnit、真实 HTTP、OpenAPI 和静态审计全部通过。
+
+---
+
+## 3. 执行结果
+
+截至 2026-06-16，五个批次已按顺序执行完成：
+
+1. `4164560 建立文章领域模型与持久化基础`
+2. `1091dbf 实现后台文章查询与编辑`
+3. `ff335fa 实现公开文章查询与筛选`
+4. `e7a9645 实现文章定时发布与回收站`
+5. `本提交 完成文章核心纵向切片`
+
+最终验证：
+
+- 定向契约与集成回归：`mvn "-Dtest=ArticleIntegrationTest,ArticleOpenApiTest,CategoryTagIntegrationTest,AttachmentIntegrationTest" test`，8 tests，0 failures，0 errors，0 skipped。
+- 失败项修正后回归：`mvn "-Dtest=BackendPropertiesTest,CategoryTagOpenApiTest,ArticleOpenApiTest" test`，6 tests，0 failures，0 errors，0 skipped。
+- 全量验证：`mvn clean test`，534 tests，0 failures，0 errors，4 skipped；Maven Enforcer 与 ArchUnit 通过。
+- 静态审计：content 无注解 SQL、无物理删除 helper、无直接系统时间、无 application/domain 内部类型泄露、无直接读取 `t_attachment`。
+- `git diff --check` 通过；冻结的 `V1__init.sql` 无差异。
+
+剩余明确延期项：PASSWORD 文章访问 token 完整流程、评论授权、置顶、推荐、slug history 和逐篇评论开关。

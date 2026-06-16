@@ -121,7 +121,7 @@
 - ADMIN 可以创建、编辑、删除和恢复文章。
 - ADMIN 可以设置文章状态：DRAFT、PUBLISHED、PRIVATE、PASSWORD、SCHEDULED。
 - ADMIN 可以配置文章标题和摘要三语副本，正文保持中文 Markdown。
-- ADMIN 可以设置分类、标签、封面、slug 和是否允许评论。
+- ADMIN 可以设置分类、标签、封面、slug 和发布状态；逐篇关闭评论不进入 V2 起点 schema。
 - ADMIN 可以导出单篇文章 Markdown。
 - ADMIN 不需要批量导入文章。
 

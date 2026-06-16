@@ -37,6 +37,8 @@ class BackendPropertiesTest {
                         tuple("GET", "/api/public/friend-links"),
                         tuple("GET", "/api/public/categories"),
                         tuple("GET", "/api/public/tags"),
+                        tuple("GET", "/api/public/articles"),
+                        tuple("GET", "/api/public/articles/**"),
                         tuple("GET", "/api/public/security-probe"),
                         tuple("GET", "/doc.html"),
                         tuple("GET", "/webjars/**"),
