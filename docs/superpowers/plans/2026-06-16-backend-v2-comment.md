@@ -244,7 +244,7 @@ Expected：编译失败，缺少 domain 类型。
 </dependency>
 ```
 
-`CommonMarkCommentMarkdownRenderer` 使用 `Parser.builder().build()` 和 `HtmlRenderer.builder().escapeHtml(true).build()`，再用 `Sanitizers.FORMATTING.and(Sanitizers.LINKS)` 清洗，禁止图片。
+`CommonMarkCommentMarkdownRenderer` 使用 `Parser.builder().build()` 和 `HtmlRenderer.builder().build()`，再用 `Sanitizers.FORMATTING.and(Sanitizers.LINKS)` 清洗，禁止脚本、危险链接和图片。
 
 - [ ] **Step 4：实现 Comment 领域对象**
 

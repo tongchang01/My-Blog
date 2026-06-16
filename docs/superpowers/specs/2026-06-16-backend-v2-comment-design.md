@@ -29,7 +29,7 @@
 
 1. 保存用户原文到 `content_md`。
 2. 使用 CommonMark 解析 Markdown。
-3. 解析阶段不允许原始 HTML 成为可信输出。
+3. 原始 HTML 不可信，必须经过 Sanitizer 白名单过滤。
 4. 使用 OWASP Java HTML Sanitizer 白名单清洗。
 5. 公开响应只返回 `contentHtml`，不返回 `contentMd`、邮箱、IP、UA。
 

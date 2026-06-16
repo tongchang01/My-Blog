@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.comment.infrastructure.persistence.mapper.CommentMapper">
+
+    <sql id="commentColumns">
+        id,
+        target_type,
+        target_id,
+        parent_id,
+        reply_to_comment_id,
+        reply_to_user_id,
+        reply_to_nickname,
+        author_user_id,
+        author_nickname,
+        author_email,
+        author_site,
+        author_ip,
+        author_user_agent,
+        content_md,
+        content_html,
+        audit_status,
+        created_at,
+        created_by,
+        updated_at,
+        updated_by,
+        deleted,
+        deleted_at,
+        deleted_by
+    </sql>
+
+    <select id="selectActiveById"
+            resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity">
+        SELECT <include refid="commentColumns"/>
+        FROM t_comment
+        WHERE id = #{id}
+          AND deleted = 0
+    </select>
+
+    <!-- 后台恢复前锁定已删除评论，避免恢复和删除并发覆盖审计字段。 -->
+    <select id="selectDeletedByIdForUpdate"
+            resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity">
+        SELECT <include refid="commentColumns"/>
+        FROM t_comment
+        WHERE id = #{id}
+          AND deleted = 1
+        FOR UPDATE
+    </select>
+
+    <!-- 审核状态变化会影响文章 comment_count，后续应用服务必须在同一事务内调用。 -->
+    <update id="updateAuditStatus">
+        UPDATE t_comment
+        SET audit_status = #{status.databaseValue},
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <!-- 评论删除只做软删除，保留回复关系和审计数据。 -->
+    <update id="softDelete">
+        UPDATE t_comment
+        SET deleted = 1,
+            deleted_at = #{deletedAt},
+            deleted_by = #{deletedBy},
+            updated_at = #{deletedAt},
+            updated_by = #{deletedBy}
+        WHERE id = #{id}
+          AND deleted = 0
+    </update>
+
+    <!-- 评论恢复只清除删除审计，不改变审核状态。 -->
+    <update id="restore">
+        UPDATE t_comment
+        SET deleted = 0,
+            deleted_at = NULL,
+            deleted_by = NULL,
+            updated_at = #{updatedAt},
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+          AND deleted = 1
+    </update>
+</mapper>
