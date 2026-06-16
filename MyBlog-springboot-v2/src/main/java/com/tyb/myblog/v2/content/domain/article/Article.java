@@ -113,6 +113,54 @@ public record Article(
                 deletedBy);
     }
 
+    public Article replace(
+            String titleZh,
+            String titleJa,
+            String titleEn,
+            String summaryZh,
+            String summaryJa,
+            String summaryEn,
+            String body,
+            Long categoryId,
+            String slug,
+            ArticleStatus status,
+            String accessPassword,
+            LocalDateTime publishAt,
+            Long coverAttachmentId,
+            List<Long> tagIds,
+            LocalDateTime updatedAt,
+            Long updatedBy) {
+        return reconstitute(
+                id,
+                titleZh,
+                titleJa,
+                titleEn,
+                summaryZh,
+                summaryJa,
+                summaryEn,
+                body,
+                categoryId,
+                authorId,
+                slug,
+                status,
+                accessPassword,
+                publishAt,
+                coverAttachmentId,
+                commentCount,
+                tagIds,
+                createdAt,
+                createdBy,
+                updatedAt,
+                updatedBy,
+                deleted,
+                deletedAt,
+                deletedBy);
+    }
+
+    public String existingPassword() {
+        return accessPassword;
+    }
+
     private static void validateAudit(
             LocalDateTime createdAt,
             Long createdBy,

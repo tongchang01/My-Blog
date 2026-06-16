@@ -1,7 +1,10 @@
 package com.tyb.myblog.v2.content.infrastructure.persistence.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.tyb.myblog.v2.content.domain.article.AdminArticleCriteria;
 import com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticleDetailRow;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -21,6 +24,15 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
     ArticleEntity selectDeletedByIdForUpdate(@Param("id") long id);
 
     List<Long> selectTagIds(@Param("articleId") long articleId);
+
+    List<AdminArticlePageRow> selectAdminPage(
+            @Param("query") AdminArticleCriteria query,
+            @Param("offset") long offset,
+            @Param("size") int size);
+
+    long countAdminPage(@Param("query") AdminArticleCriteria query);
+
+    AdminArticleDetailRow selectAdminDetail(@Param("id") long id);
 
     int updateActive(
             @Param("article") ArticleEntity article,

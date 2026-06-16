@@ -65,6 +65,112 @@
         ORDER BY tag_id ASC
     </select>
 
+    <sql id="adminArticleWhere">
+        a.deleted = 0
+        <if test="query.status != null">
+          AND a.status = #{query.status.databaseValue}
+        </if>
+        <if test="query.categoryId != null">
+          AND a.category_id = #{query.categoryId}
+        </if>
+        <if test="query.tagId != null">
+          AND EXISTS (
+              SELECT 1
+              FROM t_article_tag filter_at
+              WHERE filter_at.article_id = a.id
+                AND filter_at.tag_id = #{query.tagId}
+          )
+        </if>
+        <if test="query.titleKeyword != null and query.titleKeyword != ''">
+          AND (
+              a.title_zh LIKE CONCAT('%', #{query.titleKeyword}, '%')
+              OR a.title_ja LIKE CONCAT('%', #{query.titleKeyword}, '%')
+              OR a.title_en LIKE CONCAT('%', #{query.titleKeyword}, '%')
+          )
+        </if>
+        <if test="query.createdFrom != null">
+          AND a.created_at <![CDATA[>=]]> #{query.createdFrom}
+        </if>
+        <if test="query.createdTo != null">
+          AND a.created_at <![CDATA[<=]]> #{query.createdTo}
+        </if>
+        <if test="query.publishFrom != null">
+          AND a.publish_at <![CDATA[>=]]> #{query.publishFrom}
+        </if>
+        <if test="query.publishTo != null">
+          AND a.publish_at <![CDATA[<=]]> #{query.publishTo}
+        </if>
+    </sql>
+
+    <!-- 后台文章分页不读取 access_password，避免密码哈希穿透到应用结果。 -->
+    <select id="selectAdminPage"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow">
+        SELECT
+            a.id,
+            a.title_zh,
+            a.title_ja,
+            a.title_en,
+            a.summary_zh,
+            a.summary_ja,
+            a.summary_en,
+            a.category_id,
+            c.name_zh AS category_name_zh,
+            a.slug,
+            a.status,
+            a.publish_at,
+            a.cover_attachment_id,
+            a.comment_count,
+            a.created_at,
+            a.created_by,
+            a.updated_at,
+            a.updated_by
+        FROM t_article a
+        LEFT JOIN t_category c
+            ON c.id = a.category_id
+           AND c.deleted = 0
+        WHERE <include refid="adminArticleWhere"/>
+        ORDER BY a.updated_at DESC, a.id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <select id="countAdminPage" resultType="long">
+        SELECT COUNT(*)
+        FROM t_article a
+        WHERE <include refid="adminArticleWhere"/>
+    </select>
+
+    <!-- 后台详情返回完整文章内容和非敏感审计信息，但不返回 access_password。 -->
+    <select id="selectAdminDetail"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticleDetailRow">
+        SELECT
+            a.id,
+            a.title_zh,
+            a.title_ja,
+            a.title_en,
+            a.summary_zh,
+            a.summary_ja,
+            a.summary_en,
+            a.body,
+            a.category_id,
+            c.name_zh AS category_name_zh,
+            a.author_id,
+            a.slug,
+            a.status,
+            a.publish_at,
+            a.cover_attachment_id,
+            a.comment_count,
+            a.created_at,
+            a.created_by,
+            a.updated_at,
+            a.updated_by
+        FROM t_article a
+        LEFT JOIN t_category c
+            ON c.id = a.category_id
+           AND c.deleted = 0
+        WHERE a.id = #{id}
+          AND a.deleted = 0
+    </select>
+
     <!-- 完整更新文章业务字段，评论数只回写聚合中已有值。 -->
     <update id="updateActive">
         UPDATE t_article

@@ -249,6 +249,32 @@ class SecurityConfigTest {
     }
 
     @Test
+    void permitsAdminAndDemoToReadArticlesButOnlyAdminCanMutate()
+            throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(get("/api/admin/articles")
+                        .header("Authorization",
+                                "Bearer " + adminToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/articles")
+                        .header("Authorization",
+                                "Bearer " + demoToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/articles"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+        mockMvc.perform(post("/api/admin/articles")
+                        .header("Authorization",
+                                "Bearer " + demoToken)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("10003"));
+    }
+
+    @Test
     void permitsAdminToPatchCurrentProfile() throws Exception {
         String token = token(1001L, "admin", 1, "ADMIN");
 
