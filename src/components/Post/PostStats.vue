@@ -178,64 +178,54 @@
   </div>
 </template>
 
-<script lang="ts">
-import { PropType, computed, defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { PropType, computed, ref } from 'vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import { PluginsData, ThemeConfig } from '@/models/ThemeConfig.class'
 import useCommentPlugin from '@/hooks/useCommentPlugin'
 
-export default defineComponent({
-  name: 'ObPostStats',
-  components: { SvgIcon },
-  props: {
-    postWordCount: {
-      type: Number || undefined
-    },
-    postTimeCount: {
-      type: String || undefined
-    },
-    postTitle: {
-      type: String
-    },
-    pluginConfigs: {
-      type: Object as PropType<PluginsData>,
-      default: () => new ThemeConfig().plugins,
-      required: true
-    },
-    currentPath: {
-      type: String,
-      default: '/',
-      required: true
-    },
-    comments: Boolean
+const props = defineProps({
+  postWordCount: {
+    type: Number || undefined
   },
-  setup(props, { expose }) {
-    const commentCount = ref<number | undefined>(undefined)
-    const {
-      enabledCommentPlugin,
-      initCommentPluginCommentCount,
-      intiCommentPluginPageView
-    } = useCommentPlugin()
-
-    const getCommentCount = async () => {
-      commentCount.value = await initCommentPluginCommentCount(
-        props.currentPath
-      )
-    }
-
-    const getPostView = () => {
-      intiCommentPluginPageView(props.currentPath)
-    }
-
-    expose({
-      getCommentCount,
-      getPostView
-    })
-
-    return {
-      commentCount,
-      plugin: computed(() => enabledCommentPlugin.value.plugin)
-    }
-  }
+  postTimeCount: {
+    type: String || undefined
+  },
+  postTitle: {
+    type: String
+  },
+  pluginConfigs: {
+    type: Object as PropType<PluginsData>,
+    default: () => new ThemeConfig().plugins,
+    required: true
+  },
+  currentPath: {
+    type: String,
+    default: '/',
+    required: true
+  },
+  comments: Boolean
 })
+
+const commentCount = ref<number | undefined>(undefined)
+const {
+  enabledCommentPlugin,
+  initCommentPluginCommentCount,
+  intiCommentPluginPageView
+} = useCommentPlugin()
+
+const getCommentCount = async () => {
+  commentCount.value = await initCommentPluginCommentCount(props.currentPath)
+}
+
+const getPostView = () => {
+  intiCommentPluginPageView(props.currentPath)
+}
+
+defineExpose({
+  getCommentCount,
+  getPostView
+})
+
+const plugin = computed(() => enabledCommentPlugin.value.plugin)
 </script>
