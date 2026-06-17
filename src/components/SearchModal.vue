@@ -394,8 +394,7 @@ const moveMenuWindow = () => {
   const menuElHeight = activeMenuEl?.getBoundingClientRect().height
 
   if (menuElHeight && containerHeight && searchDropdownEl) {
-    const currentMenuElheight =
-      36 + menuElHeight * (menuActiveIndex.value + 1)
+    const currentMenuElheight = 36 + menuElHeight * (menuActiveIndex.value + 1)
     const heightDiff = currentMenuElheight - containerHeight
     if (heightDiff > 0) {
       searchDropdownEl.scrollTo({

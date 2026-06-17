@@ -156,9 +156,7 @@ onUnmounted(() => {
 })
 
 const isLoading = computed(() => !isFetched.value)
-const isEmpty = computed(
-  () => posts.value.data.length === 0 && isFetched.value
-)
+const isEmpty = computed(() => posts.value.data.length === 0 && isFetched.value)
 const categoryTitle = computed(() => queryCategory.value)
 const tagTitle = computed(() => queryTag.value)
 </script>

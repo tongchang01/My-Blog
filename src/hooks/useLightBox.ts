@@ -12,7 +12,7 @@ export default function useLightBox() {
 
     if (!postHtmlEle) return
 
-    let imageNodes = postHtmlEle.querySelectorAll('img')
+    const imageNodes = postHtmlEle.querySelectorAll('img')
     for (let i = 0; i < imageNodes.length; i++) {
       lightBoxStore.addImage(imageNodes[i].src)
       imageNodes[i].addEventListener('click', function () {

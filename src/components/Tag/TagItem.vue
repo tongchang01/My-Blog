@@ -46,8 +46,7 @@ const tagClasses = computed(() => ({
 }))
 const countClasses = computed(() => ({
   'block -mt-1.5 ml-1 text-xs opacity-50': tagSize.value === 'small',
-  'block -mt-1.5 ml-2 rounded-full text-xs text-ob':
-    tagSize.value === 'large'
+  'block -mt-1.5 ml-2 rounded-full text-xs text-ob': tagSize.value === 'large'
 }))
 const gradientBackground = computed(() => {
   return props.active

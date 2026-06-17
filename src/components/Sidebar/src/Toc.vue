@@ -23,14 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  StyleValue,
-  computed,
-  onMounted,
-  onUnmounted,
-  ref,
-  toRefs
-} from 'vue'
+import { StyleValue, computed, onMounted, onUnmounted, ref, toRefs } from 'vue'
 import { SubTitle } from '@/components/Title'
 import Sticky from '@/components/Sticky.vue'
 import Navigator from './Navigator.vue'

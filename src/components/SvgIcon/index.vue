@@ -98,10 +98,7 @@ const getExternalSvg = async () => {
     .querySelector('svg')
 
   if (svgDom !== null) {
-    const attributeEntries = [...svgDom.attributes].map(a => [
-      a.name,
-      a.value
-    ])
+    const attributeEntries = [...svgDom.attributes].map(a => [a.name, a.value])
     externalSvg.value = {
       content: svgDom.innerHTML,
       attributes: Object.fromEntries(attributeEntries)
@@ -120,8 +117,8 @@ const svgStyle = computed(() => {
       stroke: props.stroke
         ? props.stroke
         : appStore.theme === 'theme-dark'
-        ? 'var(--background-primary)'
-        : 'white',
+          ? 'var(--background-primary)'
+          : 'white',
       width: props.width,
       height: props.height
     }
@@ -131,8 +128,8 @@ const svgStyle = computed(() => {
       stroke: props.stroke
         ? props.stroke
         : appStore.theme === 'theme-dark'
-        ? 'white'
-        : 'currentColor',
+          ? 'white'
+          : 'currentColor',
       width: props.width,
       height: props.height
     }

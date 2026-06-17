@@ -1,4 +1,7 @@
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript'
+import {
+  defineConfigWithVueTs,
+  vueTsConfigs
+} from '@vue/eslint-config-typescript'
 import pluginVue from 'eslint-plugin-vue'
 import skipFormatting from '@vue/eslint-config-prettier/skip-formatting'
 import prettier from 'eslint-plugin-prettier/recommended'
@@ -35,6 +38,7 @@ export default defineConfigWithVueTs(
   {
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
+      'vue/multi-word-component-names': 'off',
       'prettier/prettier': ['error', { semi: false }],
       'no-console': 'warn',
       'no-debugger': 'warn'

@@ -31,8 +31,7 @@ const appStore = useAppStore()
 
 const linkGroupClasses = computed(() => {
   return {
-    'links-group-avatar h-[120px] w-[120px] flex items-center justify-center text-white text-6xl font-bold':
-      true,
+    'links-group-avatar h-[120px] w-[120px] flex items-center justify-center text-white text-6xl font-bold': true,
     'diamond-shape':
       appStore.themeConfig.theme.profile_shape === 'diamond-avatar'
   }

@@ -27,8 +27,8 @@ export const getGravatarUrl = (options: {
   return /^https?:\/\//.test(avatarCDN)
     ? avatarCDN
     : gravatarCDNs[String(lang)]
-    ? gravatarCDNs[String(lang)]
-    : gravatarCDNs['en']
+      ? gravatarCDNs[String(lang)]
+      : gravatarCDNs['en']
 }
 
 export const getGravatar = (

@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { createRouter, createWebHistory } from 'vue-router'
 import routes from '~pages'
 

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any*/
 import request from '@/utils/request'
 import { HexoConfig } from '@/models/HexoConfig.class'
 import { AxiosResponse } from 'axios'

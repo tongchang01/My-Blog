@@ -125,8 +125,7 @@ export function filterHTMLContent(content: string, length?: number): string {
     .replace(/(&nbsp;|<([^>]+)>)/gi, '')
 
   if (content.length > length) {
-    // TODO: replace deprecated `.substr` function
-    content = content.substr(0, length)
+    content = content.substring(0, length)
     content += '...'
   }
 

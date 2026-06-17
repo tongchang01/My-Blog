@@ -185,8 +185,7 @@ onMounted(() => {
 
 const wrapperClasses = computed(() => {
   return {
-    'bg-ob-deep-800 p-4 mt-8 lg:px-14 lg:py-10 rounded-2xl shadow-xl mb-8 lg:mb-0':
-      true,
+    'bg-ob-deep-800 p-4 mt-8 lg:px-14 lg:py-10 rounded-2xl shadow-xl mb-8 lg:mb-0': true,
     [`comment-${appStore.themeConfig.theme.profile_shape}`]: true
   }
 })

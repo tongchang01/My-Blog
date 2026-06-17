@@ -1,5 +1,9 @@
 <template>
-  <div ref="rootEl" id="sticky" :style="{ height: height + 'px', zIndex: zIndex }">
+  <div
+    ref="rootEl"
+    id="sticky"
+    :style="{ height: height + 'px', zIndex: zIndex }"
+  >
     <div :class="className" :style="styles">
       <slot>
         <div>sticky</div>
@@ -140,7 +144,8 @@ const updateScroll = () => {
   // this will update the height of your fixed container
   if (props.dynamicElClass !== '') {
     const dynamicEl = rootEl.value!.querySelector(props.dynamicElClass)
-    height.value = (dynamicEl as HTMLElement)?.getBoundingClientRect().height || heightVal
+    height.value =
+      (dynamicEl as HTMLElement)?.getBoundingClientRect().height || heightVal
   }
 
   const scrollTop = window.scrollY

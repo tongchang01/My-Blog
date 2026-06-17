@@ -43,7 +43,15 @@
 </template>
 
 <script setup lang="ts">
-import { StyleValue, computed, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
+import {
+  StyleValue,
+  computed,
+  onBeforeMount,
+  onMounted,
+  onUnmounted,
+  ref,
+  watch
+} from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
 import { useLightBoxStore } from '@/stores/lightbox'
@@ -109,10 +117,7 @@ const initialApp = async () => {
 const copyEventHandler = (event: any) => {
   if (document.getSelection() instanceof Selection) {
     if (document.getSelection()?.toString() !== '' && event.clipboardData) {
-      event.clipboardData.setData(
-        'text',
-        document.getSelection() + pagelink
-      )
+      event.clipboardData.setData('text', document.getSelection() + pagelink)
       event.preventDefault()
     }
   }
@@ -132,8 +137,7 @@ const isMobile = computed(() => {
 const resizeHandler = () => {
   const rect = document.body.getBoundingClientRect()
   const mobileState = rect.width - 1 < MOBILE_WITH
-  if (isMobile.value !== mobileState)
-    commonStore.changeMobileState(mobileState)
+  if (isMobile.value !== mobileState) commonStore.changeMobileState(mobileState)
 }
 
 const initResizeEvent = () => {

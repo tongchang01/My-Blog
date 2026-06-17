@@ -48,9 +48,9 @@ export class Article extends Post implements Detail {
   }
 }
 
-export class Page<DataType = Link[] | Record<string, Link[]>>
-  implements Detail
-{
+export class Page<
+  DataType = Link[] | Record<string, Link[]>
+> implements Detail {
   title = ''
   uid = ''
   date = {

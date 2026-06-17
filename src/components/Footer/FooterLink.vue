@@ -109,8 +109,7 @@ const refreshLinkData = () => {
         linksData.value.push(uniqueBloggers[friendsCount - 1])
         friendsCount--
       } else {
-        const blogger =
-          uniqueBloggers[Math.floor(Math.random() * friendsCount)]
+        const blogger = uniqueBloggers[Math.floor(Math.random() * friendsCount)]
         if (!recordSet.has(blogger.nick)) {
           recordSet.add(blogger.nick)
           linksData.value.push(blogger)

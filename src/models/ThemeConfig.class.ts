@@ -156,13 +156,7 @@ export class ThemeMenu implements ObMenu {
   }
 }
 
-enum LocalesTypes {
-  en,
-  'zh-CN',
-  'zh-TW'
-}
-
-export type Locales = keyof typeof LocalesTypes
+export type Locales = 'en' | 'zh-CN' | 'zh-TW'
 
 export class Menu {
   /** Name of the menu */
