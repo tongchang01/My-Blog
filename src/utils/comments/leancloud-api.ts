@@ -322,7 +322,7 @@ export class LeanCloudComment implements RecentComment {
     const templates = {
       en: 'commented [TIME]',
       'zh-CN': '[TIME]评论了',
-      'zh-TW': '[TIME]評論了'
+      ja: '[TIME]がコメントしました'
     }
 
     this.created_at = formatTime(this.created_at, {

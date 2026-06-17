@@ -69,9 +69,9 @@
             </span>
             <span
               class="relative z-50"
-              v-if="$i18n.locale === 'zh-TW' && route.i18n['zh-TW']"
+              v-if="$i18n.locale === 'ja' && route.i18n['ja']"
             >
-              {{ route.i18n['zh-TW'] }}
+              {{ route.i18n['ja'] }}
             </span>
             <span
               class="relative z-50"
@@ -94,9 +94,9 @@
             </span>
             <span
               class="relative z-50"
-              v-if="$i18n.locale === 'zh-TW' && route.i18n['zh-TW']"
+              v-if="$i18n.locale === 'ja' && route.i18n['ja']"
             >
-              {{ route.i18n['zh-TW'] }}
+              {{ route.i18n['ja'] }}
             </span>
             <span
               class="relative z-50"

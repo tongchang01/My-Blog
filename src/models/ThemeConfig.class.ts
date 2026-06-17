@@ -79,7 +79,7 @@ export class ThemeMenu implements ObMenu {
       path: '/',
       i18n: {
         'zh-CN': '首页',
-        'zh-TW': '首頁',
+        ja: 'ホーム',
         en: 'Home'
       }
     })
@@ -97,7 +97,7 @@ export class ThemeMenu implements ObMenu {
         path: '/about',
         i18n: {
           'zh-CN': '关于',
-          'zh-TW': '關於',
+          ja: '概要',
           en: 'About'
         }
       },
@@ -106,7 +106,7 @@ export class ThemeMenu implements ObMenu {
         path: '/archives',
         i18n: {
           'zh-CN': '归档',
-          'zh-TW': '歸檔',
+          ja: 'アーカイブ',
           en: 'Archives'
         }
       },
@@ -115,7 +115,7 @@ export class ThemeMenu implements ObMenu {
         path: '/tags',
         i18n: {
           'zh-CN': '标签',
-          'zh-TW': '標簽',
+          ja: 'タグ',
           en: 'Tags'
         }
       },
@@ -124,7 +124,7 @@ export class ThemeMenu implements ObMenu {
         path: '/links',
         i18n: {
           'zh-CN': '友情链接',
-          'zh-TW': '友情鏈接',
+          ja: 'リンク集',
           en: 'Friend Links'
         }
       }
@@ -156,7 +156,7 @@ export class ThemeMenu implements ObMenu {
   }
 }
 
-export type Locales = 'en' | 'zh-CN' | 'zh-TW'
+export type Locales = 'en' | 'zh-CN' | 'ja'
 
 export class Menu {
   /** Name of the menu */

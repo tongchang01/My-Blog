@@ -48,12 +48,12 @@ export function formatTime(
       months: ' 个月前',
       years: ' 年前'
     },
-    'zh-TW': {
-      seconds: '剛剛',
-      minutes: ' 分鐘前',
-      hours: ' 小時前',
-      days: ' 天前',
-      months: ' 個月前',
+    ja: {
+      seconds: 'たった今',
+      minutes: ' 分前',
+      hours: ' 時間前',
+      days: ' 日前',
+      months: ' ヶ月前',
       years: ' 年前'
     }
   }
