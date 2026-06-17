@@ -83,7 +83,6 @@ import {
   toRefs,
   watch
 } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { Profile, Sidebar, Toc } from '@/components/Sidebar'
 import { useCommonStore } from '@/stores/common'
 import { useRoute } from 'vue-router'
@@ -114,7 +113,6 @@ const props = defineProps({
 const appStore = useAppStore()
 const commonStore = useCommonStore()
 const route = useRoute()
-const { t } = useI18n()
 const post = toRefs(props).post
 const title = toRefs(props).title
 const postStatsRef = ref<PostStatsExpose>()

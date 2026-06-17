@@ -173,7 +173,6 @@ const avatarClass = computed(() => ({
 const bannerHoverGradient = computed(() => {
   return { background: appStore.themeConfig.theme.header_gradient_css }
 })
-const isMobile = computed(() => commonStore.isMobile)
 const numberOfTags = computed(() => {
   const tagCount = post.value.tags.length
   if (commonStore.isMobile) {
