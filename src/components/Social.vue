@@ -90,28 +90,21 @@
   </ul>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, toRefs } from 'vue'
+<script setup lang="ts">
+import { computed, toRefs } from 'vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 
-export default defineComponent({
-  name: 'AuSocial',
-  components: { SvgIcon },
-  props: {
-    socials: {
-      type: Object,
-      default: () => {
-        return {}
-      }
-    }
-  },
-  setup(props) {
-    const socials = toRefs(props).socials
-    return {
-      customSocials: computed(() => socials.value.customs.socials)
+const props = defineProps({
+  socials: {
+    type: Object,
+    default: () => {
+      return {}
     }
   }
 })
+
+const socials = toRefs(props).socials
+const customSocials = computed(() => socials.value.customs.socials)
 </script>
 
 <style scoped>
