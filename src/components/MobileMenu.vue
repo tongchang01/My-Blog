@@ -140,8 +140,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref, watch } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
@@ -151,105 +151,90 @@ import { useAuthorStore } from '@/stores/author'
 import { AuthorPosts } from '@/models/Post.class'
 import Social from '@/components/Social.vue'
 
-export default defineComponent({
-  name: 'ObMobileMenu',
-  components: { Dropdown, DropdownMenu, DropdownItem, Social },
-  setup() {
-    const appStore = useAppStore()
-    const authorStore = useAuthorStore()
-    const router = useRouter()
-    const navigatorStore = useNavigatorStore()
-    const { t } = useI18n()
-    const blurScreen = ref()
+const appStore = useAppStore()
+const authorStore = useAuthorStore()
+const router = useRouter()
+const navigatorStore = useNavigatorStore()
+const { t } = useI18n()
+const blurScreen = ref()
 
-    const authorData = ref(new AuthorPosts())
+const authorData = ref(new AuthorPosts())
 
-    const fetchAuthor = async () => {
-      authorData.value = await authorStore.fetchAuthorData('blog-author')
-    }
+const fetchAuthor = async () => {
+  authorData.value = await authorStore.fetchAuthorData('blog-author')
+}
 
-    const pushPage = (path: string): void => {
-      if (!path) return
-      navigatorStore.toggleMobileMenu()
-      if (path.match(/(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g)) {
-        window.location.href = path
-      } else {
-        router.push({
-          path: path
-        })
-      }
-    }
-
-    const onClickHandler = (e: MouseEvent) => {
-      if (e.target === blurScreen.value) {
-        navigatorStore.toggleMobileMenu()
-        return
-      }
-    }
-
-    watch(
-      () => navigatorStore.openMenu,
-      state => {
-        const bodyEle: HTMLElement | null =
-          document.querySelector('#body-container')
-        if (state) {
-          if (bodyEle) {
-            bodyEle.style.overflow = 'hidden'
-          }
-          blurScreen.value.style.display = 'flex'
-          blurScreen.value.style.animation =
-            '0.85s ease 0s 1 normal none running opacity_show'
-          document.addEventListener('click', onClickHandler)
-        } else {
-          if (bodyEle) {
-            bodyEle.style.overflow = 'initial'
-          }
-          window.setTimeout(() => {
-            blurScreen.value.style.animation = 'none'
-            blurScreen.value.style.display = 'none'
-          }, 500)
-          blurScreen.value.style.animation =
-            '0.85s ease 0s 1 normal none running opacity_hide'
-          document.removeEventListener('click', onClickHandler)
-        }
-      }
-    )
-
-    onMounted(() => {
-      fetchAuthor()
+const pushPage = (path: string): void => {
+  if (!path) return
+  navigatorStore.toggleMobileMenu()
+  if (path.match(/(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g)) {
+    window.location.href = path
+  } else {
+    router.push({
+      path: path
     })
+  }
+}
 
-    return {
-      avatarClass: computed(() => {
-        return {
-          'ob-avatar': true,
-          [appStore.themeConfig.theme.profile_shape]: true
-        }
-      }),
-      themeConfig: computed(() => appStore.themeConfig),
-      gradientBackground: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      }),
-      statistic: computed(() => appStore.statistic),
-      routes: computed(() => appStore.themeConfig.menu.menus),
-      openState: computed(() => navigatorStore.openMenu),
-      sidebarClasses: computed(() => ({
-        'App-Mobile-sidebar': true
-      })),
-      blurClasses: computed(() => ({
-        'App-Mobile-blur': true
-      })),
-      wrapperClasses: computed(() => ({
-        'App-Mobile-wrapper': true,
-        'open-menu': navigatorStore.openMenu
-      })),
-      blurScreen,
-      authorData,
-      pushPage,
-      t
+const onClickHandler = (e: MouseEvent) => {
+  if (e.target === blurScreen.value) {
+    navigatorStore.toggleMobileMenu()
+    return
+  }
+}
+
+watch(
+  () => navigatorStore.openMenu,
+  state => {
+    const bodyEle: HTMLElement | null =
+      document.querySelector('#body-container')
+    if (state) {
+      if (bodyEle) {
+        bodyEle.style.overflow = 'hidden'
+      }
+      blurScreen.value.style.display = 'flex'
+      blurScreen.value.style.animation =
+        '0.85s ease 0s 1 normal none running opacity_show'
+      document.addEventListener('click', onClickHandler)
+    } else {
+      if (bodyEle) {
+        bodyEle.style.overflow = 'initial'
+      }
+      window.setTimeout(() => {
+        blurScreen.value.style.animation = 'none'
+        blurScreen.value.style.display = 'none'
+      }, 500)
+      blurScreen.value.style.animation =
+        '0.85s ease 0s 1 normal none running opacity_hide'
+      document.removeEventListener('click', onClickHandler)
     }
   }
+)
+
+onMounted(() => {
+  fetchAuthor()
 })
+
+const avatarClass = computed(() => {
+  return {
+    'ob-avatar': true,
+    [appStore.themeConfig.theme.profile_shape]: true
+  }
+})
+const gradientBackground = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
+})
+const routes = computed(() => appStore.themeConfig.menu.menus)
+const sidebarClasses = computed(() => ({
+  'App-Mobile-sidebar': true
+}))
+const blurClasses = computed(() => ({
+  'App-Mobile-blur': true
+}))
+const wrapperClasses = computed(() => ({
+  'App-Mobile-wrapper': true,
+  'open-menu': navigatorStore.openMenu
+}))
 </script>
 
 <style lang="scss">
