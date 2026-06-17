@@ -101,58 +101,46 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, watch } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, watch } from 'vue'
 import { SubTitle } from '@/components/Title'
-import SvgIcon from '@/components/SvgIcon/index.vue'
+import SvgIcon, { SvgTypes } from '@/components/SvgIcon/index.vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
-import { SvgTypes } from '@/components/SvgIcon/index.vue'
 import useCommentPlugin from '@/hooks/useCommentPlugin'
 
-export default defineComponent({
-  name: 'ArRecentComment',
-  components: { SubTitle, SvgIcon },
-  setup() {
-    const appStore = useAppStore()
-    const { t } = useI18n()
-    const {
-      enabledCommentPlugin,
-      recentComments,
-      fetchRecentComment,
-      commentPluginLoading
-    } = useCommentPlugin()
+const appStore = useAppStore()
+const { t } = useI18n()
+const {
+  enabledCommentPlugin,
+  recentComments,
+  fetchRecentComment,
+  commentPluginLoading
+} = useCommentPlugin()
 
-    /** Wait for config is ready */
-    watch(
-      () => appStore.configReady,
-      (newValue, oldValue) => {
-        if (!oldValue && newValue) {
-          fetchRecentComment()
-        }
-      }
-    )
+/** Wait for config is ready */
+watch(
+  () => appStore.configReady,
+  (newValue, oldValue) => {
+    if (!oldValue && newValue) {
+      fetchRecentComment()
+    }
+  }
+)
 
-    return {
-      avatarClass: computed(() => {
-        return {
-          'col-span-1 mr-2 h-6 w-6': true,
-          [appStore.themeConfig.theme.profile_shape]: true
-        }
-      }),
-      isLoading: computed(() => commentPluginLoading.value),
-      comments: computed(() => recentComments.value),
-      isConfigReady: computed(() => appStore.configReady),
-      SvgTypes,
-      fetchRecentComment,
-      enabledCommentPlugin,
-      t
-    }
-  },
-  mounted() {
-    if (this.isConfigReady) {
-      this.fetchRecentComment()
-    }
+const avatarClass = computed(() => {
+  return {
+    'col-span-1 mr-2 h-6 w-6': true,
+    [appStore.themeConfig.theme.profile_shape]: true
+  }
+})
+const isLoading = computed(() => commentPluginLoading.value)
+const comments = computed(() => recentComments.value)
+const isConfigReady = computed(() => appStore.configReady)
+
+onMounted(() => {
+  if (isConfigReady.value) {
+    fetchRecentComment()
   }
 })
 </script>

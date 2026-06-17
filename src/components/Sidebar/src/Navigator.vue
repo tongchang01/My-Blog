@@ -41,44 +41,32 @@
   </ul>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
 import { useRouter } from 'vue-router'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import useJumpToEle from '@/hooks/useJumpToEle'
 
-export default defineComponent({
-  name: 'ArNavigator',
-  components: { SvgIcon },
-  props: {
-    comments: Boolean
-  },
-  setup() {
-    const router = useRouter()
-    const { jumpToEle } = useJumpToEle()
-
-    const backToTop = () => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      })
-    }
-
-    const goBack = () => {
-      router.back()
-    }
-
-    const jumpToComments = () => {
-      jumpToEle('comments')
-    }
-
-    return {
-      goBack,
-      backToTop,
-      jumpToComments
-    }
-  }
+defineProps({
+  comments: Boolean
 })
+
+const router = useRouter()
+const { jumpToEle } = useJumpToEle()
+
+const backToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
+const goBack = () => {
+  router.back()
+}
+
+const jumpToComments = () => {
+  jumpToEle('comments')
+}
 </script>
 
 <style lang="scss" scoped>

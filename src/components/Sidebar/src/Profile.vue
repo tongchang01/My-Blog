@@ -72,75 +72,61 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { AuthorPosts } from '@/models/Post.class'
 import { useAppStore } from '@/stores/app'
 import { useAuthorStore } from '@/stores/author'
-import { computed, defineComponent, onMounted, ref, toRefs, watch } from 'vue'
+import { computed, onMounted, ref, toRefs, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Social from '@/components/Social.vue'
 
-export default defineComponent({
-  name: 'ObProfile',
-  components: { Social },
-  props: {
-    author: {
-      type: String,
-      default: () => {
-        return ''
-      }
-    }
-  },
-  setup(props) {
-    const appStore = useAppStore()
-    const authorStore = useAuthorStore()
-    const { t } = useI18n()
-
-    const author = toRefs(props).author
-    const authorData = ref(new AuthorPosts())
-
-    const fetchData = async () => {
-      await appStore.fetchStat()
-      await fetchAuthor()
-    }
-
-    const fetchAuthor = async () => {
-      if (author.value === '') return
-      await authorStore.fetchAuthorData(author.value).then(data => {
-        authorData.value = data
-      })
-    }
-
-    watch(
-      () => props.author,
-      (newAuthor, oldAuthor) => {
-        if (newAuthor && newAuthor !== oldAuthor) {
-          fetchAuthor()
-        }
-      }
-    )
-
-    onMounted(fetchData)
-
-    return {
-      avatarClass: computed(() => {
-        return {
-          'ob-avatar': true,
-          [appStore.themeConfig.theme.profile_shape]: true
-        }
-      }),
-      themeConfig: computed(() => appStore.themeConfig),
-      gradientBackground: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      }),
-      socials: computed(() => {
-        return appStore.themeConfig.socials
-      }),
-      statistic: computed(() => appStore.statistic),
-      authorData,
-      t
+const props = defineProps({
+  author: {
+    type: String,
+    default: () => {
+      return ''
     }
   }
+})
+
+const appStore = useAppStore()
+const authorStore = useAuthorStore()
+const { t } = useI18n()
+
+const author = toRefs(props).author
+const authorData = ref(new AuthorPosts())
+
+const fetchData = async () => {
+  await appStore.fetchStat()
+  await fetchAuthor()
+}
+
+const fetchAuthor = async () => {
+  if (author.value === '') return
+  await authorStore.fetchAuthorData(author.value).then(data => {
+    authorData.value = data
+  })
+}
+
+watch(
+  () => props.author,
+  (newAuthor, oldAuthor) => {
+    if (newAuthor && newAuthor !== oldAuthor) {
+      fetchAuthor()
+    }
+  }
+)
+
+onMounted(fetchData)
+
+const avatarClass = computed(() => {
+  return {
+    'ob-avatar': true,
+    [appStore.themeConfig.theme.profile_shape]: true
+  }
+})
+const gradientBackground = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
 })
 </script>
 

@@ -22,11 +22,10 @@
   </Sticky>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
   StyleValue,
   computed,
-  defineComponent,
   onMounted,
   onUnmounted,
   ref,
@@ -36,59 +35,51 @@ import { SubTitle } from '@/components/Title'
 import Sticky from '@/components/Sticky.vue'
 import Navigator from './Navigator.vue'
 
-export default defineComponent({
-  name: 'ObTOC',
-  components: { SubTitle, Sticky, Navigator },
-  props: {
-    toc: String,
-    comments: Boolean
-  },
-  setup(props) {
-    const tocData = toRefs(props).toc
-    const sidebarNavigatorHeight = ref(0)
-    const sideBoxMaxHeight = ref(0)
+const props = defineProps({
+  toc: String,
+  comments: Boolean
+})
 
-    const updateSideBoxMaxHeight = () => {
-      const sidebarNavigator = document.getElementById('sidebar-navigator')
+const tocData = toRefs(props).toc
+const sidebarNavigatorHeight = ref(0)
+const sideBoxMaxHeight = ref(0)
 
-      sidebarNavigatorHeight.value = sidebarNavigator
-        ? sidebarNavigator.clientHeight
-        : 0
+const updateSideBoxMaxHeight = () => {
+  const sidebarNavigator = document.getElementById('sidebar-navigator')
 
-      sideBoxMaxHeight.value =
-        window.innerHeight -
-        sidebarNavigatorHeight.value -
-        63 - // header height
-        18 - // spacing between header and TOC
-        46 - // top + bottom padding of TOC box
-        18 - // spacing between header and navigator
-        60 - // height of navigator
-        18 // leave a 18px bottom spacing
-    }
+  sidebarNavigatorHeight.value = sidebarNavigator
+    ? sidebarNavigator.clientHeight
+    : 0
 
-    onMounted(() => {
-      updateSideBoxMaxHeight()
-      window.addEventListener('resize', updateSideBoxMaxHeight)
-    })
+  sideBoxMaxHeight.value =
+    window.innerHeight -
+    sidebarNavigatorHeight.value -
+    63 - // header height
+    18 - // spacing between header and TOC
+    46 - // top + bottom padding of TOC box
+    18 - // spacing between header and navigator
+    60 - // height of navigator
+    18 // leave a 18px bottom spacing
+}
 
-    onUnmounted(() => {
-      window.removeEventListener('resize', updateSideBoxMaxHeight)
-    })
+onMounted(() => {
+  updateSideBoxMaxHeight()
+  window.addEventListener('resize', updateSideBoxMaxHeight)
+})
 
-    return {
-      tocData,
-      showToc: computed(() => {
-        return tocData !== undefined && tocData.value === '' ? false : true
-      }),
-      sideBoxStyle: computed(() => {
-        return {
-          maxHeight: `${sideBoxMaxHeight.value}px`,
-          overflowY: 'scroll',
-          overflowX: 'hidden'
-        } as StyleValue | undefined
-      })
-    }
-  }
+onUnmounted(() => {
+  window.removeEventListener('resize', updateSideBoxMaxHeight)
+})
+
+const showToc = computed(() => {
+  return tocData !== undefined && tocData.value === '' ? false : true
+})
+const sideBoxStyle = computed(() => {
+  return {
+    maxHeight: `${sideBoxMaxHeight.value}px`,
+    overflowY: 'scroll',
+    overflowX: 'hidden'
+  } as StyleValue | undefined
 })
 </script>
 

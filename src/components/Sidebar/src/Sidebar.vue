@@ -4,17 +4,12 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useCommonStore } from '@/stores/common'
-import { computed, defineComponent } from 'vue'
+import { computed } from 'vue'
 
-export default defineComponent({
-  name: 'ObSidebar',
-  setup() {
-    const commonStore = useCommonStore()
-    return { isMobile: computed(() => commonStore.isMobile) }
-  }
-})
+const commonStore = useCommonStore()
+const isMobile = computed(() => commonStore.isMobile)
 </script>
 
 <style lang="scss" scoped></style>

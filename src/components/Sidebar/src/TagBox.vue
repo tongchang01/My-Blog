@@ -40,58 +40,48 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import { SubTitle } from '@/components/Title'
 import { useTagStore } from '@/stores/tag'
 import { TagList, TagItem } from '@/components/Tag'
 import { useI18n } from 'vue-i18n'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 
-export default defineComponent({
-  name: 'ObTag',
-  components: { SubTitle, TagList, TagItem, SvgIcon },
-  props: {
-    sidebarBox: {
-      type: Boolean,
-      default: true
-    },
-    activeTag: String
+const props = defineProps({
+  sidebarBox: {
+    type: Boolean,
+    default: true
   },
-  setup(props) {
-    const tagStore = useTagStore()
-    const { t } = useI18n()
-    const expand = ref<boolean>(false)
-
-    const fetchData = async () => {
-      tagStore.fetchAllTags()
-    }
-
-    const expandBox = () => {
-      expand.value = true
-    }
-
-    onMounted(fetchData)
-
-    return {
-      tags: computed(() => {
-        if (tagStore.isLoaded && tagStore.tags.length === 0) return null
-        return tagStore.tags
-      }),
-      tagBoxClasses: computed(() => ({
-        'overflow-hidden text-ellipsis relative': true,
-        'max-h-98': !expand.value,
-        'h-full': expand.value
-      })),
-      sidebarBoxClasses: computed(() => ({
-        'sidebar-box': props.sidebarBox
-      })),
-      expandBox,
-      expand,
-      t
-    }
-  }
+  activeTag: String
 })
+
+const tagStore = useTagStore()
+const { t } = useI18n()
+const expand = ref<boolean>(false)
+
+const fetchData = async () => {
+  tagStore.fetchAllTags()
+}
+
+const expandBox = () => {
+  expand.value = true
+}
+
+onMounted(fetchData)
+
+const tags = computed(() => {
+  if (tagStore.isLoaded && tagStore.tags.length === 0) return null
+  return tagStore.tags
+})
+const tagBoxClasses = computed(() => ({
+  'overflow-hidden text-ellipsis relative': true,
+  'max-h-98': !expand.value,
+  'h-full': expand.value
+}))
+const sidebarBoxClasses = computed(() => ({
+  'sidebar-box': props.sidebarBox
+}))
 </script>
 
 <style lang="scss">

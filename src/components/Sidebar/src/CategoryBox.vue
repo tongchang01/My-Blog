@@ -29,60 +29,51 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, onMounted, ref } from 'vue'
+<script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import { SubTitle } from '@/components/Title'
 import { useCategoryStore } from '@/stores/category'
 import { useAppStore } from '@/stores/app'
 import { useRouter } from 'vue-router'
 
-export default defineComponent({
-  name: 'ObArticleBox',
-  components: { SubTitle },
-  props: {
-    sidebarBox: {
-      type: Boolean,
-      default: true
-    },
-    activeCategory: {
-      type: String,
-      default: ''
-    }
+const props = defineProps({
+  sidebarBox: {
+    type: Boolean,
+    default: true
   },
-  setup(props) {
-    const appStore = useAppStore()
-    const categoryStore = useCategoryStore()
-    const loading = ref(true)
-    const router = useRouter()
-
-    const fetchData = async () => {
-      await categoryStore.fetchCategories()
-      loading.value = false
-    }
-
-    const navigateToCategory = (slug: string) => {
-      router.push({ name: 'post-search', query: { category: slug } })
-    }
-
-    onMounted(fetchData)
-
-    return {
-      loading,
-      navigateToCategory,
-      sidebarBoxClasses: computed(() => ({
-        'sidebar-box': props.sidebarBox
-      })),
-      categories: computed(() => categoryStore.categories),
-      gradientBackground: (active: boolean) => {
-        return active
-          ? {
-              background: appStore.themeConfig.theme.header_gradient_css,
-              color: '#fff',
-              opacity: 1
-            }
-          : {}
-      }
-    }
+  activeCategory: {
+    type: String,
+    default: ''
   }
 })
+
+const appStore = useAppStore()
+const categoryStore = useCategoryStore()
+const loading = ref(true)
+const router = useRouter()
+
+const fetchData = async () => {
+  await categoryStore.fetchCategories()
+  loading.value = false
+}
+
+const navigateToCategory = (slug: string) => {
+  router.push({ name: 'post-search', query: { category: slug } })
+}
+
+onMounted(fetchData)
+
+const sidebarBoxClasses = computed(() => ({
+  'sidebar-box': props.sidebarBox
+}))
+const categories = computed(() => categoryStore.categories)
+const gradientBackground = (active: boolean) => {
+  return active
+    ? {
+        background: appStore.themeConfig.theme.header_gradient_css,
+        color: '#fff',
+        opacity: 1
+      }
+    : {}
+}
 </script>
