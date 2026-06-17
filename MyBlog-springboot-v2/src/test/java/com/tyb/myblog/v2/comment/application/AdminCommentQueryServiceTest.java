@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.comment.application;
 
 import com.tyb.myblog.v2.comment.domain.AdminCommentPage;
 import com.tyb.myblog.v2.comment.domain.AdminCommentPageItem;
+import com.tyb.myblog.v2.comment.domain.AdminCommentQueryCriteria;
 import com.tyb.myblog.v2.comment.domain.AdminCommentQueryRepository;
 import com.tyb.myblog.v2.comment.domain.CommentAuditStatus;
 import com.tyb.myblog.v2.comment.domain.CommentTargetType;
@@ -33,7 +34,15 @@ class AdminCommentQueryServiceTest {
                 false,
                 1,
                 20);
-        when(repository.page(query))
+        AdminCommentQueryCriteria criteria = new AdminCommentQueryCriteria(
+                CommentTargetType.ARTICLE,
+                100L,
+                CommentAuditStatus.PENDING,
+                "hello",
+                false,
+                1,
+                20);
+        when(repository.page(criteria))
                 .thenReturn(new AdminCommentPage(List.of(item()), 1, 1, 20));
 
         AdminCommentPageResult result = service.page(
@@ -41,7 +50,7 @@ class AdminCommentQueryServiceTest {
                 query);
 
         assertThat(result.records()).hasSize(1);
-        verify(repository).page(query);
+        verify(repository).page(criteria);
     }
 
     private static AdminCommentPageItem item() {

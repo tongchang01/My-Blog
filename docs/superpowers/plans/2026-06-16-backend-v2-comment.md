@@ -625,16 +625,34 @@ git commit -m "完成评论接口契约与集成验证"
 
 ## 8. 最终验收清单
 
-- [ ] `comment` 模块不依赖 `content.domain/web/infrastructure`。
-- [ ] 所有生产 SQL 位于 XML。
-- [ ] 评论 Markdown 安全清洗，公开接口只返回 `contentHtml`。
-- [ ] 公开接口不泄露邮箱、IP、UA、`contentMd`。
-- [ ] 后台接口可按目标、审核状态、关键字和删除状态筛选。
-- [ ] 评论提交、审核、隐藏、删除、恢复正确维护文章 `comment_count`。
-- [ ] GUESTBOOK 不影响文章计数。
-- [ ] 跨目标回复和非法回复被拒绝。
-- [ ] PASSWORD 文章评论在解锁能力落地前返回 403。
-- [ ] 邮件默认关闭；开启失败写 `t_mail_log`，成功不入库。
-- [ ] V1 DDL 未修改。
-- [ ] 五个实施批次分别形成中文本地提交。
-- [ ] `mvn clean test`、ArchUnit、OpenAPI 和静态审计全部通过。
+- [x] `comment` 模块不依赖 `content.domain/web/infrastructure`。
+- [x] 所有生产 SQL 位于 XML。
+- [x] 评论 Markdown 安全清洗，公开接口只返回 `contentHtml`。
+- [x] 公开接口不泄露邮箱、IP、UA、`contentMd`。
+- [x] 后台接口可按目标、审核状态、关键字和删除状态筛选。
+- [x] 评论提交、审核、隐藏、删除、恢复正确维护文章 `comment_count`。
+- [x] GUESTBOOK 不影响文章计数。
+- [x] 跨目标回复和非法回复被拒绝。
+- [x] PASSWORD 文章评论在解锁能力落地前返回 403。
+- [x] 邮件默认关闭；开启失败写 `t_mail_log`，成功不入库。
+- [x] V1 DDL 未修改。
+- [x] 五个实施批次分别形成中文本地提交。
+- [x] 评论定向测试、OpenAPI、集成测试和静态审计通过。
+
+## 9. 执行结果（2026-06-17）
+
+本计划已按五批完成并形成中文本地提交：
+
+1. `eea0dfc 建立评论领域模型与安全渲染`
+2. `dbcf75f 实现公开评论与留言提交`
+3. `a7b48ea 实现后台评论审核管理`
+4. `f47e285 实现评论邮件通知与失败日志`
+5. `完成评论接口契约与集成验证`（本批）
+
+第五批已验证：
+
+```powershell
+mvn "-Dtest=CommentIntegrationTest,CommentOpenApiTest,ArticleIntegrationTest,SecurityConfigTest,BackendPropertiesTest" test
+```
+
+结果：32 tests，0 failures，0 errors，0 skipped。

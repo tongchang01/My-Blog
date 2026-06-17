@@ -21,8 +21,7 @@ public record AdminCommentPageItemVO(
         String contentMd,
         String contentHtml,
         CommentAuditStatus auditStatus,
-        LocalDateTime createdAt,
-        boolean deleted) {
+        LocalDateTime createdAt) {
 
     public static AdminCommentPageItemVO from(AdminCommentPageResult.Item item) {
         return new AdminCommentPageItemVO(
@@ -40,7 +39,6 @@ public record AdminCommentPageItemVO(
                 item.contentMd(),
                 item.contentHtml(),
                 item.auditStatus(),
-                item.createdAt(),
-                item.deleted());
+                item.createdAt());
     }
 }

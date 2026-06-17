@@ -43,6 +43,7 @@ class SecurityConfigTest {
     @BeforeEach
     void clearUsers() {
         jdbcTemplate.update("delete from t_article_tag");
+        jdbcTemplate.update("delete from t_comment");
         jdbcTemplate.update("delete from t_article");
         jdbcTemplate.update("delete from t_category");
         jdbcTemplate.update("delete from t_tag");
@@ -270,6 +271,30 @@ class SecurityConfigTest {
                                 "Bearer " + demoToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("10003"));
+    }
+
+    @Test
+    void permitsAdminAndDemoToReadCommentsButOnlyAdminCanMutate()
+            throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(get("/api/admin/comments")
+                        .header("Authorization",
+                                "Bearer " + adminToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/comments")
+                        .header("Authorization",
+                                "Bearer " + demoToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/comments"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+        mockMvc.perform(post("/api/admin/comments/10/approve")
+                        .header("Authorization",
+                                "Bearer " + demoToken))
                 .andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("10003"));
     }

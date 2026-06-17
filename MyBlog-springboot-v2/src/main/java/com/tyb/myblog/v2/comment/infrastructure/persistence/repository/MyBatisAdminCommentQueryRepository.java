@@ -1,8 +1,8 @@
 package com.tyb.myblog.v2.comment.infrastructure.persistence.repository;
 
-import com.tyb.myblog.v2.comment.application.AdminCommentPageQuery;
 import com.tyb.myblog.v2.comment.domain.AdminCommentPage;
 import com.tyb.myblog.v2.comment.domain.AdminCommentPageItem;
+import com.tyb.myblog.v2.comment.domain.AdminCommentQueryCriteria;
 import com.tyb.myblog.v2.comment.domain.AdminCommentQueryRepository;
 import com.tyb.myblog.v2.comment.domain.CommentAuditStatus;
 import com.tyb.myblog.v2.comment.domain.CommentTargetType;
@@ -19,34 +19,34 @@ public class MyBatisAdminCommentQueryRepository
     private final CommentMapper mapper;
 
     @Override
-    public AdminCommentPage page(AdminCommentPageQuery query) {
-        long offset = (long) (query.page() - 1) * query.size();
-        Integer targetType = query.targetType() == null
+    public AdminCommentPage page(AdminCommentQueryCriteria criteria) {
+        long offset = (long) (criteria.page() - 1) * criteria.size();
+        Integer targetType = criteria.targetType() == null
                 ? null
-                : query.targetType().databaseValue();
-        Integer auditStatus = query.auditStatus() == null
+                : criteria.targetType().databaseValue();
+        Integer auditStatus = criteria.auditStatus() == null
                 ? null
-                : query.auditStatus().databaseValue();
+                : criteria.auditStatus().databaseValue();
         return new AdminCommentPage(
                 mapper.selectAdminPage(
                                 targetType,
-                                query.targetId(),
+                                criteria.targetId(),
                                 auditStatus,
-                                normalizeKeyword(query.keyword()),
-                                query.includeDeleted(),
+                                normalizeKeyword(criteria.keyword()),
+                                criteria.includeDeleted(),
                                 offset,
-                                query.size())
+                                criteria.size())
                         .stream()
                         .map(MyBatisAdminCommentQueryRepository::toItem)
                         .toList(),
                 mapper.countAdminPage(
                         targetType,
-                        query.targetId(),
+                        criteria.targetId(),
                         auditStatus,
-                        normalizeKeyword(query.keyword()),
-                        query.includeDeleted()),
-                query.page(),
-                query.size());
+                        normalizeKeyword(criteria.keyword()),
+                        criteria.includeDeleted()),
+                criteria.page(),
+                criteria.size());
     }
 
     private static AdminCommentPageItem toItem(AdminCommentPageRow row) {

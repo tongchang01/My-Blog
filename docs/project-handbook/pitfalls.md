@@ -223,14 +223,16 @@
 
 ### 🟡 U-006 CommentCommandService / AdminCommentCommandService 集成测试缺失
 
-- **影响**：评论核心命令路径覆盖不够
-- **后续**：补 `@SpringBootTest` 集成测试
+- **状态**：✅ 已关闭（2026-06-17）
+- **处理**：已补 `CommentIntegrationTest`，覆盖公开提交、后台 approve / hide / delete / restore、DEMO 只读和文章 `comment_count` 联动
+- **原影响**：评论核心命令路径覆盖不够
 - **相关**：`rules/testing-policy.md` §10
 
 ### 🟡 U-007 评论软删除 → 恢复完整链路测试缺失
 
-- **影响**：恢复路径未端到端验证
-- **后续**：补集成测试
+- **状态**：✅ 已关闭（2026-06-17）
+- **处理**：`CommentIntegrationTest` 已端到端验证 PASS 文章评论软删除计数 -1、恢复计数 +1
+- **原影响**：恢复路径未端到端验证
 
 ### 🟡 U-008 Bearer Token 解析逻辑散落
 

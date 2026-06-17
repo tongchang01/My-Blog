@@ -8,7 +8,7 @@
 
 **DDL 冻结前的产品规格与 schema 评审已完成**。R5-R7 完成后多处与既有代码冲突（ADR-0015 审计列三件套、ADR-0017 无 FK、R5 模块边界含 stats 与 common-infra、ADR-0018 时区五层、Role 三态枚举等），继续修旧实现 = 返工。
 
-**2026-06-16 更新：content/article 文章核心纵向切片已完成。** 后台文章 CRUD、公开文章列表与详情、密码文章隐藏、软删除回收站、恢复引用校验、定时发布、OpenAPI 契约守护和集成测试均已落地。
+**2026-06-17 更新：comment 评论与留言纵向切片已完成。** 公开文章评论、留言板、后台审核、Markdown 安全清洗、文章评论计数、事务后回复通知、Resend 适配和失败日志均已落地；PASSWORD 文章评论在解锁能力完成前保持 `403`。
 
 **从现在开始，不再修改 Flyway V1__init.sql；后续 schema 变更走 V2__xxx.sql / V3__xxx.sql。**
 
@@ -80,14 +80,16 @@ M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，iden
 - active 文章引用阻止分类和标签删除；已删除文章不阻止删除，软删除完整写入五个审计字段
 - MapStruct 1.6.3 已用于 persistence 与 web 的机械映射，业务规则保持显式
 - 当前基线：`mvn clean test` 通过（485 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
+- comment 模块已完成：公开接口只返回 `contentHtml`，后台接口支持目标、状态、关键字、删除状态筛选；ADMIN 可审核/隐藏/删除/恢复，DEMO 只读；文章 `comment_count` 与审核/删除/恢复同事务维护
+- 邮件 common-infra 已完成：Resend 默认关闭，开启缺少配置时启动失败；回复通知在事务提交后发送，失败写 `t_mail_log`，成功不入库
 
-**当前处置方案**：identity、system 与 content 分类标签已收尾，下一步设计并实现文章纵向切片，再按 comment → stats / common-infra 推进。
+**当前处置方案**：identity、system、content 与 comment 已收尾，下一步进入 stats 纵向切片，再推进前台 / 后台前端骨架。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. 设计并实现 content 文章纵向切片
-2. 进入 comment → stats / common-infra
-3. 前台 / 后台前端骨架
+1. 设计并实现 stats 纵向切片
+2. 前台 / 后台前端骨架
+3. 根据前端对接结果补充接口契约细节
 
 ## 4. 相关文档
 
