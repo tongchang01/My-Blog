@@ -27,37 +27,28 @@
   </template>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Link } from '@/models/Article.class'
-import { PropType, defineComponent } from 'vue'
+import { PropType } from 'vue'
 import LinkCard from './LinkCard.vue'
 import { MainTitle } from '../Title'
 import { localizeLink } from '@/utils/localization'
 import { useI18n } from 'vue-i18n'
 
-export default defineComponent({
-  name: 'ARLinkCategory',
-  components: { LinkCard, MainTitle },
-  props: {
-    links: {
-      type: Object as PropType<Record<string, Link[]>>,
-      default: () => ({})
-    }
-  },
-  setup() {
-    const { t } = useI18n()
-
-    return {
-      linkWrapperClasses: (category: string) => {
-        return {
-          'grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6': true,
-          'xl:grid-cols-5': category !== 'links-badge-vip',
-          'xl:grid-cols-4': category === 'links-badge-vip'
-        }
-      },
-      localizeLink,
-      t
-    }
+defineProps({
+  links: {
+    type: Object as PropType<Record<string, Link[]>>,
+    default: () => ({})
   }
 })
+
+const { t } = useI18n()
+
+const linkWrapperClasses = (category: string) => {
+  return {
+    'grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6': true,
+    'xl:grid-cols-5': category !== 'links-badge-vip',
+    'xl:grid-cols-4': category === 'links-badge-vip'
+  }
+}
 </script>

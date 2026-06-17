@@ -27,44 +27,36 @@
   </li>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 
-export default defineComponent({
-  name: 'ARLinkCard',
-  components: {},
-  props: {
-    avatar: String,
-    link: String,
-    nick: String,
-    description: String,
-    type: String,
-    vip: Boolean,
-    categoryMode: Boolean
-  },
-  setup(props) {
-    const appStore = useAppStore()
-    const { t } = useI18n()
+const props = defineProps({
+  avatar: String,
+  link: String,
+  nick: String,
+  description: String,
+  type: String,
+  vip: Boolean,
+  categoryMode: Boolean
+})
 
-    return {
-      t,
-      titleStyle: {
-        'text-xl': true,
-        'vip-text': !!props.vip
-      },
-      gradientBackground: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      }),
-      articleClasses: computed(() => {
-        return {
-          'article-container': true,
-          highlighted: !!props.vip,
-          'category-mode': !!props.categoryMode
-        }
-      })
-    }
+const appStore = useAppStore()
+const { t } = useI18n()
+
+const titleStyle = {
+  'text-xl': true,
+  'vip-text': !!props.vip
+}
+const gradientBackground = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
+})
+const articleClasses = computed(() => {
+  return {
+    'article-container': true,
+    highlighted: !!props.vip,
+    'category-mode': !!props.categoryMode
   }
 })
 </script>

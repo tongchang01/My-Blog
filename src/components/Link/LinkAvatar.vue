@@ -17,41 +17,32 @@
   </a>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useAppStore } from '@/stores/app'
-import { computed, defineComponent } from 'vue'
+import { computed } from 'vue'
 
-export default defineComponent({
-  name: 'ARLinkAvatar',
-  components: {},
-  props: {
-    title: String,
-    link: String,
-    source: {
-      type: String
-    }
-  },
-  setup() {
-    const appStore = useAppStore()
+defineProps<{
+  title?: string
+  link?: string
+  source?: string
+}>()
 
-    return {
-      linkGroupClasses: computed(() => {
-        return {
-          'links-group-avatar h-[120px] w-[120px] flex items-center justify-center text-white text-6xl font-bold':
-            true,
-          'diamond-shape':
-            appStore.themeConfig.theme.profile_shape === 'diamond-avatar'
-        }
-      }),
-      avatarClasses: computed(() => {
-        return {
-          'h-full w-full shadow-xl m-0 transform-gpu': true,
-          [appStore.themeConfig.theme.profile_shape]: true,
-          'scale-[1.15]':
-            appStore.themeConfig.theme.profile_shape === 'diamond-avatar'
-        }
-      })
-    }
+const appStore = useAppStore()
+
+const linkGroupClasses = computed(() => {
+  return {
+    'links-group-avatar h-[120px] w-[120px] flex items-center justify-center text-white text-6xl font-bold':
+      true,
+    'diamond-shape':
+      appStore.themeConfig.theme.profile_shape === 'diamond-avatar'
+  }
+})
+const avatarClasses = computed(() => {
+  return {
+    'h-full w-full shadow-xl m-0 transform-gpu': true,
+    [appStore.themeConfig.theme.profile_shape]: true,
+    'scale-[1.15]':
+      appStore.themeConfig.theme.profile_shape === 'diamond-avatar'
   }
 })
 </script>

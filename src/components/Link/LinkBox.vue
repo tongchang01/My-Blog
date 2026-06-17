@@ -66,8 +66,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { PropType, defineComponent } from 'vue'
+<script setup lang="ts">
+import { PropType } from 'vue'
 import LinkAvatar from '@/components/Link/LinkAvatar.vue'
 import { MainTitle } from '@/components/Title'
 import { useI18n } from 'vue-i18n'
@@ -76,46 +76,38 @@ import SecondaryButton from '@/components/Button/SecondaryButton.vue'
 import { Link } from '@/models/Article.class'
 import { useCommonStore } from '@/stores/common'
 
-export default defineComponent({
-  name: 'ARLinkBox',
-  components: { LinkAvatar, MainTitle, PrimaryButton, SecondaryButton },
-  emits: ['onApplyClicked'],
-  props: {
-    gradientBackground: {
-      type: Object,
-      default: () => ({}),
-      required: true
-    },
-    data: {
-      type: Array as PropType<Array<Link[]>>,
-      default: () => [],
-      required: true
-    }
+const props = defineProps({
+  gradientBackground: {
+    type: Object,
+    default: () => ({}),
+    required: true
   },
-  setup(props, { emit }) {
-    const { t } = useI18n()
-    const commonStore = useCommonStore()
-
-    const applyClicked = () => {
-      emit('onApplyClicked')
-    }
-
-    const randomJump = () => {
-      commonStore.sendNotification(t('settings.notification-random-jump'))
-      setTimeout(() => {
-        const pair = props.data[Math.floor(Math.random() * 24)]
-        const blogger = pair[Math.floor(Math.random() * 2)]
-        window.open(blogger.link, '_blank')
-      }, 6000)
-    }
-
-    return {
-      applyClicked,
-      randomJump,
-      t
-    }
+  data: {
+    type: Array as PropType<Array<Link[]>>,
+    default: () => [],
+    required: true
   }
 })
+
+const emit = defineEmits<{
+  (e: 'onApplyClicked'): void
+}>()
+
+const { t } = useI18n()
+const commonStore = useCommonStore()
+
+const applyClicked = () => {
+  emit('onApplyClicked')
+}
+
+const randomJump = () => {
+  commonStore.sendNotification(t('settings.notification-random-jump'))
+  setTimeout(() => {
+    const pair = props.data[Math.floor(Math.random() * 24)]
+    const blogger = pair[Math.floor(Math.random() * 2)]
+    window.open(blogger.link, '_blank')
+  }, 6000)
+}
 </script>
 
 <style lang="scss">

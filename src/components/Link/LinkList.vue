@@ -21,24 +21,17 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Link } from '@/models/Article.class'
-import { PropType, defineComponent } from 'vue'
+import { PropType } from 'vue'
 import { localizeLink } from '@/utils/localization'
 import { SubTitle } from '../Title'
 
-export default defineComponent({
-  name: 'ARLinkList',
-  components: { SubTitle },
-  props: {
-    links: {
-      type: Array as PropType<Link[]>,
-      default: () => [],
-      required: true
-    }
-  },
-  setup() {
-    return { localizeLink }
+defineProps({
+  links: {
+    type: Array as PropType<Link[]>,
+    default: () => [],
+    required: true
   }
 })
 </script>
