@@ -120,62 +120,50 @@
   </li>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useAppStore } from '@/stores/app'
-import { computed, defineComponent } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useRouter } from 'vue-router'
 
-export default defineComponent({
-  name: 'ARArticleCard',
-  components: { SvgIcon },
-  props: {
-    data: {
-      type: Object,
-      required: true
-    }
-  },
-  setup(props) {
-    const router = useRouter()
-    const appStore = useAppStore()
-    const { t } = useI18n()
-
-    const handleCardClick = (slug?: string) => {
-      if (!slug) return
-      router.push({ name: 'post-slug', params: { slug } })
-    }
-
-    const handleAuthorClick = (link: string) => {
-      if (link === '') link = window.location.href
-      window.location.href = link
-    }
-
-    const navigateToTag = (slug: string) => {
-      router.push({ name: 'post-search', query: { tag: slug } })
-    }
-
-    const navigateToCategory = (slug: string) => {
-      router.push({ name: 'post-search', query: { category: slug } })
-    }
-
-    return {
-      avatarClasses: computed(() => ({
-        'hover:opacity-50 cursor-pointer': true,
-        [appStore.themeConfig.theme.profile_shape]: true
-      })),
-      gradientBackground: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      }),
-      post: computed(() => props.data),
-      navigateToTag,
-      navigateToCategory,
-      handleAuthorClick,
-      handleCardClick,
-      t
-    }
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true
   }
 })
+
+const router = useRouter()
+const appStore = useAppStore()
+const { t } = useI18n()
+
+const handleCardClick = (slug?: string) => {
+  if (!slug) return
+  router.push({ name: 'post-slug', params: { slug } })
+}
+
+const handleAuthorClick = (link: string) => {
+  if (link === '') link = window.location.href
+  window.location.href = link
+}
+
+const navigateToTag = (slug: string) => {
+  router.push({ name: 'post-search', query: { tag: slug } })
+}
+
+const navigateToCategory = (slug: string) => {
+  router.push({ name: 'post-search', query: { category: slug } })
+}
+
+const avatarClasses = computed(() => ({
+  'hover:opacity-50 cursor-pointer': true,
+  [appStore.themeConfig.theme.profile_shape]: true
+}))
+const gradientBackground = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
+})
+const post = computed(() => props.data)
 </script>
 
 <style lang="scss" scoped>

@@ -72,10 +72,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import {
   computed,
-  defineComponent,
   nextTick,
   onMounted,
   onUnmounted,
@@ -99,74 +98,65 @@ interface PostStatsExpose extends Ref<InstanceType<typeof PostStats>> {
   getPostView(): void
 }
 
-export default defineComponent({
-  name: 'ObPageContent',
-  components: { ObSkeleton, Sidebar, Toc, Profile, PostStats },
-  props: {
-    post: {
-      type: Object,
-      default: () => {
-        return {}
-      }
-    },
-    title: {
-      type: String,
-      default: ''
+const props = defineProps({
+  post: {
+    type: Object,
+    default: () => {
+      return {}
     }
   },
-  setup(props) {
-    const appStore = useAppStore()
-    const commonStore = useCommonStore()
-    const route = useRoute()
-    const { t } = useI18n()
-    const post = toRefs(props).post
-    const title = toRefs(props).title
-    const postStatsRef = ref<PostStatsExpose>()
-    const { enabledCommentPlugin } = useCommentPlugin()
-    const { initializeLightBox } = useLightBox()
-
-    watch(
-      () => post.value.covers,
-      value => {
-        if (value) commonStore.setHeaderImage(value)
-      }
-    )
-
-    watch(
-      () => post.value.count_time.symbolsTime,
-      async value => {
-        if (value) {
-          await nextTick()
-          initializeLightBox()
-          postStatsRef.value?.getCommentCount()
-          postStatsRef.value?.getPostView()
-        }
-      }
-    )
-
-    onMounted(() => {
-      commonStore.setHeaderImage(post.value.covers)
-    })
-
-    onUnmounted(() => {
-      commonStore.resetHeaderImage()
-    })
-
-    return {
-      enabledComment: computed(
-        () => post.value.comments && enabledCommentPlugin.value.plugin !== ''
-      ),
-      pageTitle: computed(() => {
-        if (title.value !== '') return title.value
-        return post.value.title
-      }),
-      currentPath: computed(() => route.path),
-      pluginConfigs: computed(() => appStore.themeConfig.plugins),
-      postStatsRef,
-      t
-    }
+  title: {
+    type: String,
+    default: ''
   }
 })
+
+const appStore = useAppStore()
+const commonStore = useCommonStore()
+const route = useRoute()
+const { t } = useI18n()
+const post = toRefs(props).post
+const title = toRefs(props).title
+const postStatsRef = ref<PostStatsExpose>()
+const { enabledCommentPlugin } = useCommentPlugin()
+const { initializeLightBox } = useLightBox()
+
+watch(
+  () => post.value.covers,
+  value => {
+    if (value) commonStore.setHeaderImage(value)
+  }
+)
+
+watch(
+  () => post.value.count_time.symbolsTime,
+  async value => {
+    if (value) {
+      await nextTick()
+      initializeLightBox()
+      postStatsRef.value?.getCommentCount()
+      postStatsRef.value?.getPostView()
+    }
+  }
+)
+
+onMounted(() => {
+  commonStore.setHeaderImage(post.value.covers)
+})
+
+onUnmounted(() => {
+  commonStore.resetHeaderImage()
+})
+
+const enabledComment = computed(
+  () => post.value.comments && enabledCommentPlugin.value.plugin !== ''
+)
+const pageTitle = computed(() => {
+  if (title.value !== '') return title.value
+  return post.value.title
+})
+const currentPath = computed(() => route.path)
+const pluginConfigs = computed(() => appStore.themeConfig.plugins)
 </script>
 
 <style lang="scss" scoped>

@@ -122,8 +122,8 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, toRefs } from 'vue'
+<script setup lang="ts">
+import { computed, toRefs } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
 import { useI18n } from 'vue-i18n'
@@ -135,63 +135,50 @@ enum TagLimit {
   default = '5'
 }
 
-export default defineComponent({
-  name: 'ObHorizontalArticle',
-  components: { SvgIcon },
-  props: {
-    data: {
-      type: Object,
-      default: () => ({})
-    }
-  },
-  setup(props) {
-    const router = useRouter()
-    const appStore = useAppStore()
-    const commonStore = useCommonStore()
-    const { t } = useI18n()
-    const post = toRefs(props).data
-
-    const handleCardClick = (slug?: string) => {
-      if (!slug) return
-      router.push({ name: 'post-slug', params: { slug } })
-    }
-
-    const handleAuthorClick = (link: string) => {
-      if (link === '') link = window.location.href
-      window.location.href = link
-    }
-
-    const navigateToTag = (slug: string) => {
-      router.push({ name: 'post-search', query: { tag: slug } })
-    }
-
-    const navigateToCategory = (slug: string) => {
-      router.push({ name: 'post-search', query: { category: slug } })
-    }
-
-    return {
-      avatarClass: computed(() => ({
-        'hover:opacity-50 cursor-pointer': true,
-        [appStore.themeConfig.theme.profile_shape]: true
-      })),
-      bannerHoverGradient: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      }),
-      isMobile: computed(() => commonStore.isMobile),
-      numberOfTags: computed(() => {
-        const tagCount = post.value.tags.length
-        if (commonStore.isMobile) {
-          return tagCount > TagLimit.forMobile ? TagLimit.forMobile : tagCount
-        }
-        return tagCount > TagLimit.default ? TagLimit.default : tagCount
-      }),
-      navigateToTag,
-      navigateToCategory,
-      post,
-      handleAuthorClick,
-      handleCardClick,
-      t
-    }
+const props = defineProps({
+  data: {
+    type: Object,
+    default: () => ({})
   }
+})
+
+const router = useRouter()
+const appStore = useAppStore()
+const commonStore = useCommonStore()
+const { t } = useI18n()
+const post = toRefs(props).data
+
+const handleCardClick = (slug?: string) => {
+  if (!slug) return
+  router.push({ name: 'post-slug', params: { slug } })
+}
+
+const handleAuthorClick = (link: string) => {
+  if (link === '') link = window.location.href
+  window.location.href = link
+}
+
+const navigateToTag = (slug: string) => {
+  router.push({ name: 'post-search', query: { tag: slug } })
+}
+
+const navigateToCategory = (slug: string) => {
+  router.push({ name: 'post-search', query: { category: slug } })
+}
+
+const avatarClass = computed(() => ({
+  'hover:opacity-50 cursor-pointer': true,
+  [appStore.themeConfig.theme.profile_shape]: true
+}))
+const bannerHoverGradient = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
+})
+const isMobile = computed(() => commonStore.isMobile)
+const numberOfTags = computed(() => {
+  const tagCount = post.value.tags.length
+  if (commonStore.isMobile) {
+    return tagCount > TagLimit.forMobile ? TagLimit.forMobile : tagCount
+  }
+  return tagCount > TagLimit.default ? TagLimit.default : tagCount
 })
 </script>

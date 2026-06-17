@@ -57,93 +57,85 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, toRefs } from 'vue'
+<script setup lang="ts">
+import { computed, toRefs } from 'vue'
 import { useI18n } from 'vue-i18n'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 
-export default defineComponent({
-  name: 'ObPaginator',
-  components: { SvgIcon },
-  emits: ['pageChange'],
-  props: {
-    pageTotal: {
-      type: Number,
-      required: true
-    },
-    pageSize: {
-      type: Number,
-      required: true
-    },
-    page: {
-      type: Number,
-      required: true
-    }
+const props = defineProps({
+  pageTotal: {
+    type: Number,
+    required: true
   },
-  setup(props, { emit }) {
-    const { t } = useI18n()
-    const pagination = toRefs(props)
+  pageSize: {
+    type: Number,
+    required: true
+  },
+  page: {
+    type: Number,
+    required: true
+  }
+})
 
-    const pages = computed(() => {
-      return Math.ceil(pagination.pageTotal.value / pagination.pageSize.value)
-    })
+const emit = defineEmits<{
+  (e: 'pageChange', page: number | string): void
+}>()
 
-    const paginator = computed(() => {
-      if (pages.value <= 3) {
-        const pageNumbers = []
-        for (let i = 0; i < pages.value; i++) {
-          pageNumbers.push(i + 1)
-        }
-        return {
-          head: 0,
-          pages: pageNumbers,
-          end: 0
-        }
-      } else if (pagination.page.value >= 1 && pagination.page.value < 3) {
-        return {
-          head: 1,
-          pages: [2, 3, '...'],
-          end: pages.value
-        }
-      } else if (
-        pagination.page.value >= 3 &&
-        pagination.page.value <= pages.value - 2
-      ) {
-        return {
-          head: 1,
-          pages: [
-            '...',
-            pagination.page.value - 1,
-            pagination.page.value,
-            pagination.page.value + 1,
-            '...'
-          ],
-          end: pages.value
-        }
-      } else {
-        return {
-          head: 1,
-          pages: ['...', pages.value - 2, pages.value - 1],
-          end: pages.value
-        }
-      }
-    })
+const { t } = useI18n()
+const pagination = toRefs(props)
 
-    const pageChangeEmitter = (page: number | string) => {
-      if (page === '...') return
-      emit('pageChange', page)
+const pages = computed(() => {
+  return Math.ceil(pagination.pageTotal.value / pagination.pageSize.value)
+})
+
+const paginator = computed(() => {
+  if (pages.value <= 3) {
+    const pageNumbers = []
+    for (let i = 0; i < pages.value; i++) {
+      pageNumbers.push(i + 1)
     }
-
     return {
-      currentPage: computed(() => {
-        return pagination.page.value
-      }),
-      pageChangeEmitter,
-      paginator,
-      pages,
-      t
+      head: 0,
+      pages: pageNumbers,
+      end: 0
+    }
+  } else if (pagination.page.value >= 1 && pagination.page.value < 3) {
+    return {
+      head: 1,
+      pages: [2, 3, '...'],
+      end: pages.value
+    }
+  } else if (
+    pagination.page.value >= 3 &&
+    pagination.page.value <= pages.value - 2
+  ) {
+    return {
+      head: 1,
+      pages: [
+        '...',
+        pagination.page.value - 1,
+        pagination.page.value,
+        pagination.page.value + 1,
+        '...'
+      ],
+      end: pages.value
+    }
+  } else {
+    return {
+      head: 1,
+      pages: ['...', pages.value - 2, pages.value - 1],
+      end: pages.value
     }
   }
+})
+
+const pageChangeEmitter = (page: number | string) => {
+  if (page === '...') return
+  emit('pageChange', page)
+}
+
+const currentPage = computed(() => {
+  return pagination.page.value
 })
 </script>
 
