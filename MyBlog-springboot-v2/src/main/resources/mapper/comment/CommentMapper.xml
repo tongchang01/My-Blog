@@ -94,6 +94,63 @@
           AND deleted = 0
     </select>
 
+    <!-- 后台评论列表允许按目标、状态、关键字和删除状态组合筛选，关键字只匹配作者昵称和 Markdown 原文。 -->
+    <select id="selectAdminPage"
+            resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.projection.AdminCommentPageRow">
+        SELECT
+            id,
+            target_type,
+            target_id,
+            parent_id,
+            reply_to_comment_id,
+            reply_to_nickname,
+            author_nickname,
+            author_email,
+            author_site,
+            author_ip,
+            author_user_agent,
+            content_md,
+            content_html,
+            audit_status,
+            created_at,
+            deleted
+        FROM t_comment
+        <include refid="adminCommentWhere"/>
+        ORDER BY created_at DESC, id DESC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 后台分页总数必须复用相同筛选条件，避免列表和分页条数量不一致。 -->
+    <select id="countAdminPage"
+            resultType="long">
+        SELECT COUNT(1)
+        FROM t_comment
+        <include refid="adminCommentWhere"/>
+    </select>
+
+    <sql id="adminCommentWhere">
+        <where>
+            <if test="targetType != null">
+                AND target_type = #{targetType}
+            </if>
+            <if test="targetId != null">
+                AND target_id = #{targetId}
+            </if>
+            <if test="auditStatus != null">
+                AND audit_status = #{auditStatus}
+            </if>
+            <if test="keyword != null">
+                AND (
+                    author_nickname LIKE #{keyword}
+                    OR content_md LIKE #{keyword}
+                )
+            </if>
+            <if test="!includeDeleted">
+                AND deleted = 0
+            </if>
+        </where>
+    </sql>
+
     <!-- 后台恢复前锁定已删除评论，避免恢复和删除并发覆盖审计字段。 -->
     <select id="selectDeletedByIdForUpdate"
             resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity">

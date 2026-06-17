@@ -3,6 +3,7 @@ package com.tyb.myblog.v2.comment.infrastructure.persistence.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.tyb.myblog.v2.comment.domain.CommentAuditStatus;
 import com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity;
+import com.tyb.myblog.v2.comment.infrastructure.persistence.projection.AdminCommentPageRow;
 import com.tyb.myblog.v2.comment.infrastructure.persistence.projection.CommentPageRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -27,6 +28,22 @@ public interface CommentMapper extends BaseMapper<CommentEntity> {
     long countPublicRoots(
             @Param("targetType") int targetType,
             @Param("targetId") long targetId);
+
+    List<AdminCommentPageRow> selectAdminPage(
+            @Param("targetType") Integer targetType,
+            @Param("targetId") Long targetId,
+            @Param("auditStatus") Integer auditStatus,
+            @Param("keyword") String keyword,
+            @Param("includeDeleted") boolean includeDeleted,
+            @Param("offset") long offset,
+            @Param("size") int size);
+
+    long countAdminPage(
+            @Param("targetType") Integer targetType,
+            @Param("targetId") Long targetId,
+            @Param("auditStatus") Integer auditStatus,
+            @Param("keyword") String keyword,
+            @Param("includeDeleted") boolean includeDeleted);
 
     CommentEntity selectDeletedByIdForUpdate(@Param("id") long id);
 
