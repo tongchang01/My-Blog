@@ -93,8 +93,8 @@
   </teleport>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, toRefs } from 'vue'
+<script setup lang="ts">
+import { computed, toRefs } from 'vue'
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
 import { useAppStore } from '@/stores/app'
 import ThemeToggle from '@/components/ToggleSwitch/ThemeToggle.vue'
@@ -104,68 +104,50 @@ import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useNavigatorStore } from '@/stores/navigator'
 import { Locales } from '@/models/ThemeConfig.class'
 
-export default defineComponent({
-  name: 'ArControls',
-  components: {
-    Dropdown,
-    DropdownMenu,
-    DropdownItem,
-    ThemeToggle,
-    SearchModal,
-    SvgIcon
-  },
-  props: {
-    scrollProgress: {
-      type: Number,
-      default: 0
-    }
-  },
-  setup(props) {
-    const appStore = useAppStore()
-    const searchStore = useSearchStore()
-    const navigatorStore = useNavigatorStore()
-    const ballProgress = toRefs(props).scrollProgress
-
-    const handleClick = (name: Locales): void => {
-      appStore.changeLocale(name)
-    }
-
-    const handleOpenModal = (status: boolean) => {
-      searchStore.setOpenModal(status)
-    }
-
-    const handleOpenMenu = () => {
-      navigatorStore.toggleMobileMenu()
-    }
-
-    const handleBackToTop = () => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      })
-    }
-
-    return {
-      handleBackToTop,
-      handleOpenModal,
-      handleOpenMenu,
-      handleClick,
-      progressBallClasses: computed(() => ({
-        'progress-ball': true,
-        'activated-ball': ballProgress.value > 0,
-        'reset-ball': ballProgress.value === 0
-      })),
-      leftControlClasses: computed(() => ({
-        'left-control': true,
-        'moved-right': ballProgress.value > 0
-      })),
-      currentLocale: computed(() => appStore.locale),
-      enableMultiLanguage: computed(
-        () => appStore.themeConfig.site.multi_language
-      )
-    }
+const props = defineProps({
+  scrollProgress: {
+    type: Number,
+    default: 0
   }
 })
+
+const appStore = useAppStore()
+const searchStore = useSearchStore()
+const navigatorStore = useNavigatorStore()
+const ballProgress = toRefs(props).scrollProgress
+
+const handleClick = (name: Locales): void => {
+  appStore.changeLocale(name)
+}
+
+const handleOpenModal = (status: boolean) => {
+  searchStore.setOpenModal(status)
+}
+
+const handleOpenMenu = () => {
+  navigatorStore.toggleMobileMenu()
+}
+
+const handleBackToTop = () => {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  })
+}
+
+const progressBallClasses = computed(() => ({
+  'progress-ball': true,
+  'activated-ball': ballProgress.value > 0,
+  'reset-ball': ballProgress.value === 0
+}))
+const leftControlClasses = computed(() => ({
+  'left-control': true,
+  'moved-right': ballProgress.value > 0
+}))
+const currentLocale = computed(() => appStore.locale)
+const enableMultiLanguage = computed(
+  () => appStore.themeConfig.site.multi_language
+)
 </script>
 
 <style lang="scss" scoped>

@@ -35,33 +35,25 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useAppStore } from '@/stores/app'
-import { computed, defineComponent } from 'vue'
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
-export default defineComponent({
-  name: 'ArLogo',
-  setup() {
-    const appStore = useAppStore()
-    const router = useRouter()
+const appStore = useAppStore()
+const router = useRouter()
 
-    const handleLogoClick = () => {
-      router.push('/')
-    }
+const handleLogoClick = () => {
+  router.push('/')
+}
 
-    return {
-      handleLogoClick,
-      avatarClass: computed(() => {
-        return {
-          'logo-image': true,
-          [appStore.themeConfig.theme.profile_shape]: true
-        }
-      }),
-      themeConfig: computed(() => appStore.themeConfig)
-    }
+const avatarClass = computed(() => {
+  return {
+    'logo-image': true,
+    [appStore.themeConfig.theme.profile_shape]: true
   }
 })
+const themeConfig = computed(() => appStore.themeConfig)
 </script>
 
 <style lang="scss">

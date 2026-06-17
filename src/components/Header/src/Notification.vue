@@ -18,54 +18,46 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue'
+<script setup lang="ts">
+import { computed, ref, watch } from 'vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useCommonStore } from '@/stores/common'
 
-export default defineComponent({
-  name: 'ARNotification',
-  components: { SvgIcon },
-  setup() {
-    const commonState = useCommonStore()
-    const openState = ref(commonState.notificationState)
-    const progress = ref(100)
+const commonState = useCommonStore()
+const openState = ref(commonState.notificationState)
+const progress = ref(100)
 
-    watch(
-      () => commonState.notificationState,
-      state => {
-        let timer = 0
-        openState.value = state
-        if (state) {
-          progress.value = 100
-          window.setTimeout(() => {
-            timer = window.setInterval(() => {
-              progress.value = progress.value - 20
-            }, 800)
-          })
-          window.setTimeout(() => {
-            commonState.closeNotification()
-            clearInterval(timer)
-            progress.value = 100
-          }, 5000)
-        }
-      }
-    )
-
-    return {
-      message: computed(() => commonState.notificationMessage),
-      notificationClasses: computed(() => {
-        return {
-          'notification absolute z-50 shadow-2xl': true,
-          open: openState.value
-        }
-      }),
-      progressStyle: computed(() => {
-        return {
-          width: `${progress.value}%`
-        }
+watch(
+  () => commonState.notificationState,
+  state => {
+    let timer = 0
+    openState.value = state
+    if (state) {
+      progress.value = 100
+      window.setTimeout(() => {
+        timer = window.setInterval(() => {
+          progress.value = progress.value - 20
+        }, 800)
       })
+      window.setTimeout(() => {
+        commonState.closeNotification()
+        clearInterval(timer)
+        progress.value = 100
+      }, 5000)
     }
+  }
+)
+
+const message = computed(() => commonState.notificationMessage)
+const notificationClasses = computed(() => {
+  return {
+    'notification absolute z-50 shadow-2xl': true,
+    open: openState.value
+  }
+})
+const progressStyle = computed(() => {
+  return {
+    width: `${progress.value}%`
   }
 })
 </script>

@@ -45,42 +45,29 @@
   </nav>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
 import { isExternal } from '@/utils/validate'
 
-export default defineComponent({
-  name: 'ArNavigation',
-  components: { Dropdown, DropdownMenu, DropdownItem },
-  setup() {
-    const { t, te } = useI18n()
-    const router = useRouter()
-    const appStore = useAppStore()
+const router = useRouter()
+const appStore = useAppStore()
 
-    const pushPage = (path: string): void => {
-      if (!path) return
-      if (isExternal(path)) {
-        window.location.href = path
-      } else {
-        router.push({
-          path: path
-        })
-      }
-    }
-
-    return {
-      locale: computed(() => appStore.locale),
-      routes: computed(() => appStore.themeConfig.menu.menus),
-      pushPage,
-      te,
-      t
-    }
+const pushPage = (path: string): void => {
+  if (!path) return
+  if (isExternal(path)) {
+    window.location.href = path
+  } else {
+    router.push({
+      path: path
+    })
   }
-})
+}
+
+const locale = computed(() => appStore.locale)
+const routes = computed(() => appStore.themeConfig.menu.menus)
 </script>
 
 <style lang="scss">

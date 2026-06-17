@@ -16,43 +16,28 @@
   </Sticky>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref } from 'vue'
+<script setup lang="ts">
+import { computed, ref } from 'vue'
 import { Logo, Navigation, Controls, Notification } from '../index'
 import Sticky from '@/components/Sticky.vue'
 import { useNavigatorStore } from '@/stores/navigator'
 
-export default defineComponent({
-  name: 'ArHeader',
-  components: {
-    Logo,
-    Navigation,
-    Controls,
-    Notification,
-    Sticky
-  },
-  props: {
-    msg: String
-  },
-  setup() {
-    const navigatorStore = useNavigatorStore()
-    const active = ref<boolean>(false)
-
-    const handleActiveState = (value: boolean) => {
-      active.value = value
-    }
-
-    return {
-      containerClasses: computed(() => ({
-        'header-container': true,
-        'header-active': active.value
-      })),
-      progress: computed(() => navigatorStore.progress),
-      handleActiveState,
-      active
-    }
-  }
+defineProps({
+  msg: String
 })
+
+const navigatorStore = useNavigatorStore()
+const active = ref<boolean>(false)
+
+const handleActiveState = (value: boolean) => {
+  active.value = value
+}
+
+const containerClasses = computed(() => ({
+  'header-container': true,
+  'header-active': active.value
+}))
+const progress = computed(() => navigatorStore.progress)
 </script>
 
 <style lang="scss">
