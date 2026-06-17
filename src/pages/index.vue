@@ -99,7 +99,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { Feature, FeatureList } from '@/components/Feature'
 import { ArticleCard, HorizontalArticle } from '@/components/ArticleCard'
-import { MainTitle } from '@/components/Title'
 import { Sidebar, TagBox, RecentComment, Profile } from '@/components/Sidebar'
 import { usePostStore } from '@/stores/post'
 import { FeaturePosts, PostList } from '@/models/Post.class'
@@ -227,12 +226,6 @@ const pageChangeHandler = async (page: number) => {
 const endEleId = computed(() =>
   appStore.themeConfig.footerLinks.data.length > 0 ? 'footer-link' : 'footer'
 )
-const gradientText = computed(
-  () => appStore.themeConfig.theme.background_gradient_style
-)
-const gradientBackground = computed(() => {
-  return { background: appStore.themeConfig.theme.header_gradient_css }
-})
 const themeConfig = computed(() => appStore.themeConfig)
 const categories = computed(() => {
   if (categoryStore.isLoaded && categoryStore.categories.length === 0) {

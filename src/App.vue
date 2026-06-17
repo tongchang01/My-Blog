@@ -53,7 +53,6 @@ import HeaderMain from '@/components/Header/src/Header.vue'
 import FooterContainer from '@/components/Footer/FooterContainer.vue'
 import MobileMenu from '@/components/MobileMenu.vue'
 import defaultCover from '@/assets/default-cover.jpg'
-import { useI18n } from 'vue-i18n'
 import VueEasyLightbox from 'vue-easy-lightbox'
 import FooterLink from './components/Footer/FooterLink.vue'
 
@@ -63,7 +62,6 @@ const commonStore = useCommonStore()
 const metaStore = useMetaStore()
 const searchStore = useSearchStore()
 const MOBILE_WITH = 1024 // Using the mobile width by Bootstrap design.
-const { t } = useI18n()
 
 const appWrapperClass = 'app-wrapper'
 const loadingBarClass = ref({
@@ -179,7 +177,6 @@ watch(
 
 const title = computed(() => metaStore.getTitle)
 const theme = computed(() => appStore.theme)
-const scripts = computed(() => metaStore.scripts)
 const themeConfig = computed(() => appStore.themeConfig)
 const headerImage = computed(() => {
   return {
@@ -194,8 +191,6 @@ const headerBaseBackground = computed(() => {
     opacity: commonStore.headerImage !== '' ? 0.8 : 0.99
   }
 })
-const handleEscKey = appStore.handleEscKey
-const configReady = computed(() => appStore.configReady)
 const cssVariables = computed(() => {
   if (appStore.theme === 'theme-dark') {
     return `

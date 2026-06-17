@@ -19,7 +19,6 @@
 import { computed, onBeforeMount, ref, watch } from 'vue'
 import { useArticleStore } from '@/stores/article'
 import { Page } from '@/models/Article.class'
-import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useMetaStore } from '@/stores/meta'
@@ -34,7 +33,6 @@ const appStore = useAppStore()
 const metaStore = useMetaStore()
 const pageData = ref(new Page())
 const route = useRoute()
-const { t } = useI18n()
 const pageTitleRef = ref()
 const { enabledCommentPlugin } = useCommentPlugin()
 

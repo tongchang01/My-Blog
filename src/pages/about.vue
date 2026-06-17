@@ -11,7 +11,6 @@ import { useArticleStore } from '@/stores/article'
 import { Page } from '@/models/Article.class'
 import PageContent from '@/components/PageContent.vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
-import { useI18n } from 'vue-i18n'
 import usePageTitle from '@/hooks/usePageTitle'
 import { useCommonStore } from '@/stores/common'
 import defaultCover from '@/assets/default-cover.jpg'
@@ -19,7 +18,6 @@ import defaultCover from '@/assets/default-cover.jpg'
 const commonStore = useCommonStore()
 const articleStore = useArticleStore()
 const pageData = ref(new Page())
-const { t } = useI18n()
 const { pageTitle, updateTitle } = usePageTitle()
 
 const fetchArticle = async () => {

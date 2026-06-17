@@ -78,7 +78,6 @@ const { t } = useI18n()
 const route = useRoute()
 const postStore = usePostStore()
 const metaStore = useMetaStore()
-const pageType = ref('search')
 
 const isFetched = ref(false)
 const posts = ref(new SpecificPostsList())
