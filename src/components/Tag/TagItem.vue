@@ -15,54 +15,48 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useAppStore } from '@/stores/app'
-import { PropType, computed, defineComponent, toRefs } from 'vue'
+import { PropType, computed, toRefs } from 'vue'
 
-export default defineComponent({
-  name: 'ObTagItem',
-  props: {
-    name: String,
-    slug: String,
-    count: {
-      type: Number,
-      default: 0
-    },
-    size: {
-      type: String as PropType<'small' | 'large'>,
-      default: 'small'
-    },
-    active: {
-      type: Boolean,
-      default: false
-    }
+const props = defineProps({
+  name: String,
+  slug: String,
+  count: {
+    type: Number,
+    default: 0
   },
-  setup(props) {
-    const tagSize = toRefs(props).size
-    const appStore = useAppStore()
-
-    return {
-      tagClasses: computed(() => ({
-        'flex p-1.5 rounded-md text-sm hover:bg-ob-deep-900 hover:opacity-100 hover:text-ob-bright font-bold':
-          tagSize.value === 'small',
-        'large-tag-item': tagSize.value === 'large'
-      })),
-      countClasses: computed(() => ({
-        'block -mt-1.5 ml-1 text-xs opacity-50': tagSize.value === 'small',
-        'block -mt-1.5 ml-2 rounded-full text-xs text-ob':
-          tagSize.value === 'large'
-      })),
-      gradientBackground: computed(() => {
-        return props.active
-          ? {
-              background: appStore.themeConfig.theme.header_gradient_css,
-              color: '#fff',
-              opacity: 1
-            }
-          : {}
-      })
-    }
+  size: {
+    type: String as PropType<'small' | 'large'>,
+    default: 'small'
+  },
+  active: {
+    type: Boolean,
+    default: false
   }
+})
+
+const tagSize = toRefs(props).size
+const appStore = useAppStore()
+
+const tagClasses = computed(() => ({
+  'flex p-1.5 rounded-md text-sm hover:bg-ob-deep-900 hover:opacity-100 hover:text-ob-bright font-bold':
+    tagSize.value === 'small',
+  'large-tag-item': tagSize.value === 'large'
+}))
+const countClasses = computed(() => ({
+  'block -mt-1.5 ml-1 text-xs opacity-50': tagSize.value === 'small',
+  'block -mt-1.5 ml-2 rounded-full text-xs text-ob':
+    tagSize.value === 'large'
+}))
+const gradientBackground = computed(() => {
+  return props.active
+    ? {
+        background: appStore.themeConfig.theme.header_gradient_css,
+        color: '#fff',
+        opacity: 1
+      }
+    : {}
 })
 </script>
 
