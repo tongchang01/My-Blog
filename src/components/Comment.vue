@@ -13,9 +13,9 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useAppStore } from '@/stores/app'
-import { computed, defineComponent, onMounted, toRefs, watch } from 'vue'
+import { computed, onMounted, toRefs, watch } from 'vue'
 import { MainTitle } from '@/components/Title'
 import { usePostStore } from '@/stores/post'
 import { twikooInit } from '@/utils/comments/twikoo-api'
@@ -23,178 +23,171 @@ import { githubInit } from '@/utils/comments/github-api'
 import { valineInit } from '@/utils/comments/valine-api'
 import { walineInit } from '@/utils/comments/waline-api'
 
-export default defineComponent({
-  name: 'ObComment',
-  props: {
-    /** Used for create issue title by Gitalk */
-    title: {
-      type: String,
-      default: ''
-    },
-    /** Used for create issue body content by Gitalk */
-    body: {
-      type: String,
-      default: ''
-    },
-    /** Unique ID used by Gitalk and Valine */
-    uid: {
-      type: String,
-      default: ''
-    }
+const props = defineProps({
+  /** Used for create issue title by Gitalk */
+  title: {
+    type: String,
+    default: ''
   },
-  components: { MainTitle },
-  setup(props) {
-    const postTitle = toRefs(props).title
-    const postBody = toRefs(props).body
-    const postUid = toRefs(props).uid
-    const appStore = useAppStore()
-    const postStore = usePostStore()
-    let waline: any = undefined
+  /** Used for create issue body content by Gitalk */
+  body: {
+    type: String,
+    default: ''
+  },
+  /** Unique ID used by Gitalk and Valine */
+  uid: {
+    type: String,
+    default: ''
+  }
+})
 
-    const enabledComment = (
-      postTitle: string,
-      postBody: string,
-      postUid: string
-    ) => {
-      /**
-       * Generate the data needed for Gitalk to generate the issue.
-       */
-      const title = !postTitle || postTitle === '' ? '' : postTitle
-      const body =
-        !postBody || postBody === ''
-          ? window.location.href
-          : `${window.location.href} \n ${postBody}`
+const postTitle = toRefs(props).title
+const postBody = toRefs(props).body
+const postUid = toRefs(props).uid
+const appStore = useAppStore()
+const postStore = usePostStore()
+let waline: any = undefined
 
-      const uid =
-        appStore.themeConfig.plugins.gitalk.id === 'pathname'
-          ? window.location.pathname
-          : postUid
+const enabledComment = (
+  postTitleVal: string,
+  postBodyVal: string,
+  postUidVal: string
+) => {
+  /**
+   * Generate the data needed for Gitalk to generate the issue.
+   */
+  const title = !postTitleVal || postTitleVal === '' ? '' : postTitleVal
+  const body =
+    !postBodyVal || postBodyVal === ''
+      ? window.location.href
+      : `${window.location.href} \n ${postBodyVal}`
 
-      /**
-       * Caching the current post data, used
-       * when config changes on render updates.
-       */
-      postStore.setCache({
-        title: postTitle,
-        body: postBody,
-        uid: postUid
-      })
+  const uid =
+    appStore.themeConfig.plugins.gitalk.id === 'pathname'
+      ? window.location.pathname
+      : postUidVal
 
-      if (!appStore.configReady) return
+  /**
+   * Caching the current post data, used
+   * when config changes on render updates.
+   */
+  postStore.setCache({
+    title: postTitleVal,
+    body: postBodyVal,
+    uid: postUidVal
+  })
 
-      if (appStore.themeConfig.plugins.gitalk.enable) {
-        const proxy =
-          appStore.themeConfig.plugins.gitalk.proxy === ''
-            ? 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token'
-            : appStore.themeConfig.plugins.gitalk.proxy
+  if (!appStore.configReady) return
 
-        const { clientID, clientSecret, repo, owner, admin, language } =
-          appStore.themeConfig.plugins.gitalk
+  if (appStore.themeConfig.plugins.gitalk.enable) {
+    const proxy =
+      appStore.themeConfig.plugins.gitalk.proxy === ''
+        ? 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token'
+        : appStore.themeConfig.plugins.gitalk.proxy
 
-        githubInit({
-          clientID,
-          clientSecret,
-          repo,
-          owner,
-          admin,
-          language,
-          uid,
-          title,
-          body,
-          proxy
-        })
-      } else if (appStore.themeConfig.plugins.valine.enable) {
-        const {
-          app_id,
-          app_key,
-          avatar,
-          placeholder,
-          visitor,
-          lang,
-          meta,
-          requiredFields,
-          avatarForce
-        } = appStore.themeConfig.plugins.valine
+    const { clientID, clientSecret, repo, owner, admin, language } =
+      appStore.themeConfig.plugins.gitalk
 
-        valineInit({
-          appId: app_id,
-          appKey: app_key,
-          avatar,
-          placeholder,
-          visitor,
-          lang,
-          meta,
-          requiredFields,
-          avatarForce,
-          path: window.location.pathname // Make sure updating pathname
-        })
-      } else if (appStore.themeConfig.plugins.twikoo.enable) {
-        const { envId, region, lang } = appStore.themeConfig.plugins.twikoo
-        twikooInit({ envId, region, lang, path: window.location.pathname })
-      } else if (appStore.themeConfig.plugins.waline.enable) {
-        const {
-          serverURL,
-          login,
-          reaction,
-          meta,
-          requiredMeta,
-          commentSorting,
-          wordLimit,
-          imageUploader,
-          pageSize
-        } = appStore.themeConfig.plugins.waline
-
-        waline = walineInit({
-          serverURL,
-          lang: appStore.locale ?? 'en',
-          login,
-          reaction,
-          meta,
-          requiredMeta,
-          commentSorting,
-          wordLimit,
-          imageUploader,
-          pageSize
-        })
-      }
-    }
-
-    /** Wait for config is ready */
-    watch(
-      () => appStore.configReady,
-      (newValue, oldValue) => {
-        if (!oldValue && newValue) {
-          const cachePost = postStore.cachePost
-          enabledComment(cachePost.title, cachePost.body, cachePost.uid)
-        }
-      }
-    )
-
-    /** Updating comments base on current locale */
-    watch(
-      () => appStore.locale,
-      (newLocale, oldLocale) => {
-        if (waline && newLocale !== undefined && newLocale !== oldLocale) {
-          waline.update({
-            lang: newLocale
-          })
-        }
-      }
-    )
-
-    onMounted(() => {
-      enabledComment(postTitle.value, postBody.value, postUid.value)
+    githubInit({
+      clientID,
+      clientSecret,
+      repo,
+      owner,
+      admin,
+      language,
+      uid,
+      title,
+      body,
+      proxy
     })
+  } else if (appStore.themeConfig.plugins.valine.enable) {
+    const {
+      app_id,
+      app_key,
+      avatar,
+      placeholder,
+      visitor,
+      lang,
+      meta,
+      requiredFields,
+      avatarForce
+    } = appStore.themeConfig.plugins.valine
 
-    return {
-      wrapperClasses: computed(() => {
-        return {
-          'bg-ob-deep-800 p-4 mt-8 lg:px-14 lg:py-10 rounded-2xl shadow-xl mb-8 lg:mb-0':
-            true,
-          [`comment-${appStore.themeConfig.theme.profile_shape}`]: true
-        }
+    valineInit({
+      appId: app_id,
+      appKey: app_key,
+      avatar,
+      placeholder,
+      visitor,
+      lang,
+      meta,
+      requiredFields,
+      avatarForce,
+      path: window.location.pathname // Make sure updating pathname
+    })
+  } else if (appStore.themeConfig.plugins.twikoo.enable) {
+    const { envId, region, lang } = appStore.themeConfig.plugins.twikoo
+    twikooInit({ envId, region, lang, path: window.location.pathname })
+  } else if (appStore.themeConfig.plugins.waline.enable) {
+    const {
+      serverURL,
+      login,
+      reaction,
+      meta,
+      requiredMeta,
+      commentSorting,
+      wordLimit,
+      imageUploader,
+      pageSize
+    } = appStore.themeConfig.plugins.waline
+
+    waline = walineInit({
+      serverURL,
+      lang: appStore.locale ?? 'en',
+      login,
+      reaction,
+      meta,
+      requiredMeta,
+      commentSorting,
+      wordLimit,
+      imageUploader,
+      pageSize
+    })
+  }
+}
+
+/** Wait for config is ready */
+watch(
+  () => appStore.configReady,
+  (newValue, oldValue) => {
+    if (!oldValue && newValue) {
+      const cachePost = postStore.cachePost
+      enabledComment(cachePost.title, cachePost.body, cachePost.uid)
+    }
+  }
+)
+
+/** Updating comments base on current locale */
+watch(
+  () => appStore.locale,
+  (newLocale, oldLocale) => {
+    if (waline && newLocale !== undefined && newLocale !== oldLocale) {
+      waline.update({
+        lang: newLocale
       })
     }
+  }
+)
+
+onMounted(() => {
+  enabledComment(postTitle.value, postBody.value, postUid.value)
+})
+
+const wrapperClasses = computed(() => {
+  return {
+    'bg-ob-deep-800 p-4 mt-8 lg:px-14 lg:py-10 rounded-2xl shadow-xl mb-8 lg:mb-0':
+      true,
+    [`comment-${appStore.themeConfig.theme.profile_shape}`]: true
   }
 })
 </script>
