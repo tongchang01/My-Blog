@@ -91,7 +91,7 @@ const styles = computed(
     }) as StyleValue
 )
 
-const sticky = (topValue: number, positionValue: any) => {
+const sticky = (topValue: number, positionValue: string) => {
   if (active.value) {
     return
   }

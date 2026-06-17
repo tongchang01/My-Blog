@@ -114,7 +114,7 @@ const initialApp = async () => {
   })
 }
 
-const copyEventHandler = (event: any) => {
+const copyEventHandler = (event: ClipboardEvent) => {
   if (document.getSelection() instanceof Selection) {
     if (document.getSelection()?.toString() !== '' && event.clipboardData) {
       event.clipboardData.setData('text', document.getSelection() + pagelink)

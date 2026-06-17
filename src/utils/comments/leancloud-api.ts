@@ -221,9 +221,9 @@ export class LeanCloudComments implements LeanCloudCommentsInterface {
       this.queryAll()
         .limit(limit)
         .find()
-        .then((comments: { [key: string]: any }) => {
+        .then((comments: Record<string, any>) => {
           const generatedComments: LeanCloudComment[] = comments.map(
-            (comment: { [key: string]: any }) => {
+            (comment: Record<string, any>) => {
               return new LeanCloudComment(this.mapComments(comment))
             }
           )
@@ -235,7 +235,7 @@ export class LeanCloudComments implements LeanCloudCommentsInterface {
   /**
    * Reformat the data fetch from lean cloud storage.
    */
-  mapComments(comment: { [key: string]: any }): { [key: string]: any } {
+  mapComments(comment: Record<string, any>): Record<string, any> {
     const mail = comment._serverData.mail
     const admin = this.configs.leanCloudConfig.admin
 
@@ -286,7 +286,7 @@ export class LeanCloudComment implements RecentComment {
    * @param raw Raw data from LeanCloud API
    * @param options Additional params
    */
-  constructor(raw?: { [key: string]: any }, lang?: Locales) {
+  constructor(raw?: Record<string, unknown>, lang?: Locales) {
     if (raw) {
       let cachedData = false
       for (const key of Object.keys(this)) {

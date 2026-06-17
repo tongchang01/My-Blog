@@ -19,6 +19,14 @@ export class SearchIndex {
   }
 }
 
+interface CachedSearchResult {
+  value: {
+    title: string
+    content: string
+    slug: string
+  }
+}
+
 export type SearchResultType = {
   title: string
   content: string
@@ -64,7 +72,7 @@ export class RecentSearchResults {
     if (cache === null) return []
 
     let cacheResults = JSON.parse(cache)
-    cacheResults = cacheResults.map((result: any) => {
+    cacheResults = cacheResults.map((result: CachedSearchResult) => {
       return {
         title: result.value.title,
         content: result.value.content,

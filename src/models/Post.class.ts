@@ -1,7 +1,7 @@
 import { Social } from './ThemeConfig.class'
 
 export interface PostRaw {
-  [key: string]: Array<any> | string | { [key: string]: any }
+  [key: string]: unknown[] | string | Record<string, any>
 }
 
 export interface SpecificPostListRaw {
@@ -29,7 +29,7 @@ export class NavPost {
   tags = {}
   author = {}
 
-  constructor(raw?: { [key: string]: Array<any> | string }) {
+  constructor(raw?: { [key: string]: unknown[] | string }) {
     if (raw) {
       for (const key of Object.keys(this)) {
         if (Object.prototype.hasOwnProperty.call(raw, key)) {
@@ -109,7 +109,7 @@ export class Post {
             })
           } else if (key === 'prev_post' || key === 'next_post') {
             Object.assign(this, {
-              [key]: new NavPost(raw[key] as { [key: string]: any })
+              [key]: new NavPost(raw[key] as Record<string, any>)
             })
           } else {
             if (key === 'date') {
@@ -199,7 +199,7 @@ export class AuthorPosts {
   word_count = '0'
   post_list: Post[] = []
 
-  constructor(raw?: { [key: string]: any }) {
+  constructor(raw?: Record<string, any>) {
     if (raw) {
       for (const key of Object.keys(this)) {
         if (Object.prototype.hasOwnProperty.call(raw, key)) {

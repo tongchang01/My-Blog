@@ -107,7 +107,7 @@ export class GithubComments implements GithubCommentsInterface {
     authorizationToken: '',
     lang: 'en'
   }
-  comments = []
+  comments: GithubComment[] = []
 
   constructor(options: GithubAttributes) {
     /**
@@ -141,7 +141,7 @@ export class GithubComments implements GithubCommentsInterface {
    * requesting Github api.
    * @param comments Fresh comment data for caching.
    */
-  setCache(comments: { [key: string]: any }): void {
+  setCache(comments: any[]): void {
     const cacheComments = new CommentCache(comments)
     localStorage.setItem(COMMENT_CACHE_KEY, JSON.stringify(cacheComments))
   }
@@ -173,7 +173,7 @@ export class GithubComments implements GithubCommentsInterface {
     return new Promise(resolve => {
       this.fetchGithub(url, this.configs.authorizationToken).then(response => {
         const { data } = response
-        this.comments = data.map((item: { [key: string]: any }) => {
+        this.comments = data.map((item: Record<string, any>) => {
           return new GithubComment(item, this.configs)
         })
         this.setCache(this.comments)
@@ -207,12 +207,12 @@ interface CommentCacheInterface {
 }
 
 class CommentCache implements CommentCacheInterface {
-  data = []
+  data: GithubComment[] = []
   time = 0
 
-  constructor(data?: any, time?: number) {
+  constructor(data?: any[], time?: number) {
     this.data = data
-      ? data.map((item: { [key: string]: any }) => {
+      ? data.map((item: Record<string, any>) => {
           return new GithubComment(item)
         })
       : []
@@ -259,7 +259,7 @@ export class GithubComment implements RecentComment {
    * @param raw Config data generated from Hexo
    * @param options GithubAttributes
    */
-  constructor(raw?: { [key: string]: any }, options?: GithubAttributes) {
+  constructor(raw?: Record<string, any>, options?: GithubAttributes) {
     if (raw) {
       let cachedData = false
       for (const key of Object.keys(this)) {

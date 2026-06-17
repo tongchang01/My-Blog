@@ -2,7 +2,7 @@
 import { defineComponent, h, inject, toRefs, computed } from 'vue'
 import { SkeletonStyle } from './SkeletonTheme.vue'
 
-const isEmptyVNode = (children: any) => {
+const isEmptyVNode = (children: (() => any[]) | undefined) => {
   if (!children) return true
   const firstNode = children()[0]
   let str = firstNode.text

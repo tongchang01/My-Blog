@@ -28,7 +28,7 @@ export const useMetaStore = defineStore('metaStore', () => {
       : newTitle
   }
 
-  const addScripts = (...scriptArgs: any[]) => {
+  const addScripts = (...scriptArgs: string[]) => {
     const scriptsFlat = scriptArgs.flat(1)
     for (const script of scriptsFlat) {
       scripts.value.push(script)

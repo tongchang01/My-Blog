@@ -173,7 +173,7 @@ export class Menu {
    *
    * @param raw Config data generated from Hexo
    */
-  constructor(menu: { [key: string]: any }) {
+  constructor(menu: Record<string, any>) {
     this.name = menu.name
     this.path = menu.path ? menu.path : null
     this.i18n = menu.i18n ? menu.i18n : {}
@@ -367,7 +367,7 @@ export class CustomSocials {
    *
    * @param raw - Config data generated from Hexo
    */
-  constructor(raw?: { [key: string]: any }) {
+  constructor(raw?: Record<string, any>) {
     if (raw) {
       Object.assign(
         this.socials,
