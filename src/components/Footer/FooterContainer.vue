@@ -140,62 +140,45 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, nextTick, watch } from 'vue'
+<script setup lang="ts">
+import { computed, nextTick, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
-import SvgIcon, { SvgTypes } from '@/components/SvgIcon/index.vue'
+import SvgIcon from '@/components/SvgIcon/index.vue'
 import beianImg from '@/assets/gongan-beian-40-40.png'
 import { getDaysTillNow } from '@/utils'
 import useCommentPlugin from '@/hooks/useCommentPlugin'
 
-export default defineComponent({
-  name: 'ObFooter',
-  components: { SvgIcon },
-  setup() {
-    const appStore = useAppStore()
-    const { t } = useI18n()
-    const { enabledCommentPlugin, intiCommentPluginPageView } =
-      useCommentPlugin()
+const appStore = useAppStore()
+const { t } = useI18n()
+const { enabledCommentPlugin, intiCommentPluginPageView } = useCommentPlugin()
 
-    watch(
-      () => appStore.configReady,
-      async (newValue, oldValue) => {
-        if (!oldValue && newValue) {
-          await nextTick()
-          intiCommentPluginPageView('/')
-        }
-      }
-    )
-
-    return {
-      SvgTypes,
-      beianImg,
-      avatarClass: computed(() => {
-        return {
-          'footer-avatar': true,
-          [appStore.themeConfig.theme.profile_shape]: true
-        }
-      }),
-      gradientText: computed(
-        () => appStore.themeConfig.theme.background_gradient_style
-      ),
-      gradientBackground: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      }),
-      currentYear: computed(() => new Date().getUTCFullYear()),
-      themeConfig: computed(() => appStore.themeConfig),
-      configReady: computed(() => appStore.configReady),
-      runningDays: computed(() => {
-        if (appStore.themeConfig.site.started_date === '') return undefined
-        return getDaysTillNow(`${appStore.themeConfig.site.started_date}`)
-      }),
-      intiCommentPluginPageView,
-      enabledPlugin: computed(() => enabledCommentPlugin.value.plugin),
-      t
+watch(
+  () => appStore.configReady,
+  async (newValue, oldValue) => {
+    if (!oldValue && newValue) {
+      await nextTick()
+      intiCommentPluginPageView('/')
     }
   }
+)
+
+const avatarClass = computed(() => {
+  return {
+    'footer-avatar': true,
+    [appStore.themeConfig.theme.profile_shape]: true
+  }
 })
+const gradientBackground = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
+})
+const currentYear = computed(() => new Date().getUTCFullYear())
+const themeConfig = computed(() => appStore.themeConfig)
+const runningDays = computed(() => {
+  if (appStore.themeConfig.site.started_date === '') return undefined
+  return getDaysTillNow(`${appStore.themeConfig.site.started_date}`)
+})
+const enabledPlugin = computed(() => enabledCommentPlugin.value.plugin)
 </script>
 
 <style lang="scss" scoped></style>

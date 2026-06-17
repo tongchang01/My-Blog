@@ -61,12 +61,12 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { Link } from '@/models/Article.class'
 import { FooterLink } from '@/models/ThemeConfig.class'
 import { useAppStore } from '@/stores/app'
 import { useArticleStore } from '@/stores/article'
-import { PropType, computed, defineComponent, onMounted, ref, watch } from 'vue'
+import { PropType, computed, onMounted, ref, watch } from 'vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import { shuffleArray } from '@/utils'
 
@@ -75,100 +75,90 @@ enum FriendLinkRandomMode {
   'SHUFFLE' = 'SHUFFLE'
 }
 
-export default defineComponent({
-  name: 'ARFooterLink',
-  components: { SvgIcon },
-  props: {
-    links: Array as PropType<FooterLink[]>
-  },
-  setup() {
-    const appStore = useAppStore()
-    const articleStore = useArticleStore()
-    const loadingLinks = ref<boolean>(true)
-    const linksData = ref<Link[]>([])
-    const bloggers = ref<Link[][]>([])
-    const maxShuffleLimit = 100
+defineProps({
+  links: Array as PropType<FooterLink[]>
+})
 
-    const refreshLinkData = () => {
-      loadingLinks.value = true
-      linksData.value = []
-      let uniqueBloggers = [
-        ...new Map(bloggers.value.flat().map(m => [m.nick, m])).values()
-      ]
-      setTimeout(() => {
-        const recordSet = new Set()
-        let friendsCount = uniqueBloggers.length < 5 ? uniqueBloggers.length : 5
-        let mode: FriendLinkRandomMode = FriendLinkRandomMode.SHUFFLE
-        if (uniqueBloggers.length > maxShuffleLimit) {
-          mode = FriendLinkRandomMode.RANDOM
-        }
+const appStore = useAppStore()
+const articleStore = useArticleStore()
+const loadingLinks = ref<boolean>(true)
+const linksData = ref<Link[]>([])
+const bloggers = ref<Link[][]>([])
+const maxShuffleLimit = 100
 
-        if (mode === FriendLinkRandomMode.SHUFFLE) {
-          uniqueBloggers = shuffleArray(uniqueBloggers)
-        }
-
-        while (friendsCount > 0) {
-          if (mode === FriendLinkRandomMode.SHUFFLE) {
-            linksData.value.push(uniqueBloggers[friendsCount - 1])
-            friendsCount--
-          } else {
-            const blogger =
-              uniqueBloggers[Math.floor(Math.random() * friendsCount)]
-            if (!recordSet.has(blogger.nick)) {
-              recordSet.add(blogger.nick)
-              linksData.value.push(blogger)
-              friendsCount--
-            }
-          }
-        }
-        loadingLinks.value = false
-      }, 1000)
+const refreshLinkData = () => {
+  loadingLinks.value = true
+  linksData.value = []
+  let uniqueBloggers = [
+    ...new Map(bloggers.value.flat().map(m => [m.nick, m])).values()
+  ]
+  setTimeout(() => {
+    const recordSet = new Set()
+    let friendsCount = uniqueBloggers.length < 5 ? uniqueBloggers.length : 5
+    let mode: FriendLinkRandomMode = FriendLinkRandomMode.SHUFFLE
+    if (uniqueBloggers.length > maxShuffleLimit) {
+      mode = FriendLinkRandomMode.RANDOM
     }
 
-    const fetchLinks = async () => {
-      const linksArticle = await articleStore.fetchArticle('links')
-      if (linksArticle && linksArticle.avatarWall) {
-        bloggers.value = linksArticle.avatarWall
-        refreshLinkData()
-      }
+    if (mode === FriendLinkRandomMode.SHUFFLE) {
+      uniqueBloggers = shuffleArray(uniqueBloggers)
     }
 
-    watch(
-      () => appStore.configReady,
-      (newValue, oldValue) => {
-        if (!oldValue && newValue && appStore.themeConfig.menu.menus['Links']) {
-          fetchLinks()
+    while (friendsCount > 0) {
+      if (mode === FriendLinkRandomMode.SHUFFLE) {
+        linksData.value.push(uniqueBloggers[friendsCount - 1])
+        friendsCount--
+      } else {
+        const blogger =
+          uniqueBloggers[Math.floor(Math.random() * friendsCount)]
+        if (!recordSet.has(blogger.nick)) {
+          recordSet.add(blogger.nick)
+          linksData.value.push(blogger)
+          friendsCount--
         }
       }
-    )
+    }
+    loadingLinks.value = false
+  }, 1000)
+}
 
-    onMounted(() => {
-      if (appStore.themeConfig.menu.menus['Links']) {
-        fetchLinks()
-      }
-    })
+const fetchLinks = async () => {
+  const linksArticle = await articleStore.fetchArticle('links')
+  if (linksArticle && linksArticle.avatarWall) {
+    bloggers.value = linksArticle.avatarWall
+    refreshLinkData()
+  }
+}
 
-    return {
-      avatarClass: computed(() => {
-        return {
-          'footer-link-avatar': true,
-          [appStore.themeConfig.theme.profile_shape]: true
-        }
-      }),
-      gradientBackground: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      }),
-      avatar: computed(() => appStore.themeConfig.site.avatar),
-      loadingSvgClasses: computed(() => ({
-        'cursor-pointer': true,
-        'animate-spin': loadingLinks.value
-      })),
-      refreshLinkData,
-      loadingLinks,
-      linksData
+watch(
+  () => appStore.configReady,
+  (newValue, oldValue) => {
+    if (!oldValue && newValue && appStore.themeConfig.menu.menus['Links']) {
+      fetchLinks()
     }
   }
+)
+
+onMounted(() => {
+  if (appStore.themeConfig.menu.menus['Links']) {
+    fetchLinks()
+  }
 })
+
+const avatarClass = computed(() => {
+  return {
+    'footer-link-avatar': true,
+    [appStore.themeConfig.theme.profile_shape]: true
+  }
+})
+const gradientBackground = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
+})
+const avatar = computed(() => appStore.themeConfig.site.avatar)
+const loadingSvgClasses = computed(() => ({
+  'cursor-pointer': true,
+  'animate-spin': loadingLinks.value
+}))
 </script>
 
 <style lang="scss">
