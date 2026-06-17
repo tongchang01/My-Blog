@@ -4,33 +4,26 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
 import { useDropdownStore } from '@/stores/dropdown'
 
-export default defineComponent({
-  name: 'ObDropdownItem',
-  props: {
-    name: String,
-    active: Boolean
-  },
-  setup(props) {
-    const dropdownStore = useDropdownStore()
+const props = defineProps({
+  name: String,
+  active: Boolean
+})
 
-    const handleClick = () => {
-      dropdownStore.setCommand(String(props.name))
-    }
+const dropdownStore = useDropdownStore()
 
-    return {
-      handleClick,
-      itemClasses: computed(() => {
-        return {
-          'text-ob-bright block cursor-pointer hover:bg-ob-trans my-1 px-4 py-1 font-medium text-invert hover:text-ob-bright':
-            true,
-          active: !!props.active
-        }
-      })
-    }
+const handleClick = () => {
+  dropdownStore.setCommand(String(props.name))
+}
+
+const itemClasses = computed(() => {
+  return {
+    'text-ob-bright block cursor-pointer hover:bg-ob-trans my-1 px-4 py-1 font-medium text-invert hover:text-ob-bright':
+      true,
+    active: !!props.active
   }
 })
 </script>

@@ -15,37 +15,29 @@
   </transition>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useDropdownStore } from '@/stores/dropdown'
-import { computed, defineComponent, inject, watch } from 'vue'
+import { computed, inject, watch } from 'vue'
 
-export default defineComponent({
-  name: 'ObDropdownMenu',
-  props: {
-    expand: {
-      type: Boolean,
-      default: false
-    }
-  },
-  setup() {
-    const dropdownStore = useDropdownStore()
-    const sharedState = inject('sharedState', { active: false })
-    const active = computed(() => sharedState.active)
-
-    watch(
-      () => dropdownStore.commandName,
-      (newValue, oldValue) => {
-        if (oldValue !== newValue) {
-          sharedState.active = false
-        }
-      }
-    )
-
-    return {
-      active
-    }
+defineProps({
+  expand: {
+    type: Boolean,
+    default: false
   }
 })
+
+const dropdownStore = useDropdownStore()
+const sharedState = inject('sharedState', { active: false })
+const active = computed(() => sharedState.active)
+
+watch(
+  () => dropdownStore.commandName,
+  (newValue, oldValue) => {
+    if (oldValue !== newValue) {
+      sharedState.active = false
+    }
+  }
+)
 </script>
 
 <style lang="scss" scoped>

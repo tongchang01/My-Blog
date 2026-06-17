@@ -35,43 +35,31 @@
   </div>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
-import { PropType, StyleValue, computed, defineComponent, toRefs } from 'vue'
+import { PropType, StyleValue, computed, toRefs } from 'vue'
 import { ArticleCard } from '@/components/ArticleCard'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import { Post } from '@/models/Post.class'
 
-export default defineComponent({
-  name: 'ObFeatureList',
-  components: {
-    ArticleCard,
-    SvgIcon
-  },
-  props: {
-    data: {
-      type: Array as PropType<Post[]>,
-      required: true
-    }
-  },
-  setup(props) {
-    const appStore = useAppStore()
-    const featurePosts = toRefs(props).data
-    const { t } = useI18n()
-
-    return {
-      gradientBackground: computed(() => ({
-        background: appStore.themeConfig.theme.header_gradient_css
-      })),
-      gradientText: computed(
-        () => appStore.themeConfig.theme.background_gradient_style as StyleValue
-      ),
-      featurePosts,
-      t
-    }
+const props = defineProps({
+  data: {
+    type: Array as PropType<Post[]>,
+    required: true
   }
 })
+
+const appStore = useAppStore()
+const featurePosts = toRefs(props).data
+const { t } = useI18n()
+
+const gradientBackground = computed(() => ({
+  background: appStore.themeConfig.theme.header_gradient_css
+}))
+const gradientText = computed(
+  () => appStore.themeConfig.theme.background_gradient_style as StyleValue
+)
 </script>
 
 <style lang="scss" scoped></style>
