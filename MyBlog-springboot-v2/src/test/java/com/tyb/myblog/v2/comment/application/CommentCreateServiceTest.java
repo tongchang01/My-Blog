@@ -10,6 +10,7 @@ import com.tyb.myblog.v2.content.application.article.ArticleCommentCountService;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicy;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicyService;
 import org.junit.jupiter.api.Test;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -40,6 +41,8 @@ class CommentCreateServiceTest {
             mock(CommentRateLimitService.class);
     private final DuplicateCommentGuard duplicateGuard =
             mock(DuplicateCommentGuard.class);
+    private final ApplicationEventPublisher eventPublisher =
+            mock(ApplicationEventPublisher.class);
     private final CommentCreateService service = new CommentCreateService(
             repository,
             policyService,
@@ -47,6 +50,7 @@ class CommentCreateServiceTest {
             rateLimitService,
             duplicateGuard,
             markdown -> "<p>" + markdown + "</p>",
+            eventPublisher,
             CLOCK);
 
     @Test
@@ -61,6 +65,7 @@ class CommentCreateServiceTest {
         assertThat(result.id()).isEqualTo(200L);
         assertThat(result.auditStatus()).isEqualTo(CommentAuditStatus.PASS);
         verify(countService).increment(100L, 1);
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
@@ -74,6 +79,7 @@ class CommentCreateServiceTest {
 
         assertThat(result.auditStatus()).isEqualTo(CommentAuditStatus.PENDING);
         verify(countService, never()).increment(100L, 1);
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
@@ -114,6 +120,37 @@ class CommentCreateServiceTest {
 
         assertThatThrownBy(() -> service.createArticleComment(command(100L, 10L, "reply")))
                 .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void publishesNotificationEventForPassedReply() {
+        Comment existing = Comment.reconstitute(
+                10L,
+                CommentTarget.article(100L),
+                null,
+                null,
+                null,
+                null,
+                com.tyb.myblog.v2.comment.domain.CommentAuthor.guest(
+                        "A", "a@example.com", null, null, null),
+                CommentContent.of("old", "<p>old</p>"),
+                CommentAuditStatus.PASS,
+                LocalDateTime.now(CLOCK),
+                null,
+                LocalDateTime.now(CLOCK),
+                null,
+                false,
+                null,
+                null);
+        when(policyService.requirePublicCommentable(100L))
+                .thenReturn(new ArticleCommentPolicy(100L, 0));
+        when(repository.findActiveById(10L)).thenReturn(Optional.of(existing));
+        when(repository.insert(any()))
+                .thenAnswer(invocation -> stored(invocation.getArgument(0), 202L));
+
+        service.createArticleComment(command(100L, 10L, "reply"));
+
+        verify(eventPublisher).publishEvent(any(CommentNotificationEvent.class));
     }
 
     private static CommentCreateCommand command(

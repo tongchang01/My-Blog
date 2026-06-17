@@ -45,6 +45,11 @@ myblog:
     login-max-failures: 5
     login-cooldown: 10m
     login-maximum-size: 10000
+  mail:
+    resend:
+      enabled: false
+      api-key: ${MYBLOG_RESEND_API_KEY:}
+      from-email: ${MYBLOG_RESEND_FROM_EMAIL:}
   web:
     trusted-proxies: []
   security:

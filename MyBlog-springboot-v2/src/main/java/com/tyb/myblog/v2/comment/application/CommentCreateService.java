@@ -11,6 +11,7 @@ import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentCountService;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicyService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class CommentCreateService {
     private final CommentRateLimitService rateLimitService;
     private final DuplicateCommentGuard duplicateGuard;
     private final CommentMarkdownRenderer markdownRenderer;
+    private final ApplicationEventPublisher eventPublisher;
     private final Clock clock;
 
     @Transactional
@@ -73,7 +75,23 @@ public class CommentCreateService {
         if (articleCounted && status.publiclyVisible()) {
             articleCountService.increment(target.targetId(), 1);
         }
+        publishNotification(inserted, command.replyToCommentId());
         return new CommentCreateResult(inserted.id(), inserted.auditStatus());
+    }
+
+    private void publishNotification(
+            Comment inserted,
+            Long replyToCommentId) {
+        if (replyToCommentId == null
+                || !inserted.auditStatus().publiclyVisible()) {
+            return;
+        }
+        eventPublisher.publishEvent(new CommentNotificationEvent(
+                inserted.id(),
+                replyToCommentId,
+                inserted.author().nickname(),
+                inserted.content().safeHtml(),
+                inserted.auditStatus()));
     }
 
     private ReplySnapshot resolveReply(
