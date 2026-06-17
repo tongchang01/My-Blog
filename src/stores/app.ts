@@ -7,6 +7,7 @@ import { fetchHexoConfig, fetchStatistic } from '@/api'
 import { Statistic } from '@/models/Statistic.class'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
+import { computed, ref } from 'vue'
 
 NProgress.configure({
   showSpinner: false,
@@ -36,119 +37,126 @@ const setTheme = (theme: string) => {
 /**
  * Storing the core data of the application
  */
-export const useAppStore = defineStore('app', {
-  // id is the name of the store
-  // it is used in devtools and allows restoring state
-  state: () => ({
-    /** Current application theme mode `dark` or `light` */
-    theme: Cookies.get('theme')
-      ? String(Cookies.get('theme'))
-      : getSystemMode(),
-    /** Current locale of the application */
-    locale: (Cookies.get('locale') as Locales) ?? 'en',
-    /** Hexo theme config data */
-    themeConfig: new ThemeConfig(),
-    /** Hexo engine's config data */
-    hexoConfig: new HexoConfig(),
-    /** HeaderGradient css property */
-    headerGradient: '',
-    /** Statistic data base on the blog posts and pages */
-    statistic: new Statistic(),
-    /** Loading status of the App */
-    appLoading: false,
-    /** Nprogress's timeout timer id number */
-    NPTimeout: -1,
-    /** Loading status' timeout timer id number */
-    loadingTimeout: -1,
-    /** Tracking if the blog config is ready */
-    configReady: false,
-    /** Is search modal opened */
-    openSearchModal: false
-  }),
-  getters: {
-    getTheme: state => state.theme,
-    getAppLoading: state => state.appLoading
-  },
-  actions: {
-    /** Fetching Hexo and Hexo theme's config data */
-    async fetchConfig() {
-      this.configReady = false
-      const { data } = await fetchHexoConfig()
-      this.themeConfig = new ThemeConfig(data)
-      this.hexoConfig = new HexoConfig(data)
-      this.setDefaultLocale(this.themeConfig.site.language)
-      this.initializeTheme(this.themeConfig.theme.dark_mode)
-      this.configReady = true
-    },
-    /** Fetching blog's statistics */
-    async fetchStat() {
-      const { data } = await fetchStatistic()
-      return new Promise(resolve => {
-        this.statistic = new Statistic(data)
-        resolve(this.statistic)
-      })
-    },
-    /** Initializing the theme mode of the app. */
-    initializeTheme(isDarkMode?: boolean | string) {
-      if (!Cookies.get('theme') && isDarkMode !== 'auto') {
-        this.theme = isDarkMode ? 'theme-dark' : 'theme-light'
-        Cookies.set('theme', this.theme)
-        setTheme(this.theme)
-      }
-      setTheme(this.theme)
-    },
-    /** Switch between dark and light mode */
-    toggleTheme(isDark?: boolean) {
-      this.theme =
-        isDark === true || this.theme === 'theme-light'
-          ? 'theme-dark'
-          : 'theme-light'
-      Cookies.set('theme', this.theme)
-      setTheme(this.theme)
-    },
-    /** Changing the local of the app */
-    changeLocale(locale: Locales) {
-      Cookies.set('locale', locale)
-      this.locale = locale
-      i18n.global.locale.value = locale
-    },
-    /**
-     * Setting the default locale of the app base on _config
-     * @remarks If the user had choose a locale before, this default value will be ignored.
-     */
-    setDefaultLocale(locale: Locales) {
-      if (Cookies.get('locale')) return
-      this.changeLocale(locale)
-    },
-    /** Start the global loading status of the application */
-    startLoading() {
-      if (this.appLoading === true) return
-      if (this.NPTimeout !== -1) clearTimeout(this.NPTimeout)
-      if (this.loadingTimeout !== -1) clearTimeout(this.loadingTimeout)
+export const useAppStore = defineStore('app', () => {
+  const theme = ref(
+    Cookies.get('theme') ? String(Cookies.get('theme')) : getSystemMode()
+  )
+  const locale = ref<Locales>((Cookies.get('locale') as Locales) ?? 'en')
+  const themeConfig = ref(new ThemeConfig())
+  const hexoConfig = ref(new HexoConfig())
+  const headerGradient = ref('')
+  const statistic = ref(new Statistic())
+  const appLoading = ref(false)
+  const NPTimeout = ref(-1)
+  const loadingTimeout = ref(-1)
+  const configReady = ref(false)
+  const openSearchModal = ref(false)
 
-      NProgress.start()
-      this.appLoading = true
-    },
-    /** Stops the global loading status of the application */
-    endLoading() {
-      // Leaving the timeout, so the animation have enough time to display
-      // in a situation where data loads almost instantly.
-      this.NPTimeout = window.setTimeout(() => {
-        NProgress.done()
-      }, 100)
+  const getTheme = computed(() => theme.value)
+  const getAppLoading = computed(() => appLoading.value)
 
-      this.loadingTimeout = window.setTimeout(() => {
-        this.appLoading = false
-      }, 300)
-    },
-    changeOpenModal(status: boolean) {
-      this.openSearchModal = status
-    },
-    handleEscKey() {
-      if (this.openSearchModal) this.openSearchModal = false
-    },
-    handleSearchOpen() {
-      if (!this.openSearchModal) this.openSearchModal = true
+  const fetchConfig = async () => {
+    configReady.value = false
+    const { data } = await fetchHexoConfig()
+    themeConfig.value = new ThemeConfig(data)
+    hexoConfig.value = new HexoConfig(data)
+    setDefaultLocale(themeConfig.value.site.language)
+    initializeTheme(themeConfig.value.theme.dark_mode)
+    configReady.value = true
+  }
+
+  const fetchStat = async () => {
+    const { data } = await fetchStatistic()
+    return new Promise(resolve => {
+      statistic.value = new Statistic(data)
+      resolve(statistic.value)
+    })
+  }
+
+  const initializeTheme = (isDarkMode?: boolean | string) => {
+    if (!Cookies.get('theme') && isDarkMode !== 'auto') {
+      theme.value = isDarkMode ? 'theme-dark' : 'theme-light'
+      Cookies.set('theme', theme.value)
+      setTheme(theme.value)
     }
+    setTheme(theme.value)
+  }
+
+  const toggleTheme = (isDark?: boolean) => {
+    theme.value =
+      isDark === true || theme.value === 'theme-light'
+        ? 'theme-dark'
+        : 'theme-light'
+    Cookies.set('theme', theme.value)
+    setTheme(theme.value)
+  }
+
+  const changeLocale = (newLocale: Locales) => {
+    Cookies.set('locale', newLocale)
+    locale.value = newLocale
+    i18n.global.locale.value = newLocale
+  }
+
+  const setDefaultLocale = (newLocale: Locales) => {
+    if (Cookies.get('locale')) return
+    changeLocale(newLocale)
+  }
+
+  const startLoading = () => {
+    if (appLoading.value === true) return
+    if (NPTimeout.value !== -1) clearTimeout(NPTimeout.value)
+    if (loadingTimeout.value !== -1) clearTimeout(loadingTimeout.value)
+
+    NProgress.start()
+    appLoading.value = true
+  }
+
+  const endLoading = () => {
+    NPTimeout.value = window.setTimeout(() => {
+      NProgress.done()
+    }, 100)
+
+    loadingTimeout.value = window.setTimeout(() => {
+      appLoading.value = false
+    }, 300)
+  }
+
+  const changeOpenModal = (status: boolean) => {
+    openSearchModal.value = status
+  }
+
+  const handleEscKey = () => {
+    if (openSearchModal.value) openSearchModal.value = false
+  }
+
+  const handleSearchOpen = () => {
+    if (!openSearchModal.value) openSearchModal.value = true
+  }
+
+  return {
+    theme,
+    locale,
+    themeConfig,
+    hexoConfig,
+    headerGradient,
+    statistic,
+    appLoading,
+    NPTimeout,
+    loadingTimeout,
+    configReady,
+    openSearchModal,
+    getTheme,
+    getAppLoading,
+    fetchConfig,
+    fetchStat,
+    initializeTheme,
+    toggleTheme,
+    changeLocale,
+    setDefaultLocale,
+    startLoading,
+    endLoading,
+    changeOpenModal,
+    handleEscKey,
+    handleSearchOpen
   }
 })

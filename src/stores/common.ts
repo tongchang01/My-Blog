@@ -1,36 +1,42 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-export const useCommonStore = defineStore({
-  // id is the name of the store
-  // it is used in devtools and allows restoring state
-  id: 'commonStore',
-  state: () => ({
-    /** If current window width is for mobile */
-    isMobile: false,
-    /** Header image url */
-    headerImage: '',
-    notificationState: false,
-    notificationMessage: ''
-  }),
-  getters: {},
-  actions: {
-    /** Setting the image url for the header */
-    setHeaderImage(imageUrl: string) {
-      this.headerImage = imageUrl
-    },
-    /** Resetting the header image to null */
-    resetHeaderImage() {
-      this.headerImage = ''
-    },
-    changeMobileState(isMobile: boolean) {
-      this.isMobile = isMobile
-    },
-    sendNotification(message: string) {
-      this.notificationState = true
-      this.notificationMessage = message
-    },
-    closeNotification() {
-      this.notificationState = false
-    }
+export const useCommonStore = defineStore('commonStore', () => {
+  const isMobile = ref(false)
+  const headerImage = ref('')
+  const notificationState = ref(false)
+  const notificationMessage = ref('')
+
+  const setHeaderImage = (imageUrl: string) => {
+    headerImage.value = imageUrl
+  }
+
+  const resetHeaderImage = () => {
+    headerImage.value = ''
+  }
+
+  const changeMobileState = (mobile: boolean) => {
+    isMobile.value = mobile
+  }
+
+  const sendNotification = (message: string) => {
+    notificationState.value = true
+    notificationMessage.value = message
+  }
+
+  const closeNotification = () => {
+    notificationState.value = false
+  }
+
+  return {
+    isMobile,
+    headerImage,
+    notificationState,
+    notificationMessage,
+    setHeaderImage,
+    resetHeaderImage,
+    changeMobileState,
+    sendNotification,
+    closeNotification
   }
 })
