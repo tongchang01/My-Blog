@@ -17,36 +17,24 @@
   </Toggle>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, reactive } from 'vue'
+<script setup lang="ts">
+import { computed, reactive } from 'vue'
 import Toggle from './Toggle.vue'
 import { useAppStore } from '@/stores/app'
 
-export default defineComponent({
-  name: 'ObThemeToggle',
-  components: {
-    Toggle
-  },
-  setup() {
-    const appStore = useAppStore()
-    const defaultStatus = appStore.theme === 'theme-dark' ? true : false
+const appStore = useAppStore()
+const defaultStatus = appStore.theme === 'theme-dark' ? true : false
 
-    const svgStyle = reactive({
-      fill: 'yellow',
-      margin: '7px 0 0 7px'
-    })
-
-    const handleChange = (status: boolean) => {
-      appStore.toggleTheme(status)
-    }
-
-    return {
-      svg: computed(() => svgStyle),
-      handleChange,
-      defaultStatus
-    }
-  }
+const svgStyle = reactive({
+  fill: 'yellow',
+  margin: '7px 0 0 7px'
 })
+
+const handleChange = (status: boolean) => {
+  appStore.toggleTheme(status)
+}
+
+const svg = computed(() => svgStyle)
 </script>
 
 <style lang="scss" scoped></style>

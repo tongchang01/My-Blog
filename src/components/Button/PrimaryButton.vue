@@ -7,25 +7,18 @@
   </a>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent } from 'vue'
+<script setup lang="ts">
+import { computed } from 'vue'
 import { useAppStore } from '@/stores/app'
 
-export default defineComponent({
-  name: 'ARPrimaryButton',
-  components: {},
-  props: {
-    text: String
-  },
-  setup() {
-    const appStore = useAppStore()
+defineProps<{
+  text?: string
+}>()
 
-    return {
-      gradientBackground: computed(() => {
-        return { background: appStore.themeConfig.theme.header_gradient_css }
-      })
-    }
-  }
+const appStore = useAppStore()
+
+const gradientBackground = computed(() => {
+  return { background: appStore.themeConfig.theme.header_gradient_css }
 })
 </script>
 

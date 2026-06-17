@@ -13,47 +13,41 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, onMounted, reactive, toRefs } from 'vue'
+<script setup lang="ts">
+import { onMounted, reactive, toRefs } from 'vue'
 
-export default defineComponent({
-  name: 'ObToggle',
-  props: {
-    status: Boolean
-  },
-  emits: ['changeStatus'],
-  setup(props, { emit }) {
-    const { status } = toRefs(props)
+const props = defineProps<{
+  status?: boolean
+}>()
 
-    onMounted(() => {
-      changeTransform()
-    })
+const emit = defineEmits<{
+  (e: 'changeStatus', value: boolean): void
+}>()
 
-    const toggleStyle = reactive({
-      transform: '',
-      background: '#6e40c9'
-    })
-    let toggleStatus = status.value
+const { status } = toRefs(props)
 
-    const changeStatus = () => {
-      toggleStatus = !toggleStatus
-      changeTransform()
-      emit('changeStatus', toggleStatus)
-    }
-
-    const changeTransform = () => {
-      const transform = toggleStatus ? '18px' : '0'
-      toggleStyle.transform = `translateX(${transform})`
-      const backgroundColor = toggleStatus ? '#6e40c9' : '#100E16'
-      toggleStyle.background = backgroundColor
-    }
-
-    return {
-      toggleStyle,
-      changeStatus
-    }
-  }
+onMounted(() => {
+  changeTransform()
 })
+
+const toggleStyle = reactive({
+  transform: '',
+  background: '#6e40c9'
+})
+let toggleStatus = status.value
+
+const changeStatus = () => {
+  toggleStatus = !toggleStatus
+  changeTransform()
+  emit('changeStatus', toggleStatus)
+}
+
+const changeTransform = () => {
+  const transform = toggleStatus ? '18px' : '0'
+  toggleStyle.transform = `translateX(${transform})`
+  const backgroundColor = toggleStatus ? '#6e40c9' : '#100E16'
+  toggleStyle.background = backgroundColor
+}
 </script>
 
 <style lang="scss" scoped>

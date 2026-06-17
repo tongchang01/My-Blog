@@ -27,130 +27,114 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, PropType, ref, onMounted } from 'vue'
-import { isExternalIcon } from '@/utils/validate'
-import { useAppStore } from '@/stores/app'
-
 export enum SvgTypes {
   fill = 'fill',
   stroke = 'stroke'
 }
+</script>
 
-export default defineComponent({
-  name: 'SvgIcon',
-  props: {
-    iconClass: {
-      type: String,
-      required: true
-    },
-    className: {
-      type: String,
-      default: ''
-    },
-    fill: {
-      type: String,
-      default: ''
-    },
-    stroke: {
-      type: String,
-      default: ''
-    },
-    svgType: {
-      type: String as PropType<SvgTypes>,
-      default: 'fill'
-    },
-    width: {
-      type: String,
-      default: '1em'
-    },
-    height: {
-      type: String,
-      default: '1em'
-    }
+<script setup lang="ts">
+import { computed, PropType, ref, onMounted } from 'vue'
+import { isExternalIcon } from '@/utils/validate'
+import { useAppStore } from '@/stores/app'
+
+const props = defineProps({
+  iconClass: {
+    type: String,
+    required: true
   },
-  setup(props: {
-    iconClass: string
-    className: string
-    svgType: SvgTypes
-    fill: string
-    stroke: string
-    width: string
-    height: string
-  }) {
-    const appStore = useAppStore()
-    const isExternalClass = computed(() => isExternalIcon(props.iconClass))
-    const externalSvg = ref({
-      content: '',
-      attributes: {}
-    })
+  className: {
+    type: String,
+    default: ''
+  },
+  fill: {
+    type: String,
+    default: ''
+  },
+  stroke: {
+    type: String,
+    default: ''
+  },
+  svgType: {
+    type: String as PropType<SvgTypes>,
+    default: 'fill'
+  },
+  width: {
+    type: String,
+    default: '1em'
+  },
+  height: {
+    type: String,
+    default: '1em'
+  }
+})
 
-    const iconName = computed(() => {
-      return `#icon-${props.iconClass}`
-    })
+const appStore = useAppStore()
+const isExternalClass = computed(() => isExternalIcon(props.iconClass))
+const externalSvg = ref({
+  content: '',
+  attributes: {}
+})
 
-    const svgClass = computed(() => {
-      return {
-        'svg-icon': true,
-        'external-icon': isExternalClass.value,
-        [props.className]: props.className
-      }
-    })
+const iconName = computed(() => {
+  return `#icon-${props.iconClass}`
+})
 
-    // solution @see https://stackoverflow.com/questions/76152412/how-to-transform-an-external-svg-to-a-vue3-component
-    const getExternalSvg = async () => {
-      const res = await fetch(props.iconClass)
-      const svgText = await res.text()
+const svgClass = computed(() => {
+  return {
+    'svg-icon': true,
+    'external-icon': isExternalClass.value,
+    [props.className]: props.className
+  }
+})
 
-      const svgDom = new DOMParser()
-        .parseFromString(svgText, 'image/svg+xml')
-        .querySelector('svg')
+// solution @see https://stackoverflow.com/questions/76152412/how-to-transform-an-external-svg-to-a-vue3-component
+const getExternalSvg = async () => {
+  const res = await fetch(props.iconClass)
+  const svgText = await res.text()
 
-      if (svgDom !== null) {
-        const attributeEntries = [...svgDom.attributes].map(a => [
-          a.name,
-          a.value
-        ])
-        externalSvg.value = {
-          content: svgDom.innerHTML,
-          attributes: Object.fromEntries(attributeEntries)
-        }
-      }
+  const svgDom = new DOMParser()
+    .parseFromString(svgText, 'image/svg+xml')
+    .querySelector('svg')
+
+  if (svgDom !== null) {
+    const attributeEntries = [...svgDom.attributes].map(a => [
+      a.name,
+      a.value
+    ])
+    externalSvg.value = {
+      content: svgDom.innerHTML,
+      attributes: Object.fromEntries(attributeEntries)
     }
+  }
+}
 
-    onMounted(() => {
-      if (isExternalClass.value) getExternalSvg()
-    })
+onMounted(() => {
+  if (isExternalClass.value) getExternalSvg()
+})
 
+const svgStyle = computed(() => {
+  if (props.svgType === SvgTypes.fill) {
     return {
-      svgStyle: computed(() => {
-        if (props.svgType === SvgTypes.fill) {
-          return {
-            fill: props.fill ? props.fill : 'currentColor',
-            stroke: props.stroke
-              ? props.stroke
-              : appStore.theme === 'theme-dark'
-              ? 'var(--background-primary)'
-              : 'white',
-            width: props.width,
-            height: props.height
-          }
-        } else {
-          return {
-            fill: props.fill ? props.fill : 'none',
-            stroke: props.stroke
-              ? props.stroke
-              : appStore.theme === 'theme-dark'
-              ? 'white'
-              : 'currentColor',
-            width: props.width,
-            height: props.height
-          }
-        }
-      }),
-      isExternalClass,
-      iconName,
-      svgClass,
-      externalSvg
+      fill: props.fill ? props.fill : 'currentColor',
+      stroke: props.stroke
+        ? props.stroke
+        : appStore.theme === 'theme-dark'
+        ? 'var(--background-primary)'
+        : 'white',
+      width: props.width,
+      height: props.height
+    }
+  } else {
+    return {
+      fill: props.fill ? props.fill : 'none',
+      stroke: props.stroke
+        ? props.stroke
+        : appStore.theme === 'theme-dark'
+        ? 'white'
+        : 'currentColor',
+      width: props.width,
+      height: props.height
     }
   }
 })
