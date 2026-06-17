@@ -42,17 +42,8 @@
   ></VueEasyLightbox>
 </template>
 
-<script lang="ts">
-import {
-  StyleValue,
-  computed,
-  defineComponent,
-  onBeforeMount,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch
-} from 'vue'
+<script setup lang="ts">
+import { StyleValue, computed, onBeforeMount, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
 import { useLightBoxStore } from '@/stores/lightbox'
@@ -66,183 +57,162 @@ import { useI18n } from 'vue-i18n'
 import VueEasyLightbox from 'vue-easy-lightbox'
 import FooterLink from './components/Footer/FooterLink.vue'
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    HeaderMain,
-    FooterContainer,
-    MobileMenu,
-    VueEasyLightbox,
-    FooterLink
-  },
-  setup() {
-    const appStore = useAppStore()
-    const lightBoxStore = useLightBoxStore()
-    const commonStore = useCommonStore()
-    const metaStore = useMetaStore()
-    const searchStore = useSearchStore()
-    const MOBILE_WITH = 1024 // Using the mobile width by Bootstrap design.
-    const { t } = useI18n()
+const appStore = useAppStore()
+const lightBoxStore = useLightBoxStore()
+const commonStore = useCommonStore()
+const metaStore = useMetaStore()
+const searchStore = useSearchStore()
+const MOBILE_WITH = 1024 // Using the mobile width by Bootstrap design.
+const { t } = useI18n()
 
-    const appWrapperClass = 'app-wrapper'
-    const loadingBarClass = ref({
-      'nprogress-custom-parent': false
-    })
+const appWrapperClass = 'app-wrapper'
+const loadingBarClass = ref({
+  'nprogress-custom-parent': false
+})
 
-    let pagelink = `\n\nRead more at: ${document.location.href}`
+let pagelink = `\n\nRead more at: ${document.location.href}`
 
-    /** Initializing App config and other setups */
-    const initialApp = async () => {
-      initResizeEvent()
-      await appStore.fetchConfig().then(() => {
-        metaStore.addScripts(appStore.themeConfig.site_meta.cdn.prismjs)
-        // Change the favicon dynamically.
-        if (
-          appStore.themeConfig.site_meta.favicon &&
-          appStore.themeConfig.site_meta.favicon !== ''
-        ) {
-          const link = document.querySelector("link[rel~='icon']")
-          if (link)
-            link.setAttribute('href', appStore.themeConfig.site_meta.favicon)
-        }
-
-        if (appStore.themeConfig.plugins.copy_protection.enable) {
-          const locale = appStore.locale
-          const linkPlaceholder =
-            locale === 'zh-CN'
-              ? appStore.themeConfig.plugins.copy_protection.link.cn
-              : appStore.themeConfig.plugins.copy_protection.link.en
-          const authorPlaceholder =
-            locale === 'zh-CN'
-              ? appStore.themeConfig.plugins.copy_protection.author.cn
-              : appStore.themeConfig.plugins.copy_protection.author.en
-          const licensePlaceholder =
-            locale === 'zh-CN'
-              ? appStore.themeConfig.plugins.copy_protection.license.cn
-              : appStore.themeConfig.plugins.copy_protection.license.en
-
-          pagelink = `\n\n---------------------------------\n${authorPlaceholder}: ${appStore.themeConfig.site.author}\n${linkPlaceholder}: ${document.location.href}\n${licensePlaceholder}`
-          initialCopyrightScript()
-        }
-      })
+/** Initializing App config and other setups */
+const initialApp = async () => {
+  initResizeEvent()
+  await appStore.fetchConfig().then(() => {
+    metaStore.addScripts(appStore.themeConfig.site_meta.cdn.prismjs)
+    // Change the favicon dynamically.
+    if (
+      appStore.themeConfig.site_meta.favicon &&
+      appStore.themeConfig.site_meta.favicon !== ''
+    ) {
+      const link = document.querySelector("link[rel~='icon']")
+      if (link)
+        link.setAttribute('href', appStore.themeConfig.site_meta.favicon)
     }
 
-    const copyEventHandler = (event: any) => {
-      if (document.getSelection() instanceof Selection) {
-        if (document.getSelection()?.toString() !== '' && event.clipboardData) {
-          event.clipboardData.setData(
-            'text',
-            document.getSelection() + pagelink
-          )
-          event.preventDefault()
-        }
-      }
+    if (appStore.themeConfig.plugins.copy_protection.enable) {
+      const locale = appStore.locale
+      const linkPlaceholder =
+        locale === 'zh-CN'
+          ? appStore.themeConfig.plugins.copy_protection.link.cn
+          : appStore.themeConfig.plugins.copy_protection.link.en
+      const authorPlaceholder =
+        locale === 'zh-CN'
+          ? appStore.themeConfig.plugins.copy_protection.author.cn
+          : appStore.themeConfig.plugins.copy_protection.author.en
+      const licensePlaceholder =
+        locale === 'zh-CN'
+          ? appStore.themeConfig.plugins.copy_protection.license.cn
+          : appStore.themeConfig.plugins.copy_protection.license.en
+
+      pagelink = `\n\n---------------------------------\n${authorPlaceholder}: ${appStore.themeConfig.site.author}\n${linkPlaceholder}: ${document.location.href}\n${licensePlaceholder}`
+      initialCopyrightScript()
     }
+  })
+}
 
-    const onHideLightBox = () => lightBoxStore.hideLightBox()
-
-    /** Adding copy listner */
-    const initialCopyrightScript = () => {
-      document.addEventListener('copy', copyEventHandler)
-    }
-
-    const isMobile = computed(() => {
-      return commonStore.isMobile
-    })
-
-    const resizeHandler = () => {
-      const rect = document.body.getBoundingClientRect()
-      const mobileState = rect.width - 1 < MOBILE_WITH
-      if (isMobile.value !== mobileState)
-        commonStore.changeMobileState(mobileState)
-    }
-
-    const initResizeEvent = () => {
-      resizeHandler()
-      window.addEventListener('resize', resizeHandler)
-    }
-
-    const handleOpenModal = () => {
-      searchStore.setOpenModal(true)
-    }
-
-    onBeforeMount(initialApp)
-
-    onUnmounted(() => {
-      document.removeEventListener('copy', copyEventHandler)
-      window.removeEventListener('resize', resizeHandler)
-    })
-
-    const wrapperStyle = ref({ 'min-height': '100vh' })
-
-    onMounted(() => {
-      let wrapperHeight = screen.height
-      const footerEl = document.getElementById('footer')
-      const footerHeight = footerEl?.getBoundingClientRect().height ?? 0
-      wrapperHeight = wrapperHeight - footerHeight * 2
-      wrapperStyle.value = {
-        'min-height': wrapperHeight + 'px'
-      }
-    })
-
-    /**
-     * Watches the app loading status, adding the `nprogress-custom-parent`
-     * class to the nprogress container when loading.
-     */
-    watch(
-      () => appStore.appLoading,
-      newState => {
-        loadingBarClass.value['nprogress-custom-parent'] = newState
-      }
-    )
-
-    return {
-      title: computed(() => metaStore.getTitle),
-      theme: computed(() => appStore.theme),
-      scripts: computed(() => metaStore.scripts),
-      themeConfig: computed(() => appStore.themeConfig),
-      headerImage: computed(() => {
-        return {
-          backgroundImage: `url(${commonStore.headerImage}), url(${defaultCover})`,
-          backgroundColor: '#0d0b12',
-          opacity: commonStore.headerImage !== '' ? 0.2 : 0
-        } as StyleValue
-      }),
-      headerBaseBackground: computed(() => {
-        return {
-          background: appStore.themeConfig.theme.header_gradient_css,
-          opacity: commonStore.headerImage !== '' ? 0.8 : 0.99
-        }
-      }),
-      wrapperStyle: computed(() => wrapperStyle.value),
-      handleEscKey: appStore.handleEscKey,
-      isMobile: computed(() => commonStore.isMobile),
-      configReady: computed(() => appStore.configReady),
-      cssVariables: computed(() => {
-        if (appStore.theme === 'theme-dark') {
-          return `
-            --text-accent: ${appStore.themeConfig.theme.gradient.color_1};
-            --text-sub-accent: ${appStore.themeConfig.theme.gradient.color_3};
-            --main-gradient: ${appStore.themeConfig.theme.header_gradient_css};
-          `
-        }
-        return `
-          --text-accent: ${appStore.themeConfig.theme.gradient.color_3};
-          --text-sub-accent: ${appStore.themeConfig.theme.gradient.color_2};
-          --main-gradient: ${appStore.themeConfig.theme.header_gradient_css};
-        `
-      }),
-      lightBoxVisible: computed(() => lightBoxStore.visible),
-      lightBoxIndex: computed(() => lightBoxStore.index),
-      lightBoxImages: computed(() => lightBoxStore.images),
-      appWrapperClass,
-      loadingBarClass,
-      handleOpenModal,
-      onHideLightBox,
-      t
+const copyEventHandler = (event: any) => {
+  if (document.getSelection() instanceof Selection) {
+    if (document.getSelection()?.toString() !== '' && event.clipboardData) {
+      event.clipboardData.setData(
+        'text',
+        document.getSelection() + pagelink
+      )
+      event.preventDefault()
     }
   }
+}
+
+const onHideLightBox = () => lightBoxStore.hideLightBox()
+
+/** Adding copy listner */
+const initialCopyrightScript = () => {
+  document.addEventListener('copy', copyEventHandler)
+}
+
+const isMobile = computed(() => {
+  return commonStore.isMobile
 })
+
+const resizeHandler = () => {
+  const rect = document.body.getBoundingClientRect()
+  const mobileState = rect.width - 1 < MOBILE_WITH
+  if (isMobile.value !== mobileState)
+    commonStore.changeMobileState(mobileState)
+}
+
+const initResizeEvent = () => {
+  resizeHandler()
+  window.addEventListener('resize', resizeHandler)
+}
+
+const handleOpenModal = () => {
+  searchStore.setOpenModal(true)
+}
+
+onBeforeMount(initialApp)
+
+onUnmounted(() => {
+  document.removeEventListener('copy', copyEventHandler)
+  window.removeEventListener('resize', resizeHandler)
+})
+
+const wrapperStyle = ref({ 'min-height': '100vh' })
+
+onMounted(() => {
+  let wrapperHeight = screen.height
+  const footerEl = document.getElementById('footer')
+  const footerHeight = footerEl?.getBoundingClientRect().height ?? 0
+  wrapperHeight = wrapperHeight - footerHeight * 2
+  wrapperStyle.value = {
+    'min-height': wrapperHeight + 'px'
+  }
+})
+
+/**
+ * Watches the app loading status, adding the `nprogress-custom-parent`
+ * class to the nprogress container when loading.
+ */
+watch(
+  () => appStore.appLoading,
+  newState => {
+    loadingBarClass.value['nprogress-custom-parent'] = newState
+  }
+)
+
+const title = computed(() => metaStore.getTitle)
+const theme = computed(() => appStore.theme)
+const scripts = computed(() => metaStore.scripts)
+const themeConfig = computed(() => appStore.themeConfig)
+const headerImage = computed(() => {
+  return {
+    backgroundImage: `url(${commonStore.headerImage}), url(${defaultCover})`,
+    backgroundColor: '#0d0b12',
+    opacity: commonStore.headerImage !== '' ? 0.2 : 0
+  } as StyleValue
+})
+const headerBaseBackground = computed(() => {
+  return {
+    background: appStore.themeConfig.theme.header_gradient_css,
+    opacity: commonStore.headerImage !== '' ? 0.8 : 0.99
+  }
+})
+const handleEscKey = appStore.handleEscKey
+const configReady = computed(() => appStore.configReady)
+const cssVariables = computed(() => {
+  if (appStore.theme === 'theme-dark') {
+    return `
+      --text-accent: ${appStore.themeConfig.theme.gradient.color_1};
+      --text-sub-accent: ${appStore.themeConfig.theme.gradient.color_3};
+      --main-gradient: ${appStore.themeConfig.theme.header_gradient_css};
+    `
+  }
+  return `
+    --text-accent: ${appStore.themeConfig.theme.gradient.color_3};
+    --text-sub-accent: ${appStore.themeConfig.theme.gradient.color_2};
+    --main-gradient: ${appStore.themeConfig.theme.header_gradient_css};
+  `
+})
+const lightBoxVisible = computed(() => lightBoxStore.visible)
+const lightBoxIndex = computed(() => lightBoxStore.index)
+const lightBoxImages = computed(() => lightBoxStore.images)
 </script>
 
 <style lang="scss">
