@@ -272,6 +272,27 @@
           AND a.publish_at <![CDATA[<=]]> #{now}
     </select>
 
+    <!-- 评论模块只读取公开评论策略，不直接访问文章领域或持久化实现。 -->
+    <select id="selectCommentPolicy"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleCommentPolicyRow">
+        SELECT
+            id,
+            status,
+            comment_count
+        FROM t_article
+        WHERE id = #{id}
+          AND deleted = 0
+    </select>
+
+    <!-- 评论审核状态变化时维护冗余计数，防止减到负数。 -->
+    <update id="incrementCommentCount">
+        UPDATE t_article
+        SET comment_count = comment_count + #{delta}
+        WHERE id = #{id}
+          AND deleted = 0
+          AND comment_count + #{delta} <![CDATA[>=]]> 0
+    </update>
+
     <!-- 标签按文章批量读取，避免公开列表出现 N+1 查询。 -->
     <select id="selectPublicArticleTags"
             resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagRow">

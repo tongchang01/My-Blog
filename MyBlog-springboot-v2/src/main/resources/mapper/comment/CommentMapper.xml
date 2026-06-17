@@ -38,6 +38,62 @@
           AND deleted = 0
     </select>
 
+    <!-- 公开评论分页只统计根评论，回复跟随根评论展示，避免回复数量影响分页边界。 -->
+    <select id="selectPublicRoots"
+            resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.projection.CommentPageRow">
+        SELECT
+            id,
+            parent_id,
+            reply_to_comment_id,
+            reply_to_nickname,
+            author_nickname,
+            author_site,
+            content_html,
+            created_at
+        FROM t_comment
+        WHERE target_type = #{targetType}
+          AND target_id = #{targetId}
+          AND parent_id IS NULL
+          AND audit_status = 1
+          AND deleted = 0
+        ORDER BY created_at ASC, id ASC
+        LIMIT #{size} OFFSET #{offset}
+    </select>
+
+    <!-- 根评论分页完成后再查其公开回复，保持楼中楼关系且不暴露邮箱、IP 等敏感字段。 -->
+    <select id="selectPublicReplies"
+            resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.projection.CommentPageRow">
+        SELECT
+            id,
+            parent_id,
+            reply_to_comment_id,
+            reply_to_nickname,
+            author_nickname,
+            author_site,
+            content_html,
+            created_at
+        FROM t_comment
+        WHERE parent_id IN
+        <foreach collection="parentIds" item="parentId" open="(" separator="," close=")">
+            #{parentId}
+        </foreach>
+          AND audit_status = 1
+          AND deleted = 0
+        ORDER BY created_at ASC, id ASC
+    </select>
+
+    <!-- 前台总数只表示可分页的根评论数量。 -->
+    <select id="countPublicRoots"
+            resultType="long">
+        SELECT COUNT(1)
+        FROM t_comment
+        WHERE target_type = #{targetType}
+          AND target_id = #{targetId}
+          AND parent_id IS NULL
+          AND audit_status = 1
+          AND deleted = 0
+    </select>
+
     <!-- 后台恢复前锁定已删除评论，避免恢复和删除并发覆盖审计字段。 -->
     <select id="selectDeletedByIdForUpdate"
             resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity">

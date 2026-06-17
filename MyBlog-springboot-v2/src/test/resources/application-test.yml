@@ -59,6 +59,12 @@ myblog:
         path: /api/public/articles
       - method: GET
         path: /api/public/articles/**
+      - method: POST
+        path: /api/public/articles/*/comments
+      - method: GET
+        path: /api/public/guestbook/comments
+      - method: POST
+        path: /api/public/guestbook/comments
       - method: GET
         path: /api/public/security-probe
       - method: GET

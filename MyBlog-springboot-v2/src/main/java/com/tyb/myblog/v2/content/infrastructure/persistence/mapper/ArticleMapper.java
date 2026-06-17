@@ -8,6 +8,7 @@ import com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticleDetailRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleCommentPolicyRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.DeletedArticlePageRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticleDetailRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticlePageRow;
@@ -50,6 +51,12 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
     PublicArticleDetailRow selectPublicDetail(
             @Param("id") long id,
             @Param("now") LocalDateTime now);
+
+    ArticleCommentPolicyRow selectCommentPolicy(@Param("id") long id);
+
+    int incrementCommentCount(
+            @Param("id") long id,
+            @Param("delta") int delta);
 
     List<ArticleTagRow> selectPublicArticleTags(
             @Param("articleIds") List<Long> articleIds);
