@@ -82,10 +82,13 @@ public class ArticleCreateService {
             ArticleStatus status,
             LocalDateTime requested,
             LocalDateTime now) {
+        LocalDateTime publishAt;
         if (status == ArticleStatus.PUBLISHED
                 || status == ArticleStatus.PASSWORD) {
-            return requested == null ? now : requested;
+            publishAt = requested == null ? now : requested;
+        } else {
+            publishAt = requested;
         }
-        return requested;
+        return publishAt == null ? null : publishAt.withNano(0);
     }
 }

@@ -121,6 +121,42 @@ class ArticleWriteServiceTest {
     }
 
     @Test
+    void createsPublishedArticleWithDatabasePrecision() {
+        Clock fractionalClock = Clock.fixed(
+                Instant.parse("2026-06-15T03:00:00.800Z"),
+                ZoneId.of("Asia/Tokyo"));
+        ArticleCreateService fractionalClockService =
+                new ArticleCreateService(
+                        articleRepository,
+                        new ContentAuthorization(),
+                        new ArticleReferenceValidator(
+                                categoryRepository,
+                                tagRepository,
+                                attachmentService),
+                        passwordHasher,
+                        fractionalClock);
+        when(categoryRepository.findActiveByIdsForUpdate(List.of(10L)))
+                .thenReturn(List.of(category(10L)));
+        when(articleRepository.insert(any(NewArticle.class)))
+                .thenAnswer(invocation -> articleFrom(
+                        invocation.getArgument(0), 103L));
+
+        fractionalClockService.create(
+                ADMIN,
+                createCommand(
+                        ArticleStatus.PUBLISHED,
+                        null,
+                        null,
+                        List.of()));
+
+        ArgumentCaptor<NewArticle> articleCaptor =
+                ArgumentCaptor.forClass(NewArticle.class);
+        verify(articleRepository).insert(articleCaptor.capture());
+        assertThat(articleCaptor.getValue().publishAt())
+                .isEqualTo(NOW);
+    }
+
+    @Test
     void validatesCoverAndRejectsMissingReferencesBeforeInsert() {
         when(categoryRepository.findActiveByIdsForUpdate(List.of(10L)))
                 .thenReturn(List.of(category(10L)));
