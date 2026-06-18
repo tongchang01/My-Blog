@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.stats.infrastructure.persistence.mapper.PageViewAggregationMapper">
+
+    <!-- NULL article_id 统一落到 0；UV 只在同文章、语言、JST 日期内去重。 -->
+    <select id="summarize"
+            resultType="com.tyb.myblog.v2.stats.infrastructure.persistence.projection.PageViewAggregateRow">
+        SELECT COALESCE(article_id, 0) AS article_id,
+               lang,
+               COUNT(*) AS pv,
+               COUNT(DISTINCT visitor_hash) AS uv
+        FROM t_page_view
+        WHERE created_at <![CDATA[>=]]> #{start}
+          AND created_at <![CDATA[<]]> #{end}
+        GROUP BY COALESCE(article_id, 0), lang
+    </select>
+
+    <delete id="deleteDay">
+        DELETE FROM t_page_view_daily
+        WHERE stat_date = #{statDate}
+    </delete>
+
+    <insert id="insertAll">
+        INSERT INTO t_page_view_daily (
+            article_id, lang, stat_date, pv, uv, created_at
+        ) VALUES
+        <foreach collection="rows" item="row" separator=",">
+            (#{row.articleId}, #{row.lang}, #{row.statDate},
+             #{row.pv}, #{row.uv}, CURRENT_TIMESTAMP)
+        </foreach>
+    </insert>
+
+    <!-- 明细清理只物理删除严格早于保留边界的数据。 -->
+    <delete id="deleteRawBefore">
+        DELETE FROM t_page_view
+        WHERE created_at <![CDATA[<]]> #{cutoff}
+    </delete>
+</mapper>
