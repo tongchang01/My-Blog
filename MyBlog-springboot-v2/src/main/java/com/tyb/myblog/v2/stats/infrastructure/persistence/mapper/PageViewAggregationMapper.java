@@ -2,6 +2,9 @@ package com.tyb.myblog.v2.stats.infrastructure.persistence.mapper;
 
 import com.tyb.myblog.v2.stats.infrastructure.persistence.entity.PageViewDailyEntity;
 import com.tyb.myblog.v2.stats.infrastructure.persistence.projection.PageViewAggregateRow;
+import com.tyb.myblog.v2.stats.infrastructure.persistence.projection.DailyTrafficRow;
+import com.tyb.myblog.v2.stats.infrastructure.persistence.projection.LanguageTrafficRow;
+import com.tyb.myblog.v2.stats.infrastructure.persistence.projection.TopArticleTrafficRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -24,4 +27,17 @@ public interface PageViewAggregationMapper {
     int insertAll(@Param("rows") List<PageViewDailyEntity> rows);
 
     int deleteRawBefore(@Param("cutoff") LocalDateTime cutoff);
+
+    List<DailyTrafficRow> selectTrend(
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to);
+
+    List<TopArticleTrafficRow> selectTopArticles(
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to,
+            @Param("limit") int limit);
+
+    List<LanguageTrafficRow> selectLanguages(
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to);
 }

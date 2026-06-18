@@ -10,6 +10,7 @@ import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArti
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleCommentPolicyRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleStatisticsPolicyRow;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleStatisticsSummaryRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.DeletedArticlePageRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticleDetailRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticlePageRow;
@@ -18,6 +19,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 /**
  * 文章持久化 Mapper，生产 SQL 统一位于 XML。
@@ -57,6 +59,9 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
 
     ArticleStatisticsPolicyRow selectStatisticsPolicy(
             @Param("id") long id);
+
+    List<ArticleStatisticsSummaryRow> selectStatisticsSummaries(
+            @Param("articleIds") Set<Long> articleIds);
 
     int incrementCommentCount(
             @Param("id") long id,

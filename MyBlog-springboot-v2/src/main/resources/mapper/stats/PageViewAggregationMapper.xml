@@ -37,4 +37,36 @@
         DELETE FROM t_page_view
         WHERE created_at <![CDATA[<]]> #{cutoff}
     </delete>
+
+    <!-- 缺失日期由 application 补零。 -->
+    <select id="selectTrend"
+            resultType="com.tyb.myblog.v2.stats.infrastructure.persistence.projection.DailyTrafficRow">
+        SELECT stat_date, SUM(pv) AS pv, SUM(uv) AS uv
+        FROM t_page_view_daily
+        WHERE stat_date BETWEEN #{from} AND #{to}
+        GROUP BY stat_date
+        ORDER BY stat_date ASC
+    </select>
+
+    <!-- TOP 排除非文章访问，同 PV 时按文章 ID 升序稳定排序。 -->
+    <select id="selectTopArticles"
+            resultType="com.tyb.myblog.v2.stats.infrastructure.persistence.projection.TopArticleTrafficRow">
+        SELECT article_id, SUM(pv) AS pv,
+               SUM(uv) AS daily_uv_sum
+        FROM t_page_view_daily
+        WHERE stat_date BETWEEN #{from} AND #{to}
+          AND article_id &gt; 0
+        GROUP BY article_id
+        ORDER BY pv DESC, article_id ASC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectLanguages"
+            resultType="com.tyb.myblog.v2.stats.infrastructure.persistence.projection.LanguageTrafficRow">
+        SELECT lang, SUM(pv) AS pv
+        FROM t_page_view_daily
+        WHERE stat_date BETWEEN #{from} AND #{to}
+        GROUP BY lang
+        ORDER BY lang ASC
+    </select>
 </mapper>

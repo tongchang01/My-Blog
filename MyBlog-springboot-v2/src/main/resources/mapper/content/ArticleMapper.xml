@@ -426,6 +426,18 @@
           AND deleted = 0
     </select>
 
+    <!-- 历史统计允许补齐已删除或非公开文章标题，不按删除和状态过滤。 -->
+    <select id="selectStatisticsSummaries"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleStatisticsSummaryRow">
+        SELECT id, title_zh
+        FROM t_article
+        WHERE id IN
+        <foreach collection="articleIds" item="id"
+                 open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
     <insert id="insertTagRelation">
         INSERT INTO t_article_tag (article_id, tag_id)
         VALUES (#{articleId}, #{tagId})

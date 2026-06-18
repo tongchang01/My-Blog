@@ -414,6 +414,47 @@ class SecurityConfigTest {
     }
 
     @Test
+    void permitsAdminAndDemoToReadStatsDashboard() throws Exception {
+        String adminToken = token(1001L, "admin", 1, "ADMIN");
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(get("/api/admin/stats/dashboard")
+                        .header("Authorization", "Bearer " + adminToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/admin/stats/dashboard")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void rejectsGuestAndAnonymousStatsDashboardReads() throws Exception {
+        String guestToken = token(1003L, "guest", 3, "GUEST");
+
+        mockMvc.perform(get("/api/admin/stats/dashboard")
+                        .header("Authorization", "Bearer " + guestToken))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("10003"));
+        mockMvc.perform(get("/api/admin/stats/dashboard"))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
+    void doesNotExtendDemoStatsPermissionToWrites() throws Exception {
+        String demoToken = token(1002L, "demo", 2, "DEMO");
+
+        mockMvc.perform(post("/api/admin/stats/dashboard")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/admin/stats/dashboard")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(delete("/api/admin/stats/dashboard")
+                        .header("Authorization", "Bearer " + demoToken))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
     void requiresAuthenticationForCurrentProfileEndpoints() throws Exception {
         mockMvc.perform(get("/api/auth/me"))
                 .andExpect(status().isUnauthorized())

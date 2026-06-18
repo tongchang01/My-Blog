@@ -96,6 +96,10 @@ public class SecurityConfig {
                             .hasAnyRole("ADMIN", "DEMO")
                             .requestMatchers(
                                     HttpMethod.GET,
+                                    "/api/admin/stats/dashboard")
+                            .hasAnyRole("ADMIN", "DEMO")
+                            .requestMatchers(
+                                    HttpMethod.GET,
                                     "/api/admin/categories",
                                     "/api/admin/categories/*",
                                     "/api/admin/tags",
