@@ -2,7 +2,8 @@
 
 > 本文档回答："什么必须写测试？用什么框架？怎么跑？"
 > 适用范围：V2 所有代码。
-> 当前测试文件：33 份（含 `ArchitectureRulesTest`）
+> 当前测试文件：164 份（含架构守护测试）
+> 最近全量结果：612 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试。
 
 ## 1. 测试技术栈
 
@@ -90,12 +91,13 @@ mvn test -Dtest=ArchitectureRulesTest    # 单跑架构守护
 
 | 模块 | 测试文件数 | 覆盖评估 |
 |------|-----------|---------|
-| comment | 6 | 较好（含 admin/audit） |
-| content | 5 | 中等（缺 ApplicationService 集成） |
-| identity | 8 | 较好（含登录审计） |
-| common | 9 | 较好（安全、Web 工具均覆盖） |
-| 架构守护 | 1 (ArchUnit) | ✅ 已启用 |
-| Flyway | 1 | ✅ 已启用 |
+| comment | 12 | 较好（含公开/后台、邮件和真实 HTTP 集成） |
+| content | 27 | 较好（含真实 HTTP、OpenAPI 和持久层） |
+| identity | 41 | 较好（含登录、会话、资料与改密事务） |
+| system | 29 | 较好（含站点配置、附件与友链集成） |
+| common | 36 | 较好（安全、Web、配置和基础设施） |
+| stats | 17 | 较好（含隐私 hash、聚合、调度、dashboard、真实 HTTP 与 OpenAPI） |
+| 架构守护 | 2 | ✅ 已启用 |
 
 **已知缺测**：
 - `CommentCommandService` 集成测试

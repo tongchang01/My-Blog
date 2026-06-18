@@ -8,6 +8,8 @@
 
 **Tech Stack:** Java 17、Spring Boot 3.5.14、MyBatis-Plus 3.5.12、Mapper XML、MapStruct 1.6.3、Lombok、Caffeine、JCA HmacSHA256、H2、JUnit 5、AssertJ、Mockito、MockMvc、springdoc/Knife4j。
 
+**实施状态（2026-06-18）：** Task 1 `66e5a5a`、Task 2 `0e46cef`、Task 3 `f98a9bc`、Task 4 `f28d98e` 已完成。Task 5 的契约、集成测试和 M3 文档收尾由当前提交承载，不预写自身 SHA。
+
 ---
 
 ## 0. 执行约束
@@ -152,7 +154,7 @@ docs/project-handbook/api-contract/stats.md
 
 ## 3. Task 1：访问事件与明细持久化
 
-- [ ] **Step 1：写领域失败测试**
+- [x] **Step 1：写领域失败测试**
 
 Create `PageViewEventTest`：
 
@@ -187,7 +189,7 @@ mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=PageViewEventTest" test
 
 Expected：编译失败，缺少 stats domain 类型。
 
-- [ ] **Step 2：实现领域模型和端口**
+- [x] **Step 2：实现领域模型和端口**
 
 `StatsLanguage` 固定 `ZH("zh") / JA("ja") / EN("en")`，`fromCode` 对其他值抛 `IllegalArgumentException`，由 application 映射为 `VALIDATION_ERROR`。`PageViewEvent.create` 校验：articleId 为空或正数、visitorHash 匹配 `[0-9a-f]{64}`、referrer 不超过 512 字符、createdAt 非空。
 
@@ -197,7 +199,7 @@ public interface PageViewRepository {
 }
 ```
 
-- [ ] **Step 3：写明细 Repository 失败测试**
+- [x] **Step 3：写明细 Repository 失败测试**
 
 Create `DatabasePageViewRepositoryTest`，使用 `@SpringBootTest`、test profile 和 JdbcTemplate：
 
@@ -229,7 +231,7 @@ mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=DatabasePageViewRepositoryTest" test
 
 Expected：编译失败，缺少持久化实现。
 
-- [ ] **Step 4：实现 Entity、MapStruct、Mapper XML 和 Repository**
+- [x] **Step 4：实现 Entity、MapStruct、Mapper XML 和 Repository**
 
 `PageViewEntity` 不继承 BaseEntity/AuditOnlyBase：
 
@@ -250,7 +252,7 @@ public class PageViewEntity {
 
 `PageViewPersistenceMapping` 使用 `@Mapper(componentModel = "spring")`，忽略 id，并把 `language.code()` 映射到 lang。`PageViewMapper` 继承 `BaseMapper<PageViewEntity>`，不声明注解 SQL。`MyBatisPageViewRepository.append` 要求 insert 影响 1 行且回填 id 为正数，否则抛 `IllegalStateException("访问明细写入失败")`。
 
-- [ ] **Step 5：验证并提交 Task 1**
+- [x] **Step 5：验证并提交 Task 1**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=PageViewEventTest,DatabasePageViewRepositoryTest,ArchitectureRulesTest" test
@@ -268,7 +270,7 @@ Expected：测试通过；两个 rg 无结果；提交只包含 Task 1。
 
 ## 4. Task 2：公开页面访问打点与隐私标识
 
-- [ ] **Step 1：写 content 公开统计策略失败测试**
+- [x] **Step 1：写 content 公开统计策略失败测试**
 
 Create `PublicArticleStatisticsPolicyServiceTest`：
 
@@ -297,7 +299,7 @@ void hidesNonPublicArticles(ArticleStatus status) {
 
 同时覆盖 gateway empty 与非正 articleId，均返回 NOT_FOUND。
 
-- [ ] **Step 2：实现 content application 端口**
+- [x] **Step 2：实现 content application 端口**
 
 ```java
 public interface ArticleStatisticsGateway {
@@ -320,7 +322,7 @@ public interface ArticleStatisticsGateway {
 
 由 `MyBatisArticleStatisticsGateway` 映射到 application snapshot；stats 不得直接依赖 ArticleMapper 或 content domain。
 
-- [ ] **Step 3：写 HMAC、密钥和限流失败测试**
+- [x] **Step 3：写 HMAC、密钥和限流失败测试**
 
 `HmacVisitorHashGeneratorTest`：
 
@@ -344,7 +346,7 @@ void rotatesHashByDateWithoutExposingInputs() {
 
 `StatsHashSecretStartupValidatorTest` 覆盖空密钥、少于 32 UTF-8 字节失败和 test 密钥通过。`CaffeinePageViewRateLimitServiceTest` 覆盖同 IP 前 120 次通过、第 121 次抛 RATE_LIMITED、不同 IP 隔离、空 IP 归为 unknown。
 
-- [ ] **Step 4：实现配置、HMAC 与 Caffeine 适配**
+- [x] **Step 4：实现配置、HMAC 与 Caffeine 适配**
 
 ```yaml
 myblog:
@@ -373,7 +375,7 @@ return HexFormat.of().formatHex(
 
 每次调用创建新 Mac，避免并发共享非线程安全实例。Caffeine 使用 1 分钟 expireAfterWrite 与 `asMap().compute` 原子计数。
 
-- [ ] **Step 5：写应用服务与 Controller 失败测试**
+- [x] **Step 5：写应用服务与 Controller 失败测试**
 
 `PageViewRecordServiceTest` 覆盖：非文章不调用 content policy；文章先校验；Clock 决定 JST 日期和 createdAt；Referer trim 后截断 512；缺失 UA 按空串；限流失败不持久化。
 
@@ -393,7 +395,7 @@ mockMvc.perform(post("/api/public/stats/page-views")
 
 另测非法 lang 返回 400/90001，请求类型不声明 IP/UA/referrer 字段，非文章请求可省略 articleId；OpenAPI 泄漏检查放在 Task 5。
 
-- [ ] **Step 6：实现公开打点接口**
+- [x] **Step 6：实现公开打点接口**
 
 ```java
 public record PageViewRecordCommand(
@@ -409,7 +411,7 @@ public record PageViewRecordCommand(
 
 公开路径为 `POST /api/public/stats/page-views`。把精确路径加入各 profile 的 public endpoints；OpenAPI 使用独立 `PageViewRecordOpenApiRequest`，不暴露 Command。
 
-- [ ] **Step 7：验证并提交 Task 2**
+- [x] **Step 7：验证并提交 Task 2**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=PublicArticleStatisticsPolicyServiceTest,HmacVisitorHashGeneratorTest,StatsHashSecretStartupValidatorTest,CaffeinePageViewRateLimitServiceTest,PageViewRecordServiceTest,PublicPageViewControllerTest,RuntimeProfileConfigurationTest,SecurityConfigTest" test
@@ -432,7 +434,7 @@ Expected：测试通过；无注解 SQL；stats persistence 不保存 IP/UA。
 
 ## 5. Task 3：访问日聚合与明细清理
 
-- [ ] **Step 1：写聚合 Repository 失败测试**
+- [x] **Step 1：写聚合 Repository 失败测试**
 
 Create `DatabasePageViewAggregationRepositoryTest`，同一天准备：article=100/lang=zh/hash=A 两次，hash=B 一次；article=NULL/lang=en/hash=C 一次。断言：
 
@@ -455,7 +457,7 @@ mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=DatabasePageViewAggregationRepositor
 
 Expected：编译失败。
 
-- [ ] **Step 2：实现聚合模型、端口和 XML**
+- [x] **Step 2：实现聚合模型、端口和 XML**
 
 `DailyPageView` 校验 articleId >= 0、日期/语言非空、pv/uv 非负且 uv <= pv。
 
@@ -508,7 +510,7 @@ public interface PageViewAggregationRepository {
 
 空聚合结果只执行 deleteDay，不执行空批量 insert。`PageViewDailyEntity` 不继承审计基类。
 
-- [ ] **Step 3：写事务与维护服务失败测试**
+- [x] **Step 3：写事务与维护服务失败测试**
 
 `PageViewDailyRebuildServiceTest` 断言使用 Clock 的 ZoneId 计算 `[dayStart,nextDayStart)`，调用顺序为 summarize -> deleteDay -> insertAll。集成测试让 insertAll 抛错并验证旧聚合因事务回滚仍存在。
 
@@ -527,7 +529,7 @@ verify(repository).deleteRawBefore(
 
 最近 90 天定义为 today.minusDays(89) 到 today，包含首尾；参数化测试覆盖跨月、跨年。
 
-- [ ] **Step 4：实现事务服务与维护编排**
+- [x] **Step 4：实现事务服务与维护编排**
 
 `PageViewDailyRebuildService.rebuild(LocalDate)` 标注 `@Transactional`。维护服务核心逻辑：
 
@@ -551,7 +553,7 @@ public void reconcileAndCleanup() {
 
 这里的 `LocalDate.now(clock)` 是允许的注入 Clock 用法；禁止无参数 now。
 
-- [ ] **Step 5：写调度测试并实现本地互斥**
+- [x] **Step 5：写调度测试并实现本地互斥**
 
 `PageViewMaintenanceSchedulerTest` 覆盖：ApplicationReadyEvent 调用 reconcile、5 分钟任务调用 current window、凌晨任务调用 reconcile、任务重入时第二次跳过。
 
@@ -598,7 +600,7 @@ private void runExclusively(String taskName, Runnable action) {
 
 三个入口共用一个 `ReentrantLock.tryLock()`。异常日志只写任务名和堆栈，不写访客输入。`PageViewMaintenanceScheduler` 本身必须标注 `@ConditionalOnProperty(prefix="myblog.stats.scheduling", name="enabled", havingValue="true", matchIfMissing=true)`，防止其他模块启用全局 scheduling 后误注册 stats 任务；test profile 关闭。
 
-- [ ] **Step 6：验证并提交 Task 3**
+- [x] **Step 6：验证并提交 Task 3**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=DatabasePageViewAggregationRepositoryTest,PageViewDailyRebuildServiceTest,PageViewMaintenanceServiceTest,PageViewMaintenanceSchedulerTest,ArchitectureRulesTest" test
@@ -618,7 +620,7 @@ Expected：测试通过；无注解 SQL；无无参系统时间调用。
 
 ## 6. Task 4：后台访问统计总览
 
-- [ ] **Step 1：写后台查询应用失败测试**
+- [x] **Step 1：写后台查询应用失败测试**
 
 `StatsDashboardServiceTest` 固定默认 30 个 JST 自然日：
 
@@ -651,7 +653,7 @@ void defaultsToThirtyDaysAndBuildsAccurateSummary() {
 
 31 / 30 按 scale 1、HALF_UP 为 1.0，不能只对有数据日期求平均。另测 from/to 同时出现、顺序、366 天上限、趋势补零、today 不在自定义区间时仍单查今天、标题缺失保留 TOP 行、ADMIN/DEMO 权限、区间 PV=0 时 ratio=0。
 
-- [ ] **Step 2：实现查询模型、端口与应用服务**
+- [x] **Step 2：实现查询模型、端口与应用服务**
 
 ```java
 public interface StatsDashboardRepository {
@@ -666,7 +668,7 @@ public interface StatsDashboardRepository {
 
 `StatsAuthorization.requireReadable` 只允许 ADMIN/DEMO。默认 from=today.minusDays(29)、to=today；区间包含首尾最多 366 天。periodPv 从补零趋势求和；today 单独查询；averageDailyUv 按完整区间天数计算；语言 ratio scale 4、HALF_UP。
 
-- [ ] **Step 3：写 Mapper 失败测试并实现查询 XML**
+- [x] **Step 3：写 Mapper 失败测试并实现查询 XML**
 
 `DatabaseStatsDashboardRepositoryTest` 插入跨日期、文章、语言日聚合，验证闭区间和稳定排序。XML：
 
@@ -706,7 +708,7 @@ public interface StatsDashboardRepository {
 
 累计 daily UV 的 Java/VO 字段必须命名 `dailyUvSum`，不能写成跨日 uv。
 
-- [ ] **Step 4：实现文章标题批量补齐**
+- [x] **Step 4：实现文章标题批量补齐**
 
 扩展 gateway：
 
@@ -733,7 +735,7 @@ List<ArticleStatisticsSummary> findSummaries(
 
 不存在的 ID 不伪造标题，stats 返回 null；禁止 N+1。
 
-- [ ] **Step 5：写并实现 Controller 与权限**
+- [x] **Step 5：写并实现 Controller 与权限**
 
 `AdminStatsControllerTest` 覆盖默认/显式日期和字段名。`SecurityConfigTest` 覆盖 DEMO GET 成功、其他方法 403、匿名/GUEST 拒绝。
 
@@ -743,7 +745,7 @@ GET /api/admin/stats/dashboard?from=2026-05-20&to=2026-06-18
 
 Controller 使用 `@CurrentUser AuthenticatedPrincipal`，返回字段：periodPv、todayPv、todayUv、averageDailyUv、trend、topArticles、languageDistribution。TOP 项字段为 articleId/title/pv/dailyUvSum。SecurityConfig 在通用 admin 规则前加入精确 GET 的 ADMIN/DEMO 权限。
 
-- [ ] **Step 6：验证并提交 Task 4**
+- [x] **Step 6：验证并提交 Task 4**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=StatsDashboardServiceTest,DatabaseStatsDashboardRepositoryTest,ArticleStatisticsSummaryServiceTest,AdminStatsControllerTest,SecurityConfigTest,ArchitectureRulesTest" test
@@ -766,7 +768,7 @@ Expected：测试通过；stats 只依赖 content application；所有统计 SQL
 
 ## 7. Task 5：契约、集成和 M3 收尾
 
-- [ ] **Step 1：写真 HTTP 集成失败测试**
+- [x] **Step 1：写真 HTTP 集成失败测试**
 
 Create `StatsIntegrationTest`，使用真实 Spring context、H2、JWT 和 MockMvc：
 
@@ -806,7 +808,7 @@ mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=StatsIntegrationTest" test
 
 Expected：若前四批存在遗漏则失败；逐项修正，不扩展设计范围。
 
-- [ ] **Step 2：写 OpenAPI 守护测试**
+- [x] **Step 2：写 OpenAPI 守护测试**
 
 Create `StatsOpenApiTest`：
 
@@ -830,7 +832,7 @@ assertThat(root.toString()).doesNotContain(
 
 断言请求 schema 只有 articleId/lang，dashboard TOP 项使用 dailyUvSum。
 
-- [ ] **Step 3：补接口契约文档**
+- [x] **Step 3：补接口契约文档**
 
 Create `docs/project-handbook/api-contract/stats.md`，写清：
 
@@ -847,7 +849,7 @@ Create `docs/project-handbook/api-contract/stats.md`，写清：
 | `stats.md` | 公开访问打点、日 PV/UV 聚合和后台数据总览 | 已落地 |
 ```
 
-- [ ] **Step 4：同步状态和测试文档**
+- [x] **Step 4：同步状态和测试文档**
 
 - roadmap.md：勾选 stats，M3 全部完成，下一项为 M4 前台/后台骨架。
 - status.md：记录每日 hash、准实时延迟、清理规则和 M3 完成状态。
@@ -855,7 +857,7 @@ Create `docs/project-handbook/api-contract/stats.md`，写清：
 - 设计文档：回填五批提交和最终状态。
 - 本计划：只勾选实际完成步骤，不预先勾选。
 
-- [ ] **Step 5：运行最终验证**
+- [x] **Step 5：运行最终验证**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=StatsIntegrationTest,StatsOpenApiTest,SecurityConfigTest,ArchitectureRulesTest" test
@@ -886,17 +888,17 @@ git commit -m "完成访问统计契约与M3收尾"
 
 ## 8. 最终验收清单
 
-- [ ] stats 四层结构完整，只依赖 content application。
-- [ ] 明细只保存 articleId、lang、每日 visitorHash、referrer、createdAt。
-- [ ] 原始 IP、User-Agent、hash secret 不入库、不进 API、不写日志。
-- [ ] PUBLISHED/PASSWORD 可打点，其他状态和已删除文章返回 404。
-- [ ] 每次有效访问增加 PV；同访客、文章、语言、JST 日期只增加一次 UV。
-- [ ] 非文章页面明细使用 NULL、聚合使用 articleId=0。
-- [ ] 单日聚合可重复执行且不翻倍。
-- [ ] 启动补算、5 分钟校准和 90 天清理使用同实例互斥。
-- [ ] dashboard 支持默认 30 天、最大 366 天、连续趋势、TOP 10 和语言分布。
-- [ ] API 不提供虚假跨日 UV，累计字段命名 dailyUvSum。
-- [ ] ADMIN/DEMO 可读 dashboard，GUEST/匿名不可读。
-- [ ] 所有复杂 SQL 位于 XML，生产代码保留必要中文注释。
-- [ ] `V1__init.sql` 未修改。
-- [ ] 全量测试和静态检查通过，M3 文档状态完成收尾。
+- [x] stats 四层结构完整，只依赖 content application。
+- [x] 明细只保存 articleId、lang、每日 visitorHash、referrer、createdAt。
+- [x] 原始 IP、User-Agent、hash secret 不入库、不进 API、不写日志。
+- [x] PUBLISHED/PASSWORD 可打点，其他状态和已删除文章返回 404。
+- [x] 每次有效访问增加 PV；同访客、文章、语言、JST 日期只增加一次 UV。
+- [x] 非文章页面明细使用 NULL、聚合使用 articleId=0。
+- [x] 单日聚合可重复执行且不翻倍。
+- [x] 启动补算、5 分钟校准和 90 天清理使用同实例互斥。
+- [x] dashboard 支持默认 30 天、最大 366 天、连续趋势、TOP 10 和语言分布。
+- [x] API 不提供虚假跨日 UV，累计字段命名 dailyUvSum。
+- [x] ADMIN/DEMO 可读 dashboard，GUEST/匿名不可读。
+- [x] 所有复杂 SQL 位于 XML，生产代码保留必要中文注释。
+- [x] `V1__init.sql` 未修改。
+- [x] 全量测试和静态检查通过，M3 文档状态完成收尾。

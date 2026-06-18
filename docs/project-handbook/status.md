@@ -4,11 +4,13 @@
 > 更新时机：每个里程碑完成后更新。
 > 当前日期：2026-06
 
-## ⚠️ 当前唯一主线：M3 模块重建
+## ⚠️ 当前唯一主线：M4 前台 / 后台骨架
 
 **DDL 冻结前的产品规格与 schema 评审已完成**。R5-R7 完成后多处与既有代码冲突（ADR-0015 审计列三件套、ADR-0017 无 FK、R5 模块边界含 stats 与 common-infra、ADR-0018 时区五层、Role 三态枚举等），继续修旧实现 = 返工。
 
 **2026-06-17 更新：comment 评论与留言纵向切片已完成。** 公开文章评论、留言板、后台审核、Markdown 安全清洗、文章评论计数、事务后回复通知、Resend 适配和失败日志均已落地；PASSWORD 文章评论在解锁能力完成前保持 `403`。
+
+**2026-06-18 更新：stats 访问统计纵向切片已完成，M3 后端模块重建结束。** 公开打点只接受 PUBLISHED/PASSWORD 文章和非文章页面；每日 HMAC 访客标识不保存原始 IP/User-Agent。日聚合支持启动补算、5 分钟校准和 90 天明细清理，后台 ADMIN/DEMO 可查询连续趋势、TOP 10 和语言分布。
 
 **从现在开始，不再修改 Flyway V1__init.sql；后续 schema 变更走 V2__xxx.sql / V3__xxx.sql。**
 
@@ -50,7 +52,7 @@ M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，iden
 - 已完成：认证 token 端口收口到 `common.auth.token`，JWT 实现与 identity 用例解除具体依赖
 - 已完成：ArchUnit 按 identity / content / comment / system / stats / common-infra 重写，跨模块只允许依赖对方 application 接口
 - 已完成：Maven Enforcer 锁定 Java 17 / Maven 3.9.x，并执行依赖收敛检查
-- M3 已进入业务模块重建；identity 认证会话纵向切片已提供真实 login / refresh / logout 接口
+- M3 六个后端模块已完成；identity 认证会话纵向切片已提供真实 login / refresh / logout 接口
 - 登录链路已接入用户名规范化、可信客户端 IP、单实例 Caffeine 前置限流、BCrypt、数据库失败累计与锁定、成功审计、refresh token 哈希持久化和 JWT access token 签发
 - 成功分支采用独立短事务；access token 签发失败时，成功审计与 refresh token 写入一起回滚
 - ADMIN / DEMO 可登录；未知账号、GUEST、密码错误和持久化锁定统一返回 `401 + 10001`；第 6 次连续失败返回 `429 + 90002`
@@ -79,17 +81,18 @@ M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，iden
 - 分类批量排序按升序 ID 锁定，任一目标缺失或更新异常时整体回滚；标签不提供排序接口
 - active 文章引用阻止分类和标签删除；已删除文章不阻止删除，软删除完整写入五个审计字段
 - MapStruct 1.6.3 已用于 persistence 与 web 的机械映射，业务规则保持显式
-- 当前基线：`mvn clean test` 通过（485 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
+- 当前基线：`mvn clean test` 通过（612 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
 - comment 模块已完成：公开接口只返回 `contentHtml`，后台接口支持目标、状态、关键字、删除状态筛选；ADMIN 可审核/隐藏/删除/恢复，DEMO 只读；文章 `comment_count` 与审核/删除/恢复同事务维护
 - 邮件 common-infra 已完成：Resend 默认关闭，开启缺少配置时启动失败；回复通知在事务提交后发送，失败写 `t_mail_log`，成功不入库
+- stats 模块已完成：匿名打点、每日轮换 HMAC visitor hash、日 PV/UV 幂等重算、启动补算、5 分钟校准、90 天明细清理和后台 dashboard 均已落地
+- dashboard 默认补齐最近 30 个 JST 自然日，最大闭区间 366 天；`dailyUvSum` 和 `averageDailyUv` 均明确不是跨日独立访客数
 
-**当前处置方案**：identity、system、content 与 comment 已收尾，下一步进入 stats 纵向切片，再推进前台 / 后台前端骨架。
+**当前处置方案**：M3 后端模块重建已收尾，下一步进入 M4 前台 / 后台前端骨架。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. 设计并实现 stats 纵向切片
-2. 前台 / 后台前端骨架
-3. 根据前端对接结果补充接口契约细节
+1. 前台 / 后台前端骨架
+2. 根据前端对接结果补充接口契约细节
 
 ## 4. 相关文档
 

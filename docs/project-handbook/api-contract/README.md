@@ -2,7 +2,7 @@
 
 > 本目录回答："后端给前端暴露什么接口？字段名、类型、错误码、分页约定是什么？"
 > 性质：**三端共识层**，是 backend / frontend-user / frontend-admin 的共同输入。
-> 当前状态：identity、system、content 与 comment 契约已落地，其余接口随业务模块实现逐步补齐。
+> 当前状态：identity、system、content、comment 与 stats 契约已落地，其余接口随前端对接逐步补齐。
 
 ## 与其他文档的关系
 
@@ -30,6 +30,7 @@ api-contract 是后端与前端的**单一事实源**。前后端任何一方想
 | `category-tag.md` | 分类标签三语读取、后台管理、排序和引用保护删除 | ✅ 已落地 |
 | `article.md` | 后台文章管理、公开查询、回收站、恢复和定时发布 | ✅ 已落地 |
 | `comment.md` | 公开评论、留言板、后台审核、Markdown 清洗和邮件失败日志 | ✅ 已落地 |
+| `stats.md` | 公开访问打点、日 PV/UV 聚合和后台数据总览 | ✅ 已落地 |
 | `endpoints-public.md` | 前台公开接口（文章列表、详情、评论提交等） | ⏳ |
 | `endpoints-admin.md` | 后台管理接口（按业务模块分组） | ⏳ |
 | `dto-glossary.md` | 公共 DTO 字段含义（ArticleVO / CommentVO 等） | ⏳ |

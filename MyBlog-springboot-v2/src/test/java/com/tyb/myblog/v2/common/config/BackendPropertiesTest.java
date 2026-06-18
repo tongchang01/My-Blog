@@ -42,6 +42,7 @@ class BackendPropertiesTest {
                         tuple("POST", "/api/public/articles/*/comments"),
                         tuple("GET", "/api/public/guestbook/comments"),
                         tuple("POST", "/api/public/guestbook/comments"),
+                        tuple("POST", "/api/public/stats/page-views"),
                         tuple("GET", "/api/public/security-probe"),
                         tuple("GET", "/doc.html"),
                         tuple("GET", "/webjars/**"),
