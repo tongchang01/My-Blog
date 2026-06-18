@@ -50,6 +50,14 @@ myblog:
       enabled: false
       api-key: ${MYBLOG_RESEND_API_KEY:}
       from-email: ${MYBLOG_RESEND_FROM_EMAIL:}
+  stats:
+    hash-secret: ${MYBLOG_STATS_HASH_SECRET:}
+    page-view-max-requests-per-minute: 120
+    rate-limit-maximum-size: 20000
+    scheduling:
+      enabled: true
+      aggregate-cron: "0 */5 * * * *"
+      maintenance-cron: "0 30 3 * * *"
   web:
     trusted-proxies: []
   security:
@@ -87,6 +95,8 @@ myblog:
         path: /api/public/guestbook/comments
       - method: POST
         path: /api/public/guestbook/comments
+      - method: POST
+        path: /api/public/stats/page-views
   content:
     article-publish:
       enabled: true

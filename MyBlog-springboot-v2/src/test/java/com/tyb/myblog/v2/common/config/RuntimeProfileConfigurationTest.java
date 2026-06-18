@@ -34,6 +34,8 @@ class RuntimeProfileConfigurationTest {
                 .isEqualTo("${MYBLOG_DATASOURCE_PASSWORD}");
         assertThat(local.getProperty("myblog.security.jwt.secret"))
                 .isEqualTo("${MYBLOG_JWT_SECRET}");
+        assertThat(local.getProperty("myblog.stats.hash-secret"))
+                .isEqualTo("${MYBLOG_STATS_HASH_SECRET}");
     }
 
     @Test
@@ -48,6 +50,8 @@ class RuntimeProfileConfigurationTest {
                 .isEqualTo("${MYBLOG_DATASOURCE_PASSWORD}");
         assertThat(prod.getProperty("myblog.security.jwt.secret"))
                 .isEqualTo("${MYBLOG_JWT_SECRET}");
+        assertThat(prod.getProperty("myblog.stats.hash-secret"))
+                .isEqualTo("${MYBLOG_STATS_HASH_SECRET}");
         assertThat(prod.getProperty("springdoc.api-docs.enabled")).isEqualTo(false);
         assertThat(prod.getProperty("springdoc.swagger-ui.enabled")).isEqualTo(false);
         assertThat(prod.getProperty("knife4j.enable")).isEqualTo(false);

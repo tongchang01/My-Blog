@@ -23,6 +23,8 @@ management:
         include: health
 
 myblog:
+  stats:
+    hash-secret: ${MYBLOG_STATS_HASH_SECRET}
   storage:
     type: ${MYBLOG_STORAGE_TYPE:S3}
     max-file-size: 10MB

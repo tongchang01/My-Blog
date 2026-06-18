@@ -42,6 +42,8 @@ class SecurityConfigTest {
 
     @BeforeEach
     void clearUsers() {
+        jdbcTemplate.update("delete from t_page_view_daily");
+        jdbcTemplate.update("delete from t_page_view");
         jdbcTemplate.update("delete from t_article_tag");
         jdbcTemplate.update("delete from t_comment");
         jdbcTemplate.update("delete from t_article");
@@ -105,6 +107,20 @@ class SecurityConfigTest {
                         .content("""
                                 {"refreshToken":"invalid"}
                                 """))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("10002"));
+    }
+
+    @Test
+    void permitsConfiguredPageViewPostWithoutAccessToken()
+            throws Exception {
+        mockMvc.perform(post("/api/public/stats/page-views")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"lang\":\"zh\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("00000"));
+
+        mockMvc.perform(get("/api/public/stats/page-views"))
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.code").value("10002"));
     }

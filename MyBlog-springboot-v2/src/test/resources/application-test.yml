@@ -16,6 +16,14 @@ knife4j:
   enable: true
 
 myblog:
+  stats:
+    hash-secret: test-stats-secret-test-stats-secret-123456
+    page-view-max-requests-per-minute: 120
+    rate-limit-maximum-size: 20000
+    scheduling:
+      enabled: false
+      aggregate-cron: "0 */5 * * * *"
+      maintenance-cron: "0 30 3 * * *"
   storage:
     type: LOCAL
     max-file-size: 10MB
@@ -65,6 +73,8 @@ myblog:
         path: /api/public/guestbook/comments
       - method: POST
         path: /api/public/guestbook/comments
+      - method: POST
+        path: /api/public/stats/page-views
       - method: GET
         path: /api/public/security-probe
       - method: GET

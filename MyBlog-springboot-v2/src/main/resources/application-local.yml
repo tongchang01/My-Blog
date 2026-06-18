@@ -17,6 +17,8 @@ knife4j:
   enable: true
 
 myblog:
+  stats:
+    hash-secret: ${MYBLOG_STATS_HASH_SECRET}
   storage:
     type: LOCAL
     local:
@@ -52,6 +54,8 @@ myblog:
         path: /api/public/articles
       - method: GET
         path: /api/public/articles/**
+      - method: POST
+        path: /api/public/stats/page-views
       - method: GET
         path: /doc.html
       - method: GET

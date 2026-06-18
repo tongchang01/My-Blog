@@ -417,6 +417,15 @@
         WHERE article_id = #{articleId}
     </delete>
 
+    <!-- stats 只读取公开状态，避免单次打点加载正文与标签。 -->
+    <select id="selectStatisticsPolicy"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleStatisticsPolicyRow">
+        SELECT id, status
+        FROM t_article
+        WHERE id = #{id}
+          AND deleted = 0
+    </select>
+
     <insert id="insertTagRelation">
         INSERT INTO t_article_tag (article_id, tag_id)
         VALUES (#{articleId}, #{tagId})
