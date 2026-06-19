@@ -20,9 +20,10 @@ public class AdminCommentQueryService {
             AdminCommentPageQuery query) {
         authorization.requireReadable(principal);
         AdminCommentPage page = repository.page(toCriteria(query));
+        boolean includeAuditFields = principal.roles().contains("ADMIN");
         return new AdminCommentPageResult(
                 page.records().stream()
-                        .map(AdminCommentQueryService::toItem)
+                        .map(item -> toItem(item, includeAuditFields))
                         .toList(),
                 page.total(),
                 page.page(),
@@ -42,7 +43,8 @@ public class AdminCommentQueryService {
     }
 
     private static AdminCommentPageResult.Item toItem(
-            AdminCommentPageItem item) {
+            AdminCommentPageItem item,
+            boolean includeAuditFields) {
         return new AdminCommentPageResult.Item(
                 item.id(),
                 item.targetType(),
@@ -51,10 +53,10 @@ public class AdminCommentQueryService {
                 item.replyToCommentId(),
                 item.replyToNickname(),
                 item.authorNickname(),
-                item.authorEmail(),
+                includeAuditFields ? item.authorEmail() : null,
                 item.authorSite(),
-                item.authorIp(),
-                item.authorUserAgent(),
+                includeAuditFields ? item.authorIp() : null,
+                includeAuditFields ? item.authorUserAgent() : null,
                 item.contentMd(),
                 item.contentHtml(),
                 item.auditStatus(),

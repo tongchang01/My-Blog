@@ -63,6 +63,7 @@ class CommentIntegrationTest {
         insertArticle(101L, 4);
 
         long passedId = response(post("/api/public/articles/100/comments")
+                .header("User-Agent", "JUnit")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(commentBody("Reader", "reader@example.com", "hello", null)))
                 .at("/data/id").asLong();
@@ -103,6 +104,7 @@ class CommentIntegrationTest {
                         .value((int) guestbookId));
 
         long pendingId = response(post("/api/public/articles/100/comments")
+                .header("User-Agent", "JUnit")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(commentBody("Spam", "spam@example.com", "spam text", null)))
                 .at("/data/id").asLong();
@@ -110,7 +112,26 @@ class CommentIntegrationTest {
 
         mockMvc.perform(get("/api/admin/comments")
                         .header("Authorization", bearer(demo)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].authorEmail")
+                        .value((Object) null))
+                .andExpect(jsonPath("$.data.records[0].authorIp")
+                        .value((Object) null))
+                .andExpect(jsonPath("$.data.records[0].authorUserAgent")
+                        .value((Object) null))
+                .andExpect(jsonPath("$.data.records[0].authorNickname")
+                        .exists())
+                .andExpect(jsonPath("$.data.records[0].contentMd")
+                        .exists());
+        mockMvc.perform(get("/api/admin/comments")
+                        .header("Authorization", bearer(admin)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].authorEmail")
+                        .exists())
+                .andExpect(jsonPath("$.data.records[0].authorIp")
+                        .exists())
+                .andExpect(jsonPath("$.data.records[0].authorUserAgent")
+                        .exists());
         mockMvc.perform(post("/api/admin/comments/{id}/approve", pendingId)
                         .header("Authorization", bearer(demo)))
                 .andExpect(status().isForbidden());

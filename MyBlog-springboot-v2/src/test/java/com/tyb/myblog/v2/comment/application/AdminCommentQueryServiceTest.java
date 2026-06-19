@@ -19,38 +19,66 @@ import static org.mockito.Mockito.when;
 
 class AdminCommentQueryServiceTest {
 
+    private static final AdminCommentPageQuery QUERY =
+            new AdminCommentPageQuery(
+                    CommentTargetType.ARTICLE,
+                    100L,
+                    CommentAuditStatus.PENDING,
+                    "hello",
+                    false,
+                    1,
+                    20);
+
+    private static final AdminCommentQueryCriteria CRITERIA =
+            new AdminCommentQueryCriteria(
+                    CommentTargetType.ARTICLE,
+                    100L,
+                    CommentAuditStatus.PENDING,
+                    "hello",
+                    false,
+                    1,
+                    20);
+
     private final AdminCommentQueryRepository repository =
             mock(AdminCommentQueryRepository.class);
     private final AdminCommentQueryService service =
             new AdminCommentQueryService(repository, new CommentAuthorization());
 
     @Test
-    void adminAndDemoCanReadCommentPage() {
-        AdminCommentPageQuery query = new AdminCommentPageQuery(
-                CommentTargetType.ARTICLE,
-                100L,
-                CommentAuditStatus.PENDING,
-                "hello",
-                false,
-                1,
-                20);
-        AdminCommentQueryCriteria criteria = new AdminCommentQueryCriteria(
-                CommentTargetType.ARTICLE,
-                100L,
-                CommentAuditStatus.PENDING,
-                "hello",
-                false,
-                1,
-                20);
-        when(repository.page(criteria))
+    void adminCanReadCommentAuditFields() {
+        when(repository.page(CRITERIA))
                 .thenReturn(new AdminCommentPage(List.of(item()), 1, 1, 20));
 
-        AdminCommentPageResult result = service.page(
-                new AuthenticatedPrincipal("1002", "demo", List.of("DEMO")),
-                query);
+        AdminCommentPageResult.Item result = service.page(
+                principal("ADMIN"), QUERY).records().get(0);
 
-        assertThat(result.records()).hasSize(1);
-        verify(repository).page(criteria);
+        assertThat(result.authorEmail()).isEqualTo("tyb@example.com");
+        assertThat(result.authorIp()).isEqualTo("127.0.0.1");
+        assertThat(result.authorUserAgent()).isEqualTo("JUnit");
+        verify(repository).page(CRITERIA);
+    }
+
+    @Test
+    void demoCanReadCommentWithoutAuditFields() {
+        when(repository.page(CRITERIA))
+                .thenReturn(new AdminCommentPage(List.of(item()), 1, 1, 20));
+
+        AdminCommentPageResult.Item result = service.page(
+                principal("DEMO"), QUERY).records().get(0);
+
+        assertThat(result.authorEmail()).isNull();
+        assertThat(result.authorIp()).isNull();
+        assertThat(result.authorUserAgent()).isNull();
+        assertThat(result.authorNickname()).isEqualTo("TYB");
+        assertThat(result.contentMd()).isEqualTo("hello");
+        verify(repository).page(CRITERIA);
+    }
+
+    private static AuthenticatedPrincipal principal(String role) {
+        return new AuthenticatedPrincipal(
+                "1001",
+                role.toLowerCase(),
+                List.of(role));
     }
 
     private static AdminCommentPageItem item() {
