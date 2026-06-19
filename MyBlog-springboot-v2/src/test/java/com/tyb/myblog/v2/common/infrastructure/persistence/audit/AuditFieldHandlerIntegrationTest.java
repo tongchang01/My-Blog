@@ -39,6 +39,9 @@ import static org.assertj.core.api.Assertions.assertThat;
                 );
                 """
 })
+@Sql(
+        statements = "drop table if exists t_audit_update_test",
+        executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class AuditFieldHandlerIntegrationTest {
 
     @Autowired
