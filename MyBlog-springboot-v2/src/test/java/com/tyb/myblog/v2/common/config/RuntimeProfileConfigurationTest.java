@@ -59,6 +59,34 @@ class RuntimeProfileConfigurationTest {
                 .isEqualTo("health");
     }
 
+    @Test
+    void profilesDeclareOnlyAdditionalPublicEndpoints() throws Exception {
+        PropertySource<?> application = load("application.yml");
+        PropertySource<?> local = load("application-local.yml");
+        PropertySource<?> test = load("application-test.yml");
+
+        assertThat(application.getProperty(
+                "myblog.security.public-endpoints[3].path"))
+                .isEqualTo("/api/public/site-config");
+        assertThat(application.getProperty(
+                "myblog.security.public-endpoints[9].path"))
+                .isEqualTo("/api/public/articles/*/comments");
+        assertThat(application.getProperty(
+                "myblog.security.public-endpoints[10].path"))
+                .isEqualTo("/api/public/guestbook/comments");
+
+        assertThat(local.getProperty(
+                "myblog.security.public-endpoints[0].path")).isNull();
+        assertThat(test.getProperty(
+                "myblog.security.public-endpoints[0].path")).isNull();
+        assertThat(local.getProperty(
+                "myblog.security.additional-public-endpoints[0].path"))
+                .isEqualTo("/api/public/security-probe");
+        assertThat(test.getProperty(
+                "myblog.security.additional-public-endpoints[5].path"))
+                .isEqualTo("/media/**");
+    }
+
     private PropertySource<?> load(String resourceName) throws Exception {
         List<PropertySource<?>> propertySources = loader.load(
                 resourceName,

@@ -25,7 +25,7 @@ class BackendPropertiesTest {
 
     @Test
     void bindsPublicEndpoints() {
-        assertThat(securityProperties.publicEndpoints())
+        assertThat(securityProperties.allPublicEndpoints())
                 .extracting(
                         SecurityPublicEndpointProperties.PublicEndpoint::method,
                         SecurityPublicEndpointProperties.PublicEndpoint::path)

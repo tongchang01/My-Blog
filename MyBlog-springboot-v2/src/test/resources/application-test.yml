@@ -48,33 +48,7 @@ myblog:
       login-max-attempts: 5
       login-cooldown: 10m
       bcrypt-strength: 10
-    public-endpoints:
-      - method: GET
-        path: /actuator/health
-      - method: POST
-        path: /api/auth/login
-      - method: POST
-        path: /api/auth/refresh
-      - method: GET
-        path: /api/public/site-config
-      - method: GET
-        path: /api/public/friend-links
-      - method: GET
-        path: /api/public/categories
-      - method: GET
-        path: /api/public/tags
-      - method: GET
-        path: /api/public/articles
-      - method: GET
-        path: /api/public/articles/**
-      - method: POST
-        path: /api/public/articles/*/comments
-      - method: GET
-        path: /api/public/guestbook/comments
-      - method: POST
-        path: /api/public/guestbook/comments
-      - method: POST
-        path: /api/public/stats/page-views
+    additional-public-endpoints:
       - method: GET
         path: /api/public/security-probe
       - method: GET
