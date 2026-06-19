@@ -39,7 +39,8 @@ public record AdminArticleDetailResult(
 
     public static AdminArticleDetailResult from(
             AdminArticleDetail detail,
-            String coverUrl) {
+            String coverUrl,
+            boolean includeBody) {
         return new AdminArticleDetailResult(
                 detail.id(),
                 detail.titleZh(),
@@ -48,7 +49,7 @@ public record AdminArticleDetailResult(
                 detail.summaryZh(),
                 detail.summaryJa(),
                 detail.summaryEn(),
-                detail.body(),
+                includeBody ? detail.body() : null,
                 detail.categoryId(),
                 detail.categoryNameZh(),
                 detail.authorId(),

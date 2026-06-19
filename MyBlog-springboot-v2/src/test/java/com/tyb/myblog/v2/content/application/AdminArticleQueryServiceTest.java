@@ -16,6 +16,8 @@ import com.tyb.myblog.v2.system.application.attachment.AttachmentReferenceServic
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -78,7 +80,10 @@ class AdminArticleQueryServiceTest {
     @Test
     void returnsDetailWithoutPasswordHashAndWithCoverUrl() {
         when(repository.findActiveDetail(10L))
-                .thenReturn(Optional.of(detail(10L, 300L)));
+                .thenReturn(Optional.of(detail(
+                        10L,
+                        300L,
+                        ArticleStatus.PASSWORD)));
         when(attachmentService.resolvePublicUrls(Set.of(300L)))
                 .thenReturn(Map.of(300L, "https://cdn.example.com/c.png"));
 
@@ -89,6 +94,46 @@ class AdminArticleQueryServiceTest {
         assertThat(result.coverUrl())
                 .isEqualTo("https://cdn.example.com/c.png");
         assertThat(result.tagIds()).containsExactly(20L, 30L);
+    }
+
+    @Test
+    void adminCanReadBodyForEveryArticleStatus() {
+        for (ArticleStatus status : ArticleStatus.values()) {
+            long id = 100L + status.databaseValue();
+            when(repository.findActiveDetail(id))
+                    .thenReturn(Optional.of(detail(id, null, status)));
+
+            assertThat(service.adminDetail(
+                    principal("ADMIN"), id).body())
+                    .as(status.name())
+                    .isEqualTo("正文");
+        }
+    }
+
+    @Test
+    void demoCanReadPublishedBody() {
+        when(repository.findActiveDetail(10L))
+                .thenReturn(Optional.of(detail(
+                        10L,
+                        null,
+                        ArticleStatus.PUBLISHED)));
+
+        assertThat(service.adminDetail(
+                principal("DEMO"), 10L).body())
+                .isEqualTo("正文");
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = ArticleStatus.class,
+            names = {"DRAFT", "PRIVATE", "PASSWORD", "SCHEDULED"})
+    void demoCannotReadNonPublishedBody(ArticleStatus status) {
+        when(repository.findActiveDetail(10L))
+                .thenReturn(Optional.of(detail(10L, null, status)));
+
+        assertThat(service.adminDetail(
+                principal("DEMO"), 10L).body())
+                .isNull();
     }
 
     @Test
@@ -187,7 +232,10 @@ class AdminArticleQueryServiceTest {
                 1001L);
     }
 
-    private AdminArticleDetail detail(long id, Long coverId) {
+    private AdminArticleDetail detail(
+            long id,
+            Long coverId,
+            ArticleStatus status) {
         return new AdminArticleDetail(
                 id,
                 "标题",
@@ -201,7 +249,7 @@ class AdminArticleQueryServiceTest {
                 "分类",
                 1001L,
                 "article-" + id,
-                ArticleStatus.PASSWORD,
+                status,
                 NOW.minusDays(1),
                 coverId,
                 null,

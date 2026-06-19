@@ -9,6 +9,7 @@ import com.tyb.myblog.v2.content.domain.article.AdminArticleCriteria;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePage;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
+import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentReferenceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,12 @@ public class ArticleQueryService {
                 : attachmentService.resolvePublicUrls(
                         Set.of(detail.coverAttachmentId()))
                 .get(detail.coverAttachmentId());
-        return AdminArticleDetailResult.from(detail, coverUrl);
+        boolean includeBody = principal.roles().contains("ADMIN")
+                || detail.status() == ArticleStatus.PUBLISHED;
+        return AdminArticleDetailResult.from(
+                detail,
+                coverUrl,
+                includeBody);
     }
 
     private void validateQuery(AdminArticleQuery query) {

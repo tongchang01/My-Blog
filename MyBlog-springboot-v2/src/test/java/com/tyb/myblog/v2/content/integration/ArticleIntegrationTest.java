@@ -101,6 +101,23 @@ class ArticleIntegrationTest {
                                 .withNano(0)
                                 .toString()))).at("/data/id").asLong();
 
+        mockMvc.perform(get("/api/admin/articles/{id}", publishedId)
+                        .header("Authorization", bearer(demo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.body").value("正文"));
+        mockMvc.perform(get("/api/admin/articles/{id}", passwordId)
+                        .header("Authorization", bearer(demo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.body").value((Object) null));
+        mockMvc.perform(get("/api/admin/articles/{id}", scheduledId)
+                        .header("Authorization", bearer(demo)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.body").value((Object) null));
+        mockMvc.perform(get("/api/admin/articles/{id}", passwordId)
+                        .header("Authorization", bearer(admin)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.body").value("正文"));
+
         assertThat(hash(passwordId)).startsWith("$2");
         mockMvc.perform(get("/api/admin/articles")
                         .header("Authorization", bearer(demo)))
