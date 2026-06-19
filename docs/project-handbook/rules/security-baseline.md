@@ -59,6 +59,8 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 
 ## 4. PASSWORD 文章访问 Token（独立 Token 体系）
 
+> 本节描述上线后目标方案。首版不提供 `/api/public/articles/{id}/unlock`、Article Access Token 或 PASSWORD 评论授权；公开详情、评论读取和评论提交固定返回 `403 + 10003`。
+
 | 项 | Access Token | Article Access Token |
 |---|---|---|
 | `typ` claim | `"access"` | `"article_access"` |
@@ -97,12 +99,12 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 |---|---|
 | `/api/public/**` | permitAll |
 | `/api/auth/**` | permitAll |
-| `/api/admin/** GET` | hasAnyRole('ADMIN','DEMO')；敏感读单独标 hasRole('ADMIN') |
+| `/api/admin/** GET` | hasAnyRole('ADMIN','DEMO')；application 层按角色裁剪敏感字段 |
 | `/api/admin/** POST/PUT/DELETE/PATCH` | hasRole('ADMIN')（DEMO 写必返 403） |
 
 🔴 DEMO 写权限：DEMO 视为"普通访客 + 后台只读"，写操作必须靠 `@PreAuthorize("hasRole('ADMIN')")` 后端强制拒绝，**不能只靠前端隐藏按钮**。
 
-🔴 敏感读：凡涉及 ADMIN 专属内容的 GET（PRIVATE/草稿正文、评论审计字段等）必须单独 `@PreAuthorize("hasRole('ADMIN')")`。
+🔴 敏感读：公开 DEMO 账号不得获得未公开文章正文或评论审计字段。允许 DEMO 读取的后台 GET 必须在 application 层返回字段级裁剪结果，Controller、Web mapping 和 Repository 不得各自重复判断角色。
 
 ## 7. 登录流程与审计
 
@@ -139,7 +141,7 @@ proxy_set_header X-Real-IP $remote_addr;
 | 接口 | 限制 | 超限响应 |
 |---|---|---|
 | `POST /api/auth/login` | 同 IP + 同 username 5 次/10 分钟冷却 | 429 + `90002` |
-| `POST /api/public/articles/{id}/unlock` | 同 IP + 同 article 5 次/10 分钟冷却 | 429 + `90002` |
+| `POST /api/public/articles/{id}/unlock`（上线后目标） | 同 IP + 同 article 5 次/10 分钟冷却 | 429 + `90002` |
 | `POST /api/public/articles/{id}/comments` | 同 IP 1 分钟 5 条 + 5 分钟内同 IP+同文章重复 content 拒绝 | 429 + `30002` |
 | 附件上传 | 仅 ADMIN，不限流 | — |
 

@@ -49,7 +49,7 @@
 | #18 字体策略 | CSS `:lang()` 分层 + Noto Sans 全家桶 |
 | #19 翻译工作流 | DeepL 打底 + Qiita 术语 + 人工校对 + 术语表 |
 | 鉴权 | `/api/public/**` permitAll；`/api/admin/**` 读 ADMIN+DEMO，写仅 ADMIN |
-| DEMO 视角 | **DEMO 视为普通访客 + 后台只读**；凡 ADMIN 专属内容（PRIVATE 正文 / 草稿正文 / 评论审计字段等），DEMO 不可见 |
+| DEMO 视角 | **DEMO 是公开演示账号 + 后台只读**；后台 GET 保持可读，由 application 层裁剪未公开正文和评论审计字段 |
 
 ---
 
@@ -112,16 +112,16 @@ R6 C1 JWT 撤销设计依赖：
   |---|---|---|
   | `/api/public/**` | `permitAll()` | 前台游客读公开内容（文章列表/详情/分类/标签/评论读取/友链等） |
   | `/api/auth/**` | `permitAll()` | 登录 / 刷新 / 登出 |
-  | `/api/admin/** GET` | 默认 `hasAnyRole('ADMIN','DEMO')`；**敏感读接口单独标注 `hasRole('ADMIN')`** | 后台读 |
+  | `/api/admin/** GET` | `hasAnyRole('ADMIN','DEMO')`；application 层按角色裁剪敏感字段 | 后台读 |
   | `/api/admin/** POST/PUT/DELETE/PATCH` | `hasRole('ADMIN')` | 后台写 |
 
 - **写接口红线**：DEMO 视为"普通访客 + 后台只读"，写操作不能只靠前端隐藏按钮，后端注解级强制拒绝（`@PreAuthorize("hasRole('ADMIN')")` 是写接口唯一闸门，DEMO 调到必返 403）
-- **敏感读红线**：凡涉及 ADMIN 专属内容的 GET 接口（PRIVATE/草稿正文、评论审计字段、评论管理页等），**必须单独 `@PreAuthorize("hasRole('ADMIN')")`，不得套用默认后台读规则**
-- **DEMO 权限原则**：DEMO 视为"**普通访客 + 后台只读**"，凡 ADMIN 专属内容 DEMO 一律不可见。典型 ADMIN 专属：
-  - PRIVATE 文章正文 / 草稿正文
-  - 评论审计字段（`author_email` / `author_ip` / `author_user_agent`）
-  - 评论管理页（待审/隐藏 tab 涉及审计字段）
-  - 用户管理 / 站点配置敏感字段（如有）
+- **敏感读红线**：公开 DEMO 账号不得获得未公开文章正文或评论审计字段。允许 DEMO 读取的后台 GET 必须由 application 层返回字段级裁剪结果，Controller、Web mapping 和 Repository 不得各自重复判断角色。
+- **DEMO 权限原则**：DEMO 是公开演示账号，后台 GET 端点保持可读，但响应必须按角色裁剪：
+  - PUBLISHED 文章正文可见；DRAFT、PRIVATE、PASSWORD、SCHEDULED 的 `body` 返回 `null`
+  - 评论管理列表可见；`authorEmail`、`authorIp`、`authorUserAgent` 返回 `null`
+  - ADMIN 保持完整读取；同一端点不为 DEMO 复制 Controller、Repository 或 SQL
+  - 用户管理 / 站点配置如新增敏感字段，必须单独定义字段级规则
 - **前端**：DEMO 登录时禁用/隐藏写按钮 + 顶部 banner "Demo 只读模式"（防呆）
 - **README**：明示 demo 凭证（如 `demo / demo123`），作为作品集演示入口
 - **关于"RBAC"叙事**：README / Showcase 不要包装成"完整 RBAC"。准确说法："**基于账号类型的最小权限控制**"。V2 不实现动态 RBAC；未来需要多角色时，再拆 `t_role / t_user_role / t_permission`。
@@ -326,6 +326,8 @@ Sitemap: https://blog.example.com/sitemap.xml
 
 **PASSWORD 校验流程**（关键）：
 
+> 以下为上线后目标方案；首版不提供 `/unlock`、article access token 或 PASSWORD 评论授权，当前边界以 BR-204A 和 API 契约为准。
+
 1. 用户在前端输入明文密码
 2. 前端通过 HTTPS 把明文密码传到后端
 3. 后端用 `BCrypt.matches(rawPassword, storedHash)` 校验
@@ -510,7 +512,7 @@ WHERE status = 5
   - 异步用 Spring `@Async`，不引 MQ
 - **回收站**：所有业务表后台统一"回收站"入口，按 `deleted_at desc` 排；**只支持查看 / 恢复，不提供后台彻底删除按钮**。物理删除仅限运维手动 SQL，执行前必须确认关联数据（评论、附件、标签关联等）
 - **评论审计字段**：`t_comment` 带 `author_ip VARCHAR(45)` + `author_user_agent VARCHAR(512)`，审计用不展示
-- **评论审计页权限**：评论管理页（含审计字段 `author_email` / `author_ip` / `author_user_agent`）**仅 ADMIN 可访问**，DEMO 不可见（与 Q3 决定一致）
+- **评论审计字段权限**：评论管理页对 ADMIN / DEMO 均可读；ADMIN 获得完整 `author_email` / `author_ip` / `author_user_agent`，DEMO 对应响应字段为 `null`
 - **评论数量缓存**：`t_article.comment_count INT NOT NULL DEFAULT 0` 冗余列；评论入库为 PASS / 审核 PENDING→PASS / 软删 / 隐藏 / 恢复 时，service 层在同事务内 +1 或 -1（不靠触发器）；只统计 `deleted=0 AND audit_status=PASS` 的评论；列表/卡片直接读这列，避免 N 次 count(*)
 
 ---
@@ -766,6 +768,8 @@ KEY idx_user (user_id)
 
 ### PASSWORD 文章会话策略
 
+> 本节是上线后目标方案。首版不提供 `/unlock`、article access token 或 PASSWORD 评论授权；公开详情和评论固定返回 `403 + 10003`。
+
 **签发短期专用 token**：
 
 - `/api/public/articles/{id}/unlock POST` body 含明文密码
@@ -834,7 +838,7 @@ KEY idx_user (user_id)
 | 接口 | 限制 |
 |---|---|
 | 登录 `/api/auth/login` | 同 IP + 同 username 5 次/10 分钟冷却（pitfalls U-004） |
-| PASSWORD 解锁 `/api/public/articles/{id}/unlock` | 同 IP + 同 article 5 次/10 分钟冷却（R3 #8 已定） |
+| PASSWORD 解锁 `/api/public/articles/{id}/unlock`（上线后目标） | 同 IP + 同 article 5 次/10 分钟冷却（R3 #8 已定） |
 | 评论提交 `/api/public/articles/{id}/comments` | 同 IP 1 分钟 5 条 + 5 分钟内同 IP+同文章重复 content 拒绝（R4 #12-P0 已定） |
 | 附件上传 | 仅 ADMIN，不限流 |
 

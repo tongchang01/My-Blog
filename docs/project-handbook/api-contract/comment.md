@@ -82,7 +82,10 @@
   - `includeDeleted`：默认 `false`
   - `page`、`size`
 - 成功：`200 + ApiResponse<PageResponse<AdminCommentPageItemVO>>`
-- 后台响应包含邮箱、IP、UA 与 `contentMd`，仅供管理审计使用。
+- 字段权限：
+  - ADMIN：`authorEmail`、`authorIp`、`authorUserAgent` 返回完整审计值。
+  - DEMO：上述三个字段保留在响应中，但固定为 `null`。
+  - 两种角色均可读取昵称、站点、`contentMd`、`contentHtml`、审核状态和时间字段。
 
 ### 写操作
 

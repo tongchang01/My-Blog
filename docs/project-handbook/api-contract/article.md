@@ -58,6 +58,15 @@
 
 响应 `data` 包含文章完整三语标题、摘要、正文、分类、标签、封面附件、状态和发布时间字段，但不包含 `passwordHash`。
 
+角色字段规则：
+
+| 状态 | ADMIN `body` | DEMO `body` |
+|---|---|---|
+| PUBLISHED | 完整正文 | 完整正文 |
+| DRAFT / PRIVATE / PASSWORD / SCHEDULED | 完整正文 | `null` |
+
+`body` 字段始终存在；DEMO 无权读取时返回 JSON `null`，不省略字段。任何角色均不得获得密码或 `passwordHash`。
+
 ## 新建文章
 
 `POST /api/admin/articles`
@@ -140,7 +149,7 @@
 `GET /api/public/articles/{id}?lang=zh`
 
 - `PUBLISHED`：返回当前语言标题、摘要、正文、分类、标签、封面和发布时间。
-- `PASSWORD`：当前阶段不开放解锁接口，详情返回 `403`。
+- `PASSWORD`：首版不开放解锁接口，详情返回 `403 + 10003`；完整解锁链路位于上线后增量。
 - `DRAFT`、`SCHEDULED`、已删除或不存在：返回 `404`。
 
 ## OpenAPI 守护
