@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -41,6 +42,9 @@ class StatsIntegrationTest {
 
     @Autowired
     private PageViewDailyRebuildService rebuildService;
+
+    @Autowired
+    private Clock clock;
 
     @BeforeEach
     void resetState() {
@@ -78,7 +82,7 @@ class StatsIntegrationTest {
         }
         assertThat(rawCount()).isEqualTo(acceptedRows);
 
-        LocalDate date = LocalDate.of(2026, 6, 18);
+        LocalDate date = LocalDate.now(clock);
         rebuildService.rebuild(date);
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT pv FROM t_page_view_daily "
