@@ -13,7 +13,7 @@ public final class UserAgentResolver {
     /**
      * User-Agent 最大入库长度。
      *
-     * <p>当前限制为 255，避免旧库或审计表字段长度较短时被异常请求撑爆。</p>
+     * <p>与当前登录和评论审计字段上限保持一致，同时避免异常请求头放大数据库写入。</p>
      */
     private static final int MAX_LENGTH = 255;
 

@@ -8,11 +8,11 @@
 本仓库正在进行 **MyBlog 全量重构（V2）**，三端 + 数据库 + 业务逻辑全部重设计。
 
 - **V1**：`MyBlog-springboot/` + `MyBlog-vue/MyBlog-blog/` + `MyBlog-vue/MyBlog-admin/` — 在线运行中，**仅作业务参考，不要修改**
-- **V2 后端**：`MyBlog-springboot-v2/` — 架构骨架已搭，业务待按新 schema 重写
-- **V2 前台 / 后台**：待启动；规格分别在 `frontend-user/` 和 `frontend-admin/`
+- **V2 后端**：`MyBlog-springboot-v2/` — 六个业务模块已完成第一版，当前进入审查问题修复与前端联调支持
+- **V2 前台 / 后台**：进入 M4 前端工程骨架与接口联调阶段；规格分别在 `frontend-user/` 和 `frontend-admin/`
 - **数据**：V2 不兼容 V1 schema（ADR-0013），一次性导入（见 `migration/`）
 
-当前阶段：**M3 模块重建**。业务规格、14 张表 schema、Flyway `V1__init.sql`、M1 清理、M2 基础设施和 M3 准入复核均已完成；下一步从 identity 后台登录最小纵向切片开始，详见 `status.md` / `roadmap.md` / `m3-preflight-review.md`。
+当前阶段：**M4 前端骨架与后端联调准备**。M3 六个后端模块第一版已经完成并通过 H2/MySQL 回归；当前先处理发布前审查确认的联调阻塞项，再进入前台与后台工程骨架，详见 `status.md` / `roadmap.md` / `docs/superpowers/reviews/2026-06-18-backend-v2-release-review.md`。
 
 ## 二、开始任何任务前必读
 
@@ -100,9 +100,9 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local   # 本地启动
 
 ## 十、当前焦点
 
-- **进行中**：M3 模块重建准备已完成
-- **下一步**：identity 后台登录最小纵向切片，按 domain → infrastructure → application → web → 测试拆分提交
-- **并行待启动**：`api-contract/` 接口契约、`frontend-user/` 与 `frontend-admin/` 规格
+- **进行中**：修复后端发布前审查确认的联调阻塞与测试隔离问题
+- **下一步**：启动 M4 前端工程骨架，优先联调登录、公开站点配置和非 PASSWORD 文章链路
+- **后续裁决**：PASSWORD 解锁、DEMO 敏感字段和 Web → Domain 边界单独设计，不在联调修复中顺带改变
 
 ## 十一、文档地图
 

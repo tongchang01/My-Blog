@@ -2,7 +2,7 @@
 
 > 本文档回答："这条 SQL 该写在哪？用 BaseMapper、`@Select` 注解，还是 XML？"
 > 适用范围：V2 所有持久层代码。
-> 相关 ADR：`../decisions/0005-mybatis-plus-as-orm.md`、`../decisions/0010-sql-placement.md`
+> 相关 ADR：`../decisions/0005-mybatis-plus-as-primary-orm.md`、`../decisions/0010-sql-placement-strategy.md`
 
 ## 1. 总原则
 

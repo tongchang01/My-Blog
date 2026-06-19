@@ -105,7 +105,7 @@ identity.application PersistentAccessTokenVerifier ── implements AccessToken
 
 ## 6. 状态
 
-**当前 V2 实现状态**：顶级 `infrastructure` 已删除，公共数据库基础设施归入 `common.infrastructure`；当前已建立 `common` 与 identity 安全基座，其余业务模块按 M3 小步重建。
+**当前 V2 实现状态**：顶级 `infrastructure` 已删除，公共数据库基础设施归入 `common.infrastructure`；`common`、`identity`、`content`、`comment`、`system`、`stats` 六个模块第一版均已建立。发布前审查确认的架构规则缺口按独立批次处理，不改变本节的模块完成状态。
 
 ## 7. 相关文档
 

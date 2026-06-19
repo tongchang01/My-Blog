@@ -3,7 +3,7 @@
 > 本文档回答："什么必须写测试？用什么框架？怎么跑？"
 > 适用范围：V2 所有代码。
 > 当前测试文件：164 份（含架构守护测试）
-> 最近全量结果：612 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试。
+> 最近全量结果：615 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试。
 
 ## 1. 测试技术栈
 
@@ -100,8 +100,8 @@ mvn test -Dtest=ArchitectureRulesTest    # 单跑架构守护
 | 架构守护 | 2 | ✅ 已启用 |
 
 **已知缺测**：
-- `CommentCommandService` 集成测试
-- `AdminCommentCommandService` 集成测试
+- `AdminCommentCommandService` 真实 HTTP/事务集成测试
 - 评论软删除 → 恢复完整链路测试
+- local Profile 与基础公开端点合并后的真实启动回归
 
 详见 `../pitfalls.md` 与 `../arch/README.md` 中的待办。
