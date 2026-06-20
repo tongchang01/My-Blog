@@ -33,6 +33,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 class PublicArticleControllerTest {
 
+    private static final long ARTICLE_ID = 9_007_199_254_740_993L;
+    private static final long CATEGORY_ID = 9_007_199_254_740_994L;
+    private static final long TAG_ID = 9_007_199_254_740_995L;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -56,6 +60,12 @@ class PublicArticleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records[0].title")
                         .value("标题"))
+                .andExpect(jsonPath("$.data.records[0].id")
+                        .value(Long.toString(ARTICLE_ID)))
+                .andExpect(jsonPath("$.data.records[0].categoryId")
+                        .value(Long.toString(CATEGORY_ID)))
+                .andExpect(jsonPath("$.data.records[0].tags[0].id")
+                        .value(Long.toString(TAG_ID)))
                 .andExpect(jsonPath("$.data.records[0].locked")
                         .value(true))
                 .andExpect(jsonPath("$.data.records[0].status")
@@ -69,13 +79,19 @@ class PublicArticleControllerTest {
     @Test
     void returnsPublishedDetailAndMapsPasswordToForbidden()
             throws Exception {
-        when(queryService.detail(100L, "zh"))
+        when(queryService.detail(ARTICLE_ID, "zh"))
                 .thenReturn(detail());
         when(queryService.detail(101L, "zh"))
                 .thenThrow(new ApiException(ApiErrorCode.FORBIDDEN));
 
-        mockMvc.perform(get("/api/public/articles/100"))
+        mockMvc.perform(get("/api/public/articles/{id}", ARTICLE_ID))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id")
+                        .value(Long.toString(ARTICLE_ID)))
+                .andExpect(jsonPath("$.data.categoryId")
+                        .value(Long.toString(CATEGORY_ID)))
+                .andExpect(jsonPath("$.data.tags[0].id")
+                        .value(Long.toString(TAG_ID)))
                 .andExpect(jsonPath("$.data.body").value("正文"))
                 .andExpect(jsonPath("$.data.status").doesNotExist())
                 .andExpect(jsonPath("$.data.coverAttachmentId")
@@ -86,40 +102,40 @@ class PublicArticleControllerTest {
         mockMvc.perform(get("/api/public/articles/101"))
                 .andExpect(status().isForbidden());
 
-        verify(queryService).detail(100L, "zh");
+        verify(queryService).detail(ARTICLE_ID, "zh");
     }
 
     private PublicArticlePageResult.Item pageItem() {
         return new PublicArticlePageResult.Item(
-                100L,
+                ARTICLE_ID,
                 "标题",
                 "摘要",
-                10L,
+                CATEGORY_ID,
                 "分类",
                 "article",
                 LocalDateTime.of(2026, 6, 15, 10, 0),
                 "https://cdn.example.com/c.png",
                 2,
                 List.of(new PublicArticleTagResult(
-                        20L, "标签", "tag")),
+                        TAG_ID, "标签", "tag")),
                 LocalDateTime.of(2026, 6, 15, 9, 0),
                 true);
     }
 
     private PublicArticleDetailResult detail() {
         return new PublicArticleDetailResult(
-                100L,
+                ARTICLE_ID,
                 "标题",
                 "摘要",
                 "正文",
-                10L,
+                CATEGORY_ID,
                 "分类",
                 "article",
                 LocalDateTime.of(2026, 6, 15, 10, 0),
                 "https://cdn.example.com/c.png",
                 2,
                 List.of(new PublicArticleTagResult(
-                        20L, "标签", "tag")),
+                        TAG_ID, "标签", "tag")),
                 LocalDateTime.of(2026, 6, 15, 9, 0),
                 LocalDateTime.of(2026, 6, 15, 11, 0),
                 false);

@@ -162,6 +162,26 @@
 - `PASSWORD`：首版不开放解锁接口，详情返回 `403 + 10003`；完整解锁链路位于上线后增量。
 - `DRAFT`、`SCHEDULED`、已删除或不存在：返回 `404`。
 
+## 公开接口 ID 精度约定
+
+- `GET /api/public/articles` 与 `GET /api/public/articles/{id}` 响应中的文章 `id`、`categoryId` 和标签 `id` 均使用 JSON string。
+- 该约定用于避免 Java `long` 超出 JavaScript 安全整数范围后发生精度丢失；路径参数和后端内部模型仍使用 `long`。
+- 可空的 `categoryId` 没有关联分类时返回 JSON `null`，不得返回空字符串。
+
+```json
+{
+  "id": "9007199254740993",
+  "categoryId": "9007199254740994",
+  "tags": [
+    {
+      "id": "9007199254740995",
+      "name": "Java",
+      "slug": "java"
+    }
+  ]
+}
+```
+
 ## OpenAPI 守护
 
 测试必须保证 OpenAPI 文档暴露的是契约 DTO，而不是内部 Entity、Mapper、Command 内部标记或密码 hash 字段。

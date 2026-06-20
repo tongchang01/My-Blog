@@ -72,6 +72,18 @@ class ArticleOpenApiTest {
                 .fieldNames()).toIterable()
                 .contains("updatedAt")
                 .doesNotContain("status", "coverAttachmentId");
+        assertThat(root.at(
+                        "/components/schemas/PublicArticlePageItemVO/properties/id/type")
+                .asText()).isEqualTo("string");
+        assertThat(root.at(
+                        "/components/schemas/PublicArticlePageItemVO/properties/categoryId/type")
+                .asText()).isEqualTo("string");
+        assertThat(root.at(
+                        "/components/schemas/PublicArticleDetailVO/properties/id/type")
+                .asText()).isEqualTo("string");
+        assertThat(root.at(
+                        "/components/schemas/PublicArticleTagVO/properties/id/type")
+                .asText()).isEqualTo("string");
     }
 
     private void assertMethods(
