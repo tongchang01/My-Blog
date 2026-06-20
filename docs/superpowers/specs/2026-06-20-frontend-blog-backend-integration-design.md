@@ -135,7 +135,7 @@ typed defaults
 GET /api/public/articles?page={page}&size={size}&lang={lang}
 ```
 
-首批固定 `size=12`。mapper 将后端 `records/total/page/size/pages` 映射为首页分页 ViewModel，并将文章项映射为卡片所需字段。页面不再依赖 Aurora 的 `PostList` 构造器。
+首批固定 `size=12`。后端当前分页响应只包含 `records/total/page/size`，mapper 根据 `Math.ceil(total / size)` 计算总页数并映射为首页分页 ViewModel，同时将文章项映射为卡片所需字段。页面不再依赖 Aurora 的 `PostList` 构造器。
 
 文章详情调用：
 
@@ -143,7 +143,7 @@ GET /api/public/articles?page={page}&size={size}&lang={lang}
 GET /api/public/articles/{id}?lang={lang}
 ```
 
-详情 ViewModel 包含标题、摘要、正文、分类、标签、封面、发布时间、创建/更新时间、slug 和锁定状态所需语义。Markdown 渲染安全策略不在本批次扩大；详情先沿用现有可信作者内容渲染链路，评论仍禁止直接渲染 `content_md`。
+详情 ViewModel 包含标题、摘要、正文、分类、标签、封面、发布时间、创建/更新时间、slug 和锁定状态所需语义。后端 `body` 是 Markdown 原文，当前 Aurora 页面没有可复用的 Markdown 渲染管线，因此本批次引入 `markdown-it`：禁用原始 HTML，启用基础 CommonMark 渲染和 linkify，并为外链补充安全属性。不在首批支持 Mermaid、KaTeX、MathJax 或自定义 HTML。评论仍禁止直接渲染 `content_md`，后续只消费后端清洗后的 `content_html`。
 
 ## 8. 三语与路由
 
@@ -225,6 +225,7 @@ HTTP client 只提供结构化错误，具体文案和交互由 feature/store/pa
 
 - id-led 路由与 canonical slug。
 - 详情 DTO、ViewModel、mapper、store。
+- 安全 Markdown 渲染器及其单元测试。
 - PASSWORD、404、网络失败状态。
 
 每个批次独立验证并使用一个或多个单一目的中文提交；不得把分类、评论或后台工程顺带带入。
@@ -233,7 +234,7 @@ HTTP client 只提供结构化错误，具体文案和交互由 feature/store/pa
 
 ### 12.1 自动验证
 
-- Vitest：语言选择与回退、ApiResponse 解包、错误分类、JST 解析、站点配置合并、文章列表/详情 mapper。
+- Vitest：语言选择与回退、ApiResponse 解包、错误分类、JST 解析、站点配置合并、文章列表/详情 mapper 和 Markdown 安全渲染。
 - Store 测试：加载、空数据、失败、取消旧请求和重试状态。
 - 后端测试：以超过 JavaScript 安全整数的 ID 验证公开文章列表与详情响应中的业务 ID 均为 JSON string。
 - `pnpm lint`。
