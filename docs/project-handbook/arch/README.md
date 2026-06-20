@@ -15,7 +15,7 @@
 | 文件 | 内容 |
 |------|------|
 | `module-map.md` | 六大模块边界、依赖方向、ArchUnit 守护规则一览 |
-| `persistence-strategy.md` | ORM 现状（JdbcTemplate 与 MyBatis-Plus 混用情况）+ 迁移目标 |
+| `persistence-strategy.md` | MyBatis-Plus、XML Mapper、Repository 与 Flyway 的当前策略 |
 | `auth-flow.md` | JWT 颁发/校验、登录流程、审计点 |
 | `request-flow.md` | 一个请求从 Controller 到 DB 的完整链路示例 |
 

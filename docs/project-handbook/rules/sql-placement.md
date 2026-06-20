@@ -25,7 +25,7 @@
 | 分页、排序、多条件组合 | **XML** | 后台管理列表尤其如此 |
 | 返回 projection DTO（不是 Entity） | **XML** | 优先 XML |
 | SQL 超过 10 行 | **XML** | 硬规则 |
-| 含旧库兼容逻辑、需中文注释 | **XML** | 注释更易写 |
+| 需要解释复杂业务口径 | **XML** | 注释与 SQL 放在一起 |
 
 ## 3. 审查口径
 
@@ -37,7 +37,7 @@
 4. 有分页排序
 5. 返回结果不是 Entity
 6. SQL 超过 10 行
-7. 需要解释旧库字段或状态含义
+7. 需要解释复杂业务筛选、聚合或排序口径
 
 ## 4. 禁止事项
 
@@ -46,7 +46,7 @@
 - ❌ Java 字符串拼接动态条件
 - ❌ Java 中手拼 `in (?,?,?)` 占位符
 - ❌ 后台管理列表写成超长 `@Select`
-- ❌ 新增生产代码引入 `JdbcTemplate`（遗留的按 `migrate-jdbc-to-mybatis-plus.md` 流程迁移）
+- ❌ 新增生产代码引入 `JdbcTemplate`
 
 ## 5. XML 命名与路径约定
 
@@ -67,9 +67,8 @@ Mapper 接口：
 
 复杂 SQL 必须写中文注释说明：
 - 服务于哪个业务场景
-- 涉及哪些旧表
-- 关键状态字段含义（如 `is_delete=0` 表示未删除）
-- 旧库兼容条件为何存在
+- 关键表和状态条件的业务含义
+- 聚合口径或排除条件为何存在
 - 排序规则为何这样写
 
 ## 7. 正反例
@@ -84,13 +83,12 @@ ArticleEntity findById(Long id);
 ### ✅ 正例：复杂多表查询用 XML
 
 ```xml
-<!-- 查询前台可见分类摘要。
-     旧库 t_article.is_delete=0 且 status=1 表示已发布。 -->
+<!-- 查询公开分类摘要；只统计已发布且未删除文章，空分类也保留。 -->
 <select id="listCategorySummaries" resultType="...CategorySummaryDTO">
   SELECT c.id, c.name, COUNT(a.id) AS article_count
   FROM t_category c
-  LEFT JOIN t_article a ON c.id = a.category_id AND a.is_delete = 0 AND a.status = 1
-  WHERE c.is_delete = 0
+  LEFT JOIN t_article a ON c.id = a.category_id AND a.deleted = 0 AND a.status = 2
+  WHERE c.deleted = 0
   GROUP BY c.id
   ORDER BY c.create_time DESC
 </select>

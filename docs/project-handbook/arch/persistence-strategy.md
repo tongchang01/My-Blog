@@ -1,15 +1,15 @@
 # 持久化策略
 
-> 本文档回答："数据怎么读写？现在的混用状况如何？目标是什么？"
+> 本文档回答："V2 当前如何读写数据？"
 > 适用范围：V2 所有持久层代码。
 > 相关 ADR：ADR-0005（MyBatis-Plus 为主）、ADR-0010（SQL 分层）
 
-## 1. 当前并存的两种 ORM
+## 1. 当前持久化技术
 
-| ORM | 用途 | 状态 |
+| 技术 | 用途 | 状态 |
 |-----|------|------|
-| **MyBatis-Plus 3.5.12** | V2 新写代码的主 ORM | ✅ 主推 |
-| **JdbcTemplate** | V1 遗留代码、少量过渡期使用 | ⚠️ 逐步替换 |
+| **MyBatis-Plus 3.5.12** | 单表访问、Mapper 基础能力 | ✅ 当前标准 |
+| **MyBatis XML** | join、动态条件、聚合、分页和 projection | ✅ 当前标准 |
 
 ## 2. MyBatis-Plus 使用规范
 
@@ -68,29 +68,12 @@ infrastructure.persistence.CommentRepositoryImpl  (用 Mapper 实现)
 `MYBLOG_DATASOURCE_URL`、`MYBLOG_DATASOURCE_USERNAME`、`MYBLOG_DATASOURCE_PASSWORD`
 注入，不提供 root、空密码或旧数据库名兜底。
 
-## 7. 与 V1 的关系（已转向全量重设计）
+## 7. V1 数据迁移边界
 
-⚠️ **本节策略已变更**。早期 V2 重构假设"兼容 V1 库结构"，现已确定走**全量重设计**：
+V2 运行时不依赖 V1 schema。一次性数据导入见 `../migration/`，决策原因见 ADR-0013；
+当前 Entity、SQL 和测试只表达 V2 schema。
 
-- V1 数据库结构仅作**参考**，不作兼容目标
-- 新 schema 在 `arch/schema-design.md` 单独定稿
-- V1 数据量极小（不到 20 篇文章），用一次性脚本导入即可，见 `migration/v1-data-import.md`
-- 取代该假设的决策见 ADR-0013（V2 不再兼容 V1 数据结构）
-
-历史遗留：已写的 Entity 中带有"旧库兼容"注释（如 `is_review` Integer 包装），在业务清空重写时一并清理。
-
-## 8. 旧实现盘点（不作为当前行动项）
-
-> ⚠️ **不是 TODO**。按 `status.md` / `roadmap.md` 当前主线，DDL 冻结前**停止修旧实现**，下表只用于"DDL 冻结后清理 / 重建"时回顾。
-
-| 项 | 描述 | 处置时机 |
-|----|------|------|
-| `ContentCatalogMapper` 含 @Select 长查询 | 应放到 XML mapper（rules/sql-placement.md） | M3 模块重建时按新规则重写 |
-| JdbcTemplate 与 MyBatis-Plus 并存 | V1 遗留 JdbcTemplate 残留 | M1 清理时随业务层一起删除 |
-| 尚无 `src/main/resources/mapper/` 目录 | 首个 XML mapper 落地时同步创建 | M3 第一个复杂查询出现时建 |
-| access token 撤销依赖进程内黑名单 | 已废弃；access token 通过 `token_version` 与用户状态比对失效，refresh token 使用数据库持久化 | 不再保留 `TokenRevocationStore`，也不规划 Redis 黑名单迁移 |
-
-## 9. 相关文档
+## 8. 相关文档
 
 - ADR：`../decisions/0005-mybatis-plus-as-primary-orm.md`、`../decisions/0010-sql-placement-strategy.md`
 - 规则：`../rules/sql-placement.md`

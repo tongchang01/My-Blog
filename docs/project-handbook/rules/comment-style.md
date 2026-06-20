@@ -20,27 +20,20 @@
 if (user == null) { }
 
 // ✅ 解释为什么
-// 旧库允许用户软删除后仍保留登录记录，此处空值表示账号已注销
-if (user == null) { }
+// 预检必须先于正文查询，避免 PASSWORD 文章正文进入应用内存
+if (access.status() == ArticleStatus.PASSWORD) { }
 ```
 
 ## 3. 必须写注释的地方
 
 | 类型 | 必写内容 |
 |------|---------|
-| Entity 类 | 对应表、业务用途、是否兼容旧库 |
-| Entity 字段 | 对应字段、中文含义、取值规则、是否可空 |
-| DTO/Command/Query/Response 类 + 字段 | 业务用途；Response 面向前端解释 |
-| Controller 类 | 接口归属、职责边界 |
-| Controller 公开方法 | 业务边界 |
-| ApplicationService 类 | 业务用例 |
-| ApplicationService 方法 | 流程、状态、权限 |
-| Domain Service / 领域规则方法 | 业务规则 |
-| Repository/Reader/Writer/Mapper 接口 | 查询/写入职责 |
-| Repository/Reader/Writer/Mapper 复杂方法 | 筛选条件说明 |
-| Enum 类 | 业务场景 |
-| Enum 值 | 中文含义（如确有历史含义需对照，可附在 ADR 而不在代码注释里铺陈）|
-| 配置类 + 字段 | 用途、默认值风险、生产环境要求 |
+| 公开 HTTP operation | `@Operation` 写面向调用方的业务动作与边界 |
+| 高风险 request/response 字段 | 权限、状态、时间、nullable、枚举、敏感字段使用 `@Schema` 说明契约 |
+| 业务规则与状态迁移 | 解释触发条件、不变量和拒绝原因 |
+| 事务与并发边界 | 解释锁、幂等、回滚或提交后动作的原因 |
+| 非直观 SQL | 解释业务筛选、聚合口径和排序理由 |
+| 安全与配置边界 | 解释信任来源、生产风险和失败策略 |
 
 ## 4. 必须写**行内注释**的业务场景
 
@@ -50,7 +43,8 @@ if (user == null) { }
 - 时间、过期、锁定、限流相关逻辑
 - 任何"看代码不知道为什么这么写"的特殊处理
 
-> 注：早期 V2 曾要求标注"旧库兼容字段"，现已转向全量重设计（ADR-0013），无需再为旧库语义写兼容注释。
+命名和结构已能准确表达的普通 DTO、Entity 字段、简单映射和样板方法不强制逐项
+注释。禁止为了满足数量而把代码逐句翻译成中文。
 
 ## 5. 禁止无意义注释
 
@@ -69,26 +63,25 @@ public void setName(String name) { }
 
 ```java
 /**
- * 审核状态，对应 {@code t_comment.is_review}。
+ * 公开评论审核状态。
  *
- * <p>旧库使用数字状态：{@code 0} 表示未审核，{@code 1} 表示已审核。
- * 业务层应优先转换为明确的枚举语义，避免在业务代码中散落魔法数字。</p>
+ * <p>只有 PASS 可在公开接口返回；PENDING 与 HIDDEN 均不计入公开评论总数。</p>
  */
-@TableField("is_review")
+@TableField("audit_status")
 private Integer reviewStatus;
 ```
 
 ## 7. OpenAPI 与 Javadoc 的关系
 
-- Javadoc 是代码可维护性的基础
-- OpenAPI（`@Schema(description=...)`）用于接口文档展示
-- **两者并存**：DTO/Command/Response 字段必须保留 Javadoc，再补 `@Schema`
-- `@Schema` 描述与 Javadoc 内容保持一致
+- Javadoc 解释代码内无法由命名表达的业务原因与边界。
+- 所有公开 HTTP operation 必须提供非空 `@Operation.summary`。
+- 权限、状态、时间、nullable、枚举和敏感 request/response 字段必须使用
+  `@Schema` 明确契约；普通自解释字段不机械补注解。
+- 两者同时存在时不得语义冲突。
 
 ## 8. 测试注释规则
 
 普通单元测试不强制写注释，**以下场景必须**说明业务场景：
-- 旧库兼容逻辑
 - 权限边界
 - 状态流转
 - 安全规则
@@ -105,17 +98,15 @@ void excludesDeletedCommentsFromPublicList() { ... }
 
 ## 9. 新增代码硬规则（强制）
 
-新增或修改的代码：
+新增或修改的代码必须覆盖：
 
-- 新增 Entity → 类注释 + 字段注释**全要**
-- 新增 DTO/Command/Query/Response → 类注释 + 字段注释**全要**
-- 新增 Controller 公开接口 → 业务边界注释
-- 新增 ApplicationService 公开方法 → 业务流程注释
-- 新增 Enum → 每个枚举值的中文含义
-- 新增 Mapper/Reader/Writer/Repository 复杂查询 → 筛选条件说明
-- 新增配置项 → 用途 + 生产风险
-- 涉及权限/审核/软删除/审计/限流/时间过期 → 行内注释
+- 公开 HTTP operation → 非空 `@Operation.summary`
+- 高风险 request/response 字段 → `@Schema` 明确契约
+- 复杂业务规则、状态迁移、事务/并发边界和非直观 SQL → 解释原因
+- 新增配置项 → 用途、默认行为与生产风险
+- 权限、审核、软删除、审计、限流、时间过期 → 在关键决策点说明原因
 
 ## 10. 不写注释的唯一前提
 
-仅当**命名和结构足以让维护者准确理解业务含义**时，方可省略注释。这是高门槛，默认还是写。
+当命名和结构足以让维护者准确理解业务含义，且不涉及上述强制场景时，可以省略
+注释。评审关注业务信息是否完整，不以注释数量为目标。

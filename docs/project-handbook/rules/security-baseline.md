@@ -102,7 +102,9 @@ V2 采用 **access token（无状态 JWT）+ refresh token（DB 存储）** 双 
 | `/api/admin/** GET` | hasAnyRole('ADMIN','DEMO')；application 层按角色裁剪敏感字段 |
 | `/api/admin/** POST/PUT/DELETE/PATCH` | hasRole('ADMIN')（DEMO 写必返 403） |
 
-🔴 DEMO 写权限：DEMO 视为"普通访客 + 后台只读"，写操作必须靠 `@PreAuthorize("hasRole('ADMIN')")` 后端强制拒绝，**不能只靠前端隐藏按钮**。
+🔴 DEMO 写权限：DEMO 视为"普通访客 + 后台只读"。写操作必须由后端可执行
+授权策略强制拒绝 DEMO，并由集成测试覆盖，**不能只靠前端隐藏按钮**。可使用
+SecurityFilterChain、方法级授权或 application 授权；若多层并存，必须保持语义一致。
 
 🔴 敏感读：公开 DEMO 账号不得获得未公开文章正文或评论审计字段。允许 DEMO 读取的后台 GET 必须在 application 层返回字段级裁剪结果，Controller、Web mapping 和 Repository 不得各自重复判断角色。
 

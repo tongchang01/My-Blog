@@ -42,7 +42,6 @@
 |------|-----|
 | 新增业务模块 | `workflows/add-new-module.md` |
 | 新增 API 接口 | `workflows/add-new-api.md` |
-| 把 JdbcTemplate 迁到 MyBatis-Plus | `workflows/migrate-jdbc-to-mybatis-plus.md` |
 | 新增数据库表 | `workflows/add-new-table.md` |
 | 构建与测试 | `workflows/build-and-test.md` |
 | 写 ADR | `workflows/write-adr.md` |

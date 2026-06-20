@@ -153,8 +153,9 @@ Content-Type: application/json
 ## 10. Knife4j / OpenAPI
 
 - 每个 Controller 类用 `@Tag(name="...", description="...")` 描述
-- 每个公开方法用 `@Operation(summary="...")` 描述
-- DTO 字段用 `@Schema(description="...")` 描述（中文，与 Javadoc 保持一致）
+- 每个公开 HTTP operation 用非空 `@Operation(summary="...")` 描述面向调用方的业务动作
+- 权限、状态、时间、nullable、枚举和敏感 request/response 字段用
+  `@Schema(description="...")` 明确契约；普通自解释字段不机械注解
 - 仅 `dev` / `test` profile 启用（详见 R7 D9）
 
 ## 11. 测试要求
