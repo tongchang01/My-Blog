@@ -6,7 +6,8 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default ({ mode }) => {
-  process.env = { ...process.env, ...loadEnv(mode, process.cwd()) }
+  const env = loadEnv(mode, process.cwd())
+  process.env = { ...process.env, ...env }
 
   return defineConfig({
     build: {
@@ -41,6 +42,13 @@ export default ({ mode }) => {
       },
       extensions: ['.mjs', '.js', '.ts', '.jsx', '.tsx', '.json', '.vue']
     },
-    server: {}
+    server: {
+      proxy: {
+        '/api': {
+          target: env.VITE_API_PROXY_TARGET || 'http://localhost:8080',
+          changeOrigin: true
+        }
+      }
+    }
   })
 }
