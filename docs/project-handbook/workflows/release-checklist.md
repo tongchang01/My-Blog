@@ -37,3 +37,8 @@
 
 - [ ] 没有反向代理时，`MYBLOG_WEB_TRUSTED_PROXIES` 保持空列表。
 - [ ] 客户端 IP 直接来自连接远端地址，所有转发头均被忽略。
+
+## 6. 附件存储
+
+- [ ] S3 模式确认 `/media/**` 未注册；若显式开启历史 LOCAL 兼容，确认目录存在并
+  记录关闭 `MYBLOG_STORAGE_LOCAL_WEB_ENABLED` 的时间点。

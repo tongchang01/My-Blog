@@ -65,6 +65,9 @@
 
 - LOCAL 使用 `root`、`bucket-alias`、`public-base-url`。
 - S3 使用 `region`、`bucket`、`public-base-url`。
+- `/media/**` 只在 LOCAL 模式默认注册；S3 模式默认不注册。
+- S3 迁移期如需继续读取历史 LOCAL 附件，可显式设置
+  `MYBLOG_STORAGE_LOCAL_WEB_ENABLED=true`；历史附件迁移完成后必须关闭。
 - S3 凭证来自 AWS Default Credentials Provider Chain。
 - S3 不设置对象 ACL；公开读取由 Bucket Policy 或 CloudFront 管理。
 - 历史 OSS 元数据可读取，但当前版本不提供 OSS 上传 adapter。
