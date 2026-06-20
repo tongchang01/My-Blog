@@ -123,10 +123,10 @@ public class ArticleQueryService {
         return attachmentService.resolvePublicUrls(ids);
     }
 
-    private AdminArticlePageItem withCoverUrl(
+    private AdminArticlePageResult.Item withCoverUrl(
             AdminArticlePageItem item,
             String coverUrl) {
-        return new AdminArticlePageItem(
+        return new AdminArticlePageResult.Item(
                 item.id(),
                 item.titleZh(),
                 item.titleJa(),

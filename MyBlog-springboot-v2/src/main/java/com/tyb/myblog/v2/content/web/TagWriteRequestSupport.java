@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
-import com.tyb.myblog.v2.content.domain.ContentName;
-import com.tyb.myblog.v2.content.domain.ContentSlug;
 
 /**
  * 标签完整写请求的 JSON presence 与字段规则校验。
@@ -51,21 +49,11 @@ abstract class TagWriteRequestSupport {
 
     protected Values values() {
         requireAllFields();
-        try {
-            ContentName name = ContentName.of(
-                    nameZh.value(), nameJa.value(), nameEn.value());
-            ContentSlug normalizedSlug =
-                    ContentSlug.of(slug.value());
-            return new Values(
-                    name.zh(),
-                    name.ja(),
-                    name.en(),
-                    normalizedSlug.value());
-        } catch (IllegalArgumentException exception) {
-            throw new ApiException(
-                    ApiErrorCode.VALIDATION_ERROR,
-                    exception.getMessage());
-        }
+        return new Values(
+                nameZh.value(),
+                nameJa.value(),
+                nameEn.value(),
+                slug.value());
     }
 
     private void requireAllFields() {

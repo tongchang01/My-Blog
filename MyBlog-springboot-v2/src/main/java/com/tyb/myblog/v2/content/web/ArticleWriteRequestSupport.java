@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
-import com.tyb.myblog.v2.content.domain.article.ArticleSlug;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 
 import java.time.LocalDateTime;
@@ -112,9 +111,6 @@ abstract class ArticleWriteRequestSupport {
             throw validation("文章状态不能为空");
         }
         try {
-            String normalizedSlug = ArticleSlug.optional(slug.value())
-                    .map(ArticleSlug::value)
-                    .orElse(null);
             return new Values(
                     titleZh.value(),
                     titleJa.value(),
@@ -125,7 +121,7 @@ abstract class ArticleWriteRequestSupport {
                     body.value(),
                     categoryId.value(),
                     normalizeTagIds(tagIds.value()),
-                    normalizedSlug,
+                    slug.value(),
                     status.value(),
                     password.value(),
                     publishAt.value(),

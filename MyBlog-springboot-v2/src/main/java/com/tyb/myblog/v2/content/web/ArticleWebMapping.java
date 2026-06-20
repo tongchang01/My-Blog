@@ -6,7 +6,6 @@ import com.tyb.myblog.v2.content.application.article.AdminArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticlePageResult;
-import com.tyb.myblog.v2.content.domain.article.AdminArticlePageItem;
 import org.springframework.stereotype.Component;
 
 /**
@@ -96,7 +95,7 @@ public class ArticleWebMapping {
     }
 
     private AdminArticlePageItemVO toAdminPageItem(
-            AdminArticlePageItem item) {
+            AdminArticlePageResult.Item item) {
         return new AdminArticlePageItemVO(
                 item.id(),
                 item.titleZh(),

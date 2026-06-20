@@ -5,8 +5,6 @@ import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
-import com.tyb.myblog.v2.content.domain.ContentName;
-import com.tyb.myblog.v2.content.domain.ContentSlug;
 
 /**
  * 分类完整写请求的 JSON presence 与字段规则校验。
@@ -61,25 +59,16 @@ abstract class CategoryWriteRequestSupport {
         if (sortOrder.value() == null) {
             throw validation("分类排序值不能为空");
         }
-        try {
-            ContentName name = ContentName.of(
-                    nameZh.value(), nameJa.value(), nameEn.value());
-            ContentSlug normalizedSlug =
-                    ContentSlug.of(slug.value());
-            if (sortOrder.value() < 0
-                    || sortOrder.value() > 1_000_000) {
-                throw new IllegalArgumentException(
-                        "分类排序值必须在 0 到 1000000 之间");
-            }
-            return new Values(
-                    name.zh(),
-                    name.ja(),
-                    name.en(),
-                    normalizedSlug.value(),
-                    sortOrder.value());
-        } catch (IllegalArgumentException exception) {
-            throw validation(exception.getMessage());
+        if (sortOrder.value() < 0
+                || sortOrder.value() > 1_000_000) {
+            throw validation("分类排序值必须在 0 到 1000000 之间");
         }
+        return new Values(
+                nameZh.value(),
+                nameJa.value(),
+                nameEn.value(),
+                slug.value(),
+                sortOrder.value());
     }
 
     private void requireAllFields() {

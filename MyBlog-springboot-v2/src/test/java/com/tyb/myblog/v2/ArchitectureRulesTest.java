@@ -2,6 +2,8 @@ package com.tyb.myblog.v2;
 
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.base.DescribedPredicate;
+import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
@@ -10,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
@@ -35,6 +38,12 @@ class ArchitectureRulesTest {
                     Stream.of("org.springframework.security.."),
                     Arrays.stream(BUSINESS_MODULE_PACKAGES))
             .toArray(String[]::new);
+    private static final Set<String> WEB_DOMAIN_ENUM_WHITELIST = Set.of(
+            "com.tyb.myblog.v2.identity.domain.account.AccountType",
+            "com.tyb.myblog.v2.content.domain.article.ArticleStatus",
+            "com.tyb.myblog.v2.comment.domain.CommentAuditStatus",
+            "com.tyb.myblog.v2.comment.domain.CommentTargetType",
+            "com.tyb.myblog.v2.system.domain.friendlink.FriendLinkStatus");
 
     // 业务模块可以依赖 common 的抽象能力，但不能直接依赖 common.security 的具体安全实现。
     @ArchTest
@@ -97,6 +106,14 @@ class ArchitectureRulesTest {
             noClasses()
                     .that().resideInAPackage("..web..")
                     .should().dependOnClassesThat().resideInAPackage("..infrastructure..")
+                    .allowEmptyShould(true);
+
+    // Web 只允许复用经过裁决的稳定领域枚举，其他领域对象必须由 application contract 隔离。
+    @ArchTest
+    static final ArchRule web_only_depends_on_whitelisted_domain_enums =
+            noClasses()
+                    .that().resideInAPackage("..web..")
+                    .should().dependOnClassesThat(domainTypesOutsideWebWhitelist())
                     .allowEmptyShould(true);
 
     // application 层只编排用例，不能反向依赖 Web DTO、Mapper 或 Entity。
@@ -206,6 +223,16 @@ class ArchitectureRulesTest {
                 .should().beFreeOfCycles();
     }
 
+    private static DescribedPredicate<JavaClass> domainTypesOutsideWebWhitelist() {
+        return new DescribedPredicate<>("domain types outside the Web whitelist") {
+            @Override
+            public boolean test(JavaClass input) {
+                return input.getPackageName().contains(".domain")
+                        && !WEB_DOMAIN_ENUM_WHITELIST.contains(input.getName());
+            }
+        };
+    }
+
     @Test
     void declaresCurrentArchitectureBoundaryPackages() {
         assertThatCode(() -> Class.forName("com.tyb.myblog.v2.package-info"))
@@ -242,6 +269,18 @@ class ArchitectureRulesTest {
                 .isInstanceOf(AssertionError.class)
                 .hasMessageContaining("InvalidWebController")
                 .hasMessageContaining("InvalidEntity");
+    }
+
+    @Test
+    void webRuleRejectsDeliberateDomainViolationFixture() {
+        var fixtureClasses = new ClassFileImporter()
+                .importPackages("com.tyb.myblog.v2.architecture.fixture");
+
+        assertThatThrownBy(() ->
+                web_only_depends_on_whitelisted_domain_enums.check(fixtureClasses))
+                .isInstanceOf(AssertionError.class)
+                .hasMessageContaining("InvalidWebController")
+                .hasMessageContaining("InvalidDomainDto");
     }
 
     @Test

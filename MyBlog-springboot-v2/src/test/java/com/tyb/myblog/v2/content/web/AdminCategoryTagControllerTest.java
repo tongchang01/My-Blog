@@ -290,7 +290,7 @@ class AdminCategoryTagControllerTest {
     }
 
     @Test
-    void rejectsMissingAndOverlongTagFields() throws Exception {
+    void rejectsMissingTagFields() throws Exception {
         mockMvc.perform(put("/api/admin/tags/201")
                         .contentType("application/json")
                         .content("""
@@ -300,17 +300,6 @@ class AdminCategoryTagControllerTest {
                                   "slug":"java"
                                 }
                                 """))
-                .andExpect(status().isBadRequest());
-        mockMvc.perform(post("/api/admin/tags")
-                        .contentType("application/json")
-                        .content("""
-                                {
-                                  "nameZh":"%s",
-                                  "nameJa":null,
-                                  "nameEn":null,
-                                  "slug":"java"
-                                }
-                                """.formatted("a".repeat(65))))
                 .andExpect(status().isBadRequest());
     }
 

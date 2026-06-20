@@ -16,7 +16,6 @@ import com.tyb.myblog.v2.content.application.article.CreateArticleCommand;
 import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticleQueryService;
 import com.tyb.myblog.v2.content.application.article.UpdateArticleCommand;
-import com.tyb.myblog.v2.content.domain.article.AdminArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -270,8 +269,8 @@ class AdminArticleControllerTest {
                 """;
     }
 
-    private AdminArticlePageItem pageItem() {
-        return new AdminArticlePageItem(
+    private AdminArticlePageResult.Item pageItem() {
+        return new AdminArticlePageResult.Item(
                 100L,
                 "标题",
                 null,
