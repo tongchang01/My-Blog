@@ -68,7 +68,7 @@ class DatabasePublicArticleQueryRepositoryTest {
     }
 
     @Test
-    void readsPublishedAndPasswordDetailButNotHiddenStates() {
+    void readsPasswordMetadataWithoutExposingPasswordDetail() {
         insertCategory(10L, "后端");
         insertTag(20L, "Java");
         insertArticle(100L, "Published", 2, 10L,
@@ -89,7 +89,16 @@ class DatabasePublicArticleQueryRepositoryTest {
                             .extracting("id")
                             .containsExactly(20L);
                 });
-        assertThat(repository.findPublicDetail(101L, NOW)).isPresent();
+        assertThat(repository.findPublicAccessMetadata(100L, NOW))
+                .get()
+                .extracting(metadata -> metadata.status().name())
+                .isEqualTo("PUBLISHED");
+        assertThat(repository.findPublicAccessMetadata(101L, NOW))
+                .get()
+                .extracting(metadata -> metadata.status().name())
+                .isEqualTo("PASSWORD");
+        assertThat(repository.findPublicDetail(101L, NOW)).isEmpty();
+        assertThat(repository.findPublicAccessMetadata(102L, NOW)).isEmpty();
         assertThat(repository.findPublicDetail(102L, NOW)).isEmpty();
     }
 

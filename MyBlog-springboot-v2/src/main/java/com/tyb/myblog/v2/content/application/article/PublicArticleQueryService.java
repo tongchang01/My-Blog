@@ -4,6 +4,7 @@ import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.ArticleTagView;
+import com.tyb.myblog.v2.content.domain.article.PublicArticleAccessMetadata;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleDetail;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePage;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePageItem;
@@ -57,15 +58,20 @@ public class PublicArticleQueryService {
                     "文章 ID 必须为正数");
         }
         LocalDateTime now = LocalDateTime.now(clock);
-        PublicArticleDetail detail = repository.findPublicDetail(id, now)
+        PublicArticleAccessMetadata access = repository
+                .findPublicAccessMetadata(id, now)
                 .orElseThrow(() -> new ApiException(
                         ApiErrorCode.NOT_FOUND,
                         "文章不存在"));
-        if (detail.status() == ArticleStatus.PASSWORD) {
+        if (access.status() == ArticleStatus.PASSWORD) {
             throw new ApiException(
                     ApiErrorCode.FORBIDDEN,
                     "密码文章暂不开放正文访问");
         }
+        PublicArticleDetail detail = repository.findPublicDetail(id, now)
+                .orElseThrow(() -> new ApiException(
+                        ApiErrorCode.NOT_FOUND,
+                        "文章不存在"));
         String coverUrl = detail.coverAttachmentId() == null
                 ? null
                 : attachmentService.resolvePublicUrls(

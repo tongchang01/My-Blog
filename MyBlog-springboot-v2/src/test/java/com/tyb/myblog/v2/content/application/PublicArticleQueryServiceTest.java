@@ -7,6 +7,7 @@ import com.tyb.myblog.v2.content.application.article.PublicArticleQuery;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQueryService;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.ArticleTagView;
+import com.tyb.myblog.v2.content.domain.article.PublicArticleAccessMetadata;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleDetail;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePage;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePageItem;
@@ -29,6 +30,8 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -86,12 +89,17 @@ class PublicArticleQueryServiceTest {
 
     @Test
     void returnsPublishedDetailBodyAndRejectsPasswordDetail() {
+        when(repository.findPublicAccessMetadata(100L, NOW))
+                .thenReturn(Optional.of(new PublicArticleAccessMetadata(
+                        100L,
+                        ArticleStatus.PUBLISHED)));
+        when(repository.findPublicAccessMetadata(101L, NOW))
+                .thenReturn(Optional.of(new PublicArticleAccessMetadata(
+                        101L,
+                        ArticleStatus.PASSWORD)));
         when(repository.findPublicDetail(100L, NOW))
                 .thenReturn(Optional.of(detail(
                         100L, ArticleStatus.PUBLISHED)));
-        when(repository.findPublicDetail(101L, NOW))
-                .thenReturn(Optional.of(detail(
-                        101L, ArticleStatus.PASSWORD)));
 
         PublicArticleDetailResult result = service.detail(100L, "en");
         assertThat(result.body()).isEqualTo("正文");
@@ -100,6 +108,18 @@ class PublicArticleQueryServiceTest {
         assertError(
                 () -> service.detail(101L, "zh"),
                 ApiErrorCode.FORBIDDEN);
+        verify(repository, never()).findPublicDetail(101L, NOW);
+    }
+
+    @Test
+    void rejectsMissingPublicAccessMetadata() {
+        when(repository.findPublicAccessMetadata(999L, NOW))
+                .thenReturn(Optional.empty());
+
+        assertError(
+                () -> service.detail(999L, "zh"),
+                ApiErrorCode.NOT_FOUND);
+        verify(repository, never()).findPublicDetail(999L, NOW);
     }
 
     @Test

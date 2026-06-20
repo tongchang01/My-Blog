@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 /**
- * 公开详情 SQL 投影，PASSWORD 只用于上层返回 403。
+ * 已发布文章公开详情 SQL 投影。
  */
 @Data
 public class PublicArticleDetailRow {

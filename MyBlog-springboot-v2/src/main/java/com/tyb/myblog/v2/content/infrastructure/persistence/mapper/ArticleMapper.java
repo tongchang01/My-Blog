@@ -13,6 +13,7 @@ import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleCo
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleStatisticsPolicyRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleStatisticsSummaryRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.DeletedArticlePageRow;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticleAccessMetadataRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticleDetailRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticlePageRow;
 import org.apache.ibatis.annotations.Mapper;
@@ -54,6 +55,10 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
             @Param("size") int size);
 
     long countPublicPage(@Param("query") PublicArticleCriteria query);
+
+    PublicArticleAccessMetadataRow selectPublicAccessMetadata(
+            @Param("id") long id,
+            @Param("now") LocalDateTime now);
 
     PublicArticleDetailRow selectPublicDetail(
             @Param("id") long id,

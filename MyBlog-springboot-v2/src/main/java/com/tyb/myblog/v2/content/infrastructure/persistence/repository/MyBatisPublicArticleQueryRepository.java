@@ -3,6 +3,7 @@ package com.tyb.myblog.v2.content.infrastructure.persistence.repository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.ArticleTagView;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleCriteria;
+import com.tyb.myblog.v2.content.domain.article.PublicArticleAccessMetadata;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleDetail;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePage;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePageItem;
@@ -47,6 +48,17 @@ public class MyBatisPublicArticleQueryRepository
                 mapper.countPublicPage(criteria),
                 criteria.page(),
                 criteria.size());
+    }
+
+    @Override
+    public Optional<PublicArticleAccessMetadata> findPublicAccessMetadata(
+            long id,
+            LocalDateTime now) {
+        return Optional.ofNullable(
+                        mapper.selectPublicAccessMetadata(id, now))
+                .map(row -> new PublicArticleAccessMetadata(
+                        row.getId(),
+                        ArticleStatus.fromDatabase(row.getStatus())));
     }
 
     @Override

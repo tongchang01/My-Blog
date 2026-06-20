@@ -7,6 +7,10 @@ public interface PublicArticleQueryRepository {
 
     PublicArticlePage findPublicPage(PublicArticleCriteria criteria);
 
+    Optional<PublicArticleAccessMetadata> findPublicAccessMetadata(
+            long id,
+            LocalDateTime now);
+
     Optional<PublicArticleDetail> findPublicDetail(
             long id,
             LocalDateTime now);
