@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.identity.web;
 
 import com.tyb.myblog.v2.identity.application.profile.CurrentUserProfileResult;
 import com.tyb.myblog.v2.identity.domain.account.AccountType;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 /**
  * 当前登录账号及其公开资料响应。
@@ -12,7 +13,8 @@ import com.tyb.myblog.v2.identity.domain.account.AccountType;
  * @param profile 公开资料
  */
 public record CurrentUserVO(
-        long id,
+        @Schema(format = "int64", example = "9007199254740993")
+        String id,
         String username,
         AccountType type,
         UserProfileVO profile
@@ -26,7 +28,7 @@ public record CurrentUserVO(
      */
     public static CurrentUserVO from(CurrentUserProfileResult result) {
         return new CurrentUserVO(
-                result.id(),
+                Long.toString(result.id()),
                 result.username(),
                 result.type(),
                 UserProfileVO.from(result.profile()));
