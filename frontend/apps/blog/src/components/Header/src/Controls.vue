@@ -1,23 +1,9 @@
 <template>
   <div
     class="header-controls ml-auto top-0 right-0 flex flex-row items-center text-white"
-    @keydown.k="handleOpenModal(true)"
     tabindex="0"
   >
     <div :class="leftControlClasses">
-      <span
-        class="icon-control flex items-center text-invert"
-        data-dia="search"
-        @click="handleOpenModal(true)"
-      >
-        <SvgIcon
-          icon-class="search"
-          fill="currentColor"
-          stroke="none"
-          width="1.2rem"
-          height="1.2rem"
-        />
-      </span>
       <Dropdown
         v-if="enableMultiLanguage"
         @command="handleClick"
@@ -88,9 +74,6 @@
       </span>
     </div>
   </div>
-  <teleport to="body">
-    <SearchModal />
-  </teleport>
 </template>
 
 <script setup lang="ts">
@@ -98,8 +81,6 @@ import { computed, toRefs } from 'vue'
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
 import { useAppStore } from '@/stores/app'
 import ThemeToggle from '@/components/ToggleSwitch/ThemeToggle.vue'
-import SearchModal from '@/components/SearchModal.vue'
-import { useSearchStore } from '@/stores/search'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useNavigatorStore } from '@/stores/navigator'
 import { useRoute, useRouter } from 'vue-router'
@@ -113,7 +94,6 @@ const props = defineProps({
 })
 
 const appStore = useAppStore()
-const searchStore = useSearchStore()
 const navigatorStore = useNavigatorStore()
 const route = useRoute()
 const router = useRouter()
@@ -132,10 +112,6 @@ const handleClick = async (name: string): Promise<void> => {
   } else {
     await router.push({ name: 'home', params: { lang: name } })
   }
-}
-
-const handleOpenModal = (status: boolean) => {
-  searchStore.setOpenModal(status)
 }
 
 const handleOpenMenu = () => {

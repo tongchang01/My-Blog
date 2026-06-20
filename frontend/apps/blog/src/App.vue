@@ -4,7 +4,6 @@
     <div
       id="App-Container"
       class="app-container lg:max-w-screen-2xl px-3 lg:px-8"
-      @keydown.meta.k.stop.prevent="handleOpenModal"
       tabindex="-1"
       :style="cssVariables"
     >
@@ -22,7 +21,6 @@
     </div>
     <div id="loading-bar-wrapper" :class="loadingBarClass"></div>
   </div>
-  <FooterLink :links="themeConfig.footerLinks.data" />
   <FooterContainer :style="cssVariables" />
   <template v-if="isMobile">
     <MobileMenu />
@@ -56,19 +54,16 @@ import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
 import { useLightBoxStore } from '@/stores/lightbox'
 import { useMetaStore } from '@/stores/meta'
-import { useSearchStore } from './stores/search'
 import HeaderMain from '@/components/Header/src/Header.vue'
 import FooterContainer from '@/components/Footer/FooterContainer.vue'
 import MobileMenu from '@/components/MobileMenu.vue'
 import defaultCover from '@/assets/default-cover.jpg'
 import VueEasyLightbox from 'vue-easy-lightbox'
-import FooterLink from './components/Footer/FooterLink.vue'
 
 const appStore = useAppStore()
 const lightBoxStore = useLightBoxStore()
 const commonStore = useCommonStore()
 const metaStore = useMetaStore()
-const searchStore = useSearchStore()
 const MOBILE_WITH = 1024 // Using the mobile width by Bootstrap design.
 
 const appWrapperClass = 'app-wrapper'
@@ -145,10 +140,6 @@ const initResizeEvent = () => {
   window.addEventListener('resize', resizeHandler)
 }
 
-const handleOpenModal = () => {
-  searchStore.setOpenModal(true)
-}
-
 onBeforeMount(initialApp)
 
 onUnmounted(() => {
@@ -181,7 +172,6 @@ watch(
 
 const title = computed(() => metaStore.getTitle)
 const theme = computed(() => appStore.theme)
-const themeConfig = computed(() => appStore.themeConfig)
 const headerImage = computed(() => {
   return {
     backgroundImage: `url(${commonStore.headerImage}), url(${defaultCover})`,

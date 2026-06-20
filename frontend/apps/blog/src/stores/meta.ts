@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import i18n from '@/locales/index'
 import { useAppStore } from './app'
-import { useRoute } from 'vue-router'
 import { computed, ref } from 'vue'
 
 export const useMetaStore = defineStore('metaStore', () => {
@@ -13,11 +12,7 @@ export const useMetaStore = defineStore('metaStore', () => {
 
   const getTitle = computed(() => {
     const appStore = useAppStore()
-    const route = useRoute()
-    let subtitle = appStore.themeConfig.site.subtitle || 'Blog'
-    if (route.name && route.name === 'home') {
-      subtitle = appStore.themeConfig.site.slogan
-    }
+    const subtitle = appStore.themeConfig.site.subtitle || 'Blog'
     if (title.value === '') return subtitle
     return `${title.value} | ${subtitle}`
   })
