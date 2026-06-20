@@ -5,12 +5,15 @@
   "author": "",
   "license": "MIT",
   "private": true,
+  "packageManager": "pnpm@9.15.9",
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint .",
-    "prepare": "husky install"
+    "lint": "eslint ."
   },
   "dependencies": {
     "axios": "^1.7.9",
