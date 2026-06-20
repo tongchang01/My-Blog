@@ -102,7 +102,6 @@ import SearchModal from '@/components/SearchModal.vue'
 import { useSearchStore } from '@/stores/search'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useNavigatorStore } from '@/stores/navigator'
-import { Locales } from '@/models/ThemeConfig.class'
 
 const props = defineProps({
   scrollProgress: {
@@ -116,8 +115,10 @@ const searchStore = useSearchStore()
 const navigatorStore = useNavigatorStore()
 const ballProgress = toRefs(props).scrollProgress
 
-const handleClick = (name: Locales): void => {
-  appStore.changeLocale(name)
+const handleClick = (name: string): void => {
+  if (name === 'en' || name === 'zh-CN' || name === 'ja') {
+    appStore.changeLocale(name)
+  }
 }
 
 const handleOpenModal = (status: boolean) => {

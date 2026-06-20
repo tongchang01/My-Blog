@@ -82,7 +82,7 @@ let pagelink = `\n\nRead more at: ${document.location.href}`
 const initialApp = async () => {
   initResizeEvent()
   await appStore.fetchConfig().then(() => {
-    metaStore.addScripts(appStore.themeConfig.site_meta.cdn.prismjs)
+    metaStore.addScripts(...appStore.themeConfig.site_meta.cdn.prismjs)
     // Change the favicon dynamically.
     if (
       appStore.themeConfig.site_meta.favicon &&

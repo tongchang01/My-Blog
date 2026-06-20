@@ -78,7 +78,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits<{
-  (e: 'pageChange', page: number | string): void
+  (e: 'pageChange', page: number): void
 }>()
 
 const { t } = useI18n()
@@ -130,7 +130,7 @@ const paginator = computed(() => {
 })
 
 const pageChangeEmitter = (page: number | string) => {
-  if (page === '...') return
+  if (typeof page !== 'number') return
   emit('pageChange', page)
 }
 

@@ -424,9 +424,11 @@ const handleEnterDown = () => {
  * for user to finish typing. Prevent uncessary searches
  * between typing of a keyword.
  */
-const searchKeyword = _.debounce((e: Event) => {
-  if (e.target.value !== '') {
-    searchResults.value = searchStore.searchIndexes.search(e.target.value)
+const searchKeyword = _.debounce((event: Event) => {
+  const target = event.target as HTMLInputElement | null
+  const keyword = target?.value ?? ''
+  if (keyword !== '') {
+    searchResults.value = searchStore.searchIndexes.search(keyword)
     if (searchResults.value.length > 0) {
       resetIndex(searchResults.value.length)
       isEmpty.value = false

@@ -119,9 +119,9 @@
                 </span>
                 <span
                   class="relative z-50"
-                  v-if="$i18n.locale === 'zh-TW' && sub.i18n['zh-TW']"
+                  v-if="$i18n.locale === 'ja' && sub.i18n.ja"
                 >
-                  {{ sub.i18n['zh-TW'] }}
+                  {{ sub.i18n.ja }}
                 </span>
                 <span
                   class="relative z-50"
