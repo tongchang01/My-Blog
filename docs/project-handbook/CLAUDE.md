@@ -9,7 +9,7 @@
 
 - **V1**：`MyBlog-springboot/` + `MyBlog-vue/MyBlog-blog/` + `MyBlog-vue/MyBlog-admin/` — 在线运行中，**仅作业务参考，不要修改**
 - **V2 后端**：`MyBlog-springboot-v2/` — 六个业务模块已完成第一版，当前进入审查问题修复与前端联调支持
-- **V2 前台 / 后台**：进入 M4 前端工程骨架与接口联调阶段；规格分别在 `frontend-user/` 和 `frontend-admin/`
+- **V2 前台 / 后台**：进入 M4 前端工程骨架与接口联调阶段；前台规格在 `frontend-user/`，后台规格与计划在 `frontend/apps/admin/docs/`
 - **数据**：V2 不兼容 V1 schema（ADR-0013），一次性导入（见 `migration/`）
 
 当前阶段：**M4 前端骨架与后端联调准备**。M3 六个后端模块第一版已经完成并通过 H2/MySQL 回归；当前先处理发布前审查确认的联调阻塞项，再进入前台与后台工程骨架，详见 `status.md` / `roadmap.md` / `docs/superpowers/reviews/2026-06-18-backend-v2-release-review.md`。
@@ -120,6 +120,6 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local   # 本地启动
 | **业务规格** | `product/` |
 | **接口契约** | `api-contract/` |
 | **前台规格** | `frontend-user/` |
-| **后台规格** | `frontend-admin/` |
+| **后台规格** | `frontend/apps/admin/docs/` |
 | **V1→V2 数据迁移** | `migration/` |
 | 文档结构总览 | `INDEX.md` |

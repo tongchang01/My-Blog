@@ -1051,7 +1051,7 @@ t_mail_log:
 - FE-2 图床后端**实现切换**（已在 R5 决定起点为 LOCAL，未来切 S3/OSS 不动 schema）
 - FE-3 部署 CI / 镜像构建 / 反代具体配置（部署形态 V2 单实例已在 R7 定）
 - FE-4 前台主题风格
-- FE-5 ~~后台 UI 框架~~ → **已定：Element Plus**（见 `frontend-admin/README.md` 已决策项）
+- FE-5 ~~后台 UI 框架~~ → **已定：Element Plus**（见 `frontend/apps/admin/docs/README.md` 已决策项）
 - FE-6 Markdown 渲染器（Vditor / Bytemd / md-editor-v3）
 - FE-7 CSS 方案（Tailwind / 原生 / UnoCSS）
 

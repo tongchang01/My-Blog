@@ -84,9 +84,6 @@ docs/ClaudeCode/
 ├── frontend-user/        【前台规格】博客访客端
 │   └── README.md
 │
-├── frontend-admin/       【后台规格】管理员端
-│   └── README.md
-│
 └── migration/            【数据迁移】V1 → V2 一次性导入
     └── README.md
 ```
@@ -101,7 +98,8 @@ docs/ClaudeCode/
 | **workflows/** | "我要做 X，步骤是？" | 长期有效 | 动作命名，如 `add-new-module.md` |
 | **product/** | "要做什么业务？" | 随业务演进 | 主题命名 |
 | **api-contract/** | "前后端约定的接口是什么？" | 与代码同步 | 主题命名 |
-| **frontend-user/**, **frontend-admin/** | "前端做什么？长什么样？" | 与代码同步 | 主题命名 |
+| **frontend-user/** | "博客前台做什么？长什么样？" | 与代码同步 | 主题命名 |
+| `frontend/apps/admin/docs/` | "管理后台做什么？怎么实现？" | 与后台代码同步 | 主题命名 |
 | **migration/** | "V1 数据怎么导到 V2？" | 一次性，导完即归档 | 主题命名 |
 | **pitfalls.md** | "不要这样做" | 持续追加，不删 | 单一文件 |
 
