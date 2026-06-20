@@ -1,14 +1,6 @@
 import { defineStore } from 'pinia'
+import { Archives, Post, SpecificPostsList } from '@/models/Post.class'
 import {
-  Archives,
-  FeaturePosts,
-  Post,
-  PostList,
-  SpecificPostsList
-} from '@/models/Post.class'
-import {
-  fetchFeature,
-  fetchPostsList,
   fetchPostBySlug,
   fetchPostsListByCategory,
   fetchPostsListByTag,
@@ -17,36 +9,11 @@ import {
 import { ref } from 'vue'
 
 export const usePostStore = defineStore('postStore', () => {
-  const featurePosts = ref(new FeaturePosts())
-  const posts = ref(new PostList())
-  const postTotal = ref(0)
   const cachePost = ref({
     title: '',
     body: '',
     uid: ''
   })
-
-  const fetchFeaturePostsData = async () => {
-    const { data } = await fetchFeature()
-    return new Promise(resolve =>
-      setTimeout(() => {
-        featurePosts.value = new FeaturePosts(data)
-        resolve(featurePosts.value)
-      }, 200)
-    )
-  }
-
-  const fetchPostsListData = async (page?: number): Promise<PostList> => {
-    if (!page) page = 1
-    const { data } = await fetchPostsList(page)
-    return new Promise(resolve =>
-      setTimeout(() => {
-        posts.value = new PostList(data)
-        postTotal.value = posts.value.total
-        resolve(posts.value)
-      }, 200)
-    )
-  }
 
   const fetchArchives = async (page?: number): Promise<Archives> => {
     if (!page) page = 1
@@ -98,12 +65,7 @@ export const usePostStore = defineStore('postStore', () => {
   }
 
   return {
-    featurePosts,
-    posts,
-    postTotal,
     cachePost,
-    fetchFeaturePosts: fetchFeaturePostsData,
-    fetchPostsList: fetchPostsListData,
     fetchArchives,
     fetchPost,
     fetchPostsByCategory,

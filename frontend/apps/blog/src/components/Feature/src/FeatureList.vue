@@ -26,11 +26,6 @@
           <ArticleCard :data="post" />
         </li>
       </template>
-      <template v-else>
-        <li v-for="n in 2" :key="n">
-          <ArticleCard :data="{}" />
-        </li>
-      </template>
     </ul>
   </div>
 </template>
@@ -41,11 +36,11 @@ import { useI18n } from 'vue-i18n'
 import { PropType, StyleValue, computed, toRefs } from 'vue'
 import { ArticleCard } from '@/components/ArticleCard'
 import SvgIcon from '@/components/SvgIcon/index.vue'
-import { Post } from '@/models/Post.class'
+import type { ArticleCardViewModel } from '@/features/articles/model'
 
 const props = defineProps({
   data: {
-    type: Array as PropType<Post[]>,
+    type: Array as PropType<ArticleCardViewModel[]>,
     required: true
   }
 })

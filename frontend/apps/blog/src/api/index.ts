@@ -3,7 +3,6 @@ import { AxiosResponse } from 'axios'
 import {
   AuthorPosts,
   Categories,
-  Post,
   PostList,
   SpecificPostListRaw,
   Tags
@@ -12,13 +11,6 @@ import { Article, Page } from '@/models/Article.class'
 import { Statistic } from '@/models/Statistic.class'
 import { SearchIndexes } from '@/models/Search.class'
 import { paginator } from '@/utils'
-
-// GET /api/posts/:pageNum.json (default 1.json)
-export async function fetchPostsList(
-  currentPage: number
-): Promise<AxiosResponse<any>> {
-  return request.get<PostList>(`/posts/${currentPage}.json`)
-}
 
 // GET /api/posts/:pageNum.json (default 1.json)
 export async function fetchArchivesList(
@@ -83,11 +75,6 @@ export async function fetchImplicitPageBySource(
   source: string
 ): Promise<AxiosResponse<any>> {
   return request.get<Page>(`/pages/${source}/index.json`)
-}
-
-// GET /api/features.json
-export async function fetchFeature(): Promise<AxiosResponse<any>> {
-  return request.get<Post[]>('/features.json')
 }
 
 // GET /api/statistic.json

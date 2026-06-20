@@ -1,173 +1,118 @@
 <template>
-  <li class="article-container" @click="handleCardClick(post?.slug)">
+  <div class="article-container" @click="navigateToArticle">
     <div class="article">
       <div class="article-thumbnail">
-        <img v-if="post.cover" v-lazy="post.cover" alt="" />
-        <img v-else src="@/assets/default-cover.jpg" />
+        <img v-if="article?.coverUrl" v-lazy="article.coverUrl" alt="" />
+        <img v-else src="@/assets/default-cover.jpg" alt="" />
         <span class="thumbnail-screen" :style="gradientBackground" />
       </div>
       <div class="article-content">
-        <span>
-          <b v-if="post.pinned" class="article-tag">
-            <span>
-              <SvgIcon
-                icon-class="hot"
-                width="1rem"
-                height="1rem"
-                stroke="currentColor"
-              />
-              <span>{{ t('settings.pinned') }}</span>
-            </span>
-          </b>
-          <b v-if="post.feature" class="article-tag">
-            <span>
-              <SvgIcon
-                icon-class="hot"
-                width="1rem"
-                height="1rem"
-                stroke="currentColor"
-              />
-              <span>{{ t('settings.featured') }}</span>
-            </span>
-          </b>
-          <b
-            v-if="post.categories && post.categories.length > 0"
-            @click="navigateToCategory(post.categories[0].slug)"
-          >
-            {{ post.categories[0].name }}
-          </b>
-          <b v-else-if="post.categories && post.categories.length <= 0">
-            {{ t('settings.default-category') }}
-          </b>
-          <ob-skeleton v-else tag="b" height="20px" width="35px" />
+        <span v-if="article">
+          <b>{{ article.category?.name || t('settings.default-category') }}</b>
+          <b v-if="article.locked" class="article-tag ml-2">🔒</b>
         </span>
+        <ob-skeleton v-else tag="b" height="20px" width="60px" />
 
         <span class="flex flex-wrap">
-          <ul v-if="post.tags && post.tags.length > 0">
-            <li
-              v-for="tag in post.min_tags"
-              :key="tag.slug"
-              @click="navigateToTag(tag.slug)"
-            >
+          <ul v-if="article">
+            <li v-for="tag in article.tags.slice(0, 2)" :key="tag.id">
               <em># </em><span>{{ tag.name }}</span>
             </li>
           </ul>
-          <ul v-else-if="post.tags && post.tags.length <= 0">
-            <li>
-              <em>#</em><span>{{ t('settings.default-tag') }}</span>
-            </li>
-          </ul>
-          <ul v-else>
-            <ob-skeleton
-              v-if="!post.tags"
-              :count="2"
-              tag="li"
-              height="16px"
-              width="35px"
-            />
-          </ul>
+          <ob-skeleton
+            v-else
+            :count="2"
+            tag="span"
+            height="16px"
+            width="35px"
+          />
         </span>
 
-        <router-link
-          v-if="post.title"
-          :to="{ name: 'post-slug', params: { slug: post.slug } }"
-        >
-          <h1 data-dia="article-link">{{ post.title }}</h1>
-        </router-link>
+        <h1 v-if="article" data-dia="article-link">{{ article.title }}</h1>
         <ob-skeleton v-else tag="h1" height="3rem" />
 
-        <p v-if="post.text">{{ post.text }}</p>
+        <p v-if="article">{{ article.summary }}</p>
         <ob-skeleton v-else tag="p" :count="4" height="16px" />
 
-        <div class="article-footer" v-if="post.author && post.date">
-          <div class="flex flex-row items-center">
-            <img
-              :class="avatarClasses"
-              :src="post.author.avatar"
-              :alt="`avatar-${post.author.name}`"
-              @click="handleAuthorClick(post.author.link)"
-            />
-            <span class="text-ob-dim">
-              <strong
-                class="text-ob-normal pr-1.5 hover:text-ob hover:opacity-50 cursor-pointer"
-                @click="handleAuthorClick(post.author.link)"
-              >
-                {{ post.author.name }}
-              </strong>
-              {{ t('settings.shared-on') }} {{ t(post.date.month) }}
-              {{ post.date.day }}, {{ post.date.year }}
-            </span>
-          </div>
-        </div>
-
-        <div class="article-footer" v-else>
-          <div class="flex flex-row items-center mt-6">
-            <ob-skeleton
-              class="mr-2"
-              height="28px"
-              width="28px"
-              :circle="true"
-            />
-            <span class="text-ob-dim mt-1">
-              <ob-skeleton height="20px" width="150px" />
-            </span>
-          </div>
+        <div v-if="article" class="article-footer">
+          <span class="text-ob-dim">
+            {{ article.publishedAt }} · {{ article.commentCount }} comments
+          </span>
         </div>
       </div>
     </div>
-  </li>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from '@/stores/app'
-import { computed } from 'vue'
+import { computed, type PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import SvgIcon from '@/components/SvgIcon/index.vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
+import { useAppStore } from '@/stores/app'
+import type { ArticleCardViewModel } from '@/features/articles/model'
+import type { Post } from '@/models/Post.class'
+
+type LegacyPost = Partial<Post>
+type CompatibleArticle = ArticleCardViewModel & { legacy: boolean }
 
 const props = defineProps({
   data: {
-    type: Object,
-    required: true
+    type: Object as PropType<ArticleCardViewModel | LegacyPost | null>,
+    default: null
   }
 })
 
 const router = useRouter()
+const route = useRoute()
 const appStore = useAppStore()
 const { t } = useI18n()
+const article = computed<CompatibleArticle | null>(() => {
+  if (!props.data) return null
+  if ('id' in props.data) return { ...props.data, legacy: false }
 
-const handleCardClick = (slug?: string) => {
-  if (!slug) return
-  router.push({ name: 'post-slug', params: { slug } })
-}
-
-const handleAuthorClick = (link: string) => {
-  if (link === '') link = window.location.href
-  window.location.href = link
-}
-
-const navigateToTag = (slug: string) => {
-  router.push({ name: 'post-search', query: { tag: slug } })
-}
-
-const navigateToCategory = (slug: string) => {
-  router.push({ name: 'post-search', query: { category: slug } })
-}
-
-const avatarClasses = computed(() => ({
-  'hover:opacity-50 cursor-pointer': true,
-  [appStore.themeConfig.theme.profile_shape]: true
-}))
-const gradientBackground = computed(() => {
-  return { background: appStore.themeConfig.theme.header_gradient_css }
+  const category = props.data.categories?.[0]
+  return {
+    id: props.data.uid ?? props.data.slug ?? '',
+    slug: props.data.slug ?? '',
+    title: props.data.title ?? '',
+    summary: props.data.text ?? '',
+    coverUrl: props.data.cover || null,
+    category: category ? { id: category.slug, name: category.name } : null,
+    tags: (props.data.tags ?? []).map(tag => ({
+      id: tag.slug,
+      name: tag.name,
+      slug: tag.slug
+    })),
+    publishedAt: props.data.date
+      ? `${props.data.date.year}-${props.data.date.day}`
+      : '',
+    locked: false,
+    commentCount: 0,
+    legacy: true
+  }
 })
-const post = computed(() => props.data)
+
+const navigateToArticle = () => {
+  if (!article.value) return
+  if (article.value.legacy) {
+    if (article.value.slug) {
+      router.push({ name: 'post-slug', params: { slug: article.value.slug } })
+    }
+    return
+  }
+  router.push({
+    name: 'article-detail',
+    params: {
+      lang: route.params.lang ?? appStore.locale,
+      id: article.value.id,
+      slug: article.value.slug
+    }
+  })
+}
+
+const gradientBackground = computed(() => ({
+  background: appStore.themeConfig.theme.header_gradient_css
+}))
 </script>
 
-<style lang="scss" scoped>
-.feature-sign {
-  width: calc(100% - 0.5rem);
-  height: calc(100% - 0.5rem);
-  margin: 0.25rem;
-}
-</style>
+<style lang="scss" scoped></style>

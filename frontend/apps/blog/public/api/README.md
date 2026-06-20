@@ -12,16 +12,14 @@ cp -r ./* <工程根>/public/api/
 
 ## 文件清单
 
-| 文件                       | 大小    | 内容                               |
-| -------------------------- | ------- | ---------------------------------- |
-| `statistic.json`           | ~70 B   | 文章/分类/标签计数                 |
-| `categories.json`          | ~330 B  | 分类列表                           |
-| `tags.json`                | ~700 B  | 标签列表                           |
-| `features.json`            | ~3 KB   | 首页推荐文章                       |
-| `search.json`              | 空数组  | 搜索索引（mock 为空）              |
-| `posts/1.json`             | ~7 KB   | 文章列表第 1 页（含 1 篇示例文章） |
-| `archives/1.json`          | ~7 KB   | 归档第 1 页                        |
-| `authors/blog-author.json` | ~1.6 KB | 默认作者信息                       |
+| 文件                       | 大小    | 内容                  |
+| -------------------------- | ------- | --------------------- |
+| `statistic.json`           | ~70 B   | 文章/分类/标签计数    |
+| `categories.json`          | ~330 B  | 分类列表              |
+| `tags.json`                | ~700 B  | 标签列表              |
+| `search.json`              | 空数组  | 搜索索引（mock 为空） |
+| `archives/1.json`          | ~7 KB   | 归档第 1 页           |
+| `authors/blog-author.json` | ~1.6 KB | 默认作者信息          |
 
 ## 来源
 
