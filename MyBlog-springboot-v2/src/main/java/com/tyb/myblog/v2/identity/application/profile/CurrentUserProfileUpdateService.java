@@ -28,7 +28,7 @@ public class CurrentUserProfileUpdateService {
      * @return 更新后的完整用户资料
      */
     @Transactional
-    public UserProfile update(
+    public UserProfileResult update(
             AuthenticatedPrincipal principal,
             UpdateCurrentUserProfileCommand command) {
         requireAdmin(principal);
@@ -54,7 +54,7 @@ public class CurrentUserProfileUpdateService {
             log.error("当前用户资料更新行数异常，userId={}", userId);
             throw new ApiException(ApiErrorCode.INTERNAL_ERROR);
         }
-        return updated;
+        return UserProfileResult.from(updated);
     }
 
     private void requireAdmin(AuthenticatedPrincipal principal) {

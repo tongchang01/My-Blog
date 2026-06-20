@@ -56,11 +56,12 @@ class CurrentUserProfileUpdateServiceTest {
         when(repository.update(org.mockito.ArgumentMatchers.any(UserProfile.class)))
                 .thenReturn(true);
 
-        UserProfile updated = service.update(admin("1001"), command);
+        UserProfileResult updated = service.update(admin("1001"), command);
 
         assertThat(updated.nickname()).isEqualTo("New Name");
         assertThat(updated.location()).isNull();
-        verify(repository).update(updated);
+        verify(repository).update(
+                org.mockito.ArgumentMatchers.any(UserProfile.class));
     }
 
     @Test

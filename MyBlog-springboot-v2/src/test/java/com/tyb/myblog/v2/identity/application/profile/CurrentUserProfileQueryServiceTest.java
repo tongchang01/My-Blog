@@ -46,7 +46,7 @@ class CurrentUserProfileQueryServiceTest {
         assertThat(result.id()).isEqualTo(1001L);
         assertThat(result.username()).isEqualTo("admin");
         assertThat(result.type()).isEqualTo(AccountType.ADMIN);
-        assertThat(result.profile()).isEqualTo(profile);
+        assertThat(result.profile()).isEqualTo(UserProfileResult.from(profile));
     }
 
     @ParameterizedTest

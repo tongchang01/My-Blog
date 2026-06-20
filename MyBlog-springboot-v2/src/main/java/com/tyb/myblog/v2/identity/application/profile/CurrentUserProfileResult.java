@@ -1,7 +1,6 @@
 package com.tyb.myblog.v2.identity.application.profile;
 
 import com.tyb.myblog.v2.identity.domain.account.AccountType;
-import com.tyb.myblog.v2.identity.domain.profile.UserProfile;
 
 /**
  * 当前用户账号与个人资料的组合查询结果。
@@ -15,6 +14,6 @@ public record CurrentUserProfileResult(
         long id,
         String username,
         AccountType type,
-        UserProfile profile
+        UserProfileResult profile
 ) {
 }

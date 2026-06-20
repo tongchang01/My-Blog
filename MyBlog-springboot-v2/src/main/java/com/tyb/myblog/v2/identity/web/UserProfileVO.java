@@ -1,6 +1,6 @@
 package com.tyb.myblog.v2.identity.web;
 
-import com.tyb.myblog.v2.identity.domain.profile.UserProfile;
+import com.tyb.myblog.v2.identity.application.profile.UserProfileResult;
 
 /**
  * 当前用户公开资料响应，不暴露内部用户 ID。
@@ -38,12 +38,12 @@ public record UserProfileVO(
 ) {
 
     /**
-     * 将领域资料转换为 HTTP 响应。
+     * 将应用结果转换为 HTTP 响应。
      *
-     * @param profile 用户资料领域对象
+     * @param profile 用户资料应用结果
      * @return 用户资料响应
      */
-    public static UserProfileVO from(UserProfile profile) {
+    public static UserProfileVO from(UserProfileResult profile) {
         return new UserProfileVO(
                 profile.nickname(),
                 profile.avatarUrl(),

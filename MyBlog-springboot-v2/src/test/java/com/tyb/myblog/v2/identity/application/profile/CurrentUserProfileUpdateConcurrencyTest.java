@@ -86,7 +86,7 @@ class CurrentUserProfileUpdateConcurrencyTest {
     void shouldSerializeConcurrentPatchesAndPreserveBothFieldChanges() throws Exception {
         assertThat(AopUtils.isAopProxy(service)).isTrue();
 
-        Future<UserProfile> nicknameUpdate = executor.submit(() -> {
+        Future<UserProfileResult> nicknameUpdate = executor.submit(() -> {
             authenticate();
             try {
                 return service.update(
@@ -98,7 +98,7 @@ class CurrentUserProfileUpdateConcurrencyTest {
         });
         assertThat(repository.awaitFirstLock()).isTrue();
 
-        Future<UserProfile> locationUpdate = executor.submit(() -> {
+        Future<UserProfileResult> locationUpdate = executor.submit(() -> {
             authenticate();
             try {
                 return service.update(

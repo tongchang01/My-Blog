@@ -50,7 +50,7 @@ public class CurrentUserProfileQueryService {
                 currentAccount.id(),
                 currentAccount.username(),
                 currentAccount.type(),
-                profile.orElseThrow());
+                UserProfileResult.from(profile.orElseThrow()));
     }
 
     private long parsePositiveUserId(String principalId) {

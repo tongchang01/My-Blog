@@ -9,8 +9,8 @@ import com.tyb.myblog.v2.identity.application.auth.ChangePasswordCommand;
 import com.tyb.myblog.v2.identity.application.profile.CurrentUserProfileQueryService;
 import com.tyb.myblog.v2.identity.application.profile.CurrentUserProfileResult;
 import com.tyb.myblog.v2.identity.application.profile.CurrentUserProfileUpdateService;
+import com.tyb.myblog.v2.identity.application.profile.UserProfileResult;
 import com.tyb.myblog.v2.identity.domain.account.AccountType;
-import com.tyb.myblog.v2.identity.domain.profile.UserProfile;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,7 +58,7 @@ class CurrentUserControllerTest {
     private ChangePasswordApplicationService changePasswordService;
 
     private AuthenticatedPrincipal principal;
-    private UserProfile profile;
+    private UserProfileResult profile;
 
     @BeforeEach
     void setUp() {
@@ -306,9 +306,8 @@ class CurrentUserControllerTest {
                 .andExpect(jsonPath("$.code").value("90001"));
     }
 
-    private UserProfile profile(String nickname, String twitterUrl) {
-        return UserProfile.create(
-                1001L,
+    private UserProfileResult profile(String nickname, String twitterUrl) {
+        return new UserProfileResult(
                 nickname,
                 "https://example.com/avatar.png",
                 "中文简介",
