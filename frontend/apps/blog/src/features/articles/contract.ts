@@ -18,3 +18,8 @@ export interface PublicArticleListItemDto {
   createdAt: string
   locked: boolean
 }
+
+export interface PublicArticleDetailDto extends PublicArticleListItemDto {
+  body: string
+  updatedAt: string
+}

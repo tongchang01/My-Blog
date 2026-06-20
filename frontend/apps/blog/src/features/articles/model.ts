@@ -25,4 +25,17 @@ export interface ArticlePageViewModel {
   pages: number
 }
 
+export interface ArticleDetailViewModel extends ArticleCardViewModel {
+  bodyHtml: string
+  updatedAt: string
+}
+
 export type ArticleListStatus = 'idle' | 'loading' | 'ready' | 'empty' | 'error'
+
+export type ArticleDetailStatus =
+  | 'idle'
+  | 'loading'
+  | 'ready'
+  | 'locked'
+  | 'notFound'
+  | 'error'

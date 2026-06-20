@@ -2,7 +2,10 @@ import { requestApi } from '@/shared/http/client'
 import { ApiError } from '@/shared/http/error'
 import type { PageResponse } from '@/shared/http/contract'
 import type { SupportedLocale } from '@/shared/i18n/locale'
-import type { PublicArticleListItemDto } from './contract'
+import type {
+  PublicArticleDetailDto,
+  PublicArticleListItemDto
+} from './contract'
 
 export interface LoadPublicArticlesParams {
   page: number
@@ -26,5 +29,20 @@ export const loadPublicArticles = async ({
     signal
   })
   if (data === null) throw new ApiError('Article page response is empty')
+  return data
+}
+
+export const loadPublicArticle = async (
+  id: string,
+  lang: SupportedLocale,
+  signal?: AbortSignal
+): Promise<PublicArticleDetailDto> => {
+  const data = await requestApi<PublicArticleDetailDto>({
+    method: 'GET',
+    url: `/public/articles/${encodeURIComponent(id)}`,
+    params: { lang },
+    signal
+  })
+  if (data === null) throw new ApiError('Article detail response is empty')
   return data
 }

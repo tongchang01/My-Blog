@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
-import { Archives, Post, SpecificPostsList } from '@/models/Post.class'
+import { Archives, SpecificPostsList } from '@/models/Post.class'
 import {
-  fetchPostBySlug,
   fetchPostsListByCategory,
   fetchPostsListByTag,
   fetchArchivesList
@@ -21,15 +20,6 @@ export const usePostStore = defineStore('postStore', () => {
     return new Promise(resolve =>
       setTimeout(() => {
         resolve(new Archives(data))
-      }, 200)
-    )
-  }
-
-  const fetchPost = async (slug: string): Promise<Post> => {
-    const { data } = await fetchPostBySlug(slug)
-    return new Promise(resolve =>
-      setTimeout(() => {
-        resolve(new Post(data))
       }, 200)
     )
   }
@@ -67,7 +57,6 @@ export const usePostStore = defineStore('postStore', () => {
   return {
     cachePost,
     fetchArchives,
-    fetchPost,
     fetchPostsByCategory,
     fetchPostsByTag,
     setCache

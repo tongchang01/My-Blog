@@ -1,8 +1,16 @@
 import type { PageResponse } from '@/shared/http/contract'
 import type { SupportedLocale } from '@/shared/i18n/locale'
 import { formatJst } from '@/shared/time/jst'
-import type { PublicArticleListItemDto } from './contract'
-import type { ArticleCardViewModel, ArticlePageViewModel } from './model'
+import { renderMarkdown } from '@/shared/markdown/render'
+import type {
+  PublicArticleDetailDto,
+  PublicArticleListItemDto
+} from './contract'
+import type {
+  ArticleCardViewModel,
+  ArticleDetailViewModel,
+  ArticlePageViewModel
+} from './model'
 
 const mapArticle = (
   dto: PublicArticleListItemDto,
@@ -32,4 +40,13 @@ export const mapArticlePage = (
   page: dto.page,
   size: dto.size,
   pages: dto.size > 0 ? Math.ceil(dto.total / dto.size) : 0
+})
+
+export const mapArticleDetail = (
+  dto: PublicArticleDetailDto,
+  locale: SupportedLocale
+): ArticleDetailViewModel => ({
+  ...mapArticle(dto, locale),
+  bodyHtml: renderMarkdown(dto.body),
+  updatedAt: formatJst(dto.updatedAt, locale)
 })

@@ -7,7 +7,7 @@ import {
   SpecificPostListRaw,
   Tags
 } from '@/models/Post.class'
-import { Article, Page } from '@/models/Article.class'
+import { Page } from '@/models/Article.class'
 import { Statistic } from '@/models/Statistic.class'
 import { SearchIndexes } from '@/models/Search.class'
 import { paginator } from '@/utils'
@@ -50,13 +50,6 @@ export async function fetchPostsListByCategory(
   response.data.postlist = paginator(response.data.postlist, page, pageSize)
 
   return response
-}
-
-// GET /api/articles/:Slug.json
-export async function fetchPostBySlug(
-  slug: string
-): Promise<AxiosResponse<any>> {
-  return request.get<Article>(`/articles/${slug}.json`)
 }
 
 // GET /api/tags.json
