@@ -20,7 +20,7 @@ export const getGravatarUrl = (options: {
   const gravatarCDNs: { [key: string]: string } = {
     en: 'https://www.gravatar.com/avatar/',
     ja: 'https://www.gravatar.com/avatar/',
-    'zh-CN': 'https://gravatar.loli.net/avatar/'
+    zh: 'https://gravatar.loli.net/avatar/'
   }
 
   return /^https?:\/\//.test(avatarCDN)

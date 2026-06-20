@@ -40,7 +40,7 @@ export function formatTime(
       months: ' months ago',
       years: ' years ago'
     },
-    'zh-CN': {
+    zh: {
       seconds: '刚刚',
       minutes: ' 分钟前',
       hours: ' 小时前',

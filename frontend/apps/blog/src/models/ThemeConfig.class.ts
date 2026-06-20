@@ -1,3 +1,5 @@
+import type { SupportedLocale } from '@/shared/i18n/locale'
+
 interface ThemeRaw {
   /** Hexo config data */
   theme_config: {
@@ -86,7 +88,7 @@ export class ThemeMenu implements ObMenu {
         name: 'Home',
         path: '/',
         i18n: {
-          'zh-CN': '首页',
+          zh: '首页',
           ja: 'ホーム',
           en: 'Home'
         }
@@ -95,7 +97,7 @@ export class ThemeMenu implements ObMenu {
         name: 'About',
         path: '/about',
         i18n: {
-          'zh-CN': '关于',
+          zh: '关于',
           ja: '概要',
           en: 'About'
         }
@@ -104,7 +106,7 @@ export class ThemeMenu implements ObMenu {
         name: 'Archives',
         path: '/archives',
         i18n: {
-          'zh-CN': '归档',
+          zh: '归档',
           ja: 'アーカイブ',
           en: 'Archives'
         }
@@ -113,7 +115,7 @@ export class ThemeMenu implements ObMenu {
         name: 'Tags',
         path: '/tags',
         i18n: {
-          'zh-CN': '标签',
+          zh: '标签',
           ja: 'タグ',
           en: 'Tags'
         }
@@ -122,7 +124,7 @@ export class ThemeMenu implements ObMenu {
         name: 'Categories',
         path: '/categories',
         i18n: {
-          'zh-CN': '分类',
+          zh: '分类',
           ja: 'カテゴリ',
           en: 'Categories'
         }
@@ -131,7 +133,7 @@ export class ThemeMenu implements ObMenu {
         name: 'Links',
         path: '/links',
         i18n: {
-          'zh-CN': '友情链接',
+          zh: '友情链接',
           ja: 'リンク集',
           en: 'Friend Links'
         }
@@ -164,7 +166,7 @@ export class ThemeMenu implements ObMenu {
   }
 }
 
-export type Locales = 'en' | 'zh-CN' | 'ja'
+export type Locales = SupportedLocale
 
 export class Menu {
   /** Name of the menu */
@@ -184,7 +186,11 @@ export class Menu {
   constructor(menu: Record<string, any>) {
     this.name = menu.name
     this.path = menu.path ? menu.path : null
-    this.i18n = menu.i18n ? menu.i18n : {}
+    const translations = menu.i18n ? menu.i18n : {}
+    this.i18n = {
+      ...translations,
+      zh: translations.zh ?? translations['zh-CN']
+    }
     this.children = menu.children
       ? Object.keys(menu.children).map(
           (key: string) => new Menu(menu.children[key])

@@ -358,7 +358,7 @@ export class GithubComment implements RecentComment {
   transformTime(lang: Locales): void {
     const templates = {
       en: 'commented [TIME]',
-      'zh-CN': '[TIME]评论了',
+      zh: '[TIME]评论了',
       ja: '[TIME]がコメントしました'
     }
 

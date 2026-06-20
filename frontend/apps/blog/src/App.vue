@@ -96,15 +96,15 @@ const initialApp = async () => {
     if (appStore.themeConfig.plugins.copy_protection.enable) {
       const locale = appStore.locale
       const linkPlaceholder =
-        locale === 'zh-CN'
+        locale === 'zh'
           ? appStore.themeConfig.plugins.copy_protection.link.cn
           : appStore.themeConfig.plugins.copy_protection.link.en
       const authorPlaceholder =
-        locale === 'zh-CN'
+        locale === 'zh'
           ? appStore.themeConfig.plugins.copy_protection.author.cn
           : appStore.themeConfig.plugins.copy_protection.author.en
       const licensePlaceholder =
-        locale === 'zh-CN'
+        locale === 'zh'
           ? appStore.themeConfig.plugins.copy_protection.license.cn
           : appStore.themeConfig.plugins.copy_protection.license.en
 

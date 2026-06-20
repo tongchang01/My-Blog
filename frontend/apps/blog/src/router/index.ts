@@ -1,9 +1,38 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import type { RouteRecordRaw } from 'vue-router'
 import routes from '~pages'
+import Cookies from 'js-cookie'
+import { resolveInitialLocale } from '@/shared/i18n/locale'
+
+const initialLocale = () =>
+  resolveInitialLocale(
+    Cookies.get('locale') ?? localStorage.getItem('locale'),
+    navigator.language
+  )
+
+const localizedRoutes: RouteRecordRaw[] = [
+  {
+    path: '/',
+    name: 'root',
+    redirect: () => ({ name: 'home', params: { lang: initialLocale() } })
+  },
+  {
+    path: '/:lang(zh|ja|en)',
+    name: 'home',
+    component: () => import('@/pages/index.vue')
+  },
+  {
+    path: '/:lang(zh|ja|en)/posts/:id(\\d+)/:slug?',
+    name: 'article-detail',
+    component: () => import('@/pages/post/[slug].vue')
+  }
+]
+
+const remainingGeneratedRoutes = routes.filter(route => route.name !== 'index')
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes,
+  routes: [...localizedRoutes, ...remainingGeneratedRoutes],
   scrollBehavior(to, from, savedPosition) {
     return new Promise(resolve => {
       if (to.hash) {

@@ -34,7 +34,7 @@
             width="1.2rem"
             height="1.2rem"
           />
-          <span v-if="$i18n.locale == 'zh-CN'">CN</span>
+          <span v-if="$i18n.locale == 'zh'">CN</span>
           <span v-if="$i18n.locale == 'ja'">JP</span>
           <span v-if="$i18n.locale == 'en'">En</span>
         </span>
@@ -42,7 +42,7 @@
           <DropdownItem name="en" :active="currentLocale === 'en'">
             English
           </DropdownItem>
-          <DropdownItem name="zh-CN" :active="currentLocale === 'zh-CN'">
+          <DropdownItem name="zh" :active="currentLocale === 'zh'">
             简体中文
           </DropdownItem>
           <DropdownItem name="ja" :active="currentLocale === 'ja'">
@@ -102,6 +102,8 @@ import SearchModal from '@/components/SearchModal.vue'
 import { useSearchStore } from '@/stores/search'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useNavigatorStore } from '@/stores/navigator'
+import { useRoute, useRouter } from 'vue-router'
+import { isSupportedLocale } from '@/shared/i18n/locale'
 
 const props = defineProps({
   scrollProgress: {
@@ -113,11 +115,23 @@ const props = defineProps({
 const appStore = useAppStore()
 const searchStore = useSearchStore()
 const navigatorStore = useNavigatorStore()
+const route = useRoute()
+const router = useRouter()
 const ballProgress = toRefs(props).scrollProgress
 
-const handleClick = (name: string): void => {
-  if (name === 'en' || name === 'zh-CN' || name === 'ja') {
-    appStore.changeLocale(name)
+const handleClick = async (name: string): Promise<void> => {
+  if (!isSupportedLocale(name)) return
+
+  appStore.changeLocale(name)
+  if (route.params.lang) {
+    await router.push({
+      name: route.name ?? 'home',
+      params: { ...route.params, lang: name },
+      query: route.query,
+      hash: route.hash
+    })
+  } else {
+    await router.push({ name: 'home', params: { lang: name } })
   }
 }
 

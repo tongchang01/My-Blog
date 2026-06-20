@@ -8,6 +8,7 @@ import { Statistic } from '@/models/Statistic.class'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { computed, ref } from 'vue'
+import { resolveInitialLocale } from '@/shared/i18n/locale'
 
 NProgress.configure({
   showSpinner: false,
@@ -41,7 +42,12 @@ export const useAppStore = defineStore('app', () => {
   const theme = ref(
     Cookies.get('theme') ? String(Cookies.get('theme')) : getSystemMode()
   )
-  const locale = ref<Locales>((Cookies.get('locale') as Locales) ?? 'en')
+  const locale = ref<Locales>(
+    resolveInitialLocale(
+      Cookies.get('locale') ?? localStorage.getItem('locale'),
+      navigator.language
+    )
+  )
   const themeConfig = ref(new ThemeConfig())
   const hexoConfig = ref(new HexoConfig())
   const headerGradient = ref('')
@@ -60,7 +66,6 @@ export const useAppStore = defineStore('app', () => {
     const { data } = await fetchHexoConfig()
     themeConfig.value = new ThemeConfig(data)
     hexoConfig.value = new HexoConfig(data)
-    setDefaultLocale(themeConfig.value.site.language)
     initializeTheme(themeConfig.value.theme.dark_mode)
     configReady.value = true
   }
@@ -93,13 +98,9 @@ export const useAppStore = defineStore('app', () => {
 
   const changeLocale = (newLocale: Locales) => {
     Cookies.set('locale', newLocale)
+    localStorage.setItem('locale', newLocale)
     locale.value = newLocale
     i18n.global.locale.value = newLocale
-  }
-
-  const setDefaultLocale = (newLocale: Locales) => {
-    if (Cookies.get('locale')) return
-    changeLocale(newLocale)
   }
 
   const startLoading = () => {
@@ -152,7 +153,6 @@ export const useAppStore = defineStore('app', () => {
     initializeTheme,
     toggleTheme,
     changeLocale,
-    setDefaultLocale,
     startLoading,
     endLoading,
     changeOpenModal,
