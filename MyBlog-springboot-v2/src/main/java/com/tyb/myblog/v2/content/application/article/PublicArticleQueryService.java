@@ -115,9 +115,7 @@ public class PublicArticleQueryService {
                         item.categoryNameJa(),
                         item.categoryNameEn()),
                 item.slug(),
-                item.status(),
                 item.publishAt(),
-                item.coverAttachmentId(),
                 coverUrl,
                 item.commentCount(),
                 tags(item.tags(), lang),
@@ -141,13 +139,12 @@ public class PublicArticleQueryService {
                         detail.categoryNameJa(),
                         detail.categoryNameEn()),
                 detail.slug(),
-                detail.status(),
                 detail.publishAt(),
-                detail.coverAttachmentId(),
                 coverUrl,
                 detail.commentCount(),
                 tags(detail.tags(), lang),
                 detail.createdAt(),
+                detail.updatedAt(),
                 false);
     }
 

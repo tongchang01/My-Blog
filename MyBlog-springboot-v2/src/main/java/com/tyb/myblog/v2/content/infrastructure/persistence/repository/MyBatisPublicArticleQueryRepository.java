@@ -130,7 +130,8 @@ public class MyBatisPublicArticleQueryRepository
                 null,
                 row.getCommentCount(),
                 tags,
-                row.getCreatedAt());
+                row.getCreatedAt(),
+                row.getUpdatedAt());
     }
 
     private ArticleTagView toTag(ArticleTagRow row) {

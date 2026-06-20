@@ -28,4 +28,5 @@ public class PublicArticleDetailRow {
     private Long coverAttachmentId;
     private Integer commentCount;
     private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

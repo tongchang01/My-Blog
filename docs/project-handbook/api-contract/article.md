@@ -130,6 +130,9 @@
 
 `GET /api/public/articles`
 
+公开列表通过 `locked` 表示密码文章，不暴露内部 `status` 与
+`coverAttachmentId`；封面只返回可直接使用的 `coverUrl`。
+
 查询参数：
 
 | 字段 | 类型 | 说明 |
@@ -147,6 +150,9 @@
 ## 公开文章详情
 
 `GET /api/public/articles/{id}?lang=zh`
+
+公开详情不暴露内部 `status` 与 `coverAttachmentId`，返回
+`coverUrl`、`createdAt` 和 `updatedAt`。
 
 - `PUBLISHED`：返回当前语言标题、摘要、正文、分类、标签、封面和发布时间。
 - `PASSWORD`：首版不开放解锁接口，详情返回 `403 + 10003`；完整解锁链路位于上线后增量。

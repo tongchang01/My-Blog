@@ -285,7 +285,8 @@
             a.publish_at,
             a.cover_attachment_id,
             a.comment_count,
-            a.created_at
+            a.created_at,
+            a.updated_at
         FROM t_article a
         LEFT JOIN t_category c
             ON c.id = a.category_id

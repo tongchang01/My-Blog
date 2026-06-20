@@ -63,6 +63,15 @@ class ArticleOpenApiTest {
                 "accessPassword",
                 "\"passwordHash\"",
                 "\"deleted\"");
+        assertThat(root.at(
+                        "/components/schemas/PublicArticlePageItemVO/properties")
+                .fieldNames()).toIterable()
+                .doesNotContain("status", "coverAttachmentId");
+        assertThat(root.at(
+                        "/components/schemas/PublicArticleDetailVO/properties")
+                .fieldNames()).toIterable()
+                .contains("updatedAt")
+                .doesNotContain("status", "coverAttachmentId");
     }
 
     private void assertMethods(

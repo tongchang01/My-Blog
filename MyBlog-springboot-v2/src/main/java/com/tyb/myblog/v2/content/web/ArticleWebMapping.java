@@ -73,13 +73,12 @@ public class ArticleWebMapping {
                 result.categoryId(),
                 result.categoryName(),
                 result.slug(),
-                result.status(),
                 result.publishAt(),
-                result.coverAttachmentId(),
                 result.coverUrl(),
                 result.commentCount(),
                 result.tags(),
                 result.createdAt(),
+                result.updatedAt(),
                 result.locked());
     }
 
@@ -128,9 +127,7 @@ public class ArticleWebMapping {
                 item.categoryId(),
                 item.categoryName(),
                 item.slug(),
-                item.status(),
                 item.publishAt(),
-                item.coverAttachmentId(),
                 item.coverUrl(),
                 item.commentCount(),
                 item.tags(),

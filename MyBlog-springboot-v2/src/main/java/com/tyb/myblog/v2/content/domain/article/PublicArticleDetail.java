@@ -26,5 +26,6 @@ public record PublicArticleDetail(
         String coverUrl,
         int commentCount,
         List<ArticleTagView> tags,
-        LocalDateTime createdAt) {
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt) {
 }

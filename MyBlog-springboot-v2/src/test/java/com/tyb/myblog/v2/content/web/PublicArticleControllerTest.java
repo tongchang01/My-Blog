@@ -8,7 +8,6 @@ import com.tyb.myblog.v2.content.application.article.PublicArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQuery;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQueryService;
 import com.tyb.myblog.v2.content.application.article.PublicArticleTagResult;
-import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -59,6 +58,10 @@ class PublicArticleControllerTest {
                         .value("标题"))
                 .andExpect(jsonPath("$.data.records[0].locked")
                         .value(true))
+                .andExpect(jsonPath("$.data.records[0].status")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.records[0].coverAttachmentId")
+                        .doesNotExist())
                 .andExpect(jsonPath("$.data.records[0].body")
                         .doesNotExist());
     }
@@ -74,6 +77,11 @@ class PublicArticleControllerTest {
         mockMvc.perform(get("/api/public/articles/100"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.body").value("正文"))
+                .andExpect(jsonPath("$.data.status").doesNotExist())
+                .andExpect(jsonPath("$.data.coverAttachmentId")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.updatedAt")
+                        .value("2026-06-15T11:00:00"))
                 .andExpect(jsonPath("$.data.locked").value(false));
         mockMvc.perform(get("/api/public/articles/101"))
                 .andExpect(status().isForbidden());
@@ -89,9 +97,7 @@ class PublicArticleControllerTest {
                 10L,
                 "分类",
                 "article",
-                ArticleStatus.PASSWORD,
                 LocalDateTime.of(2026, 6, 15, 10, 0),
-                300L,
                 "https://cdn.example.com/c.png",
                 2,
                 List.of(new PublicArticleTagResult(
@@ -109,14 +115,13 @@ class PublicArticleControllerTest {
                 10L,
                 "分类",
                 "article",
-                ArticleStatus.PUBLISHED,
                 LocalDateTime.of(2026, 6, 15, 10, 0),
-                300L,
                 "https://cdn.example.com/c.png",
                 2,
                 List.of(new PublicArticleTagResult(
                         20L, "标签", "tag")),
                 LocalDateTime.of(2026, 6, 15, 9, 0),
+                LocalDateTime.of(2026, 6, 15, 11, 0),
                 false);
     }
 }

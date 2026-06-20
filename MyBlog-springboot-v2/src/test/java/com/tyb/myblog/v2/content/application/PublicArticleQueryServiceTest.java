@@ -187,7 +187,8 @@ class PublicArticleQueryServiceTest {
                 null,
                 2,
                 List.of(tag()),
-                NOW.minusDays(2));
+                NOW.minusDays(2),
+                NOW.minusDays(1));
     }
 
     private ArticleTagView tag() {
