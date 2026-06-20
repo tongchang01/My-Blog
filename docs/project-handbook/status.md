@@ -1,5 +1,12 @@
 # 当前进度
 
+## 2026-06-20：博客后台基础闭环完成
+
+- 后台工程位于 `frontend/apps/admin/`，基于 Pure Admin Thin i18n 固定提交建立，工程文档独立归档在 `frontend/apps/admin/docs/`。
+- 已完成 zh/ja/en、静态路由、ADMIN/DEMO、登录与 `/me` 原子编排、单飞 refresh、退出清理和空仪表盘；文章等业务管理页尚未实现。
+- 阶段验证：前端 28 tests、lint、typecheck、build 通过；后端局部 27 tests 通过；后端全量 637 tests，0 failures、0 errors、4 skipped。
+- H2 test profile 的真实 HTTP 联调通过 ADMIN/DEMO、refresh 轮换、logout 撤销和 Vite 代理；可视化浏览器点击验收因本次浏览器控制不可用，保留为本机复验项。
+
 ## 2026-06-20：博客前台首批后端联调完成
 
 - 前台工程位于 `frontend/apps/blog/`，已建立 Node 24、pnpm 9.15.9、Vitest、vue-tsc、lint 和生产构建基线。
@@ -8,7 +15,7 @@
 - 首页迁移链路不再请求 `site.json`、`posts/1.json`、`features.json`、旧搜索和旧友链页面数据。
 - 阶段验证：后端 `mvn clean test` 共 636 tests，0 failures、0 errors、4 skipped；前端 30 tests 全部通过，lint 0 errors，typecheck 与 build 通过。
 - 真实联调使用 H2 test profile；本机 `local` profile 因缺少数据库账号/密码、JWT secret 和 stats hash secret 未执行 MySQL 数据验收。
-- M4 尚未完成：后台管理工程、分类/标签/归档/友链/关于/搜索、评论/留言/统计、PASSWORD 解锁和 Spotify 仍在后续批次。
+- M4 尚未完成：前后台业务页面、分类/标签/归档/友链/关于/搜索、评论/留言/统计、PASSWORD 解锁和 Spotify 仍在后续批次。
 
 > 本文档回答："V2 现在做到哪了？接下来按什么主线推进？"
 > 更新时机：每个里程碑完成后更新。
@@ -97,12 +104,13 @@ M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，iden
 - stats 模块已完成：匿名打点、每日轮换 HMAC visitor hash、日 PV/UV 幂等重算、启动补算、5 分钟校准、90 天明细清理和后台 dashboard 均已落地
 - dashboard 默认补齐最近 30 个 JST 自然日，最大闭区间 366 天；`dailyUvSum` 和 `averageDailyUv` 均明确不是跨日独立访客数
 
-**当前处置方案**：M3 后端模块重建已收尾，下一步进入 M4 前台 / 后台前端骨架。
+**当前处置方案**：M3 后端模块重建与 M4 前后台基础骨架已收尾，下一步按业务模块逐个对接后台管理页面。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. 前台 / 后台前端骨架
-2. 根据前端对接结果补充接口契约细节
+1. 后台文章管理纵向切片
+2. 按模块继续分类/标签、评论、友链、配置和统计页面
+3. 根据前端对接结果补充接口契约细节
 
 ## 4. 相关文档
 
