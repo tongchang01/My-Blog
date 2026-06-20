@@ -61,6 +61,7 @@ panel:
   pureHiddenFooter: 隐藏页脚
   pureMultiTagsCache: 页签持久化
 menus:
+  dashboard: 仪表盘
   pureHome: 首页
   pureLogin: 登录
   pureAbnormal: 异常页面
@@ -73,6 +74,7 @@ menus:
   purePermissionButtonRouter: 路由返回按钮权限
   purePermissionButtonLogin: 登录接口返回按钮权限
 status:
+  readOnlyDemo: 当前为只读演示账号
   pureLoad: 加载中...
   pureMessage: 消息
   pureNotify: 通知

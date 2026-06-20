@@ -1,12 +1,13 @@
 // 多组件库的国际化和本地项目国际化兼容
 import { type I18n, createI18n } from "vue-i18n";
 import type { App, WritableComputedRef } from "vue";
-import { responsiveStorageNameSpace } from "@/config";
-import { storageLocal, isObject } from "@pureadmin/utils";
+import { isObject } from "@pureadmin/utils";
 
 // element-plus国际化
 import enLocale from "element-plus/es/locale/lang/en";
+import jaLocale from "element-plus/es/locale/lang/ja";
 import zhLocale from "element-plus/es/locale/lang/zh-cn";
+import { loadAdminLocale } from "@/features/i18n/locale";
 
 const siphonI18n = (function () {
   // 仅初始化一次国际化配置
@@ -31,6 +32,10 @@ export const localesConfigs = {
   en: {
     ...siphonI18n("en"),
     ...enLocale
+  },
+  ja: {
+    ...siphonI18n("ja"),
+    ...jaLocale
   }
 };
 
@@ -103,11 +108,8 @@ export const $t = (key: string) => key;
 
 export const i18n: I18n = createI18n({
   legacy: false,
-  locale:
-    storageLocal().getItem<StorageConfigs>(
-      `${responsiveStorageNameSpace()}locale`
-    )?.locale ?? "zh",
-  fallbackLocale: "en",
+  locale: loadAdminLocale(navigator.language),
+  fallbackLocale: "zh",
   messages: localesConfigs
 });
 

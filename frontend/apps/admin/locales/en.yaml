@@ -61,6 +61,7 @@ panel:
   pureHiddenFooter: Hidden Footer
   pureMultiTagsCache: MultiTags Cache
 menus:
+  dashboard: Dashboard
   pureHome: Home
   pureLogin: Login
   pureAbnormal: Abnormal Page
@@ -73,6 +74,7 @@ menus:
   purePermissionButtonRouter: Route return button permission
   purePermissionButtonLogin: Login interface return button permission
 status:
+  readOnlyDemo: The current demo account is read-only
   pureLoad: Loading...
   pureMessage: Message
   pureNotify: Notify

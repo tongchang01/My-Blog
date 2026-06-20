@@ -41,7 +41,8 @@ const { t } = useI18n();
 const { dataTheme, overallStyle, dataThemeChange } = useDataThemeChange();
 dataThemeChange(overallStyle.value);
 const { title, getDropdownItemStyle, getDropdownItemClass } = useNav();
-const { locale, translationCh, translationEn } = useTranslationLang();
+const { locale, translationCh, translationJa, translationEn } =
+  useTranslationLang();
 
 const ruleForm = reactive({
   username: "admin",
@@ -125,6 +126,16 @@ useEventListener(document, "keydown", ({ code }) => {
                 :icon="Check"
               />
               简体中文
+            </el-dropdown-item>
+            <el-dropdown-item
+              :style="getDropdownItemStyle(locale, 'ja')"
+              :class="['dark:text-white!', getDropdownItemClass(locale, 'ja')]"
+              @click="translationJa"
+            >
+              <span v-show="locale === 'ja'" class="check-ja">
+                <IconifyIconOffline :icon="Check" />
+              </span>
+              日本語
             </el-dropdown-item>
             <el-dropdown-item
               :style="getDropdownItemStyle(locale, 'en')"

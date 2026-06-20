@@ -20,7 +20,7 @@ import Check from "~icons/ep/check";
 const menuRef = ref();
 const defaultActive = ref(null);
 
-const { t, route, locale, translationCh, translationEn } =
+const { t, route, locale, translationCh, translationJa, translationEn } =
   useTranslationLang(menuRef);
 const {
   device,
@@ -116,6 +116,16 @@ watch(
                 <IconifyIconOffline :icon="Check" />
               </span>
               简体中文
+            </el-dropdown-item>
+            <el-dropdown-item
+              :style="getDropdownItemStyle(locale, 'ja')"
+              :class="['dark:text-white!', getDropdownItemClass(locale, 'ja')]"
+              @click="translationJa"
+            >
+              <span v-show="locale === 'ja'" class="check-ja">
+                <IconifyIconOffline :icon="Check" />
+              </span>
+              日本語
             </el-dropdown-item>
             <el-dropdown-item
               :style="getDropdownItemStyle(locale, 'en')"
