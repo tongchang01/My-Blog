@@ -60,6 +60,9 @@ myblog:
       maintenance-cron: "0 30 3 * * *"
   web:
     trusted-proxies: []
+  comment:
+    audit:
+      blocked-keywords: []
   security:
     jwt:
       issuer: myblog-v2

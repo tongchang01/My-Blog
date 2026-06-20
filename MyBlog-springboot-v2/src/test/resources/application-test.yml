@@ -38,6 +38,10 @@ myblog:
     login-max-failures: 5
     login-cooldown: 10m
     login-maximum-size: 10000
+  comment:
+    audit:
+      blocked-keywords:
+        - spam
   security:
     jwt:
       issuer: myblog-v2-test

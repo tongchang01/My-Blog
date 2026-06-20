@@ -9,6 +9,7 @@ import com.tyb.myblog.v2.comment.domain.NewComment;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentCountService;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicy;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicyService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -41,6 +42,8 @@ class CommentCreateServiceTest {
             mock(CommentRateLimitService.class);
     private final DuplicateCommentGuard duplicateGuard =
             mock(DuplicateCommentGuard.class);
+    private final CommentAuditPolicy auditPolicy =
+            mock(CommentAuditPolicy.class);
     private final ApplicationEventPublisher eventPublisher =
             mock(ApplicationEventPublisher.class);
     private final CommentCreateService service = new CommentCreateService(
@@ -49,9 +52,15 @@ class CommentCreateServiceTest {
             countService,
             rateLimitService,
             duplicateGuard,
+            auditPolicy,
             markdown -> "<p>" + markdown + "</p>",
             eventPublisher,
             CLOCK);
+
+    @BeforeEach
+    void defaultAuditPolicy() {
+        when(auditPolicy.audit(any())).thenReturn(CommentAuditStatus.PASS);
+    }
 
     @Test
     void createsPassingArticleCommentAndIncrementsCount() {
@@ -72,6 +81,8 @@ class CommentCreateServiceTest {
     void blacklistedCommentBecomesPendingAndDoesNotIncrementCount() {
         when(policyService.requirePublicCommentable(100L))
                 .thenReturn(new ArticleCommentPolicy(100L, 0));
+        when(auditPolicy.audit("spam"))
+                .thenReturn(CommentAuditStatus.PENDING);
         when(repository.insert(any()))
                 .thenAnswer(invocation -> stored(invocation.getArgument(0), 201L));
 

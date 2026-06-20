@@ -27,6 +27,7 @@ public class CommentCreateService {
     private final ArticleCommentCountService articleCountService;
     private final CommentRateLimitService rateLimitService;
     private final DuplicateCommentGuard duplicateGuard;
+    private final CommentAuditPolicy auditPolicy;
     private final CommentMarkdownRenderer markdownRenderer;
     private final ApplicationEventPublisher eventPublisher;
     private final Clock clock;
@@ -54,7 +55,7 @@ public class CommentCreateService {
                 target,
                 command.contentMd());
         ReplySnapshot reply = resolveReply(target, command.replyToCommentId());
-        CommentAuditStatus status = audit(command.contentMd());
+        CommentAuditStatus status = auditPolicy.audit(command.contentMd());
         Comment inserted = repository.insert(NewComment.create(
                 target,
                 reply.parentId(),
@@ -113,14 +114,6 @@ public class CommentCreateService {
                 parentId,
                 replyTo.author().userId(),
                 replyTo.author().nickname());
-    }
-
-    private CommentAuditStatus audit(String contentMd) {
-        if (contentMd != null
-                && contentMd.toLowerCase(java.util.Locale.ROOT).contains("spam")) {
-            return CommentAuditStatus.PENDING;
-        }
-        return CommentAuditStatus.PASS;
     }
 
     private record ReplySnapshot(
