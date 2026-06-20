@@ -65,6 +65,19 @@
         ORDER BY tag_id ASC
     </select>
 
+    <!-- 后台分页按文章批量读取标签 ID，避免逐条查询。 -->
+    <select id="selectTagIdsBatch"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagIdRow">
+        SELECT article_id, tag_id
+        FROM t_article_tag
+        WHERE article_id IN
+        <foreach collection="articleIds" item="articleId"
+                 open="(" separator="," close=")">
+            #{articleId}
+        </foreach>
+        ORDER BY article_id ASC, tag_id ASC
+    </select>
+
     <sql id="adminArticleWhere">
         a.deleted = 0
         <if test="query.status != null">

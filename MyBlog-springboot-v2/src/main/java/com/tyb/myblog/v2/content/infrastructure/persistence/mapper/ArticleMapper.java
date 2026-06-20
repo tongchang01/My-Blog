@@ -6,6 +6,7 @@ import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleCriteria;
 import com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagRow;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagIdRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticleDetailRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleCommentPolicyRow;
@@ -34,6 +35,9 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
     ArticleEntity selectDeletedByIdForUpdate(@Param("id") long id);
 
     List<Long> selectTagIds(@Param("articleId") long articleId);
+
+    List<ArticleTagIdRow> selectTagIdsBatch(
+            @Param("articleIds") List<Long> articleIds);
 
     List<AdminArticlePageRow> selectAdminPage(
             @Param("query") AdminArticleCriteria query,

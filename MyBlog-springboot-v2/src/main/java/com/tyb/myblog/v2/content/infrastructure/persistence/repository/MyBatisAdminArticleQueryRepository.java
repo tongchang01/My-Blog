@@ -11,11 +11,15 @@ import com.tyb.myblog.v2.content.domain.article.DeletedArticlePageItem;
 import com.tyb.myblog.v2.content.infrastructure.persistence.mapper.ArticleMapper;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticleDetailRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagIdRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.DeletedArticlePageRow;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 基于 MyBatis XML 的后台文章查询仓储。
@@ -30,10 +34,17 @@ public class MyBatisAdminArticleQueryRepository
     @Override
     public AdminArticlePage findActivePage(AdminArticleCriteria criteria) {
         long offset = (long) (criteria.page() - 1) * criteria.size();
+        List<AdminArticlePageRow> rows = mapper.selectAdminPage(
+                criteria,
+                offset,
+                criteria.size());
+        Map<Long, List<Long>> tagIdsByArticle = tagIds(rows);
         return new AdminArticlePage(
-                mapper.selectAdminPage(criteria, offset, criteria.size())
-                        .stream()
-                        .map(this::toPageItem)
+                rows.stream()
+                        .map(row -> toPageItem(
+                                row,
+                                tagIdsByArticle.getOrDefault(
+                                        row.getId(), List.of())))
                         .toList(),
                 mapper.countAdminPage(criteria),
                 criteria.page(),
@@ -60,7 +71,8 @@ public class MyBatisAdminArticleQueryRepository
     }
 
     private AdminArticlePageItem toPageItem(
-            AdminArticlePageRow row) {
+            AdminArticlePageRow row,
+            List<Long> tagIds) {
         return new AdminArticlePageItem(
                 row.getId(),
                 row.getTitleZh(),
@@ -77,11 +89,27 @@ public class MyBatisAdminArticleQueryRepository
                 row.getCoverAttachmentId(),
                 null,
                 row.getCommentCount(),
-                mapper.selectTagIds(row.getId()),
+                tagIds,
                 row.getCreatedAt(),
                 row.getCreatedBy(),
                 row.getUpdatedAt(),
                 row.getUpdatedBy());
+    }
+
+    private Map<Long, List<Long>> tagIds(
+            List<AdminArticlePageRow> rows) {
+        if (rows.isEmpty()) {
+            return Map.of();
+        }
+        return mapper.selectTagIdsBatch(rows.stream()
+                        .map(AdminArticlePageRow::getId)
+                        .toList())
+                .stream()
+                .collect(Collectors.groupingBy(
+                        ArticleTagIdRow::getArticleId,
+                        Collectors.mapping(
+                                ArticleTagIdRow::getTagId,
+                                Collectors.toList())));
     }
 
     private AdminArticleDetail toDetail(AdminArticleDetailRow row) {
