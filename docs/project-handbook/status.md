@@ -1,5 +1,15 @@
 # 当前进度
 
+## 2026-06-20：博客前台首批后端联调完成
+
+- 前台工程位于 `frontend/apps/blog/`，已建立 Node 24、pnpm 9.15.9、Vitest、vue-tsc、lint 和生产构建基线。
+- 已完成三语入口、公开站点配置、公开文章列表/分页、ID 主导详情、安全 Markdown、canonical slug 以及 locked/404/error/retry 状态。
+- 后端公开文章 ID 契约已改为 JSON string；后端内部、数据库和路径参数仍使用 `long`。
+- 首页迁移链路不再请求 `site.json`、`posts/1.json`、`features.json`、旧搜索和旧友链页面数据。
+- 阶段验证：后端 `mvn clean test` 共 636 tests，0 failures、0 errors、4 skipped；前端 30 tests 全部通过，lint 0 errors，typecheck 与 build 通过。
+- 真实联调使用 H2 test profile；本机 `local` profile 因缺少数据库账号/密码、JWT secret 和 stats hash secret 未执行 MySQL 数据验收。
+- M4 尚未完成：后台管理工程、分类/标签/归档/友链/关于/搜索、评论/留言/统计、PASSWORD 解锁和 Spotify 仍在后续批次。
+
 > 本文档回答："V2 现在做到哪了？接下来按什么主线推进？"
 > 更新时机：每个里程碑完成后更新。
 > 当前日期：2026-06
