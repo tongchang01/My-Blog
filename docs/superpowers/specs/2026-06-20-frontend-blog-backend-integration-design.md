@@ -92,6 +92,14 @@ frontend/apps/blog/src/
 
 ## 5. HTTP 与契约处理
 
+### 5.1 业务 ID 的 JSON 表达
+
+后端内部、数据库和路径参数继续使用 Java `long` / MySQL `BIGINT`，但所有进入本批次公开文章响应的业务 ID 必须输出为 JSON string，包括文章 `id`、`categoryId` 和标签 `id`。原因是 `ASSIGN_ID` 雪花值可能超过 JavaScript 的安全整数范围；前端不得先接收 number 再调用 `String()`，因为精度在 JSON 解析时已经丢失。
+
+本批次先收窄修复公开文章列表与详情契约，并同步后端测试和 API 文档。其他后台或后续公开接口的 ID 字符串化按对应前端联调批次处理，不在本轮全量扩散。前端 contract、ViewModel、路由参数和 API 参数从一开始都把业务 ID 建模为 `string`。
+
+### 5.2 HTTP client
+
 `shared/http/client.ts` 负责：
 
 - 使用环境变量配置 API base URL；
@@ -183,31 +191,37 @@ HTTP client 只提供结构化错误，具体文案和交互由 feature/store/pa
 
 ## 11. 实施批次与提交边界
 
-### 批次 0：前端质量基线
+### 批次 0：公开文章 ID 契约前置修复
+
+- 公开文章列表与详情的文章、分类和标签 ID 输出为 JSON string。
+- 后端内部查询、持久化和 path variable 保持 `long`。
+- 同步公开文章控制器/OpenAPI 测试和 `api-contract/article.md`。
+
+### 批次 1：前端质量基线
 
 - 修复现有 10 个 TypeScript 错误。
 - 正式引入 `vue-tsc` 和 `typecheck` 命令。
 - 引入 Vitest 基线。
 
-### 批次 1：共享基础能力
+### 批次 2：共享基础能力
 
 - HTTP client、统一响应解包和 ApiError。
 - 语言选择、路由语言校验和持久化。
 - JST 时间工具。
 
-### 批次 2：站点配置纵向切片
+### 批次 3：站点配置纵向切片
 
 - 默认配置、后端契约、mapper、store。
 - App 启动加载和失败降级。
 - 将当前仍有效的主题、导航、作者和社交配置完整迁入 typed defaults 后，删除 `site.json` 读取链路；其他 mock 暂留。
 
-### 批次 3：公开文章列表纵向切片
+### 批次 4：公开文章列表纵向切片
 
 - 列表 DTO、ViewModel、mapper、store。
 - 首页、卡片、分页、空状态、错误重试。
 - 删除 `posts/1.json` 和首页 feature 静态读取链路；首页特色区暂按普通列表数据降级，不在本批次发明后端不存在的“精选文章”契约。
 
-### 批次 4：公开文章详情纵向切片
+### 批次 5：公开文章详情纵向切片
 
 - id-led 路由与 canonical slug。
 - 详情 DTO、ViewModel、mapper、store。
@@ -221,6 +235,7 @@ HTTP client 只提供结构化错误，具体文案和交互由 feature/store/pa
 
 - Vitest：语言选择与回退、ApiResponse 解包、错误分类、JST 解析、站点配置合并、文章列表/详情 mapper。
 - Store 测试：加载、空数据、失败、取消旧请求和重试状态。
+- 后端测试：以超过 JavaScript 安全整数的 ID 验证公开文章列表与详情响应中的业务 ID 均为 JSON string。
 - `pnpm lint`。
 - `pnpm typecheck`。
 - `pnpm test --run`。
