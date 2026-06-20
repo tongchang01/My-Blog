@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.content.web;
 
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.content.application.category.CategoryQueryService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ public class PublicCategoryController {
     private final CategoryQueryService queryService;
     private final CategoryWebMapping mapping;
 
+    @Operation(summary = "查询公开分类列表")
     @GetMapping
     public ApiResponse<List<PublicCategoryVO>> list(
             @RequestParam String lang) {

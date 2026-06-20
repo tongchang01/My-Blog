@@ -41,6 +41,7 @@ public class AdminAttachmentController {
     /**
      * 分页查询 active 附件。
      */
+    @Operation(summary = "分页查询附件")
     @GetMapping
     public ApiResponse<PageResponse<AttachmentVO>> page(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -60,6 +61,7 @@ public class AdminAttachmentController {
     /**
      * 查询单个 active 附件。
      */
+    @Operation(summary = "查询附件详情")
     @GetMapping("/{id}")
     public ApiResponse<AttachmentVO> detail(
             @CurrentUser AuthenticatedPrincipal principal,

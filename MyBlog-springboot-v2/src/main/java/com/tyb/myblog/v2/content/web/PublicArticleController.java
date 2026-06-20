@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.content.web;
 
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.common.web.PageResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQuery;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQueryService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ public class PublicArticleController {
     private final PublicArticleQueryService queryService;
     private final ArticleWebMapping mapping;
 
+    @Operation(summary = "分页查询公开文章")
     @GetMapping
     public ApiResponse<PageResponse<PublicArticlePageItemVO>> page(
             @RequestParam(defaultValue = "1") int page,
@@ -42,6 +44,7 @@ public class PublicArticleController {
                         archiveMonth))));
     }
 
+    @Operation(summary = "查询公开文章详情")
     @GetMapping("/{id:\\d+}")
     public ApiResponse<PublicArticleDetailVO> detail(
             @PathVariable long id,

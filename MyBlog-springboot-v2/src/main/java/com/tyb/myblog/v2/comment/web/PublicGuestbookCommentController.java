@@ -6,6 +6,7 @@ import com.tyb.myblog.v2.comment.application.CommentQueryService;
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.common.web.ClientIpResolver;
 import com.tyb.myblog.v2.common.web.PageResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ public class PublicGuestbookCommentController {
     private final CommentCreateService createService;
     private final ClientIpResolver clientIpResolver;
 
+    @Operation(summary = "查询公开留言")
     @GetMapping
     public ApiResponse<PageResponse<PublicCommentVO>> page(
             @RequestParam(defaultValue = "1") int page,
@@ -31,6 +33,7 @@ public class PublicGuestbookCommentController {
                 queryService.guestbookComments(page, size)));
     }
 
+    @Operation(summary = "提交公开留言")
     @PostMapping
     public ApiResponse<PublicCommentCreateVO> create(
             @org.springframework.web.bind.annotation.RequestBody

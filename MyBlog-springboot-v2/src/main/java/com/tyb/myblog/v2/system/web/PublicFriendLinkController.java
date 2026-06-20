@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.system.web;
 
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.system.application.friendlink.FriendLinkQueryService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +22,7 @@ public class PublicFriendLinkController {
 
     private final FriendLinkQueryService queryService;
 
+    @Operation(summary = "查询公开友链列表")
     @GetMapping
     public ApiResponse<List<PublicFriendLinkVO>> list() {
         return ApiResponse.ok(queryService.publicList().stream()

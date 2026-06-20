@@ -39,6 +39,7 @@ public class AdminCategoryController {
     private final CategoryDeleteService deleteService;
     private final CategoryWebMapping mapping;
 
+    @Operation(summary = "查询后台分类列表")
     @GetMapping
     public ApiResponse<List<AdminCategoryVO>> list(
             @CurrentUser AuthenticatedPrincipal principal) {
@@ -48,6 +49,7 @@ public class AdminCategoryController {
                         .toList());
     }
 
+    @Operation(summary = "查询后台分类详情")
     @GetMapping("/{id:\\d+}")
     public ApiResponse<AdminCategoryVO> detail(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -90,6 +92,7 @@ public class AdminCategoryController {
                         principal, id, request.toCommand())));
     }
 
+    @Operation(summary = "批量调整分类排序")
     @PutMapping("/sort-orders")
     public ApiResponse<Void> updateSortOrders(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -99,6 +102,7 @@ public class AdminCategoryController {
         return ApiResponse.ok(null);
     }
 
+    @Operation(summary = "删除分类")
     @DeleteMapping("/{id:\\d+}")
     public ApiResponse<Void> delete(
             @CurrentUser AuthenticatedPrincipal principal,

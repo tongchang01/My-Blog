@@ -42,6 +42,7 @@ public class AdminFriendLinkController {
     private final FriendLinkSortService sortService;
     private final FriendLinkDeleteService deleteService;
 
+    @Operation(summary = "分页查询后台友链")
     @GetMapping
     public ApiResponse<PageResponse<AdminFriendLinkVO>> page(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -58,6 +59,7 @@ public class AdminFriendLinkController {
                 result.size()));
     }
 
+    @Operation(summary = "查询后台友链详情")
     @GetMapping("/{id:\\d+}")
     public ApiResponse<AdminFriendLinkVO> detail(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -100,6 +102,7 @@ public class AdminFriendLinkController {
                         principal, id, request.toCommand())));
     }
 
+    @Operation(summary = "修改友链可见状态")
     @PatchMapping("/{id:\\d+}/status")
     public ApiResponse<AdminFriendLinkVO> updateStatus(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -111,6 +114,7 @@ public class AdminFriendLinkController {
                         principal, id, request.toCommand())));
     }
 
+    @Operation(summary = "批量调整友链排序")
     @PutMapping("/sort-orders")
     public ApiResponse<java.util.List<AdminFriendLinkVO>>
             updateSortOrders(
@@ -124,6 +128,7 @@ public class AdminFriendLinkController {
                 .toList());
     }
 
+    @Operation(summary = "删除友链")
     @DeleteMapping("/{id:\\d+}")
     public ApiResponse<Void> delete(
             @CurrentUser AuthenticatedPrincipal principal,

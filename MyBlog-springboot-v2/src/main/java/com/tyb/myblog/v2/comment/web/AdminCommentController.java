@@ -10,6 +10,7 @@ import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.auth.CurrentUser;
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.common.web.PageResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +28,7 @@ public class AdminCommentController {
     private final AdminCommentQueryService queryService;
     private final AdminCommentCommandService commandService;
 
+    @Operation(summary = "分页查询后台评论")
     @GetMapping
     public ApiResponse<PageResponse<AdminCommentPageItemVO>> page(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -56,6 +58,7 @@ public class AdminCommentController {
                 result.size()));
     }
 
+    @Operation(summary = "审核通过评论")
     @PostMapping("/{id:\\d+}/approve")
     public ApiResponse<Void> approve(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -64,6 +67,7 @@ public class AdminCommentController {
         return ApiResponse.ok(null);
     }
 
+    @Operation(summary = "隐藏评论")
     @PostMapping("/{id:\\d+}/hide")
     public ApiResponse<Void> hide(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -72,6 +76,7 @@ public class AdminCommentController {
         return ApiResponse.ok(null);
     }
 
+    @Operation(summary = "恢复已删除评论")
     @PostMapping("/{id:\\d+}/restore")
     public ApiResponse<Void> restore(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -80,6 +85,7 @@ public class AdminCommentController {
         return ApiResponse.ok(null);
     }
 
+    @Operation(summary = "删除评论")
     @DeleteMapping("/{id:\\d+}")
     public ApiResponse<Void> delete(
             @CurrentUser AuthenticatedPrincipal principal,

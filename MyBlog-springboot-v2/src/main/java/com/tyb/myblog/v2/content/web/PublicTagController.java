@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.content.web;
 
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.content.application.tag.TagQueryService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +24,7 @@ public class PublicTagController {
     private final TagQueryService queryService;
     private final TagWebMapping mapping;
 
+    @Operation(summary = "查询公开标签列表")
     @GetMapping
     public ApiResponse<List<PublicTagVO>> list(
             @RequestParam String lang) {

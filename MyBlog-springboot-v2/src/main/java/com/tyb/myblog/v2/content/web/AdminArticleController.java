@@ -50,6 +50,7 @@ public class AdminArticleController {
     private final DeletedArticleQueryService deletedQueryService;
     private final ArticleWebMapping mapping;
 
+    @Operation(summary = "分页查询后台文章")
     @GetMapping
     public ApiResponse<PageResponse<AdminArticlePageItemVO>> page(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -87,6 +88,7 @@ public class AdminArticleController {
         return ApiResponse.ok(mapping.toAdminPage(result));
     }
 
+    @Operation(summary = "查询后台文章详情")
     @GetMapping("/{id:\\d+}")
     public ApiResponse<AdminArticleDetailVO> detail(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -95,6 +97,7 @@ public class AdminArticleController {
                 queryService.adminDetail(principal, id)));
     }
 
+    @Operation(summary = "分页查询文章回收站")
     @GetMapping("/recycle-bin")
     public ApiResponse<PageResponse<DeletedArticlePageItemVO>> recycleBin(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -146,6 +149,7 @@ public class AdminArticleController {
         return ApiResponse.ok(mapping.toAdminDetail(detail));
     }
 
+    @Operation(summary = "删除文章")
     @DeleteMapping("/{id:\\d+}")
     public ApiResponse<Void> delete(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -154,6 +158,7 @@ public class AdminArticleController {
         return ApiResponse.ok(null);
     }
 
+    @Operation(summary = "恢复已删除文章")
     @PostMapping("/{id:\\d+}/restore")
     public ApiResponse<AdminArticleDetailVO> restore(
             @CurrentUser AuthenticatedPrincipal principal,

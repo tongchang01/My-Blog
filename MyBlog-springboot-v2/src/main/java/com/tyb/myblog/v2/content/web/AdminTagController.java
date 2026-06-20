@@ -37,6 +37,7 @@ public class AdminTagController {
     private final TagDeleteService deleteService;
     private final TagWebMapping mapping;
 
+    @Operation(summary = "查询后台标签列表")
     @GetMapping
     public ApiResponse<List<AdminTagVO>> list(
             @CurrentUser AuthenticatedPrincipal principal) {
@@ -46,6 +47,7 @@ public class AdminTagController {
                         .toList());
     }
 
+    @Operation(summary = "查询后台标签详情")
     @GetMapping("/{id:\\d+}")
     public ApiResponse<AdminTagVO> detail(
             @CurrentUser AuthenticatedPrincipal principal,
@@ -88,6 +90,7 @@ public class AdminTagController {
                         principal, id, request.toCommand())));
     }
 
+    @Operation(summary = "删除标签")
     @DeleteMapping("/{id:\\d+}")
     public ApiResponse<Void> delete(
             @CurrentUser AuthenticatedPrincipal principal,
