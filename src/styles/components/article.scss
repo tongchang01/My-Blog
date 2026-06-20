@@ -44,9 +44,9 @@
       b {
         @apply text-ob text-xs uppercase cursor-pointer hover:opacity-60;
         &.article-tag {
-          @apply relative py-0.5 px-1.5 text-white mr-2 hover:opacity-100 cursor-default;
+          @apply inline-flex items-center relative py-0.5 px-1.5 text-white mr-2 hover:opacity-100 cursor-default;
           span {
-            @apply relative z-10 text-xs ml-0.5;
+            @apply relative z-10 text-xs flex items-center gap-1;
             position: relative;
             z-index: 10;
             span {
@@ -117,10 +117,10 @@
     b {
       @apply text-ob uppercase hover:opacity-60 cursor-pointer;
       &.article-tag {
-        @apply relative py-0.5 px-1.5 text-white mr-3 hover:opacity-100 cursor-default;
+        @apply inline-flex items-center relative py-0.5 px-1.5 text-white mr-3 hover:opacity-100 cursor-default;
 
         span {
-          @apply relative z-10 text-xs ml-0.5;
+          @apply relative z-10 text-xs flex items-center gap-1;
           position: relative;
           z-index: 10;
 

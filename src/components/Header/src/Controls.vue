@@ -34,8 +34,8 @@
             width="1.2rem"
             height="1.2rem"
           />
-          <span v-if="$i18n.locale == 'zh-CN'">简体</span>
-          <span v-if="$i18n.locale == 'ja'">日本語</span>
+          <span v-if="$i18n.locale == 'zh-CN'">CN</span>
+          <span v-if="$i18n.locale == 'ja'">JP</span>
           <span v-if="$i18n.locale == 'en'">En</span>
         </span>
         <DropdownMenu>
@@ -43,7 +43,7 @@
             English
           </DropdownItem>
           <DropdownItem name="zh-CN" :active="currentLocale === 'zh-CN'">
-            简体
+            简体中文
           </DropdownItem>
           <DropdownItem name="ja" :active="currentLocale === 'ja'">
             日本語

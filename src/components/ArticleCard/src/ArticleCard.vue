@@ -12,9 +12,8 @@
             <span>
               <SvgIcon
                 icon-class="hot"
-                width="1.rem"
-                height="1.05rem"
-                class="-mb-0.5"
+                width="1rem"
+                height="1rem"
                 stroke="currentColor"
               />
               <span>{{ t('settings.pinned') }}</span>
@@ -24,9 +23,8 @@
             <span>
               <SvgIcon
                 icon-class="hot"
-                width="1.05rem"
-                height="1.05rem"
-                class="-mb-0.5"
+                width="1rem"
+                height="1rem"
                 stroke="currentColor"
               />
               <span>{{ t('settings.featured') }}</span>

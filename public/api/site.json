@@ -70,7 +70,7 @@
       "opacity": 1
     },
     "theme": {
-      "profile_shape": "diamond",
+      "profile_shape": "circle",
       "feature": true,
       "gradient": {
         "color_1": "#06b6d4",

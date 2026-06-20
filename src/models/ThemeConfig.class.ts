@@ -73,17 +73,7 @@ interface ObMenu {
 }
 
 export class ThemeMenu implements ObMenu {
-  menus: { [pathName: string]: Menu } = {
-    Home: new Menu({
-      name: 'Home',
-      path: '/',
-      i18n: {
-        'zh-CN': '首页',
-        ja: 'ホーム',
-        en: 'Home'
-      }
-    })
-  }
+  menus: { [pathName: string]: Menu } = {}
 
   /**
    * Model class for Hexo theme's menu set
@@ -92,6 +82,15 @@ export class ThemeMenu implements ObMenu {
    */
   constructor(raw?: GeneralOptions) {
     const extract: GeneralOptions = {
+      Home: {
+        name: 'Home',
+        path: '/',
+        i18n: {
+          'zh-CN': '首页',
+          ja: 'ホーム',
+          en: 'Home'
+        }
+      },
       About: {
         name: 'About',
         path: '/about',
@@ -117,6 +116,15 @@ export class ThemeMenu implements ObMenu {
           'zh-CN': '标签',
           ja: 'タグ',
           en: 'Tags'
+        }
+      },
+      Categories: {
+        name: 'Categories',
+        path: '/categories',
+        i18n: {
+          'zh-CN': '分类',
+          ja: 'カテゴリ',
+          en: 'Categories'
         }
       },
       Links: {
