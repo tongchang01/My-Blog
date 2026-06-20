@@ -25,16 +25,12 @@ class AttachmentOpenApiTest {
 
     private static final Set<String> ATTACHMENT_FIELDS = Set.of(
             "id",
-            "storageType",
-            "bucket",
-            "objectKey",
             "publicUrl",
             "contentType",
             "fileSize",
             "width",
             "height",
             "originalFilename",
-            "hashSha256",
             "createdAt",
             "createdBy");
 

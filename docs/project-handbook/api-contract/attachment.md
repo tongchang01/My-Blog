@@ -29,22 +29,18 @@
 ```json
 {
   "id": 123,
-  "storageType": "S3",
-  "bucket": "myblog-assets",
-  "objectKey": "attachments/2026/06/uuid.webp",
   "publicUrl": "https://static.example.com/attachments/2026/06/uuid.webp",
   "contentType": "image/webp",
   "fileSize": 102400,
   "width": 1600,
   "height": 900,
   "originalFilename": "cover.webp",
-  "hashSha256": "64位小写十六进制",
   "createdAt": "2026-06-14T12:00:00",
   "createdBy": 1001
 }
 ```
 
-响应不包含删除和更新审计字段。
+响应不包含存储类型、Bucket、对象键、SHA-256、删除和更新审计字段。
 
 ## 3. 去重与恢复
 

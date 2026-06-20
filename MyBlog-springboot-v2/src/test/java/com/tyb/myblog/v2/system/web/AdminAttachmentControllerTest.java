@@ -118,8 +118,10 @@ class AdminAttachmentControllerTest {
         mockMvc.perform(get("/api/admin/attachments/10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id").value(10))
-                .andExpect(jsonPath("$.data.objectKey")
-                        .value("attachments/a.png"));
+                .andExpect(jsonPath("$.data.storageType").doesNotExist())
+                .andExpect(jsonPath("$.data.bucket").doesNotExist())
+                .andExpect(jsonPath("$.data.objectKey").doesNotExist())
+                .andExpect(jsonPath("$.data.hashSha256").doesNotExist());
     }
 
     private AttachmentResult result() {
