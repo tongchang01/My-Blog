@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 全局 API 异常处理器。
@@ -120,6 +121,21 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.fail(
                         ApiErrorCode.VALIDATION_ERROR.code(),
                         "缺少上传文件"));
+    }
+
+    /**
+     * 处理未匹配到接口或静态资源的请求。
+     *
+     * @param exception 资源不存在异常
+     * @return HTTP 404 统一错误响应
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    ResponseEntity<ApiResponse<Void>> handleNoResourceFoundException(
+            NoResourceFoundException exception) {
+        return ResponseEntity.status(exception.getStatusCode())
+                .body(ApiResponse.fail(
+                        ApiErrorCode.NOT_FOUND.code(),
+                        "接口不存在"));
     }
 
     /**

@@ -70,6 +70,15 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void returnsNotFoundEnvelopeForUnknownApiRoute() throws Exception {
+        mockMvc.perform(get("/api/test/errors/missing-route"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.code").value("90003"))
+                .andExpect(jsonPath("$.msg").value("接口不存在"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @Test
     void returnsBusinessEnvelope() throws Exception {
         mockMvc.perform(post("/api/test/errors/business"))
                 .andExpect(status().isConflict())
