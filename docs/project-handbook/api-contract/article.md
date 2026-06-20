@@ -8,7 +8,11 @@
 - 后台只允许 `ADMIN` 写入；`DEMO` 只读。
 - 公开接口不需要登录。
 - 文章密码只在写入接口接收明文，后端仅持久化 BCrypt hash，任何查询响应不得返回密码或 hash。
-- `publishAt`、`createdAt`、`updatedAt`、`deletedAt` 均使用 JST 语义的 ISO-8601 本地时间字符串。
+- `publishAt`、`createdAt`、`updatedAt`、`deletedAt` 等 `LocalDateTime`
+  响应，以及后台日期时间参数，均表示 `Asia/Tokyo` 本地时间，格式固定为
+  `yyyy-MM-dd'T'HH:mm:ss`，不携带 offset。前端必须按 JST 语义解析，不能直接按
+  浏览器本地时区解释。该约定来自 ADR-0018；不得给 `LocalDateTime` format 追加
+  `xxx`。
 - 文章软删除后进入回收站，不做物理删除。
 
 ## 后台文章列表

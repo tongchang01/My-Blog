@@ -69,6 +69,9 @@ mvn spring-boot:run -Dspring-boot.run.profiles=prod
 - [ ] 涉及配置变更已在 `../arch/` 或 `../rules/` 同步
 - [ ] 新增第三方依赖有当前任务的实际使用点，没有仅为未来可能需求提前占位
 
+部署或发布前还必须执行 [发布检查清单](release-checklist.md)；PR 测试通过不能替代
+CORS、反向代理路径和客户端 IP 解析验证。
+
 ## 4. 测试 Profile 行为
 
 | Profile | 数据库 | Flyway | API 文档 |

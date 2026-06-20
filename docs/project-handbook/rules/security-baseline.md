@@ -155,6 +155,14 @@ proxy_set_header X-Real-IP $remote_addr;
 - 必须显式列出允许的源
 - `allow-credentials: true` 时 `allowed-origins` 必须为具体域名
 - 默认 exposed-headers：`Authorization` / `X-Article-Token`
+- 同源反向代理部署可保持 CORS origin 空列表，但必须验证 `/api/**` 转发后路径前缀
+  未被剥离。
+- 跨域前端必须把 `MYBLOG_CORS_ALLOWED_ORIGINS` 设置为具体 origin，并验证浏览器
+  OPTIONS 预检。
+- 反向代理部署必须把 `MYBLOG_WEB_TRUSTED_PROXIES` 设置为实际代理 IP / CIDR；
+  禁止为了省事默认信任整个私网。应使用两台客户端验证解析 IP 和限流键不同。
+- 客户端直连 Spring Boot 时，trusted proxies 必须保持空列表。
+- 完整上线检查见 `../workflows/release-checklist.md`。
 
 ## 11. 评论安全基线（R4 #12-P0）
 

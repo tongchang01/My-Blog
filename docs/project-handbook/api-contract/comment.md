@@ -25,6 +25,9 @@
 - Auth：匿名
 - Query：`page`、`size`
 - 成功：`200 + ApiResponse<PageResponse<PublicCommentVO>>`
+- 分页对象的 `total` 只统计根评论；当前页每个根评论的 `replies` 完整返回。
+- 当前版本不对回复单独分页。只有响应体大小或接口延迟达到可观测阈值后，才引入
+  独立 replies endpoint，不能在现有 `total/page/size` 中混入回复数量。
 - 错误：
   - `403 + 10003`：PASSWORD 文章暂不开放评论
   - `404 + 90003`：文章不存在、未发布、私密、定时或已删除
@@ -60,6 +63,7 @@
 - Auth：匿名
 - Query：`page`、`size`
 - 成功：`200 + ApiResponse<PageResponse<PublicCommentVO>>`
+- `total` 只统计根评论；当前页根评论的 `replies` 完整返回，回复暂不单独分页。
 - 留言板目标固定为 `targetType=GUESTBOOK`、`targetId=0`。
 
 ### `POST /api/public/guestbook/comments`
