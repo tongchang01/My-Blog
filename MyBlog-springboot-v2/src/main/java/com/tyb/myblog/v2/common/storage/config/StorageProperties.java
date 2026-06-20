@@ -94,6 +94,7 @@ public class StorageProperties {
         private Path root;
         private String bucketAlias;
         private URI publicBaseUrl;
+        private Boolean webEnabled;
     }
 
     @Getter
