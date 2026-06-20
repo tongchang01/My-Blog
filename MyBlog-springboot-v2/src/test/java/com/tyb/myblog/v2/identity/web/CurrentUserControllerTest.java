@@ -84,7 +84,7 @@ class CurrentUserControllerTest {
             throws Exception {
         when(queryService.query("1001"))
                 .thenReturn(new CurrentUserProfileResult(
-                        1001L,
+                        9007199254740993L,
                         "admin",
                         AccountType.ADMIN,
                         profile));
@@ -92,7 +92,9 @@ class CurrentUserControllerTest {
         mockMvc.perform(get("/api/auth/me"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("00000"))
-                .andExpect(jsonPath("$.data.id").value(1001))
+                .andExpect(jsonPath("$.data.id").isString())
+                .andExpect(jsonPath("$.data.id")
+                        .value("9007199254740993"))
                 .andExpect(jsonPath("$.data.username").value("admin"))
                 .andExpect(jsonPath("$.data.type").value("ADMIN"))
                 .andExpect(jsonPath("$.data.profile.nickname").value("TYB"))

@@ -46,6 +46,20 @@ class CurrentUserOpenApiTest {
     private ObjectMapper objectMapper;
 
     @Test
+    void documentsCurrentUserIdAsInt64String() throws Exception {
+        String content = mockMvc.perform(get("/v3/api-docs"))
+                .andExpect(status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        JsonNode id = objectMapper.readTree(content)
+                .at("/components/schemas/CurrentUserVO/properties/id");
+
+        assertThat(id.path("type").asText()).isEqualTo("string");
+        assertThat(id.path("format").asText()).isEqualTo("int64");
+    }
+
+    @Test
     void documentsPatchFieldsAsNullableStringsInsteadOfPatchValues()
             throws Exception {
         String content = mockMvc.perform(get("/v3/api-docs"))
