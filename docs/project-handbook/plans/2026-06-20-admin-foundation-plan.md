@@ -200,6 +200,50 @@ git add frontend/apps/admin
 git commit -m "引入Pure Admin Thin后台基线"
 ```
 
+## Task 2A：将后台工程文档迁入后台目录
+
+**Files:**
+- Move: `docs/project-handbook/frontend-admin/README.md` → `frontend/apps/admin/docs/README.md`
+- Move: `docs/project-handbook/specs/2026-06-20-admin-foundation-design.md` → `frontend/apps/admin/docs/2026-06-20-admin-foundation-design.md`
+- Move: `docs/project-handbook/plans/2026-06-20-admin-foundation-plan.md` → `frontend/apps/admin/docs/2026-06-20-admin-foundation-plan.md`
+- Modify: `docs/project-handbook/INDEX.md`
+- Modify: `docs/project-handbook/CLAUDE.md`
+
+- [ ] **Step 1: 在后台工程内建立文档目录并移动文件**
+
+使用 `git mv` 保留主仓库中的文件历史：
+
+```powershell
+New-Item -ItemType Directory -Force frontend/apps/admin/docs | Out-Null
+git mv docs/project-handbook/frontend-admin/README.md frontend/apps/admin/docs/README.md
+git mv docs/project-handbook/specs/2026-06-20-admin-foundation-design.md frontend/apps/admin/docs/2026-06-20-admin-foundation-design.md
+git mv docs/project-handbook/plans/2026-06-20-admin-foundation-plan.md frontend/apps/admin/docs/2026-06-20-admin-foundation-plan.md
+```
+
+- [ ] **Step 2: 更新项目手册索引**
+
+将 `INDEX.md` 和 `CLAUDE.md` 中后台规格位置改为 `frontend/apps/admin/docs/`。`api-contract/` 仍保留在项目手册，因为它是前台、后台与后端共享的接口事实源，不属于单一前端工程文档。
+
+- [ ] **Step 3: 验证旧目录不再承担后台工程文档**
+
+Run:
+
+```powershell
+Test-Path docs/project-handbook/frontend-admin
+rg -n "docs/project-handbook/frontend-admin|specs/2026-06-20-admin-foundation|plans/2026-06-20-admin-foundation" docs frontend/apps/admin/docs
+```
+
+Expected: `Test-Path` 返回 `False`；搜索结果不再把旧路径作为当前文档入口。
+
+- [ ] **Step 4: 检查并提交**
+
+```powershell
+git diff --stat
+git status --short
+git add -A docs/project-handbook frontend/apps/admin/docs
+git commit -m "迁移后台工程文档到前端目录"
+```
+
 ## Task 3：建立后台测试与质量基线
 
 **Files:**
@@ -772,7 +816,7 @@ git commit -m "建立后台静态权限与仪表盘"
 - Modify: `frontend/apps/admin/vite.config.ts`
 - Create: `frontend/apps/admin/.env.development`
 - Create: `frontend/apps/admin/.env.production`
-- Modify: `docs/project-handbook/frontend-admin/README.md`
+- Modify: `frontend/apps/admin/docs/README.md`
 - Modify: `docs/project-handbook/status.md`
 - Modify: `docs/project-handbook/roadmap.md`
 
@@ -829,12 +873,12 @@ Expected: 局部认证测试通过；全量测试 0 failures、0 errors。Docker
 
 - [ ] **Step 5: 更新文档并提交**
 
-`frontend-admin/README.md` 记录技术栈、目录、启动命令、静态权限、认证流程、上游快照和后续业务模块边界；`status.md` 与 `roadmap.md` 将后台基础闭环标记完成，但文章等业务页保持未完成。
+`frontend/apps/admin/docs/README.md` 记录技术栈、目录、启动命令、静态权限、认证流程、上游快照和后续业务模块边界；`status.md` 与 `roadmap.md` 将后台基础闭环标记完成，但文章等业务页保持未完成。
 
 ```powershell
 git diff --stat
 git status --short
-git add frontend/apps/admin/vite.config.ts frontend/apps/admin/.env.development frontend/apps/admin/.env.production docs/project-handbook/frontend-admin/README.md docs/project-handbook/status.md docs/project-handbook/roadmap.md
+git add frontend/apps/admin/vite.config.ts frontend/apps/admin/.env.development frontend/apps/admin/.env.production frontend/apps/admin/docs/README.md docs/project-handbook/status.md docs/project-handbook/roadmap.md
 git commit -m "记录后台基础工程验收结果"
 ```
 
@@ -843,6 +887,7 @@ git commit -m "记录后台基础工程验收结果"
 - [ ] `git status --short` 无未提交文件。
 - [ ] `git log --oneline` 中每个提交只对应一个任务目的。
 - [ ] Pure Admin Thin 上游许可证和 `UPSTREAM.md` 均存在。
+- [ ] 后台设计、计划和工程说明均位于 `frontend/apps/admin/docs/`，不再位于后端项目手册目录。
 - [ ] 后台工程不包含 `.git`、`node_modules`、`dist` 或 Mock 服务。
 - [ ] 所有 API 逻辑只判断 `code`，不依赖后端中文 `msg`。
 - [ ] token、密码和认证请求体不进入日志。
