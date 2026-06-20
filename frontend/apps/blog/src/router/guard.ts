@@ -14,7 +14,10 @@ router.beforeEach(async (to, from, next) => {
     return
   }
   if (isSupportedLocale(routeLocale)) {
+    const shouldReloadConfig =
+      appStore.locale !== routeLocale && appStore.configReady
     appStore.changeLocale(routeLocale)
+    if (shouldReloadConfig) await appStore.fetchConfig()
   }
 
   appStore.startLoading()

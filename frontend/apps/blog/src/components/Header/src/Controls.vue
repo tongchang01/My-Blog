@@ -122,7 +122,6 @@ const ballProgress = toRefs(props).scrollProgress
 const handleClick = async (name: string): Promise<void> => {
   if (!isSupportedLocale(name)) return
 
-  appStore.changeLocale(name)
   if (route.params.lang) {
     await router.push({
       name: route.name ?? 'home',

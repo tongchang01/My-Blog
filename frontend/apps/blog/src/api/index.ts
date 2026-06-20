@@ -1,5 +1,4 @@
 import request from '@/utils/request'
-import { HexoConfig } from '@/models/HexoConfig.class'
 import { AxiosResponse } from 'axios'
 import {
   AuthorPosts,
@@ -13,11 +12,6 @@ import { Article, Page } from '@/models/Article.class'
 import { Statistic } from '@/models/Statistic.class'
 import { SearchIndexes } from '@/models/Search.class'
 import { paginator } from '@/utils'
-
-// GET /api/site.json
-export async function fetchHexoConfig(): Promise<AxiosResponse<any>> {
-  return request.get<HexoConfig>('/site.json')
-}
 
 // GET /api/posts/:pageNum.json (default 1.json)
 export async function fetchPostsList(

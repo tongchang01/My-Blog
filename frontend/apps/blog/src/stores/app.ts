@@ -1,14 +1,15 @@
 import { defineStore } from 'pinia'
 import Cookies from 'js-cookie'
 import i18n from '@/locales/index'
-import { Locales, ThemeConfig } from '@/models/ThemeConfig.class'
+import { Locales } from '@/models/ThemeConfig.class'
 import { HexoConfig } from '@/models/HexoConfig.class'
-import { fetchHexoConfig, fetchStatistic } from '@/api'
+import { fetchStatistic } from '@/api'
 import { Statistic } from '@/models/Statistic.class'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { computed, ref } from 'vue'
 import { resolveInitialLocale } from '@/shared/i18n/locale'
+import { useSiteSettingsStore } from '@/features/site-settings/store'
 
 NProgress.configure({
   showSpinner: false,
@@ -39,6 +40,7 @@ const setTheme = (theme: string) => {
  * Storing the core data of the application
  */
 export const useAppStore = defineStore('app', () => {
+  const siteSettingsStore = useSiteSettingsStore()
   const theme = ref(
     Cookies.get('theme') ? String(Cookies.get('theme')) : getSystemMode()
   )
@@ -48,26 +50,27 @@ export const useAppStore = defineStore('app', () => {
       navigator.language
     )
   )
-  const themeConfig = ref(new ThemeConfig())
+  const themeConfig = computed(() => siteSettingsStore.settings.themeConfig)
+  const siteTitle = computed(() => siteSettingsStore.settings.siteTitle)
+  const siteSubtitle = computed(() => siteSettingsStore.settings.siteSubtitle)
+  const configStatus = computed(() => siteSettingsStore.status)
   const hexoConfig = ref(new HexoConfig())
   const headerGradient = ref('')
   const statistic = ref(new Statistic())
   const appLoading = ref(false)
   const NPTimeout = ref(-1)
   const loadingTimeout = ref(-1)
-  const configReady = ref(false)
+  const configReady = computed(
+    () => configStatus.value === 'ready' || configStatus.value === 'degraded'
+  )
   const openSearchModal = ref(false)
 
   const getTheme = computed(() => theme.value)
   const getAppLoading = computed(() => appLoading.value)
 
   const fetchConfig = async () => {
-    configReady.value = false
-    const { data } = await fetchHexoConfig()
-    themeConfig.value = new ThemeConfig(data)
-    hexoConfig.value = new HexoConfig(data)
+    await siteSettingsStore.load(locale.value)
     initializeTheme(themeConfig.value.theme.dark_mode)
-    configReady.value = true
   }
 
   const fetchStat = async () => {
@@ -138,6 +141,9 @@ export const useAppStore = defineStore('app', () => {
     theme,
     locale,
     themeConfig,
+    siteTitle,
+    siteSubtitle,
+    configStatus,
     hexoConfig,
     headerGradient,
     statistic,
