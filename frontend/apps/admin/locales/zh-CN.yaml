@@ -82,6 +82,12 @@ status:
   pureNoMessage: 暂无消息
   pureNoNotify: 暂无通知
   pureNoTodo: 暂无待办
+dashboard:
+  welcome: 欢迎
+  account: 账号
+  role: 角色
+  backendStatus: 后端连接
+  connected: 已连接
 login:
   pureUsername: 账号
   purePassword: 密码

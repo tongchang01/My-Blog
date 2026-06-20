@@ -82,6 +82,12 @@ status:
   pureNoMessage: メッセージはありません
   pureNoNotify: 通知はありません
   pureNoTodo: タスクはありません
+dashboard:
+  welcome: ようこそ
+  account: アカウント
+  role: ロール
+  backendStatus: バックエンド接続
+  connected: 接続済み
 login:
   pureUsername: ユーザー名
   purePassword: パスワード

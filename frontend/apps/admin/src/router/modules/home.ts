@@ -15,10 +15,11 @@ export default {
     {
       path: "/dashboard",
       name: "Dashboard",
-      component: () => import("@/views/welcome/index.vue"),
+      component: () => import("@/features/dashboard/index.vue"),
       meta: {
         title: $t("menus.dashboard"),
-        showLink: true
+        showLink: true,
+        roles: ["ADMIN", "DEMO"]
       }
     }
   ]

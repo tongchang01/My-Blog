@@ -95,6 +95,7 @@
     "@types/sortablejs": "^1.15.9",
     "@vitejs/plugin-vue": "^6.0.1",
     "@vitejs/plugin-vue-jsx": "^5.1.1",
+    "@vue/test-utils": "2.4.6",
     "axios-mock-adapter": "2.1.0",
     "boxen": "^8.0.1",
     "code-inspector-plugin": "^1.2.10",

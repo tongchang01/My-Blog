@@ -82,6 +82,12 @@ status:
   pureNoMessage: No Message
   pureNoNotify: No Notify
   pureNoTodo: No Todo
+dashboard:
+  welcome: Welcome
+  account: Account
+  role: Role
+  backendStatus: Backend connection
+  connected: Connected
 login:
   pureUsername: Username
   purePassword: Password

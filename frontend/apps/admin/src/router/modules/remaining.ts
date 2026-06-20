@@ -13,7 +13,7 @@ export default [
   },
   // 全屏403（无权访问）页面
   {
-    path: "/access-denied",
+    path: "/error/403",
     name: "AccessDenied",
     component: () => import("@/views/error/403.vue"),
     meta: {
