@@ -22,10 +22,7 @@ export const refreshSession = (refreshToken: string) =>
     { skipAuthRefresh: true }
   );
 
-export const logout = (refreshToken: string) =>
-  http.post<ApiResponse<null>>("/api/auth/logout", {
-    data: { refreshToken }
-  });
+export const logout = () => http.post<ApiResponse<null>>("/api/auth/logout");
 
 export const getCurrentUser = () =>
   http.get<ApiResponse<CurrentUser>>("/api/auth/me");

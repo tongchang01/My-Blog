@@ -88,6 +88,10 @@ login:
   pureLogin: ログイン
   pureLoginSuccess: ログインしました
   pureLoginFail: ログインに失敗しました
+  errorBadCredentials: ユーザー名またはパスワードが正しくありません
+  errorRateLimited: ログイン試行が多すぎます。しばらくしてから再試行してください
+  errorNetwork: ネットワークに接続できません。接続を確認してください
+  errorUnknown: ログインに失敗しました。しばらくしてから再試行してください
   pureUsernameReg: ユーザー名を入力してください
   purePassWordReg: パスワードを入力してください
   purePassWordRuleReg: パスワードは8〜18文字で入力してください

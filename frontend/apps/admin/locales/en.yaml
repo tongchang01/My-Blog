@@ -88,6 +88,10 @@ login:
   pureLogin: Login
   pureLoginSuccess: Login Success
   pureLoginFail: Login Fail
+  errorBadCredentials: Incorrect username or password
+  errorRateLimited: Too many login attempts. Please try again later
+  errorNetwork: Network connection failed. Please try again
+  errorUnknown: Login failed. Please try again later
   pureUsernameReg: Please enter username
   purePassWordReg: Please enter password
   purePassWordRuleReg: The password format should be any combination of 8-18 digits

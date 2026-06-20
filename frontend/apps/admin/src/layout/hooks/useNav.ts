@@ -7,13 +7,16 @@ import { getTopMenu } from "@/router/utils";
 import { useFullscreen } from "@vueuse/core";
 import type { routeMetaType } from "../types";
 import { transformI18n } from "@/plugins/i18n";
-import { router, remainingPaths } from "@/router";
+import { resetRouter, router, remainingPaths } from "@/router";
 import { computed, type CSSProperties } from "vue";
 import { useAppStoreHook } from "@/store/modules/app";
 import { useUserStoreHook } from "@/store/modules/user";
 import { useGlobal, isAllEmpty } from "@pureadmin/utils";
 import { useEpThemeStoreHook } from "@/store/modules/epTheme";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+import { sessionService } from "@/features/auth/session";
+import { routerArrays } from "@/layout/types";
+import { useMultiTagsStoreHook } from "@/store/modules/multiTags";
 import ExitFullscreen from "~icons/ri/fullscreen-exit-fill";
 import Fullscreen from "~icons/ri/fullscreen-fill";
 
@@ -40,16 +43,16 @@ export function useNav() {
 
   /** 头像（如果头像为空则使用 src/assets/user.jpg ） */
   const userAvatar = computed(() => {
-    return isAllEmpty(useUserStoreHook()?.avatar)
-      ? Avatar
-      : useUserStoreHook()?.avatar;
+    const avatar = useUserStoreHook().currentUser?.profile.avatarUrl;
+    return isAllEmpty(avatar) ? Avatar : avatar;
   });
 
   /** 昵称（如果昵称为空则显示用户名） */
   const username = computed(() => {
-    return isAllEmpty(useUserStoreHook()?.nickname)
-      ? useUserStoreHook()?.username
-      : useUserStoreHook()?.nickname;
+    const user = useUserStoreHook().currentUser;
+    return isAllEmpty(user?.profile.nickname)
+      ? user?.username
+      : user?.profile.nickname;
   });
 
   /** 设置国际化选中后的样式 */
@@ -97,8 +100,16 @@ export function useNav() {
   }
 
   /** 退出登录 */
-  function logout() {
-    useUserStoreHook().logOut();
+  async function logout() {
+    try {
+      await sessionService.signOut();
+    } catch {
+      // 本地退出不依赖服务端撤销结果。
+    } finally {
+      useMultiTagsStoreHook().handleTags("equal", [...routerArrays]);
+      resetRouter();
+      await router.push("/login");
+    }
   }
 
   function backTopMenu() {

@@ -11,9 +11,10 @@ import { useEventListener } from "@vueuse/core";
 import type { FormInstance } from "element-plus";
 import { $t, transformI18n } from "@/plugins/i18n";
 import { useLayout } from "@/layout/hooks/useLayout";
-import { useUserStoreHook } from "@/store/modules/user";
-import { initRouter, getTopMenu } from "@/router/utils";
+import { initRouter } from "@/router/utils";
 import { bg, avatar, illustration } from "./utils/static";
+import { sessionService } from "@/features/auth/session";
+import { ApiClientError } from "@/utils/http/error";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 import { useTranslationLang } from "@/layout/hooks/useTranslationLang";
 import { useDataThemeChange } from "@/layout/hooks/useDataThemeChange";
@@ -45,39 +46,34 @@ const { locale, translationCh, translationJa, translationEn } =
   useTranslationLang();
 
 const ruleForm = reactive({
-  username: "admin",
-  password: "admin123"
+  username: "",
+  password: ""
 });
+
+function loginErrorKey(error: unknown): string {
+  if (!(error instanceof ApiClientError)) return "login.errorNetwork";
+  if (error.kind === "badCredentials") return "login.errorBadCredentials";
+  if (error.kind === "rateLimited") return "login.errorRateLimited";
+  return "login.errorUnknown";
+}
 
 const onLogin = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  await formEl.validate(valid => {
-    if (valid) {
-      loading.value = true;
-      useUserStoreHook()
-        .loginByUsername({
-          username: ruleForm.username,
-          password: ruleForm.password
-        })
-        .then(res => {
-          if (res.success) {
-            // 获取后端路由
-            return initRouter().then(() => {
-              disabled.value = true;
-              router
-                .push(getTopMenu(true).path)
-                .then(() => {
-                  message(t("login.pureLoginSuccess"), { type: "success" });
-                })
-                .finally(() => (disabled.value = false));
-            });
-          } else {
-            message(t("login.pureLoginFail"), { type: "error" });
-          }
-        })
-        .finally(() => (loading.value = false));
-    }
-  });
+  const valid = await formEl.validate().catch(() => false);
+  if (!valid) return;
+  loading.value = true;
+  disabled.value = true;
+  try {
+    await sessionService.signIn({ ...ruleForm });
+    await initRouter();
+    await router.push("/dashboard");
+    message(t("login.pureLoginSuccess"), { type: "success" });
+  } catch (error) {
+    message(t(loginErrorKey(error)), { type: "error" });
+  } finally {
+    loading.value = false;
+    disabled.value = false;
+  }
 };
 
 const immediateDebounce: any = debounce(
