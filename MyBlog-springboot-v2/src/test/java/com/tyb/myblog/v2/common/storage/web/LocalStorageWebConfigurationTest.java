@@ -16,6 +16,14 @@ class LocalStorageWebConfigurationTest {
                             LocalStorageWebConfiguration.class);
 
     @Test
+    void doesNotRegisterLocalMediaMappingWithoutStoragePropertiesBean() {
+        new ApplicationContextRunner()
+                .withUserConfiguration(LocalStorageWebConfiguration.class)
+                .run(context -> assertThat(context)
+                        .doesNotHaveBean(LocalStorageWebConfiguration.class));
+    }
+
+    @Test
     void doesNotRegisterLocalMediaMappingByDefaultForS3() {
         contextRunner
                 .withPropertyValues("myblog.storage.type=S3")
