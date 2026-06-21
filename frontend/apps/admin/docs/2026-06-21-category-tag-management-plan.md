@@ -22,11 +22,11 @@
 - Modify: `src/utils/http/error.ts`
 - Modify: `src/utils/http/error.test.ts`
 
-- [ ] **Step 1: 写 API 与表单失败测试**
+- [x] **Step 1: 写 API 与表单失败测试**
 
 API 测试必须断言分类、标签的列表、详情、创建、更新、删除路径，以及 `PUT /api/admin/categories/sort-orders` 的 `{ items }` 请求体。表单测试覆盖中文名称和 slug 必填、可选语言空白转 `null`、分类排序范围 `0..1000000`、详情映射保留字符串 ID。错误测试断言 `90004` 映射为 `conflict`。
 
-- [ ] **Step 2: 运行测试并确认红灯**
+- [x] **Step 2: 运行测试并确认红灯**
 
 ```powershell
 corepack pnpm exec vitest run src/api/taxonomy.test.ts src/features/taxonomy/form.test.ts src/utils/http/error.test.ts
@@ -34,7 +34,7 @@ corepack pnpm exec vitest run src/api/taxonomy.test.ts src/features/taxonomy/for
 
 Expected: FAIL，原因是 taxonomy 模块和 `conflict` 错误类型尚未定义。
 
-- [ ] **Step 3: 实现模型与纯函数**
+- [x] **Step 3: 实现模型与纯函数**
 
 `model.ts` 定义：
 
@@ -71,11 +71,11 @@ export interface CategorySortItem { id: string; sortOrder: number }
 
 从文章模型移除重复的 `CategoryItem`、`TagItem` 定义，改为从 taxonomy 模型导入并重新导出，保持现有文章列表与编辑器导入路径兼容。
 
-- [ ] **Step 4: 实现 API 与冲突错误分类**
+- [x] **Step 4: 实现 API 与冲突错误分类**
 
 `taxonomy.ts` 暴露分类和标签的 list/detail/create/update/delete，以及 `updateCategorySortOrders(items)`。请求体完整提交后端要求字段，排序请求包装为 `{ items }`。在 `ApiErrorKind` 增加 `conflict`，把 `90004` 映射为 `conflict`，不改变 token 刷新逻辑。
 
-- [ ] **Step 5: 运行局部测试和类型检查**
+- [x] **Step 5: 运行局部测试和类型检查**
 
 ```powershell
 corepack pnpm exec vitest run src/api/taxonomy.test.ts src/features/taxonomy/form.test.ts src/utils/http/error.test.ts
@@ -84,7 +84,7 @@ corepack pnpm typecheck
 
 Expected: 全部 PASS。
 
-- [ ] **Step 6: 检查并提交**
+- [x] **Step 6: 检查并提交**
 
 ```powershell
 git diff --stat
@@ -101,7 +101,7 @@ git commit -m "实现分类标签写接口基础"
 - Create: `src/features/taxonomy/categories/index.vue`
 - Create: `src/features/taxonomy/categories/index.test.ts`
 
-- [ ] **Step 1: 写状态控制器失败测试**
+- [x] **Step 1: 写状态控制器失败测试**
 
 覆盖初始化加载、本地关键词匹配三语名称与 slug、打开新增/编辑弹窗、保存后刷新、只收集修改过的排序值、删除冲突映射。关键断言：
 
@@ -114,7 +114,7 @@ expect(api.updateCategorySortOrders).toHaveBeenCalledWith([
 ]);
 ```
 
-- [ ] **Step 2: 运行测试确认缺少实现**
+- [x] **Step 2: 运行测试确认缺少实现**
 
 ```powershell
 corepack pnpm exec vitest run src/features/taxonomy/categories/useCategoryManagement.test.ts
@@ -122,21 +122,21 @@ corepack pnpm exec vitest run src/features/taxonomy/categories/useCategoryManage
 
 Expected: FAIL，模块不存在。
 
-- [ ] **Step 3: 实现分类状态控制器**
+- [x] **Step 3: 实现分类状态控制器**
 
 状态包含 `items`、`keyword`、`loading`、`requestError`、`operationError`、`dialogOpen`、`editingId`、`form`、`formErrors`、`saving`、`sortDrafts`。方法为 `initialize`、`retry`、`openCreate`、`openEdit`、`closeDialog`、`save`、`setSortOrder`、`saveSortOrders`、`remove`。
 
 `filteredItems` 按原始列表顺序返回；关键词使用 `trim().toLocaleLowerCase()` 比较。写操作成功后重新请求列表并清空对应错误。
 
-- [ ] **Step 4: 写页面失败测试**
+- [x] **Step 4: 写页面失败测试**
 
 测试 ADMIN 可见新增、编辑、删除和保存排序，DEMO 不渲染写控件；测试弹窗字段、删除确认和 loading/error/empty 状态。
 
-- [ ] **Step 5: 实现分类页面**
+- [x] **Step 5: 实现分类页面**
 
 页面使用独立筛选卡片和结果卡片。表格列为名称、slug、排序、更新时间和操作；ADMIN 的排序列使用 `el-input-number`，弹窗使用 `el-dialog`，删除使用 `ElMessageBox.confirm`。冲突提示按保存或删除操作显示本地化文案。
 
-- [ ] **Step 6: 运行局部验证并提交**
+- [x] **Step 6: 运行局部验证并提交**
 
 ```powershell
 corepack pnpm exec vitest run src/features/taxonomy/categories
@@ -155,11 +155,11 @@ git commit -m "实现后台分类管理页面"
 - Create: `src/features/taxonomy/tags/index.vue`
 - Create: `src/features/taxonomy/tags/index.test.ts`
 
-- [ ] **Step 1: 写标签状态和页面失败测试**
+- [x] **Step 1: 写标签状态和页面失败测试**
 
 覆盖本地筛选、新增、编辑、删除、写后刷新、ADMIN 写控件、DEMO 只读、删除确认和冲突提示，并明确断言页面不存在排序控件。
 
-- [ ] **Step 2: 运行测试确认红灯**
+- [x] **Step 2: 运行测试确认红灯**
 
 ```powershell
 corepack pnpm exec vitest run src/features/taxonomy/tags
@@ -167,11 +167,11 @@ corepack pnpm exec vitest run src/features/taxonomy/tags
 
 Expected: FAIL，模块不存在。
 
-- [ ] **Step 3: 实现标签状态控制器与页面**
+- [x] **Step 3: 实现标签状态控制器与页面**
 
 标签状态与分类保持同样的加载、筛选、弹窗和删除语义，但不包含 `sortDrafts`、`dirtySortItems` 或排序 API。表格列为名称、slug、更新时间和操作。
 
-- [ ] **Step 4: 运行局部验证并提交**
+- [x] **Step 4: 运行局部验证并提交**
 
 ```powershell
 corepack pnpm exec vitest run src/features/taxonomy/tags
@@ -193,7 +193,7 @@ git commit -m "实现后台标签管理页面"
 - Modify: `docs/README.md`
 - Modify: `docs/2026-06-21-category-tag-management-plan.md`
 
-- [ ] **Step 1: 写路由失败测试**
+- [x] **Step 1: 写路由失败测试**
 
 ```ts
 expect(categoryList?.path).toBe("/categories/list");
@@ -202,15 +202,15 @@ expect(tagList?.path).toBe("/tags/list");
 expect(tagList?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
 ```
 
-- [ ] **Step 2: 实现菜单与路由**
+- [x] **Step 2: 实现菜单与路由**
 
 在现有父路由下保留文章列表、新增、编辑路由，增加 `CategoryList` 与 `TagList` 两个可见子项。父菜单标题改为三语“内容管理”，内部 route name 保持 `Articles`，避免无关重命名。
 
-- [ ] **Step 3: 增加完整三语文案**
+- [x] **Step 3: 增加完整三语文案**
 
 文案覆盖筛选、列名、新增/编辑弹窗、排序、删除确认、loading/empty/error/retry、表单校验、slug 冲突、引用冲突和成功反馈。三个语言文件键结构保持一致。
 
-- [ ] **Step 4: 更新文档并运行局部验证**
+- [x] **Step 4: 更新文档并运行局部验证**
 
 `docs/README.md` 记录分类标签页面能力、权限边界和暂未实现项；计划中已完成步骤改为 `[x]`。
 
@@ -219,7 +219,7 @@ corepack pnpm exec vitest run src/router/static-router.test.ts src/features/taxo
 corepack pnpm typecheck
 ```
 
-- [ ] **Step 5: 检查并提交**
+- [x] **Step 5: 检查并提交**
 
 ```powershell
 git diff --check

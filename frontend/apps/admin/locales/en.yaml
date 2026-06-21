@@ -63,7 +63,10 @@ panel:
 menus:
   dashboard: Dashboard
   articles: Articles
+  contentManagement: Content Management
   articleManagement: Article Management
+  categoryManagement: Categories
+  tagManagement: Tags
   pureHome: Home
   pureLogin: Login
   pureAbnormal: Abnormal Page
@@ -159,6 +162,50 @@ articles:
       categoryRequired: Non-draft articles require a category
       scheduledRequired: Scheduled articles require a publish time
       passwordRequired: Password articles require an access password
+taxonomy:
+  filter:
+    title: Filters
+    keyword: Name or slug
+    placeholder: Search multilingual names or slug
+  actions:
+    retry: Retry
+    edit: Edit
+    delete: Delete
+    save: Save
+    cancel: Cancel
+    saveSort: Save order
+  columns:
+    name: Name
+    sortOrder: Sort order
+    updatedAt: Updated at
+    operations: Actions
+  fields:
+    nameZh: Chinese name
+    nameJa: Japanese name
+    nameEn: English name
+    sortOrder: Sort order
+  categories:
+    title: Total categories
+    create: New category
+    edit: Edit category
+    empty: No categories match the current filter
+    deleteConfirm: Delete this category?
+  tags:
+    title: Total tags
+    create: New tag
+    edit: Edit tag
+    empty: No tags match the current filter
+    deleteConfirm: Delete this tag?
+  states:
+    error: Unable to load data. Please retry
+  validation:
+    required: This field is required
+    sortOrderRange: Sort order must be an integer from 0 to 1000000
+  errors:
+    saveConflict: The name or slug is already in use
+    deleteConflict: This item is still referenced by active articles
+    forbidden: This account does not have write permission
+    request: The operation failed. Please retry
 login:
   pureUsername: Username
   purePassword: Password

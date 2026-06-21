@@ -63,7 +63,10 @@ panel:
 menus:
   dashboard: 仪表盘
   articles: 文章管理
+  contentManagement: 内容管理
   articleManagement: 文章列表
+  categoryManagement: 分类管理
+  tagManagement: 标签管理
   pureHome: 首页
   pureLogin: 登录
   pureAbnormal: 异常页面
@@ -159,6 +162,50 @@ articles:
       categoryRequired: 非草稿文章必须选择分类
       scheduledRequired: 定时发布必须选择发布时间
       passwordRequired: 密码文章必须设置访问密码
+taxonomy:
+  filter:
+    title: 筛选条件
+    keyword: 名称或 Slug
+    placeholder: 请输入三语名称或 Slug
+  actions:
+    retry: 重试
+    edit: 编辑
+    delete: 删除
+    save: 保存
+    cancel: 取消
+    saveSort: 保存排序
+  columns:
+    name: 名称
+    sortOrder: 排序值
+    updatedAt: 更新时间
+    operations: 操作
+  fields:
+    nameZh: 中文名称
+    nameJa: 日文名称
+    nameEn: 英文名称
+    sortOrder: 排序值
+  categories:
+    title: 分类总数
+    create: 新增分类
+    edit: 编辑分类
+    empty: 没有符合条件的分类
+    deleteConfirm: 确认删除这个分类吗？
+  tags:
+    title: 标签总数
+    create: 新增标签
+    edit: 编辑标签
+    empty: 没有符合条件的标签
+    deleteConfirm: 确认删除这个标签吗？
+  states:
+    error: 数据加载失败，请重试
+  validation:
+    required: 此项为必填项
+    sortOrderRange: 排序值必须是 0 到 1000000 之间的整数
+  errors:
+    saveConflict: 名称或 Slug 已被占用
+    deleteConflict: 仍被活动文章引用，无法删除
+    forbidden: 当前账号没有写权限
+    request: 操作失败，请重试
 login:
   pureUsername: 账号
   purePassword: 密码

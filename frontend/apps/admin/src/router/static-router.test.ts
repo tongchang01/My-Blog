@@ -28,5 +28,15 @@ describe("static admin routes", () => {
     expect(articleCreate?.meta?.showLink).toBe(false);
     expect(articleEdit?.path).toBe("/articles/:id/edit");
     expect(articleEdit?.meta?.roles).toEqual(["ADMIN"]);
+    const categoryList = articles?.children?.find(
+      route => route.name === "CategoryList"
+    );
+    const tagList = articles?.children?.find(
+      route => route.name === "TagList"
+    );
+    expect(categoryList?.path).toBe("/categories/list");
+    expect(categoryList?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
+    expect(tagList?.path).toBe("/tags/list");
+    expect(tagList?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
   });
 });

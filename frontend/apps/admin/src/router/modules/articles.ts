@@ -8,7 +8,7 @@ export default {
   redirect: "/articles/list",
   meta: {
     icon: "ep/document",
-    title: $t("menus.articles"),
+    title: $t("menus.contentManagement"),
     rank: 1
   },
   children: [
@@ -42,6 +42,27 @@ export default {
         showLink: false,
         activePath: "/articles/list",
         roles: ["ADMIN"]
+      }
+    },
+    {
+      path: "/categories/list",
+      name: "CategoryList",
+      component: () =>
+        import("@/features/taxonomy/categories/index.vue"),
+      meta: {
+        title: $t("menus.categoryManagement"),
+        showLink: true,
+        roles: ["ADMIN", "DEMO"]
+      }
+    },
+    {
+      path: "/tags/list",
+      name: "TagList",
+      component: () => import("@/features/taxonomy/tags/index.vue"),
+      meta: {
+        title: $t("menus.tagManagement"),
+        showLink: true,
+        roles: ["ADMIN", "DEMO"]
       }
     }
   ]

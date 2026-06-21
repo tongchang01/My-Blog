@@ -63,7 +63,10 @@ panel:
 menus:
   dashboard: ダッシュボード
   articles: 記事管理
+  contentManagement: コンテンツ管理
   articleManagement: 記事一覧
+  categoryManagement: カテゴリ管理
+  tagManagement: タグ管理
   pureHome: ホーム
   pureLogin: ログイン
   pureAbnormal: エラーページ
@@ -159,6 +162,50 @@ articles:
       categoryRequired: 下書き以外の記事にはカテゴリが必要です
       scheduledRequired: 公開予約日時を選択してください
       passwordRequired: パスワード記事には閲覧パスワードが必要です
+taxonomy:
+  filter:
+    title: 絞り込み条件
+    keyword: 名前または Slug
+    placeholder: 多言語名または Slug を入力してください
+  actions:
+    retry: 再試行
+    edit: 編集
+    delete: 削除
+    save: 保存
+    cancel: キャンセル
+    saveSort: 並び順を保存
+  columns:
+    name: 名前
+    sortOrder: 並び順
+    updatedAt: 更新日時
+    operations: 操作
+  fields:
+    nameZh: 中国語名
+    nameJa: 日本語名
+    nameEn: 英語名
+    sortOrder: 並び順
+  categories:
+    title: カテゴリ総数
+    create: カテゴリを追加
+    edit: カテゴリを編集
+    empty: 条件に一致するカテゴリがありません
+    deleteConfirm: このカテゴリを削除しますか？
+  tags:
+    title: タグ総数
+    create: タグを追加
+    edit: タグを編集
+    empty: 条件に一致するタグがありません
+    deleteConfirm: このタグを削除しますか？
+  states:
+    error: データの読み込みに失敗しました。再試行してください
+  validation:
+    required: 必須項目です
+    sortOrderRange: 並び順は 0 から 1000000 の整数で入力してください
+  errors:
+    saveConflict: 名前または Slug は既に使用されています
+    deleteConflict: 公開中の記事から参照されているため削除できません
+    forbidden: このアカウントには書き込み権限がありません
+    request: 操作に失敗しました。再試行してください
 login:
   pureUsername: ユーザー名
   purePassword: パスワード
