@@ -1,0 +1,107 @@
+import { describe, expect, it } from "vitest";
+import type { ArticleDetail } from "../model";
+import {
+  articleDetailToForm,
+  articleFormToPayload,
+  createEmptyArticleForm,
+  validateArticleForm
+} from "./form";
+
+const detail: ArticleDetail = {
+  id: "100",
+  titleZh: "中文标题",
+  titleJa: null,
+  titleEn: "English title",
+  summaryZh: "中文摘要",
+  summaryJa: null,
+  summaryEn: null,
+  body: "# 正文",
+  categoryId: "10",
+  categoryNameZh: "分类",
+  authorId: "1001",
+  slug: "hello-world",
+  status: "PASSWORD",
+  publishAt: "2026-06-21T10:00:00",
+  coverAttachmentId: "30",
+  coverUrl: null,
+  commentCount: 2,
+  tagIds: ["20"],
+  createdAt: "2026-06-20T10:00:00",
+  createdBy: "1001",
+  updatedAt: "2026-06-21T10:00:00",
+  updatedBy: "1001"
+};
+
+describe("article editor form", () => {
+  it("creates a draft form and maps detail without exposing a password", () => {
+    expect(createEmptyArticleForm()).toMatchObject({
+      status: "DRAFT",
+      categoryId: null,
+      tagIds: [],
+      password: "",
+      coverAttachmentId: null
+    });
+
+    expect(articleDetailToForm(detail)).toMatchObject({
+      titleZh: "中文标题",
+      titleJa: "",
+      titleEn: "English title",
+      body: "# 正文",
+      categoryId: "10",
+      tagIds: ["20"],
+      password: "",
+      coverAttachmentId: "30"
+    });
+  });
+
+  it("normalizes optional values and preserves large id strings", () => {
+    const form = articleDetailToForm(detail);
+    form.titleJa = "  ";
+    form.slug = "  custom-slug  ";
+    form.password = "  ";
+    form.tagIds = ["9007199254741202", "9007199254741202"];
+
+    expect(articleFormToPayload(form)).toEqual({
+      titleZh: "中文标题",
+      titleJa: null,
+      titleEn: "English title",
+      summaryZh: "中文摘要",
+      summaryJa: null,
+      summaryEn: null,
+      body: "# 正文",
+      categoryId: "10",
+      tagIds: ["9007199254741202"],
+      slug: "custom-slug",
+      status: "PASSWORD",
+      password: null,
+      publishAt: "2026-06-21T10:00:00",
+      coverAttachmentId: "30"
+    });
+  });
+
+  it("validates required content and status-specific fields", () => {
+    const empty = createEmptyArticleForm();
+    expect(validateArticleForm(empty, "create")).toEqual({
+      titleZh: "required",
+      summaryZh: "required",
+      body: "required"
+    });
+
+    const scheduled = {
+      ...empty,
+      titleZh: "标题",
+      summaryZh: "摘要",
+      body: "正文",
+      status: "SCHEDULED" as const
+    };
+    expect(validateArticleForm(scheduled, "create")).toEqual({
+      publishAt: "scheduledRequired"
+    });
+
+    const password = { ...scheduled, status: "PASSWORD" as const };
+    expect(validateArticleForm(password, "create")).toEqual({
+      password: "passwordRequired"
+    });
+    expect(validateArticleForm(password, "edit")).toEqual({});
+  });
+});
