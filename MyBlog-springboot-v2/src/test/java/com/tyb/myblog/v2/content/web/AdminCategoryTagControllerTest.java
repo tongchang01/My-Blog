@@ -52,6 +52,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(GlobalExceptionHandler.class)
 class AdminCategoryTagControllerTest {
 
+    private static final long UNSAFE_BROWSER_ID = 9_007_199_254_740_993L;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -108,16 +110,16 @@ class AdminCategoryTagControllerTest {
     void returnsCompleteCategoryListAndDetail() throws Exception {
         CategoryResult result = categoryResult();
         AdminCategoryVO vo = new AdminCategoryVO(
-                result.id(),
+                Long.toString(result.id()),
                 result.nameZh(),
                 result.nameJa(),
                 result.nameEn(),
                 result.slug(),
                 result.sortOrder(),
                 result.createdAt(),
-                result.createdBy(),
+                Long.toString(result.createdBy()),
                 result.updatedAt(),
-                result.updatedBy());
+                Long.toString(result.updatedBy()));
         when(categoryService.adminList(principal))
                 .thenReturn(List.of(result));
         when(categoryService.adminDetail(principal, 101L))
@@ -131,27 +133,30 @@ class AdminCategoryTagControllerTest {
                 .andExpect(jsonPath("$.data[0].sortOrder")
                         .value(10))
                 .andExpect(jsonPath("$.data[0].createdBy")
-                        .value(1001))
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
                 .andExpect(jsonPath("$.data[0].deleted")
                         .doesNotExist());
         mockMvc.perform(get("/api/admin/categories/101"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(101));
+                .andExpect(jsonPath("$.data.id")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.updatedBy")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)));
     }
 
     @Test
     void returnsCompleteTagListAndDetail() throws Exception {
         TagResult result = tagResult();
         AdminTagVO vo = new AdminTagVO(
-                result.id(),
+                Long.toString(result.id()),
                 result.nameZh(),
                 result.nameJa(),
                 result.nameEn(),
                 result.slug(),
                 result.createdAt(),
-                result.createdBy(),
+                Long.toString(result.createdBy()),
                 result.updatedAt(),
-                result.updatedBy());
+                Long.toString(result.updatedBy()));
         when(tagService.adminList(principal))
                 .thenReturn(List.of(result));
         when(tagService.adminDetail(principal, 201L))
@@ -168,7 +173,12 @@ class AdminCategoryTagControllerTest {
                         .doesNotExist());
         mockMvc.perform(get("/api/admin/tags/201"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(201));
+                .andExpect(jsonPath("$.data.id")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.createdBy")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.updatedBy")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)));
     }
 
     @Test
@@ -333,55 +343,55 @@ class AdminCategoryTagControllerTest {
 
     private AdminCategoryVO categoryVO(CategoryResult result) {
         return new AdminCategoryVO(
-                result.id(),
+                Long.toString(result.id()),
                 result.nameZh(),
                 result.nameJa(),
                 result.nameEn(),
                 result.slug(),
                 result.sortOrder(),
                 result.createdAt(),
-                result.createdBy(),
+                Long.toString(result.createdBy()),
                 result.updatedAt(),
-                result.updatedBy());
+                Long.toString(result.updatedBy()));
     }
 
     private AdminTagVO tagVO(TagResult result) {
         return new AdminTagVO(
-                result.id(),
+                Long.toString(result.id()),
                 result.nameZh(),
                 result.nameJa(),
                 result.nameEn(),
                 result.slug(),
                 result.createdAt(),
-                result.createdBy(),
+                Long.toString(result.createdBy()),
                 result.updatedAt(),
-                result.updatedBy());
+                Long.toString(result.updatedBy()));
     }
 
     private CategoryResult categoryResult() {
         return new CategoryResult(
-                101L,
+                UNSAFE_BROWSER_ID,
                 "后端",
                 null,
                 "Backend",
                 "backend",
                 10,
                 LocalDateTime.of(2026, 6, 15, 10, 0),
-                1001L,
+                UNSAFE_BROWSER_ID,
                 LocalDateTime.of(2026, 6, 15, 11, 0),
-                1001L);
+                UNSAFE_BROWSER_ID);
     }
 
     private TagResult tagResult() {
         return new TagResult(
-                201L,
+                UNSAFE_BROWSER_ID,
                 "Java",
                 null,
                 null,
                 "java",
                 LocalDateTime.of(2026, 6, 15, 10, 0),
-                1001L,
+                UNSAFE_BROWSER_ID,
                 LocalDateTime.of(2026, 6, 15, 11, 0),
-                1001L);
+                UNSAFE_BROWSER_ID);
     }
 }

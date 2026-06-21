@@ -1,19 +1,21 @@
 package com.tyb.myblog.v2.content.web;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.time.LocalDateTime;
 
 /**
  * 后台分类响应。
  */
 public record AdminCategoryVO(
-        long id,
+        @Schema(format = "int64") String id,
         String nameZh,
         String nameJa,
         String nameEn,
         String slug,
         int sortOrder,
         LocalDateTime createdAt,
-        Long createdBy,
+        @Schema(format = "int64") String createdBy,
         LocalDateTime updatedAt,
-        Long updatedBy) {
+        @Schema(format = "int64") String updatedBy) {
 }

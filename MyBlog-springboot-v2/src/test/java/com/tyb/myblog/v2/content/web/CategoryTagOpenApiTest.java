@@ -104,6 +104,12 @@ class CategoryTagOpenApiTest {
                 root,
                 "TagWriteOpenApiRequest",
                 TAG_WRITE_FIELDS);
+        assertStringId(root, "AdminCategoryVO", "id");
+        assertStringId(root, "AdminCategoryVO", "createdBy");
+        assertStringId(root, "AdminCategoryVO", "updatedBy");
+        assertStringId(root, "AdminTagVO", "id");
+        assertStringId(root, "AdminTagVO", "createdBy");
+        assertStringId(root, "AdminTagVO", "updatedBy");
         String document = root.toString();
         assertThat(document).doesNotContain(
                 "CategoryEntity",
@@ -145,6 +151,17 @@ class CategoryTagOpenApiTest {
                                 + "/required"))
                 .extracting(JsonNode::asText)
                 .containsExactlyInAnyOrderElementsOf(fields);
+    }
+
+    private void assertStringId(
+            JsonNode root,
+            String schema,
+            String field) {
+        JsonNode property = root.at(
+                "/components/schemas/" + schema
+                        + "/properties/" + field);
+        assertThat(property.path("type").asText()).isEqualTo("string");
+        assertThat(property.path("format").asText()).isEqualTo("int64");
     }
 
     private JsonNode apiDocument() throws Exception {

@@ -16,5 +16,20 @@ public interface TagWebMapping {
 
     PublicTagVO toPublicVO(PublicTagResult source);
 
-    AdminTagVO toAdminVO(TagResult source);
+    default AdminTagVO toAdminVO(TagResult source) {
+        return new AdminTagVO(
+                Long.toString(source.id()),
+                source.nameZh(),
+                source.nameJa(),
+                source.nameEn(),
+                source.slug(),
+                source.createdAt(),
+                nullableId(source.createdBy()),
+                source.updatedAt(),
+                nullableId(source.updatedBy()));
+    }
+
+    private static String nullableId(Long value) {
+        return value == null ? null : Long.toString(value);
+    }
 }

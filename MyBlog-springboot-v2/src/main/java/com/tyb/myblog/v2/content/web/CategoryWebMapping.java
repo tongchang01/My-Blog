@@ -16,5 +16,21 @@ public interface CategoryWebMapping {
 
     PublicCategoryVO toPublicVO(PublicCategoryResult source);
 
-    AdminCategoryVO toAdminVO(CategoryResult source);
+    default AdminCategoryVO toAdminVO(CategoryResult source) {
+        return new AdminCategoryVO(
+                Long.toString(source.id()),
+                source.nameZh(),
+                source.nameJa(),
+                source.nameEn(),
+                source.slug(),
+                source.sortOrder(),
+                source.createdAt(),
+                nullableId(source.createdBy()),
+                source.updatedAt(),
+                nullableId(source.updatedBy()));
+    }
+
+    private static String nullableId(Long value) {
+        return value == null ? null : Long.toString(value);
+    }
 }
