@@ -25,10 +25,14 @@
 |------|------|------|
 | `page` | number | 页码，从 1 开始 |
 | `size` | number | 每页数量 |
-| `status` | number | 可选，1 草稿、2 已发布、3 密码、4 定时 |
-| `keyword` | string | 可选，按标题或 slug 模糊匹配 |
+| `status` | string | 可选，`DRAFT`、`PUBLISHED`、`PRIVATE`、`PASSWORD`、`SCHEDULED` |
+| `titleKeyword` | string | 可选，按三语标题模糊匹配 |
 | `categoryId` | string | 可选，分类 ID |
 | `tagId` | string | 可选，标签 ID |
+| `createdFrom` | string | 可选，创建时间下界，JST `yyyy-MM-dd'T'HH:mm:ss` |
+| `createdTo` | string | 可选，创建时间上界，JST `yyyy-MM-dd'T'HH:mm:ss` |
+| `publishFrom` | string | 可选，发布时间下界，JST `yyyy-MM-dd'T'HH:mm:ss` |
+| `publishTo` | string | 可选，发布时间上界，JST `yyyy-MM-dd'T'HH:mm:ss` |
 
 响应 `data`：
 
@@ -38,16 +42,24 @@
     {
       "id": "ARTICLE_ID",
       "slug": "hello-world",
-      "status": 2,
+      "status": "PUBLISHED",
       "titleZh": "中文标题",
       "titleEn": "English title",
       "titleJa": "日本語タイトル",
+      "summaryZh": "中文摘要",
+      "summaryEn": "English summary",
+      "summaryJa": "日本語概要",
       "categoryId": "CATEGORY_ID",
       "categoryNameZh": "分类",
       "coverAttachmentId": "ATTACHMENT_ID",
+      "coverUrl": "https://cdn.example.com/cover.png",
+      "commentCount": 2,
+      "tagIds": ["TAG_ID"],
       "publishAt": "2026-06-16T12:00:00",
       "createdAt": "2026-06-16T10:00:00",
-      "updatedAt": "2026-06-16T11:00:00"
+      "createdBy": "USER_ID",
+      "updatedAt": "2026-06-16T11:00:00",
+      "updatedBy": "USER_ID"
     }
   ],
   "total": 1,
@@ -161,6 +173,28 @@
 - `PUBLISHED`：返回当前语言标题、摘要、正文、分类、标签、封面和发布时间。
 - `PASSWORD`：首版不开放解锁接口，详情返回 `403 + 10003`；完整解锁链路位于上线后增量。
 - `DRAFT`、`SCHEDULED`、已删除或不存在：返回 `404`。
+
+## ID 精度约定
+
+- 后台文章列表/详情响应中的文章 `id`、`categoryId`、`authorId`、`coverAttachmentId`、`tagIds`、`createdBy`、`updatedBy` 均使用 JSON string；可空关联没有值时返回 JSON `null`。
+- 后台分类与标签响应中的 `id`、`createdBy`、`updatedBy` 同样使用 JSON string。
+- 公开文章列表/详情响应中的文章 `id`、`categoryId` 和标签 `id` 均使用 JSON string。
+- 该约定用于避免 Java `long` 超出 JavaScript 安全整数范围后发生精度丢失；路径参数和后端内部模型仍使用 `long`。
+- 可空的 `categoryId` 没有关联分类时返回 JSON `null`，不得返回空字符串。
+
+```json
+{
+  "id": "9007199254740993",
+  "categoryId": "9007199254740994",
+  "tags": [
+    {
+      "id": "9007199254740995",
+      "name": "Java",
+      "slug": "java"
+    }
+  ]
+}
+```
 
 ## OpenAPI 守护
 

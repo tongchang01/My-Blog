@@ -1,5 +1,31 @@
 # 当前进度
 
+## 2026-06-21：后台文章只读列表完成
+
+- 后台新增 `/articles/list` 静态业务路由，ADMIN/DEMO 均可访问；当前严格只读，不提供伪造的编辑、删除和批量操作。
+- 页面采用独立可折叠筛选卡片，当前支持标题关键词和状态；文章表格展示三语标题、状态、分类、标签、评论数、发布与更新时间。
+- 已完成并行字典加载、latest-request-wins、分页、刷新、loading/empty/error/retry 和 zh/ja/en 文案。
+- 后台文章、分类、标签 Web ID 已统一为 JSON string，并由 OpenAPI `string/int64` 测试守护；后端内部模型保持 `long`。
+- 验证：前端 43 tests、typecheck、build 通过；后端 `mvn clean test` 共 637 tests，0 failures、0 errors、4 skipped；视觉 QA 通过。
+- 下一步：文章详情/编辑、Vditor 与 ADMIN 写权限交互；随后进入分类/标签管理页。
+
+## 2026-06-20：博客后台基础闭环完成
+
+- 后台工程位于 `frontend/apps/admin/`，基于 Pure Admin Thin i18n 固定提交建立，工程文档独立归档在 `frontend/apps/admin/docs/`。
+- 已完成 zh/ja/en、静态路由、ADMIN/DEMO、登录与 `/me` 原子编排、单飞 refresh、退出清理和空仪表盘；文章只读列表已于 2026-06-21 作为首个业务页落地。
+- 阶段验证：前端 28 tests、lint、typecheck、build 通过；后端局部 27 tests 通过；后端全量 637 tests，0 failures、0 errors、4 skipped。
+- H2 test profile 的真实 HTTP 联调通过 ADMIN/DEMO、refresh 轮换、logout 撤销和 Vite 代理；可视化浏览器点击验收因本次浏览器控制不可用，保留为本机复验项。
+
+## 2026-06-20：博客前台首批后端联调完成
+
+- 前台工程位于 `frontend/apps/blog/`，已建立 Node 24、pnpm 9.15.9、Vitest、vue-tsc、lint 和生产构建基线。
+- 已完成三语入口、公开站点配置、公开文章列表/分页、ID 主导详情、安全 Markdown、canonical slug 以及 locked/404/error/retry 状态。
+- 后端公开文章 ID 契约已改为 JSON string；后端内部、数据库和路径参数仍使用 `long`。
+- 首页迁移链路不再请求 `site.json`、`posts/1.json`、`features.json`、旧搜索和旧友链页面数据。
+- 阶段验证：后端 `mvn clean test` 共 636 tests，0 failures、0 errors、4 skipped；前端 30 tests 全部通过，lint 0 errors，typecheck 与 build 通过。
+- 真实联调使用 H2 test profile；本机 `local` profile 因缺少数据库账号/密码、JWT secret 和 stats hash secret 未执行 MySQL 数据验收。
+- M4 尚未完成：前后台业务页面、分类/标签/归档/友链/关于/搜索、评论/留言/统计、PASSWORD 解锁和 Spotify 仍在后续批次。
+
 > 本文档回答："V2 现在做到哪了？接下来按什么主线推进？"
 > 更新时机：每个里程碑完成后更新。
 > 当前日期：2026-06
@@ -87,12 +113,13 @@ M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，iden
 - stats 模块已完成：匿名打点、每日轮换 HMAC visitor hash、日 PV/UV 幂等重算、启动补算、5 分钟校准、90 天明细清理和后台 dashboard 均已落地
 - dashboard 默认补齐最近 30 个 JST 自然日，最大闭区间 366 天；`dailyUvSum` 和 `averageDailyUv` 均明确不是跨日独立访客数
 
-**当前处置方案**：M3 后端模块重建已收尾，下一步进入 M4 前台 / 后台前端骨架。
+**当前处置方案**：M3 后端模块重建与 M4 前后台基础骨架已收尾，下一步按业务模块逐个对接后台管理页面。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. 前台 / 后台前端骨架
-2. 根据前端对接结果补充接口契约细节
+1. 后台文章详情/编辑与 Vditor
+2. 按模块继续分类/标签、评论、友链、配置和统计页面
+3. 根据前端对接结果补充接口契约细节
 
 ## 4. 相关文档
 
