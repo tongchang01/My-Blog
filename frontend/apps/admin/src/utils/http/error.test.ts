@@ -8,6 +8,7 @@ describe("apiErrorFromCode", () => {
     ["10003", "forbidden"],
     ["90001", "validation"],
     ["90002", "rateLimited"],
+    ["90004", "conflict"],
     ["99999", "server"],
     ["unexpected", "unknown"]
   ] as const)("maps %s to %s", (code, kind) => {

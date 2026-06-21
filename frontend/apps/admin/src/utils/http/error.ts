@@ -3,6 +3,7 @@ export type ApiErrorKind =
   | "sessionExpired"
   | "forbidden"
   | "validation"
+  | "conflict"
   | "rateLimited"
   | "server"
   | "network"
@@ -14,6 +15,7 @@ const CODE_KIND: Readonly<Record<string, ApiErrorKind>> = {
   "10003": "forbidden",
   "90001": "validation",
   "90002": "rateLimited",
+  "90004": "conflict",
   "99999": "server"
 };
 

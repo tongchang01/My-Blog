@@ -1,3 +1,15 @@
+import type {
+  CategoryItem,
+  LocalizedNames,
+  TagItem
+} from "@/features/taxonomy/model";
+
+export type {
+  CategoryItem,
+  LocalizedNames,
+  TagItem
+} from "@/features/taxonomy/model";
+
 export type ArticleStatus =
   | "DRAFT"
   | "PUBLISHED"
@@ -7,12 +19,6 @@ export type ArticleStatus =
 
 export type ArticleStatusFilter = ArticleStatus | "ALL";
 export type AdminLocale = "zh" | "ja" | "en";
-
-export interface LocalizedNames {
-  nameZh: string | null;
-  nameJa: string | null;
-  nameEn: string | null;
-}
 
 export interface ArticleListFilters {
   titleKeyword: string;
@@ -71,17 +77,6 @@ export interface ArticleWritePayload {
   password: string | null;
   publishAt: string | null;
   coverAttachmentId: string | null;
-}
-
-export interface CategoryItem extends LocalizedNames {
-  id: string;
-  slug: string;
-  sortOrder: number;
-}
-
-export interface TagItem extends LocalizedNames {
-  id: string;
-  slug: string;
 }
 
 export interface PageResponse<T> {

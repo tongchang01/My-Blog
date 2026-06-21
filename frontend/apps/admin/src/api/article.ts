@@ -4,9 +4,7 @@ import type {
   ArticleListItem,
   ArticleDetail,
   ArticleWritePayload,
-  CategoryItem,
-  PageResponse,
-  TagItem
+  PageResponse
 } from "@/features/articles/model";
 import { buildArticleListParams } from "@/features/articles/query";
 import { http } from "@/utils/http";
@@ -17,11 +15,7 @@ export const listArticles = (filters: ArticleListFilters) =>
     { params: buildArticleListParams(filters) }
   );
 
-export const listCategories = () =>
-  http.get<ApiResponse<CategoryItem[]>>("/api/admin/categories");
-
-export const listTags = () =>
-  http.get<ApiResponse<TagItem[]>>("/api/admin/tags");
+export { listCategories, listTags } from "./taxonomy";
 
 export const getArticle = (id: string) =>
   http.get<ApiResponse<ArticleDetail>>(`/api/admin/articles/${id}`);
