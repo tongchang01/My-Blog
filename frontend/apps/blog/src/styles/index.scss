@@ -1,0 +1,148 @@
+@import './theme-variables.scss';
+
+/* Base css */
+@import 'tailwindcss/base';
+
+/* Components css */
+@import 'tailwindcss/components';
+@import './components/article.scss';
+@import './components/sidebar-box.scss';
+@import './components/search-modal.scss';
+
+/* Utilities css */
+@import 'tailwindcss/utilities';
+
+@import './transitions.scss';
+
+.stroke-ob-bright {
+  stroke: var(--text-bright) !important;
+}
+
+.diamond-clip-path {
+  clip-path: polygon(50% 3%, 91% 25%, 91% 75%, 50% 97%, 9% 75%, 9% 25%);
+  background: var(--background-trans);
+}
+
+.diamond-icon {
+  @apply w-[2.7rem] h-[2.7rem] text-xl flex items-center justify-center text-ob-bright hover:opacity-50 transition cursor-pointer;
+}
+
+html {
+  scrollbar-color: rgba(82, 82, 82, 0.8) transparent;
+  height: 100%;
+  font-size: 18px;
+}
+
+body {
+  min-height: 100%;
+  font-size: 16px;
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei";
+  line-height: 2;
+}
+
+h1 code,
+h2 code,
+h3 code,
+h4 code,
+h5 code,
+h6 code {
+  font-size: inherit !important;
+}
+
+html::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html::-webkit-scrollbar-thumb {
+  background: #434343;
+  border-radius: 16px;
+  box-shadow: inset 2px 2px 2px rgba(100, 100, 100, 0.25),
+    inset -2px -2px 2px rgba(0, 0, 0, 0.25);
+}
+
+html::-webkit-scrollbar-track {
+  border: none;
+  background: linear-gradient(90deg, #434343, #434343 1px, #111 0, #111);
+}
+
+div::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+div::-webkit-scrollbar-thumb {
+  background: #434343;
+  border-radius: 16px;
+  box-shadow: inset 2px 2px 2px rgba(100, 100, 100, 0.25),
+    inset -2px -2px 2px rgba(0, 0, 0, 0.25);
+}
+
+div::-webkit-scrollbar-track {
+  border: none;
+  background: transparent !important;
+}
+
+b {
+  @apply font-bold text-ob-bright;
+}
+
+.highlighted {
+  @apply relative;
+}
+
+.highlighted:before {
+  content: '';
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(130deg,
+      rgb(36, 198, 220, 0.5),
+      rgb(84, 51, 255, 0.5) 41.07%,
+      rgb(255, 0, 153, 0.5) 76.05%);
+  transform: translate3d(0px, 25px, 0) scale(0.85);
+  filter: blur(20px);
+  opacity: var(0.7);
+  transition: opacity 0.3s;
+  border-radius: inherit;
+}
+
+/*
+  * Prevents issues when the parent creates a
+  * stacking context. (For example, using the transform
+  * property )
+  */
+.highlighted::after {
+  content: '';
+  z-index: -1;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: inherit;
+  border-radius: inherit;
+}
+
+@keyframes opacity_show {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes opacity_hide {
+  0% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
