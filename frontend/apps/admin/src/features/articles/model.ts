@@ -51,6 +51,28 @@ export interface ArticleListItem {
   updatedBy: string | null;
 }
 
+export interface ArticleDetail extends ArticleListItem {
+  body: string | null;
+  authorId: string;
+}
+
+export interface ArticleWritePayload {
+  titleZh: string;
+  titleJa: string | null;
+  titleEn: string | null;
+  summaryZh: string;
+  summaryJa: string | null;
+  summaryEn: string | null;
+  body: string;
+  categoryId: string | null;
+  tagIds: string[];
+  slug: string | null;
+  status: ArticleStatus;
+  password: string | null;
+  publishAt: string | null;
+  coverAttachmentId: string | null;
+}
+
 export interface CategoryItem extends LocalizedNames {
   id: string;
   slug: string;

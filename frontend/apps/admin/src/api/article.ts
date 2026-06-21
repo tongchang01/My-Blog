@@ -2,6 +2,8 @@ import type { ApiResponse } from "./contract";
 import type {
   ArticleListFilters,
   ArticleListItem,
+  ArticleDetail,
+  ArticleWritePayload,
   CategoryItem,
   PageResponse,
   TagItem
@@ -20,3 +22,18 @@ export const listCategories = () =>
 
 export const listTags = () =>
   http.get<ApiResponse<TagItem[]>>("/api/admin/tags");
+
+export const getArticle = (id: string) =>
+  http.get<ApiResponse<ArticleDetail>>(`/api/admin/articles/${id}`);
+
+export const createArticle = (payload: ArticleWritePayload) =>
+  http.post<ApiResponse<ArticleDetail>>("/api/admin/articles", {
+    data: payload
+  });
+
+export const updateArticle = (id: string, payload: ArticleWritePayload) =>
+  http.request<ApiResponse<ArticleDetail>>(
+    "put",
+    `/api/admin/articles/${id}`,
+    { data: payload }
+  );
