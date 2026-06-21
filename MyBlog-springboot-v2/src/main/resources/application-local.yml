@@ -5,7 +5,7 @@ spring:
     password: ${MYBLOG_DATASOURCE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
-    enabled: false
+    enabled: true
 
 springdoc:
   api-docs:
