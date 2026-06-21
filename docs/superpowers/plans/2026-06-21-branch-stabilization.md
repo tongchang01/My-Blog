@@ -15,8 +15,8 @@
 - 保留：`backend-v2-refactor`
 - 保留：`frontend-v2-integration`
 - 保留：`master`
-- 新建：`codex/backend-v2-integration-ready`
-- 新建：`codex/frontend-v2-clean`
+- 新建：`backend-v2-integration-ready`
+- 新建：`frontend-v2-clean`
 - 记录：`docs/project-handbook/plans/branch-stabilization-manifest.md`
 
 ### Task 1：冻结当前引用和提交清单
@@ -82,12 +82,12 @@ Commit: `记录V2分支稳定化基线`
 
 - [ ] **Step 1: 创建隔离 worktree**
 
-从 `backend-v2-refactor` 创建 `codex/backend-v2-integration-ready`，不得在当前前端 worktree 内切换分支。
+从 `backend-v2-refactor` 创建 `backend-v2-integration-ready`，不得在当前前端 worktree 内切换分支。
 
 Run:
 
 ```powershell
-git worktree add E:\My-Blog\.worktrees\backend-v2-integration-ready -b codex/backend-v2-integration-ready backend-v2-refactor
+git worktree add E:\My-Blog\.worktrees\backend-v2-integration-ready -b backend-v2-integration-ready backend-v2-refactor
 ```
 
 Expected: 新 worktree HEAD 等于 Task 1 记录的 backend SHA。
@@ -120,7 +120,7 @@ Expected: 637 tests，0 failures，0 errors，既有 Docker 条件测试允许 s
 Run:
 
 ```powershell
-git diff --name-only backend-v2-refactor...codex/backend-v2-integration-ready
+git diff --name-only backend-v2-refactor...backend-v2-integration-ready
 ```
 
 Expected: 不出现 `frontend/`、V1 目录或前端工程文档。
@@ -136,7 +136,7 @@ Expected: 不出现 `frontend/`、V1 目录或前端工程文档。
 Run:
 
 ```powershell
-git worktree add E:\My-Blog\.worktrees\frontend-v2-clean -b codex/frontend-v2-clean codex/backend-v2-integration-ready
+git worktree add E:\My-Blog\.worktrees\frontend-v2-clean -b frontend-v2-clean backend-v2-integration-ready
 ```
 
 - [ ] **Step 2: 按最终状态迁入前端目录**
@@ -167,7 +167,7 @@ git restore --source=frontend-v2-integration --staged --worktree -- docs/archive
 Run:
 
 ```powershell
-git diff --name-only codex/backend-v2-integration-ready...codex/frontend-v2-clean | rg "^MyBlog-springboot-v2/"
+git diff --name-only backend-v2-integration-ready...frontend-v2-clean | rg "^MyBlog-springboot-v2/"
 ```
 
 Expected: 无输出。
@@ -209,7 +209,7 @@ Expected: 43 tests、typecheck 和生产构建通过。
 Run:
 
 ```powershell
-git diff --name-status frontend-v2-integration codex/frontend-v2-clean -- frontend
+git diff --name-status frontend-v2-integration frontend-v2-clean -- frontend
 ```
 
 Expected: 无输出，两个分支中受版本控制的 `frontend/` 最终状态完全一致。
@@ -229,8 +229,8 @@ Run:
 
 ```powershell
 git status --short
-git log --oneline --decorate -10 codex/backend-v2-integration-ready
-git log --oneline --decorate -10 codex/frontend-v2-clean
+git log --oneline --decorate -10 backend-v2-integration-ready
+git log --oneline --decorate -10 frontend-v2-clean
 ```
 
 - [ ] **Step 3: 请求集成选择**

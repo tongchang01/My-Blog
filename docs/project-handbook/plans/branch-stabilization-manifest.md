@@ -83,8 +83,8 @@
 
 | 分支 | 基线 | 状态 |
 | --- | --- | --- |
-| `codex/backend-v2-integration-ready` | `backend-v2-refactor` 冻结 SHA | 已建立；已验证实现 tip `239e411bcdb839b16f4958ec8690e6250b5929bb` |
-| `codex/frontend-v2-clean` | 后端候选 | 已建立；首次同步后端基线 tip `038ebf63b5600ea0b17a728e6db46d7fd39c9ca5` |
+| `backend-v2-integration-ready` | `backend-v2-refactor` 冻结 SHA | 已建立；已验证实现 tip `239e411bcdb839b16f4958ec8690e6250b5929bb` |
+| `frontend-v2-clean` | 后端候选 | 已建立；首次同步后端基线 tip `038ebf63b5600ea0b17a728e6db46d7fd39c9ca5` |
 
 清单提交本身会使分支 tip 前进；上表记录的是进入最终报告前实际执行测试的内容 tip，不把自引用 SHA 伪装为最终分支指针。
 
