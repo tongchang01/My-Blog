@@ -44,7 +44,9 @@ public class PublicArticleQueryService {
                         .map(item -> toItem(
                                 item,
                                 lang,
-                                coverUrls.get(item.coverAttachmentId())))
+                                item.coverAttachmentId() == null
+                                        ? null
+                                        : coverUrls.get(item.coverAttachmentId())))
                         .toList(),
                 page.total(),
                 page.page(),
