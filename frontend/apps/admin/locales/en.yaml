@@ -1,0 +1,143 @@
+buttons:
+  pureLoginOut: LoginOut
+  pureLogin: Login
+  pureOpenSystemSet: Open System Configs
+  pureReload: Reload
+  pureCloseCurrentTab: Close CurrentTab
+  pureCloseLeftTabs: Close LeftTabs
+  pureCloseRightTabs: Close RightTabs
+  pureCloseOtherTabs: Close OtherTabs
+  pureCloseAllTabs: Close AllTabs
+  pureContentFullScreen: Content FullScreen
+  pureContentExitFullScreen: Content ExitFullScreen
+  pureClickCollapse: Collapse
+  pureClickExpand: Expand
+  pureConfirm: Confirm
+  pureSwitch: Switch
+  pureClose: Close
+  pureBackTop: BackTop
+  pureOpenText: Open
+  pureCloseText: Close
+search:
+  pureTotal: Total
+  pureHistory: History
+  pureCollect: Collect
+  pureDragSort: （Drag Sort）
+  pureEmpty: Empty
+  purePlaceholder: Search Menu
+panel:
+  pureSystemSet: System Configs
+  pureCloseSystemSet: Close System Configs
+  pureClearCacheAndToLogin: Clear cache and return to login page
+  pureClearCache: Clear Cache
+  pureOverallStyle: Overall Style
+  pureOverallStyleLight: Light
+  pureOverallStyleLightTip: Set sail freshly and light up the comfortable work interface
+  pureOverallStyleDark: Dark
+  pureOverallStyleDarkTip: Moonlight Overture, indulge in the tranquility and elegance of the night
+  pureOverallStyleSystem: Auto
+  pureOverallStyleSystemTip: Synchronize time, the interface naturally responds to morning and dusk
+  pureThemeColor: Theme Color
+  pureLayoutModel: Layout Model
+  pureVerticalTip: The menu on the left is familiar and friendly
+  pureHorizontalTip: Top menu, concise overview
+  pureMixTip: Mixed menu, flexible
+  pureStretch: Stretch Page
+  pureStretchFixed: Fixed
+  pureStretchFixedTip: Compact pages make it easy to find the information you need
+  pureStretchCustom: Custom
+  pureStretchCustomTip: Minimum 1280, maximum 1600
+  pureTagsStyle: Tags Style
+  pureTagsStyleSmart: Smart
+  pureTagsStyleSmartTip: Smart tags add fun and brilliance
+  pureTagsStyleCard: Card
+  pureTagsStyleCardTip: Card tags for efficient browsing
+  pureTagsStyleChrome: Chrome
+  pureTagsStyleChromeTip: Chrome style is classic and elegant
+  pureInterfaceDisplay: Interface Display
+  pureGreyModel: Grey Model
+  pureWeakModel: Weak Model
+  pureHiddenTags: Hidden Tags
+  pureHiddenFooter: Hidden Footer
+  pureMultiTagsCache: MultiTags Cache
+menus:
+  dashboard: Dashboard
+  articles: Articles
+  articleManagement: Article Management
+  pureHome: Home
+  pureLogin: Login
+  pureAbnormal: Abnormal Page
+  purePageNotFound: "404"
+  pureAccessDenied: "403"
+  pureServerError: "500"
+  purePermission: Permission Manage
+  purePermissionPage: Page Permission
+  purePermissionButton: Button Permission
+  purePermissionButtonRouter: Route return button permission
+  purePermissionButtonLogin: Login interface return button permission
+status:
+  readOnlyDemo: The current demo account is read-only
+  pureLoad: Loading...
+  pureMessage: Message
+  pureNotify: Notify
+  pureTodo: Todo
+  pureNoMessage: No Message
+  pureNoNotify: No Notify
+  pureNoTodo: No Todo
+dashboard:
+  welcome: Welcome
+  account: Account
+  role: Role
+  backendStatus: Backend connection
+  connected: Connected
+articles:
+  filter:
+    eyebrow: Query Workspace
+    title: Filters
+    collapse: Collapse
+    expand: Expand
+    titleKeyword: Title keyword
+    titlePlaceholder: Search multilingual titles
+    status: Article status
+    statusPlaceholder: Select a status
+    futureHint: Category, tag and date filters can be added here later.
+  result:
+    eyebrow: Content Inventory
+    total: Total articles
+  actions:
+    search: Search
+    reset: Reset
+    refresh: Refresh
+    retry: Retry
+  columns:
+    title: Title
+    status: Status
+    category: Category
+    tags: Tags
+    comments: Comments
+    publishAt: Publish time
+    updatedAt: Update time
+  status:
+    all: All
+    draft: Draft
+    published: Published
+    private: Private
+    password: Password
+    scheduled: Scheduled
+    unknown: Unknown
+  states:
+    empty: No articles match the current filters
+    error: Unable to load articles. Please retry
+login:
+  pureUsername: Username
+  purePassword: Password
+  pureLogin: Login
+  pureLoginSuccess: Login Success
+  pureLoginFail: Login Fail
+  errorBadCredentials: Incorrect username or password
+  errorRateLimited: Too many login attempts. Please try again later
+  errorNetwork: Network connection failed. Please try again
+  errorUnknown: Login failed. Please try again later
+  pureUsernameReg: Please enter username
+  purePassWordReg: Please enter password
+  purePassWordRuleReg: The password format should be any combination of 8-18 digits

@@ -1,0 +1,143 @@
+buttons:
+  pureLoginOut: ログアウト
+  pureLogin: ログイン
+  pureOpenSystemSet: システム設定を開く
+  pureReload: 再読み込み
+  pureCloseCurrentTab: 現在のタブを閉じる
+  pureCloseLeftTabs: 左側のタブを閉じる
+  pureCloseRightTabs: 右側のタブを閉じる
+  pureCloseOtherTabs: その他のタブを閉じる
+  pureCloseAllTabs: すべてのタブを閉じる
+  pureContentFullScreen: コンテンツを全画面表示
+  pureContentExitFullScreen: 全画面表示を終了
+  pureClickCollapse: 折りたたむ
+  pureClickExpand: 展開する
+  pureConfirm: 確認
+  pureSwitch: 切り替え
+  pureClose: 閉じる
+  pureBackTop: ページ上部へ戻る
+  pureOpenText: オン
+  pureCloseText: オフ
+search:
+  pureTotal: 合計
+  pureHistory: 検索履歴
+  pureCollect: お気に入り
+  pureDragSort: （ドラッグして並べ替え）
+  pureEmpty: 検索結果がありません
+  purePlaceholder: メニューを検索
+panel:
+  pureSystemSet: システム設定
+  pureCloseSystemSet: 設定を閉じる
+  pureClearCacheAndToLogin: キャッシュを消去してログイン画面へ戻る
+  pureClearCache: キャッシュを消去
+  pureOverallStyle: 全体スタイル
+  pureOverallStyleLight: ライト
+  pureOverallStyleLightTip: 明るく見やすい画面を使用します
+  pureOverallStyleDark: ダーク
+  pureOverallStyleDarkTip: 暗い環境に適した画面を使用します
+  pureOverallStyleSystem: システム
+  pureOverallStyleSystemTip: システム設定に合わせます
+  pureThemeColor: テーマカラー
+  pureLayoutModel: レイアウト
+  pureVerticalTip: 左側メニューを使用します
+  pureHorizontalTip: 上部メニューを使用します
+  pureMixTip: 混合メニューを使用します
+  pureStretch: ページ幅
+  pureStretchFixed: 固定
+  pureStretchFixedTip: 固定幅で表示します
+  pureStretchCustom: カスタム
+  pureStretchCustomTip: 1280から1600の範囲で設定します
+  pureTagsStyle: タブスタイル
+  pureTagsStyleSmart: スマート
+  pureTagsStyleSmartTip: スマートスタイルを使用します
+  pureTagsStyleCard: カード
+  pureTagsStyleCardTip: カードスタイルを使用します
+  pureTagsStyleChrome: Chrome
+  pureTagsStyleChromeTip: Chrome風スタイルを使用します
+  pureInterfaceDisplay: 表示設定
+  pureGreyModel: グレーモード
+  pureWeakModel: 色覚サポート
+  pureHiddenTags: タブを非表示
+  pureHiddenFooter: フッターを非表示
+  pureMultiTagsCache: タブを保持
+menus:
+  dashboard: ダッシュボード
+  articles: 記事管理
+  articleManagement: 記事一覧
+  pureHome: ホーム
+  pureLogin: ログイン
+  pureAbnormal: エラーページ
+  purePageNotFound: "404"
+  pureAccessDenied: "403"
+  pureServerError: "500"
+  purePermission: 権限管理
+  purePermissionPage: ページ権限
+  purePermissionButton: ボタン権限
+  purePermissionButtonRouter: ルートのボタン権限
+  purePermissionButtonLogin: ログインのボタン権限
+status:
+  readOnlyDemo: 現在のデモアカウントは読み取り専用です
+  pureLoad: 読み込み中...
+  pureMessage: メッセージ
+  pureNotify: 通知
+  pureTodo: タスク
+  pureNoMessage: メッセージはありません
+  pureNoNotify: 通知はありません
+  pureNoTodo: タスクはありません
+dashboard:
+  welcome: ようこそ
+  account: アカウント
+  role: ロール
+  backendStatus: バックエンド接続
+  connected: 接続済み
+articles:
+  filter:
+    eyebrow: Query Workspace
+    title: 絞り込み条件
+    collapse: 折りたたむ
+    expand: 展開する
+    titleKeyword: タイトルキーワード
+    titlePlaceholder: 多言語タイトルを検索
+    status: 記事ステータス
+    statusPlaceholder: ステータスを選択
+    futureHint: カテゴリ、タグ、日付の条件を今後ここに追加できます。
+  result:
+    eyebrow: Content Inventory
+    total: 記事総数
+  actions:
+    search: 検索
+    reset: リセット
+    refresh: 更新
+    retry: 再試行
+  columns:
+    title: タイトル
+    status: ステータス
+    category: カテゴリ
+    tags: タグ
+    comments: コメント数
+    publishAt: 公開日時
+    updatedAt: 更新日時
+  status:
+    all: すべて
+    draft: 下書き
+    published: 公開済み
+    private: 非公開
+    password: パスワード
+    scheduled: 公開予約
+    unknown: 不明
+  states:
+    empty: 条件に一致する記事はありません
+    error: 記事一覧を読み込めませんでした。再試行してください
+login:
+  pureUsername: ユーザー名
+  purePassword: パスワード
+  pureLogin: ログイン
+  pureLoginSuccess: ログインしました
+  pureLoginFail: ログインに失敗しました
+  errorBadCredentials: ユーザー名またはパスワードが正しくありません
+  errorRateLimited: ログイン試行が多すぎます。しばらくしてから再試行してください
+  errorNetwork: ネットワークに接続できません。接続を確認してください
+  errorUnknown: ログインに失敗しました。しばらくしてから再試行してください
+  pureUsernameReg: ユーザー名を入力してください
+  purePassWordReg: パスワードを入力してください
+  purePassWordRuleReg: パスワードは8〜18文字で入力してください
