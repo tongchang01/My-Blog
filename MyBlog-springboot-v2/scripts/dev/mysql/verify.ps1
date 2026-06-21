@@ -1,0 +1,89 @@
+$ErrorActionPreference = "Stop"
+Set-StrictMode -Version Latest
+
+$scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
+$verifySeedFile = Join-Path $scriptDirectory "verify-seed.sql"
+$allowedDatabase = "myblog_v2_dev"
+$defaultUrl = "jdbc:mysql://localhost:3306/myblog_v2_dev"
+
+function Require-EnvironmentVariable {
+    param([string]$Name)
+
+    $value = [Environment]::GetEnvironmentVariable($Name, "Process")
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        throw "Missing required environment variable: $Name"
+    }
+    return $value
+}
+
+$username = Require-EnvironmentVariable "MYBLOG_DATASOURCE_USERNAME"
+$password = Require-EnvironmentVariable "MYBLOG_DATASOURCE_PASSWORD"
+$datasourceUrl = [Environment]::GetEnvironmentVariable(
+    "MYBLOG_DATASOURCE_URL",
+    "Process")
+if ([string]::IsNullOrWhiteSpace($datasourceUrl)) {
+    $datasourceUrl = $defaultUrl
+}
+
+$match = [regex]::Match(
+    $datasourceUrl,
+    '^jdbc:mysql://(?<host>[^/:?]+)(?::(?<port>[0-9]+))?/(?<database>[^?]+)')
+if (-not $match.Success) {
+    throw "MYBLOG_DATASOURCE_URL must be a jdbc:mysql URL"
+}
+if ($match.Groups["database"].Value -ne $allowedDatabase) {
+    throw "Only '$allowedDatabase' can be verified"
+}
+
+$port = 3306
+if ($match.Groups["port"].Success) {
+    $port = [int]$match.Groups["port"].Value
+}
+
+$mysql = Get-Command mysql -ErrorAction Stop
+$mysqlArguments = @(
+    "--protocol=TCP",
+    "--host=$($match.Groups['host'].Value)",
+    "--port=$port",
+    "--user=$username",
+    "--default-character-set=utf8mb4",
+    "--batch",
+    "--raw",
+    "--skip-column-names",
+    $allowedDatabase
+)
+$originalMysqlPassword = [Environment]::GetEnvironmentVariable("MYSQL_PWD", "Process")
+
+try {
+    [Environment]::SetEnvironmentVariable("MYSQL_PWD", $password, "Process")
+
+    $verifyPath = $verifySeedFile.Replace('\', '/')
+    $rows = & $mysql.Source @mysqlArguments "--execute=source $verifyPath" 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "Seed verification query failed: $($rows -join [Environment]::NewLine)"
+    }
+
+    foreach ($row in $rows) {
+        $columns = ([string]$row) -split "`t"
+        if ($columns.Count -lt 4 -or $columns[3] -ne "1") {
+            throw "Seed verification failed: $row"
+        }
+        Write-Host "$($columns[0]): expected=$($columns[1]), actual=$($columns[2])"
+    }
+
+    $metadata = & $mysql.Source @mysqlArguments `
+        "--execute=SET time_zone = '+09:00'; SELECT @@session.time_zone; SELECT MAX(version) FROM flyway_schema_history WHERE success = 1;" 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "Database metadata verification failed: $($metadata -join [Environment]::NewLine)"
+    }
+    if ($metadata.Count -lt 2 -or $metadata[0] -ne "+09:00" -or $metadata[1] -ne "2") {
+        throw "Expected session time zone +09:00 and Flyway version 2; actual: $($metadata -join ', ')"
+    }
+
+    Write-Host "Database time zone and Flyway version verified"
+} finally {
+    [Environment]::SetEnvironmentVariable(
+        "MYSQL_PWD",
+        $originalMysqlPassword,
+        "Process")
+}
