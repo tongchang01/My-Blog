@@ -15,9 +15,9 @@
 - 修改：`src/api/article.ts`
 - 修改：`src/api/article.test.ts`
 
-- [ ] 先添加详情、创建、更新请求测试并确认失败。
-- [ ] 定义 `ArticleDetail` 与 `ArticleWritePayload`，实现 `getArticle`、`createArticle`、`updateArticle`。
-- [ ] 运行 `pnpm vitest run src/api/article.test.ts` 并提交。
+- [x] 先添加详情、创建、更新请求测试并确认失败。
+- [x] 定义 `ArticleDetail` 与 `ArticleWritePayload`，实现 `getArticle`、`createArticle`、`updateArticle`。
+- [x] 运行 `pnpm vitest run src/api/article.test.ts` 并提交。
 
 ### 任务 2：编辑表单领域逻辑
 
@@ -25,9 +25,9 @@
 - 新建：`src/features/articles/editor/form.ts`
 - 新建：`src/features/articles/editor/form.test.ts`
 
-- [ ] 先覆盖默认值、详情映射、可选字段转 null、定时发布时间和密码规则并确认失败。
-- [ ] 实现 `createEmptyArticleForm`、`articleDetailToForm`、`validateArticleForm`、`articleFormToPayload`。
-- [ ] 运行领域测试并提交。
+- [x] 先覆盖默认值、详情映射、可选字段转 null、非草稿分类、定时发布时间和密码规则并确认失败。
+- [x] 实现 `createEmptyArticleForm`、`articleDetailToForm`、`validateArticleForm`、`articleFormToPayload`。
+- [x] 运行领域测试并提交。
 
 ### 任务 3：编辑页面、路由和列表入口
 
@@ -39,9 +39,9 @@
 - 修改：`src/router/modules/articles.ts`
 - 修改：`src/router/static-router.test.ts`
 
-- [ ] 先添加路由、列表入口与编辑页交互测试并确认失败。
-- [ ] 实现 ADMIN 新建/编辑路由、列表入口、表单加载和保存。
-- [ ] 运行相关组件与路由测试并提交。
+- [x] 先添加路由、列表入口与编辑页交互测试并确认失败。
+- [x] 实现 ADMIN 新建/编辑路由、列表入口、表单加载和保存。
+- [x] 运行相关组件与路由测试并提交。
 
 ### 任务 4：三语文案与阶段验证
 
@@ -49,9 +49,9 @@
 - 修改：`locales/zh-CN.yaml`
 - 修改：`locales/ja.yaml`
 - 修改：`locales/en.yaml`
-- 修改：`docs/implementation-status.md`
+- 修改：`docs/README.md`
 
-- [ ] 增加文章编辑页三语文案并更新实现状态。
-- [ ] 运行 `pnpm test`、`pnpm typecheck`、`pnpm build`。
-- [ ] 启动后端和 Admin，使用本地 MySQL 创建并编辑一篇测试文章，确认列表与公开接口结果。
-- [ ] 检查 `git diff --stat`、`git status --short` 后提交文案与状态文档。
+- [x] 增加文章编辑页三语文案并更新实现状态。
+- [x] 运行 `pnpm test`、`pnpm typecheck`、`pnpm build`。
+- [x] 启动后端和 Admin，使用本地 MySQL 创建、编辑并发布一篇测试文章，确认列表与持久化结果后清理联调数据。
+- [x] 检查 `git diff --stat`、`git status --short` 后提交文案与状态文档。
