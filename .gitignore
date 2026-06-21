@@ -26,6 +26,8 @@ yarn-error.log*
 node_modules/
 dist/
 build/
+!frontend/apps/admin/build/
+!frontend/apps/admin/build/**
 .cache/
 coverage/
 

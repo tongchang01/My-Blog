@@ -33,6 +33,7 @@
     "types": [
       "node",
       "vite/client",
+      "vite-svg-loader",
       "element-plus/global",
       "@pureadmin/table/volar",
       "unplugin-icons/types/vue",
