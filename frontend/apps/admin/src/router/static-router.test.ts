@@ -9,7 +9,7 @@ describe("static admin routes", () => {
     expect(text).not.toContain("PermissionButton");
   });
 
-  it("contains the read-only article route for admin and demo roles", () => {
+  it("keeps the list readable and protects article write routes", () => {
     const articles = (constantMenus as any[]).find(
       route => route.name === "Articles"
     );
@@ -18,6 +18,15 @@ describe("static admin routes", () => {
     );
     expect(articles?.path).toBe("/articles");
     expect(articleList?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
-    expect(JSON.stringify(articles)).not.toContain("edit");
+    const articleCreate = articles?.children?.find(
+      route => route.name === "ArticleCreate"
+    );
+    const articleEdit = articles?.children?.find(
+      route => route.name === "ArticleEdit"
+    );
+    expect(articleCreate?.meta?.roles).toEqual(["ADMIN"]);
+    expect(articleCreate?.meta?.showLink).toBe(false);
+    expect(articleEdit?.path).toBe("/articles/:id/edit");
+    expect(articleEdit?.meta?.roles).toEqual(["ADMIN"]);
   });
 });

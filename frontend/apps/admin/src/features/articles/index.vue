@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
+import { useUserStoreHook } from "@/store/modules/user";
 import type { AdminLocale, ArticleListItem, TagItem } from "./model";
 import {
   formatJstDateTime,
@@ -12,6 +14,9 @@ import { useArticleList } from "./useArticleList";
 defineOptions({ name: "ArticleList" });
 
 const filtersExpanded = ref(true);
+const router = useRouter();
+const userStore = useUserStoreHook();
+const isAdmin = computed(() => userStore.isAdmin);
 const state = useArticleList();
 const {
   filters,
@@ -73,6 +78,14 @@ function statusTagType(status: string) {
   if (status === "SCHEDULED") return "primary";
   if (status === "PRIVATE") return "danger";
   return "info";
+}
+
+function createArticle(): void {
+  router.push("/articles/new");
+}
+
+function editArticle(id: string): void {
+  router.push(`/articles/${id}/edit`);
 }
 
 onMounted(initialize);
@@ -177,13 +190,23 @@ onMounted(initialize);
               <span class="result-count">{{ total }}</span>
             </h2>
           </div>
-          <el-button
-            data-testid="article-refresh"
-            :loading="loading"
-            @click="refresh"
-          >
-            {{ transformI18n("articles.actions.refresh") }}
-          </el-button>
+          <div class="result-actions">
+            <el-button
+              v-if="isAdmin"
+              data-testid="article-create"
+              type="primary"
+              @click="createArticle"
+            >
+              {{ transformI18n("articles.actions.create") }}
+            </el-button>
+            <el-button
+              data-testid="article-refresh"
+              :loading="loading"
+              @click="refresh"
+            >
+              {{ transformI18n("articles.actions.refresh") }}
+            </el-button>
+          </div>
         </div>
       </template>
 
@@ -297,6 +320,19 @@ onMounted(initialize);
                 formatJstDateTime(row.updatedAt)
               }}</template>
             </el-table-column>
+            <el-table-column
+              v-if="isAdmin"
+              data-testid="article-operation-column"
+              :label="transformI18n('articles.columns.operations')"
+              fixed="right"
+              width="90"
+            >
+              <template #default="{ row }">
+                <el-button link type="primary" @click="editArticle(row.id)">
+                  {{ transformI18n("articles.actions.edit") }}
+                </el-button>
+              </template>
+            </el-table-column>
           </el-table>
         </div>
 
@@ -354,6 +390,11 @@ onMounted(initialize);
 }
 
 .filter-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.result-actions {
   display: flex;
   gap: 10px;
 }

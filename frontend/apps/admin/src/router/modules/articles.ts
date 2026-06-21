@@ -21,6 +21,28 @@ export default {
         showLink: true,
         roles: ["ADMIN", "DEMO"]
       }
+    },
+    {
+      path: "/articles/new",
+      name: "ArticleCreate",
+      component: () => import("@/features/articles/editor/index.vue"),
+      meta: {
+        title: $t("articles.editor.createTitle"),
+        showLink: false,
+        activePath: "/articles/list",
+        roles: ["ADMIN"]
+      }
+    },
+    {
+      path: "/articles/:id/edit",
+      name: "ArticleEdit",
+      component: () => import("@/features/articles/editor/index.vue"),
+      meta: {
+        title: $t("articles.editor.editTitle"),
+        showLink: false,
+        activePath: "/articles/list",
+        roles: ["ADMIN"]
+      }
     }
   ]
 } satisfies RouteConfigsTable;
