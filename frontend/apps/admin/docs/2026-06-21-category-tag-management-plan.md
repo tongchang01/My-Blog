@@ -235,7 +235,7 @@ git commit -m "接入分类标签菜单与三语文案"
 - Modify: `docs/README.md`
 - Modify: `docs/2026-06-21-category-tag-management-plan.md`
 
-- [ ] **Step 1: 运行完整前端门禁**
+- [x] **Step 1: 运行完整前端门禁**
 
 ```powershell
 corepack pnpm test
@@ -245,23 +245,23 @@ corepack pnpm build
 
 Expected: 0 failures，typecheck exit 0，build exit 0；允许既有 Browserslist 数据过期警告。
 
-- [ ] **Step 2: 启动本地后端与 Admin**
+- [x] **Step 2: 启动本地后端与 Admin**
 
 后端连接 `myblog_v2_dev`，Admin 使用 `http://127.0.0.1:8848/`，确认 8080 与 8848 监听成功。
 
-- [ ] **Step 3: 浏览器验证分类闭环**
+- [x] **Step 3: 浏览器验证分类闭环**
 
 使用 ADMIN 新增临时分类，编辑三语名称和排序值，保存排序并确认列表回显；删除前完成二次确认验证。再尝试删除一个被活动文章引用的既有分类，确认页面显示引用冲突且数据未删除。
 
-- [ ] **Step 4: 浏览器验证标签闭环**
+- [x] **Step 4: 浏览器验证标签闭环**
 
 使用 ADMIN 新增临时标签，编辑名称和 slug，确认列表回显后删除；再尝试删除一个被活动文章引用的既有标签，确认引用保护提示。
 
-- [ ] **Step 5: 清理联调数据与停止服务**
+- [x] **Step 5: 清理联调数据与停止服务**
 
 通过管理 API 或针对已知临时 ID 的数据库事务彻底删除临时分类和标签；确认原有分类、标签和五篇活动文章未改变。停止 8080、8848 服务并确认端口不再监听。
 
-- [ ] **Step 6: 写验收结果并提交**
+- [x] **Step 6: 写验收结果并提交**
 
 ```powershell
 git diff --check
@@ -271,7 +271,7 @@ git add frontend/apps/admin/docs
 git commit -m "记录分类标签管理验收结果"
 ```
 
-- [ ] **Step 7: 最终检查**
+- [x] **Step 7: 最终检查**
 
 ```powershell
 git status -sb
