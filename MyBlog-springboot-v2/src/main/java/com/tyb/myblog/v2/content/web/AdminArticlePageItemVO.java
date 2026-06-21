@@ -1,6 +1,8 @@
 package com.tyb.myblog.v2.content.web;
 
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,24 +11,27 @@ import java.util.List;
  * 后台文章分页条目响应。
  */
 public record AdminArticlePageItemVO(
-        long id,
+        @Schema(format = "int64") String id,
         String titleZh,
         String titleJa,
         String titleEn,
         String summaryZh,
         String summaryJa,
         String summaryEn,
-        Long categoryId,
+        @Schema(format = "int64") String categoryId,
         String categoryNameZh,
         String slug,
         ArticleStatus status,
         LocalDateTime publishAt,
-        Long coverAttachmentId,
+        @Schema(format = "int64") String coverAttachmentId,
         String coverUrl,
         int commentCount,
-        List<Long> tagIds,
+        @ArraySchema(schema = @Schema(
+                implementation = String.class,
+                format = "int64"))
+        List<String> tagIds,
         LocalDateTime createdAt,
-        Long createdBy,
+        @Schema(format = "int64") String createdBy,
         LocalDateTime updatedAt,
-        Long updatedBy) {
+        @Schema(format = "int64") String updatedBy) {
 }

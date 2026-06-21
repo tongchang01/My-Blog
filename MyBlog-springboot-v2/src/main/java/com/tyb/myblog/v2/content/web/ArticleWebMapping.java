@@ -6,6 +6,7 @@ import com.tyb.myblog.v2.content.application.article.AdminArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticlePageResult;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,7 +29,7 @@ public class ArticleWebMapping {
     public AdminArticleDetailVO toAdminDetail(
             AdminArticleDetailResult result) {
         return new AdminArticleDetailVO(
-                result.id(),
+                id(result.id()),
                 result.titleZh(),
                 result.titleJa(),
                 result.titleEn(),
@@ -36,20 +37,20 @@ public class ArticleWebMapping {
                 result.summaryJa(),
                 result.summaryEn(),
                 result.body(),
-                result.categoryId(),
+                nullableId(result.categoryId()),
                 result.categoryNameZh(),
-                result.authorId(),
+                id(result.authorId()),
                 result.slug(),
                 result.status(),
                 result.publishAt(),
-                result.coverAttachmentId(),
+                nullableId(result.coverAttachmentId()),
                 result.coverUrl(),
                 result.commentCount(),
-                result.tagIds(),
+                ids(result.tagIds()),
                 result.createdAt(),
-                result.createdBy(),
+                nullableId(result.createdBy()),
                 result.updatedAt(),
-                result.updatedBy());
+                nullableId(result.updatedBy()));
     }
 
     public PageResponse<PublicArticlePageItemVO> toPublicPage(
@@ -96,26 +97,26 @@ public class ArticleWebMapping {
     private AdminArticlePageItemVO toAdminPageItem(
             AdminArticlePageResult.Item item) {
         return new AdminArticlePageItemVO(
-                item.id(),
+                id(item.id()),
                 item.titleZh(),
                 item.titleJa(),
                 item.titleEn(),
                 item.summaryZh(),
                 item.summaryJa(),
                 item.summaryEn(),
-                item.categoryId(),
+                nullableId(item.categoryId()),
                 item.categoryNameZh(),
                 item.slug(),
                 item.status(),
                 item.publishAt(),
-                item.coverAttachmentId(),
+                nullableId(item.coverAttachmentId()),
                 item.coverUrl(),
                 item.commentCount(),
-                item.tagIds(),
+                ids(item.tagIds()),
                 item.createdAt(),
-                item.createdBy(),
+                nullableId(item.createdBy()),
                 item.updatedAt(),
-                item.updatedBy());
+                nullableId(item.updatedBy()));
     }
 
     private PublicArticlePageItemVO toPublicPageItem(
@@ -135,6 +136,19 @@ public class ArticleWebMapping {
                 item.locked());
     }
 
+    private String id(long value) {
+        return Long.toString(value);
+    }
+
+    private String nullableId(Long value) {
+        return value == null ? null : Long.toString(value);
+    }
+
+    private List<String> ids(List<Long> values) {
+        return values.stream()
+                .map(this::id)
+                .toList();
+    }
     private DeletedArticlePageItemVO toDeletedPageItem(
             DeletedArticlePageResult.Item item) {
         return new DeletedArticlePageItemVO(

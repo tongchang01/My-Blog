@@ -72,6 +72,23 @@ class ArticleOpenApiTest {
                 .fieldNames()).toIterable()
                 .contains("updatedAt")
                 .doesNotContain("status", "coverAttachmentId");
+        assertStringId(root, "AdminArticlePageItemVO", "id");
+        assertStringId(root, "AdminArticlePageItemVO", "categoryId");
+        assertStringId(root, "AdminArticlePageItemVO", "coverAttachmentId");
+        assertStringId(root, "AdminArticlePageItemVO", "createdBy");
+        assertStringId(root, "AdminArticlePageItemVO", "updatedBy");
+        assertStringId(root, "AdminArticleDetailVO", "id");
+        assertStringId(root, "AdminArticleDetailVO", "categoryId");
+        assertStringId(root, "AdminArticleDetailVO", "authorId");
+        assertStringId(root, "AdminArticleDetailVO", "coverAttachmentId");
+        assertStringId(root, "AdminArticleDetailVO", "createdBy");
+        assertStringId(root, "AdminArticleDetailVO", "updatedBy");
+        assertThat(root.at(
+                        "/components/schemas/AdminArticlePageItemVO/properties/tagIds/items/type")
+                .asText()).isEqualTo("string");
+        assertThat(root.at(
+                        "/components/schemas/AdminArticleDetailVO/properties/tagIds/items/type")
+                .asText()).isEqualTo("string");
     }
 
     private void assertMethods(
@@ -91,6 +108,17 @@ class ArticleOpenApiTest {
                                 + "/required"))
                 .extracting(JsonNode::asText)
                 .containsExactlyInAnyOrderElementsOf(fields);
+    }
+
+    private void assertStringId(
+            JsonNode root,
+            String schema,
+            String field) {
+        JsonNode property = root.at(
+                "/components/schemas/" + schema
+                        + "/properties/" + field);
+        assertThat(property.path("type").asText()).isEqualTo("string");
+        assertThat(property.path("format").asText()).isEqualTo("int64");
     }
 
     private JsonNode apiDocument() throws Exception {

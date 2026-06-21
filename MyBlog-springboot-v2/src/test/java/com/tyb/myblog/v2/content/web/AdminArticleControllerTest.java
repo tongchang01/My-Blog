@@ -51,6 +51,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 class AdminArticleControllerTest {
 
+    private static final long UNSAFE_BROWSER_ID = 9_007_199_254_740_993L;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -102,6 +104,18 @@ class AdminArticleControllerTest {
                         .queryParam("page", "1")
                         .queryParam("size", "20"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].id")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.records[0].categoryId")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.records[0].coverAttachmentId")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.records[0].tagIds[0]")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.records[0].createdBy")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.records[0].updatedBy")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
                 .andExpect(jsonPath("$.data.records[0].titleZh")
                         .value("标题"))
                 .andExpect(jsonPath("$.data.records[0].coverUrl")
@@ -111,6 +125,20 @@ class AdminArticleControllerTest {
 
         mockMvc.perform(get("/api/admin/articles/100"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.categoryId")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.authorId")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.coverAttachmentId")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.tagIds[0]")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.createdBy")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.updatedBy")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
                 .andExpect(jsonPath("$.data.body").value("正文"))
                 .andExpect(jsonPath("$.data.password").doesNotExist())
                 .andExpect(jsonPath("$.data.accessPassword").doesNotExist());
@@ -130,7 +158,8 @@ class AdminArticleControllerTest {
                         .contentType("application/json")
                         .content(writeBody()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(100));
+                .andExpect(jsonPath("$.data.id")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)));
         mockMvc.perform(put("/api/admin/articles/100")
                         .contentType("application/json")
                         .content(writeBody()))
@@ -242,7 +271,8 @@ class AdminArticleControllerTest {
                         .value(1001));
         mockMvc.perform(post("/api/admin/articles/100/restore"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(100));
+                .andExpect(jsonPath("$.data.id")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)));
 
         verify(deleteService).delete(principal, 100L);
         verify(restoreService).restore(principal, 100L);
@@ -271,31 +301,31 @@ class AdminArticleControllerTest {
 
     private AdminArticlePageResult.Item pageItem() {
         return new AdminArticlePageResult.Item(
-                100L,
+                UNSAFE_BROWSER_ID,
                 "标题",
                 null,
                 "Title",
                 "摘要",
                 null,
                 null,
-                10L,
+                UNSAFE_BROWSER_ID,
                 "分类",
                 "article",
                 ArticleStatus.PUBLISHED,
                 LocalDateTime.of(2026, 6, 15, 10, 0),
-                300L,
+                UNSAFE_BROWSER_ID,
                 "https://cdn.example.com/c.png",
                 2,
-                List.of(20L),
+                List.of(UNSAFE_BROWSER_ID),
                 LocalDateTime.of(2026, 6, 15, 9, 0),
-                1001L,
+                UNSAFE_BROWSER_ID,
                 LocalDateTime.of(2026, 6, 15, 11, 0),
-                1001L);
+                UNSAFE_BROWSER_ID);
     }
 
     private AdminArticleDetailResult detail() {
         return new AdminArticleDetailResult(
-                100L,
+                UNSAFE_BROWSER_ID,
                 "标题",
                 null,
                 "Title",
@@ -303,20 +333,20 @@ class AdminArticleControllerTest {
                 null,
                 null,
                 "正文",
-                10L,
+                UNSAFE_BROWSER_ID,
                 "分类",
-                1001L,
+                UNSAFE_BROWSER_ID,
                 "article",
                 ArticleStatus.PUBLISHED,
                 LocalDateTime.of(2026, 6, 15, 10, 0),
-                300L,
+                UNSAFE_BROWSER_ID,
                 "https://cdn.example.com/c.png",
                 2,
-                List.of(20L),
+                List.of(UNSAFE_BROWSER_ID),
                 LocalDateTime.of(2026, 6, 15, 9, 0),
-                1001L,
+                UNSAFE_BROWSER_ID,
                 LocalDateTime.of(2026, 6, 15, 11, 0),
-                1001L);
+                UNSAFE_BROWSER_ID);
     }
 
     private ArticleResult articleResult() {

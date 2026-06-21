@@ -1,6 +1,8 @@
 package com.tyb.myblog.v2.content.web;
 
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.List;
  * 后台文章详情响应，不包含访问密码哈希。
  */
 public record AdminArticleDetailVO(
-        long id,
+        @Schema(format = "int64") String id,
         String titleZh,
         String titleJa,
         String titleEn,
@@ -17,18 +19,21 @@ public record AdminArticleDetailVO(
         String summaryJa,
         String summaryEn,
         String body,
-        Long categoryId,
+        @Schema(format = "int64") String categoryId,
         String categoryNameZh,
-        long authorId,
+        @Schema(format = "int64") String authorId,
         String slug,
         ArticleStatus status,
         LocalDateTime publishAt,
-        Long coverAttachmentId,
+        @Schema(format = "int64") String coverAttachmentId,
         String coverUrl,
         int commentCount,
-        List<Long> tagIds,
+        @ArraySchema(schema = @Schema(
+                implementation = String.class,
+                format = "int64"))
+        List<String> tagIds,
         LocalDateTime createdAt,
-        Long createdBy,
+        @Schema(format = "int64") String createdBy,
         LocalDateTime updatedAt,
-        Long updatedBy) {
+        @Schema(format = "int64") String updatedBy) {
 }
