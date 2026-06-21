@@ -44,6 +44,7 @@
 | 新增 API 接口 | `workflows/add-new-api.md` |
 | 新增数据库表 | `workflows/add-new-table.md` |
 | 构建与测试 | `workflows/build-and-test.md` |
+| 初始化本地 MySQL 联调环境 | `workflows/local-mysql-development.md` |
 | 写 ADR | `workflows/write-adr.md` |
 
 ## 五、架构现状速查
@@ -95,7 +96,7 @@ mvn test -Dtest=ArchitectureRulesTest       # 单跑架构守护
 mvn spring-boot:run -Dspring-boot.run.profiles=local   # 本地启动
 ```
 
-启动 `local` / `prod` 前必须提供数据库账号、密码和 `MYBLOG_JWT_SECRET`（≥32 字节）；完整清单与 profile 差异见 `workflows/build-and-test.md`。
+启动 `local` / `prod` 前必须提供数据库账号、密码和 `MYBLOG_JWT_SECRET`（≥32 字节）；完整清单与 profile 差异见 `workflows/build-and-test.md`。空库初始化、固定开发种子和真实前后台联调见 `workflows/local-mysql-development.md`。
 
 ## 十、当前焦点
 

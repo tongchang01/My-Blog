@@ -72,6 +72,7 @@ docs/ClaudeCode/
 │   ├── migrate-jdbc-to-mybatis-plus.md
 │   ├── add-new-table.md
 │   ├── build-and-test.md
+│   ├── local-mysql-development.md
 │   └── write-adr.md
 │
 ├── product/              【业务规格】要做什么（先于代码与表）
