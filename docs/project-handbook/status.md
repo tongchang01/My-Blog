@@ -12,6 +12,8 @@
 
 **2026-06-18 更新：stats 访问统计纵向切片已完成，M3 后端模块重建结束。** 公开打点只接受 PUBLISHED/PASSWORD 文章和非文章页面；每日 HMAC 访客标识不保存原始 IP/User-Agent。日聚合支持启动补算、5 分钟校准和 90 天明细清理，后台 ADMIN/DEMO 可查询连续趋势、TOP 10 和语言分布。
 
+**2026-06-21 更新：前台与后台 V2 工程候选已形成，本地 MySQL 自动化基线已建立。** local profile 已启用 Flyway；新增固定开发种子、空库守护、初始化/验收脚本和操作手册。PowerShell 契约测试及 H2 全量回归通过；真实 `myblog_v2_dev` 初始化与接口联调因当前终端未设置五个本机环境变量而尚未执行，不得标记为已验收。
+
 **从现在开始，不再修改 Flyway V1__init.sql；后续 schema 变更走 V2__xxx.sql / V3__xxx.sql。**
 
 M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，identity 与 system 的首个纵向切片已落地。代码阶段的推进原则：
@@ -81,18 +83,20 @@ M1 旧代码清理、M2 基础设施补齐和 M3 准入复核已经完成，iden
 - 分类批量排序按升序 ID 锁定，任一目标缺失或更新异常时整体回滚；标签不提供排序接口
 - active 文章引用阻止分类和标签删除；已删除文章不阻止删除，软删除完整写入五个审计字段
 - MapStruct 1.6.3 已用于 persistence 与 web 的机械映射，业务规则保持显式
-- 当前基线：`mvn clean test` 通过（612 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
+- 当前基线：`mvn clean test` 通过（638 tests，0 failures，0 errors，4 skipped；跳过项均为 Docker 不可用时的 Testcontainers MySQL 条件测试）
 - comment 模块已完成：公开接口只返回 `contentHtml`，后台接口支持目标、状态、关键字、删除状态筛选；ADMIN 可审核/隐藏/删除/恢复，DEMO 只读；文章 `comment_count` 与审核/删除/恢复同事务维护
 - 邮件 common-infra 已完成：Resend 默认关闭，开启缺少配置时启动失败；回复通知在事务提交后发送，失败写 `t_mail_log`，成功不入库
 - stats 模块已完成：匿名打点、每日轮换 HMAC visitor hash、日 PV/UV 幂等重算、启动补算、5 分钟校准、90 天明细清理和后台 dashboard 均已落地
 - dashboard 默认补齐最近 30 个 JST 自然日，最大闭区间 366 天；`dailyUvSum` 和 `averageDailyUv` 均明确不是跨日独立访客数
 
-**当前处置方案**：M3 后端模块重建已收尾，下一步进入 M4 前台 / 后台前端骨架。
+**当前处置方案**：M3 后端模块重建已收尾，M4 前台 / 后台工程候选已形成；下一步用本机 MySQL 完成真实账号与内容接口联调，再继续后台写能力。
 
 ## 3. 下一步推进顺序（详见 `roadmap.md`）
 
-1. 前台 / 后台前端骨架
-2. 根据前端对接结果补充接口契约细节
+1. 按 `workflows/local-mysql-development.md` 初始化本机 `myblog_v2_dev`
+2. 验收 ADMIN/DEMO 登录、刷新、公开站点配置和文章查询
+3. 前台移除剩余静态 JSON 依赖，后台继续文章写能力
+4. V1 → V2 正式数据迁移保持独立设计与执行
 
 ## 4. 相关文档
 
