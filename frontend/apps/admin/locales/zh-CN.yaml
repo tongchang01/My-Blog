@@ -109,6 +109,8 @@ articles:
     reset: 重置
     refresh: 刷新
     retry: 重试
+    create: 新建文章
+    edit: 编辑
   columns:
     title: 标题
     status: 状态
@@ -117,6 +119,7 @@ articles:
     comments: 评论数
     publishAt: 发布时间
     updatedAt: 更新时间
+    operations: 操作
   status:
     all: 全部
     draft: 草稿
@@ -128,6 +131,34 @@ articles:
   states:
     empty: 没有符合条件的文章
     error: 文章列表加载失败，请重试
+  editor:
+    createTitle: 新建文章
+    editTitle: 编辑文章
+    subtitle: 编辑 Markdown 内容与发布设置
+    back: 返回列表
+    save: 保存文章
+    contentSection: 文章内容
+    settingsSection: 发布设置
+    titleZh: 中文标题
+    titleJa: 日文标题
+    titleEn: 英文标题
+    summaryZh: 中文摘要
+    summaryJa: 日文摘要
+    summaryEn: 英文摘要
+    body: Markdown 正文
+    status: 文章状态
+    slug: 文章路径
+    category: 分类
+    tags: 标签
+    publishAt: 定时发布时间
+    password: 访问密码
+    passwordKeepHint: 留空将保留当前密码
+    requestError: 文章加载或保存失败，请重试
+    validation:
+      required: 此项为必填项
+      categoryRequired: 非草稿文章必须选择分类
+      scheduledRequired: 定时发布必须选择发布时间
+      passwordRequired: 密码文章必须设置访问密码
 login:
   pureUsername: 账号
   purePassword: 密码

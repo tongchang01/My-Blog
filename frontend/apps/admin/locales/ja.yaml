@@ -109,6 +109,8 @@ articles:
     reset: リセット
     refresh: 更新
     retry: 再試行
+    create: 新規記事
+    edit: 編集
   columns:
     title: タイトル
     status: ステータス
@@ -117,6 +119,7 @@ articles:
     comments: コメント数
     publishAt: 公開日時
     updatedAt: 更新日時
+    operations: 操作
   status:
     all: すべて
     draft: 下書き
@@ -128,6 +131,34 @@ articles:
   states:
     empty: 条件に一致する記事はありません
     error: 記事一覧を読み込めませんでした。再試行してください
+  editor:
+    createTitle: 新規記事
+    editTitle: 記事を編集
+    subtitle: Markdown本文と公開設定を編集します
+    back: 一覧へ戻る
+    save: 記事を保存
+    contentSection: 記事内容
+    settingsSection: 公開設定
+    titleZh: 中国語タイトル
+    titleJa: 日本語タイトル
+    titleEn: 英語タイトル
+    summaryZh: 中国語概要
+    summaryJa: 日本語概要
+    summaryEn: 英語概要
+    body: Markdown本文
+    status: 記事ステータス
+    slug: 記事スラッグ
+    category: カテゴリ
+    tags: タグ
+    publishAt: 公開予約日時
+    password: 閲覧パスワード
+    passwordKeepHint: 空欄の場合は現在のパスワードを保持します
+    requestError: 記事の読み込みまたは保存に失敗しました。再試行してください
+    validation:
+      required: 必須項目です
+      categoryRequired: 下書き以外の記事にはカテゴリが必要です
+      scheduledRequired: 公開予約日時を選択してください
+      passwordRequired: パスワード記事には閲覧パスワードが必要です
 login:
   pureUsername: ユーザー名
   purePassword: パスワード

@@ -95,13 +95,24 @@ describe("article editor form", () => {
       status: "SCHEDULED" as const
     };
     expect(validateArticleForm(scheduled, "create")).toEqual({
+      categoryId: "categoryRequired",
       publishAt: "scheduledRequired"
     });
 
     const password = { ...scheduled, status: "PASSWORD" as const };
     expect(validateArticleForm(password, "create")).toEqual({
+      categoryId: "categoryRequired",
       password: "passwordRequired"
     });
-    expect(validateArticleForm(password, "edit")).toEqual({});
+    expect(validateArticleForm(password, "edit")).toEqual({
+      categoryId: "categoryRequired"
+    });
+
+    expect(
+      validateArticleForm(
+        { ...scheduled, status: "PUBLISHED" as const },
+        "edit"
+      )
+    ).toEqual({ categoryId: "categoryRequired" });
   });
 });

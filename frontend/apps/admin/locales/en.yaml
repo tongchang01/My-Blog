@@ -109,6 +109,8 @@ articles:
     reset: Reset
     refresh: Refresh
     retry: Retry
+    create: New article
+    edit: Edit
   columns:
     title: Title
     status: Status
@@ -117,6 +119,7 @@ articles:
     comments: Comments
     publishAt: Publish time
     updatedAt: Update time
+    operations: Actions
   status:
     all: All
     draft: Draft
@@ -128,6 +131,34 @@ articles:
   states:
     empty: No articles match the current filters
     error: Unable to load articles. Please retry
+  editor:
+    createTitle: New article
+    editTitle: Edit article
+    subtitle: Edit Markdown content and publishing settings
+    back: Back to list
+    save: Save article
+    contentSection: Article content
+    settingsSection: Publishing settings
+    titleZh: Chinese title
+    titleJa: Japanese title
+    titleEn: English title
+    summaryZh: Chinese summary
+    summaryJa: Japanese summary
+    summaryEn: English summary
+    body: Markdown body
+    status: Article status
+    slug: Article slug
+    category: Category
+    tags: Tags
+    publishAt: Scheduled publish time
+    password: Access password
+    passwordKeepHint: Leave blank to keep the current password
+    requestError: Unable to load or save the article. Please retry
+    validation:
+      required: This field is required
+      categoryRequired: Non-draft articles require a category
+      scheduledRequired: Scheduled articles require a publish time
+      passwordRequired: Password articles require an access password
 login:
   pureUsername: Username
   purePassword: Password

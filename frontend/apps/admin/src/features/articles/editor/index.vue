@@ -149,7 +149,10 @@ onMounted(() => initialize().catch(() => undefined));
         <el-form-item :label="transformI18n('articles.editor.slug')">
           <el-input v-model="form.slug" placeholder="article-slug" />
         </el-form-item>
-        <el-form-item :label="transformI18n('articles.editor.category')">
+        <el-form-item
+          :label="transformI18n('articles.editor.category')"
+          :error="fieldError('categoryId')"
+        >
           <el-select v-model="form.categoryId" clearable class="full-width">
             <el-option
               v-for="category in categories"

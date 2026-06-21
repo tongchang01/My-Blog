@@ -7,6 +7,7 @@ import type {
 export type ArticleEditorMode = "create" | "edit";
 export type ArticleFormErrorCode =
   | "required"
+  | "categoryRequired"
   | "scheduledRequired"
   | "passwordRequired";
 
@@ -82,6 +83,9 @@ export function validateArticleForm(
   if (!form.titleZh.trim()) errors.titleZh = "required";
   if (!form.summaryZh.trim()) errors.summaryZh = "required";
   if (!form.body.trim()) errors.body = "required";
+  if (form.status !== "DRAFT" && !form.categoryId) {
+    errors.categoryId = "categoryRequired";
+  }
   if (form.status === "SCHEDULED" && !form.publishAt) {
     errors.publishAt = "scheduledRequired";
   }
