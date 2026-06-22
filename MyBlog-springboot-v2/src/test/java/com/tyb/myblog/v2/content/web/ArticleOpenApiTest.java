@@ -83,6 +83,9 @@ class ArticleOpenApiTest {
         assertStringId(root, "AdminArticleDetailVO", "coverAttachmentId");
         assertStringId(root, "AdminArticleDetailVO", "createdBy");
         assertStringId(root, "AdminArticleDetailVO", "updatedBy");
+        assertStringId(root, "DeletedArticlePageItemVO", "id");
+        assertStringId(root, "DeletedArticlePageItemVO", "categoryId");
+        assertStringId(root, "DeletedArticlePageItemVO", "deletedBy");
         assertThat(root.at(
                         "/components/schemas/AdminArticlePageItemVO/properties/tagIds/items/type")
                 .asText()).isEqualTo("string");

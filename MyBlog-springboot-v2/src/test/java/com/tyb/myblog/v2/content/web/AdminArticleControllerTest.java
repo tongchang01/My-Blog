@@ -246,14 +246,14 @@ class AdminArticleControllerTest {
         when(deletedQueryService.page(principal, 1, 20))
                 .thenReturn(new DeletedArticlePageResult(
                         List.of(new DeletedArticlePageResult.Item(
-                                100L,
+                                UNSAFE_BROWSER_ID,
                                 "标题",
                                 null,
                                 null,
                                 ArticleStatus.PUBLISHED,
-                                10L,
+                                UNSAFE_BROWSER_ID - 1,
                                 LocalDateTime.of(2026, 6, 16, 12, 0),
-                                1001L)),
+                                UNSAFE_BROWSER_ID - 2)),
                         1,
                         1,
                         20));
@@ -266,9 +266,12 @@ class AdminArticleControllerTest {
                 .andExpect(status().isOk());
         mockMvc.perform(get("/api/admin/articles/recycle-bin"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.records[0].id").value(100))
+                .andExpect(jsonPath("$.data.records[0].id")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.records[0].categoryId")
+                        .value(Long.toString(UNSAFE_BROWSER_ID - 1)))
                 .andExpect(jsonPath("$.data.records[0].deletedBy")
-                        .value(1001));
+                        .value(Long.toString(UNSAFE_BROWSER_ID - 2)));
         mockMvc.perform(post("/api/admin/articles/100/restore"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.id")

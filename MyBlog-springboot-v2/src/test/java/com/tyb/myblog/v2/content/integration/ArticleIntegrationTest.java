@@ -182,7 +182,7 @@ class ArticleIntegrationTest {
                         .header("Authorization", bearer(demo)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records[0].id")
-                        .value((int) publishedId));
+                        .value(Long.toString(publishedId)));
 
         jdbcTemplate.update("UPDATE t_tag SET deleted = 1 WHERE id = 20");
         mockMvc.perform(post("/api/admin/articles/{id}/restore", publishedId)

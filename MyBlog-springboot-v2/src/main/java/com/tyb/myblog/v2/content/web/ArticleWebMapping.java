@@ -152,13 +152,13 @@ public class ArticleWebMapping {
     private DeletedArticlePageItemVO toDeletedPageItem(
             DeletedArticlePageResult.Item item) {
         return new DeletedArticlePageItemVO(
-                item.id(),
+                id(item.id()),
                 item.titleZh(),
                 item.titleJa(),
                 item.titleEn(),
                 item.status(),
-                item.categoryId(),
+                nullableId(item.categoryId()),
                 item.deletedAt(),
-                item.deletedBy());
+                nullableId(item.deletedBy()));
     }
 }
