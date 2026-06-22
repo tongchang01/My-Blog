@@ -65,6 +65,7 @@ menus:
   articles: Articles
   contentManagement: Content Management
   articleManagement: Article Management
+  articleRecycleBin: Article Recycle Bin
   categoryManagement: Categories
   tagManagement: Tags
   pureHome: Home
@@ -114,6 +115,10 @@ articles:
     retry: Retry
     create: New article
     edit: Edit
+    delete: Delete
+  delete:
+    confirm: The article will be moved to the recycle bin. Continue
+    error: Unable to delete the article. Please retry
   columns:
     title: Title
     status: Status
@@ -134,6 +139,19 @@ articles:
   states:
     empty: No articles match the current filters
     error: Unable to load articles. Please retry
+  recycle:
+    title: Article Recycle Bin
+    empty: The recycle bin is empty
+    deletedAt: Deleted at
+    deletedBy: Deleted by ID
+    restore: Restore
+    restoreConfirm: Restoring keeps the original status, so a published article may become public immediately. Continue
+    errors:
+      load: Unable to load the recycle bin. Please retry
+      referenceConflict: The article references a category, tag or cover that is no longer available
+      notFound: The article does not exist or has already been restored
+      forbidden: This account cannot restore articles
+      request: Unable to restore the article. Please retry
   editor:
     createTitle: New article
     editTitle: Edit article

@@ -23,6 +23,17 @@ export default {
       }
     },
     {
+      path: "/articles/recycle-bin",
+      name: "ArticleRecycleBin",
+      component: () =>
+        import("@/features/articles/recycle-bin/index.vue"),
+      meta: {
+        title: $t("menus.articleRecycleBin"),
+        showLink: true,
+        roles: ["ADMIN", "DEMO"]
+      }
+    },
+    {
       path: "/articles/new",
       name: "ArticleCreate",
       component: () => import("@/features/articles/editor/index.vue"),

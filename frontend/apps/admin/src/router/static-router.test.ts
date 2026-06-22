@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { localesConfigs } from "@/plugins/i18n";
 import { constantMenus } from "./index";
 
 describe("static admin routes", () => {
@@ -16,8 +17,14 @@ describe("static admin routes", () => {
     const articleList = articles?.children?.find(
       route => route.name === "ArticleList"
     );
+    const articleRecycleBin = articles?.children?.find(
+      route => route.name === "ArticleRecycleBin"
+    );
     expect(articles?.path).toBe("/articles");
     expect(articleList?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
+    expect(articleRecycleBin?.path).toBe("/articles/recycle-bin");
+    expect(articleRecycleBin?.meta?.showLink).toBe(true);
+    expect(articleRecycleBin?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
     const articleCreate = articles?.children?.find(
       route => route.name === "ArticleCreate"
     );
@@ -38,5 +45,18 @@ describe("static admin routes", () => {
     expect(categoryList?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
     expect(tagList?.path).toBe("/tags/list");
     expect(tagList?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
+  });
+
+  it("provides article lifecycle labels in all admin locales", () => {
+    for (const locale of [
+      localesConfigs.zh,
+      localesConfigs.ja,
+      localesConfigs.en
+    ]) {
+      expect(locale.menus.articleRecycleBin).toBeTruthy();
+      expect(locale.articles.actions.delete).toBeTruthy();
+      expect(locale.articles.recycle.restore).toBeTruthy();
+      expect(locale.articles.recycle.errors.referenceConflict).toBeTruthy();
+    }
   });
 });

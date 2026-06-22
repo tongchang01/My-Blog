@@ -65,6 +65,7 @@ menus:
   articles: 記事管理
   contentManagement: コンテンツ管理
   articleManagement: 記事一覧
+  articleRecycleBin: 記事のゴミ箱
   categoryManagement: カテゴリ管理
   tagManagement: タグ管理
   pureHome: ホーム
@@ -114,6 +115,10 @@ articles:
     retry: 再試行
     create: 新規記事
     edit: 編集
+    delete: 削除
+  delete:
+    confirm: 削除した記事はゴミ箱へ移動します。続行しますか
+    error: 記事を削除できませんでした。再試行してください
   columns:
     title: タイトル
     status: ステータス
@@ -134,6 +139,19 @@ articles:
   states:
     empty: 条件に一致する記事はありません
     error: 記事一覧を読み込めませんでした。再試行してください
+  recycle:
+    title: 記事のゴミ箱
+    empty: ゴミ箱に記事はありません
+    deletedAt: 削除日時
+    deletedBy: 削除ユーザー ID
+    restore: 復元
+    restoreConfirm: 復元すると元の状態が有効になり、公開済みの記事はすぐ再公開される場合があります。続行しますか
+    errors:
+      load: ゴミ箱を読み込めませんでした。再試行してください
+      referenceConflict: 記事が参照するカテゴリ、タグ、またはカバー画像が無効なため復元できません
+      notFound: 記事が存在しないか、すでに復元されています
+      forbidden: このアカウントには記事を復元する権限がありません
+      request: 記事を復元できませんでした。再試行してください
   editor:
     createTitle: 新規記事
     editTitle: 記事を編集
