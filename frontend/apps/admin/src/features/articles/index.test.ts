@@ -5,6 +5,15 @@ import { http } from "@/utils/http";
 import { useUserStoreHook } from "@/store/modules/user";
 import ArticleList from "./index.vue";
 
+const { confirm } = vi.hoisted(() => ({
+  confirm: vi.fn().mockResolvedValue("confirm")
+}));
+
+vi.mock("element-plus", async importOriginal => ({
+  ...(await importOriginal<typeof import("element-plus")>()),
+  ElMessageBox: { confirm }
+}));
+
 vi.mock("vue-router", () => ({ useRouter: () => ({ push: vi.fn() }) }));
 
 const mock = new MockAdapter(http.instance);
@@ -24,7 +33,33 @@ const stubs = {
   "el-select": true,
   "el-skeleton": true,
   "el-table": true,
-  "el-table-column": { template: "<div />" },
+  "el-table-column": {
+    data: () => ({
+      row: {
+        id: "100",
+        titleZh: "标题",
+        titleJa: null,
+        titleEn: null,
+        summaryZh: null,
+        summaryJa: null,
+        summaryEn: null,
+        categoryId: null,
+        categoryNameZh: null,
+        slug: "article-100",
+        status: "DRAFT",
+        publishAt: null,
+        coverAttachmentId: null,
+        coverUrl: null,
+        commentCount: 0,
+        tagIds: [],
+        createdAt: "2026-06-20T10:00:00",
+        createdBy: "1001",
+        updatedAt: "2026-06-21T10:00:00",
+        updatedBy: "1001"
+      }
+    }),
+    template: "<div><slot :row='row' /></div>"
+  },
   "el-tag": true
 };
 
@@ -41,7 +76,10 @@ function replyDictionaries() {
   });
 }
 
-afterEach(() => mock.reset());
+afterEach(() => {
+  mock.reset();
+  confirm.mockClear();
+});
 
 describe("article list page", () => {
   it("renders independent cards and admin write controls", async () => {
@@ -117,6 +155,45 @@ describe("article list page", () => {
     expect(
       wrapper.find('[data-testid="article-operation-column"]').exists()
     ).toBe(true);
+    expect(wrapper.find('[data-testid="article-delete-100"]').exists()).toBe(
+      true
+    );
+
+    mock.onDelete("/api/admin/articles/100").reply(200, {
+      code: "00000",
+      msg: "success",
+      data: null
+    });
+    await wrapper.get('[data-testid="article-delete-100"]').trigger("click");
+    await flushPromises();
+
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(mock.history.delete).toHaveLength(1);
+  });
+
+  it("keeps DEMO users read-only", async () => {
+    useUserStoreHook().SET_CURRENT_USER({
+      id: "1002",
+      username: "demo",
+      type: "DEMO",
+      profile: null
+    });
+    replyDictionaries();
+    mock.onGet("/api/admin/articles").reply(200, {
+      code: "00000",
+      msg: "success",
+      data: { records: [], total: 0, page: 1, size: 20 }
+    });
+
+    const wrapper = mount(ArticleList, { global: { stubs } });
+    await flushPromises();
+
+    expect(
+      wrapper.find('[data-testid="article-operation-column"]').exists()
+    ).toBe(false);
+    expect(wrapper.find('[data-testid^="article-delete-"]').exists()).toBe(
+      false
+    );
   });
 
   it("supports refresh and retry after a list error", async () => {

@@ -59,6 +59,7 @@ function api(overrides: Partial<ArticleListApi> = {}): ArticleListApi {
     listArticles: vi.fn().mockResolvedValue(ok(page("1"))),
     listCategories: vi.fn().mockResolvedValue(ok([] as CategoryItem[])),
     listTags: vi.fn().mockResolvedValue(ok([] as TagItem[])),
+    deleteArticle: vi.fn().mockResolvedValue(ok(null)),
     ...overrides
   };
 }
@@ -157,5 +158,52 @@ describe("article list state", () => {
     await older;
 
     expect(state.items.value[0].id).toBe("new");
+  });
+
+  it("deletes one article and refreshes the current page", async () => {
+    const source = api();
+    const state = useArticleList(source);
+    await state.refresh();
+
+    await expect(state.remove("100")).resolves.toBe(true);
+
+    expect(source.deleteArticle).toHaveBeenCalledWith("100");
+    expect(source.listArticles).toHaveBeenCalledTimes(2);
+    expect(state.deletingId.value).toBeNull();
+    expect(state.operationError.value).toBeNull();
+  });
+
+  it("returns to the previous page when deletion empties the last page", async () => {
+    const listArticles = vi
+      .fn()
+      .mockResolvedValueOnce(ok({ ...page("21", 2), total: 21 }))
+      .mockResolvedValueOnce(
+        ok({ records: [], total: 20, page: 2, size: 20 })
+      )
+      .mockResolvedValueOnce(ok({ ...page("20"), total: 20 }));
+    const source = api({ listArticles });
+    const state = useArticleList(source);
+    state.filters.page = 2;
+    await state.refresh();
+
+    await expect(state.remove("21")).resolves.toBe(true);
+
+    expect(state.filters.page).toBe(1);
+    expect(state.items.value[0].id).toBe("20");
+    expect(listArticles).toHaveBeenCalledTimes(3);
+  });
+
+  it("keeps current data and exposes a deletion error", async () => {
+    const source = api({
+      deleteArticle: vi.fn().mockRejectedValue(new Error("delete failed"))
+    });
+    const state = useArticleList(source);
+    await state.refresh();
+
+    await expect(state.remove("1")).resolves.toBe(false);
+
+    expect(state.items.value[0].id).toBe("1");
+    expect(state.operationError.value?.message).toBe("delete failed");
+    expect(source.listArticles).toHaveBeenCalledOnce();
   });
 });

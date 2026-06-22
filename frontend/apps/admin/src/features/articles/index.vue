@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -26,6 +27,8 @@ const {
   total,
   loading,
   error,
+  operationError,
+  deletingId,
   initialize,
   search,
   reset,
@@ -86,6 +89,19 @@ function createArticle(): void {
 
 function editArticle(id: string): void {
   router.push(`/articles/${id}/edit`);
+}
+
+async function confirmRemove(item: ArticleListItem): Promise<void> {
+  try {
+    await ElMessageBox.confirm(
+      `${transformI18n("articles.delete.confirm")}：${articleTitle(item)}`,
+      transformI18n("articles.actions.delete"),
+      { type: "warning" }
+    );
+  } catch {
+    return;
+  }
+  await state.remove(item.id);
 }
 
 onMounted(initialize);
@@ -210,6 +226,15 @@ onMounted(initialize);
         </div>
       </template>
 
+      <el-alert
+        v-if="operationError"
+        data-testid="article-operation-error"
+        type="error"
+        :closable="false"
+        :title="transformI18n('articles.delete.error')"
+        show-icon
+      />
+
       <el-skeleton
         v-if="loading && items.length === 0"
         data-testid="article-loading"
@@ -325,11 +350,21 @@ onMounted(initialize);
               data-testid="article-operation-column"
               :label="transformI18n('articles.columns.operations')"
               fixed="right"
-              width="90"
+              width="150"
             >
               <template #default="{ row }">
                 <el-button link type="primary" @click="editArticle(row.id)">
                   {{ transformI18n("articles.actions.edit") }}
+                </el-button>
+                <el-button
+                  :data-testid="`article-delete-${row.id}`"
+                  link
+                  type="danger"
+                  :loading="deletingId === row.id"
+                  :disabled="deletingId !== null"
+                  @click="confirmRemove(row)"
+                >
+                  {{ transformI18n("articles.actions.delete") }}
                 </el-button>
               </template>
             </el-table-column>

@@ -1,6 +1,7 @@
 import { reactive, ref } from "vue";
 import type { ApiResponse } from "@/api/contract";
 import {
+  deleteArticle,
   listArticles,
   listCategories,
   listTags
@@ -19,12 +20,14 @@ export interface ArticleListApi {
   ): Promise<ApiResponse<PageResponse<ArticleListItem>>>;
   listCategories(): Promise<ApiResponse<CategoryItem[]>>;
   listTags(): Promise<ApiResponse<TagItem[]>>;
+  deleteArticle(id: string): Promise<ApiResponse<null>>;
 }
 
 const defaultApi: ArticleListApi = {
   listArticles,
   listCategories,
-  listTags
+  listTags,
+  deleteArticle
 };
 
 const DEFAULT_FILTERS: ArticleListFilters = {
@@ -46,6 +49,8 @@ export function useArticleList(api: ArticleListApi = defaultApi) {
   const total = ref(0);
   const loading = ref(false);
   const error = ref<Error | null>(null);
+  const operationError = ref<Error | null>(null);
+  const deletingId = ref<string | null>(null);
   let requestVersion = 0;
 
   async function loadArticles(): Promise<void> {
@@ -106,6 +111,30 @@ export function useArticleList(api: ArticleListApi = defaultApi) {
     await loadArticles();
   }
 
+  async function remove(id: string): Promise<boolean> {
+    operationError.value = null;
+    deletingId.value = id;
+    try {
+      await api.deleteArticle(id);
+      await loadArticles();
+      if (
+        !error.value &&
+        items.value.length === 0 &&
+        total.value > 0 &&
+        filters.page > 1
+      ) {
+        filters.page -= 1;
+        await loadArticles();
+      }
+      return true;
+    } catch (reason) {
+      operationError.value = asError(reason);
+      return false;
+    } finally {
+      deletingId.value = null;
+    }
+  }
+
   return {
     filters,
     items,
@@ -114,10 +143,13 @@ export function useArticleList(api: ArticleListApi = defaultApi) {
     total,
     loading,
     error,
+    operationError,
+    deletingId,
     initialize,
     search,
     reset,
     refresh,
-    changePage
+    changePage,
+    remove
   };
 }
