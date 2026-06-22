@@ -62,6 +62,17 @@ export interface ArticleDetail extends ArticleListItem {
   authorId: string;
 }
 
+export interface DeletedArticleListItem {
+  id: string;
+  titleZh: string | null;
+  titleJa: string | null;
+  titleEn: string | null;
+  status: ArticleStatus;
+  categoryId: string | null;
+  deletedAt: string;
+  deletedBy: string | null;
+}
+
 export interface ArticleWritePayload {
   titleZh: string;
   titleJa: string | null;

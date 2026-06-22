@@ -8,6 +8,7 @@ describe("apiErrorFromCode", () => {
     ["10003", "forbidden"],
     ["90001", "validation"],
     ["90002", "rateLimited"],
+    ["90003", "notFound"],
     ["90004", "conflict"],
     ["99999", "server"],
     ["unexpected", "unknown"]

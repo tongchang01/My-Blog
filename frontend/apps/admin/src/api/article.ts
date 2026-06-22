@@ -4,6 +4,7 @@ import type {
   ArticleListItem,
   ArticleDetail,
   ArticleWritePayload,
+  DeletedArticleListItem,
   PageResponse
 } from "@/features/articles/model";
 import { buildArticleListParams } from "@/features/articles/query";
@@ -30,4 +31,18 @@ export const updateArticle = (id: string, payload: ArticleWritePayload) =>
     "put",
     `/api/admin/articles/${id}`,
     { data: payload }
+  );
+
+export const deleteArticle = (id: string) =>
+  http.request<ApiResponse<null>>("delete", `/api/admin/articles/${id}`);
+
+export const listDeletedArticles = (page: number, size: number) =>
+  http.get<ApiResponse<PageResponse<DeletedArticleListItem>>>(
+    "/api/admin/articles/recycle-bin",
+    { params: { page, size } }
+  );
+
+export const restoreArticle = (id: string) =>
+  http.post<ApiResponse<ArticleDetail>>(
+    `/api/admin/articles/${id}/restore`
   );
