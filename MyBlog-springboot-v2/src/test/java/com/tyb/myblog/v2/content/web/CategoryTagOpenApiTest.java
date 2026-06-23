@@ -118,8 +118,7 @@ class CategoryTagOpenApiTest {
                 "TagMapper",
                 "ContentName",
                 "ContentSlug",
-                "SubmittedField",
-                "\"deleted\"");
+                "SubmittedField");
     }
 
     private void assertMethods(

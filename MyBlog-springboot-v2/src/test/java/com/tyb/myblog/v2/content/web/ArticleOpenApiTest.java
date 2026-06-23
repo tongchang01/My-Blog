@@ -61,8 +61,7 @@ class ArticleOpenApiTest {
                 "ArticleMapper",
                 "SubmittedField",
                 "accessPassword",
-                "\"passwordHash\"",
-                "\"deleted\"");
+                "\"passwordHash\"");
         assertThat(root.at(
                         "/components/schemas/PublicArticlePageItemVO/properties")
                 .fieldNames()).toIterable()
@@ -72,6 +71,10 @@ class ArticleOpenApiTest {
                 .fieldNames()).toIterable()
                 .contains("updatedAt")
                 .doesNotContain("status", "coverAttachmentId");
+        assertNoFields(root, "AdminArticlePageItemVO", "deleted");
+        assertNoFields(root, "AdminArticleDetailVO", "deleted");
+        assertNoFields(root, "PublicArticlePageItemVO", "deleted");
+        assertNoFields(root, "PublicArticleDetailVO", "deleted");
         assertStringId(root, "AdminArticlePageItemVO", "id");
         assertStringId(root, "AdminArticlePageItemVO", "categoryId");
         assertStringId(root, "AdminArticlePageItemVO", "coverAttachmentId");
@@ -122,6 +125,18 @@ class ArticleOpenApiTest {
                         + "/properties/" + field);
         assertThat(property.path("type").asText()).isEqualTo("string");
         assertThat(property.path("format").asText()).isEqualTo("int64");
+    }
+
+    private void assertNoFields(
+            JsonNode root,
+            String schema,
+            String... fields) {
+        assertThat(root.at(
+                        "/components/schemas/" + schema
+                                + "/properties")
+                        .fieldNames())
+                .toIterable()
+                .doesNotContain(fields);
     }
 
     private JsonNode apiDocument() throws Exception {
