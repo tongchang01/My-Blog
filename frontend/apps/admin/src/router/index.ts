@@ -101,6 +101,18 @@ export function resetRouter() {
   resetLoadedPaths();
 }
 
+export function resolveRouteDocumentTitle(
+  to: Pick<ToRouteType, "matched" | "meta">
+) {
+  const matchedTitle = [...to.matched]
+    .reverse()
+    .find(item => item.meta?.title)?.meta.title;
+  const rawTitle = matchedTitle || to.meta?.title;
+  if (!rawTitle) return getConfig().Title || "";
+  const title = transformI18n(rawTitle);
+  return getConfig().Title ? `${title} | ${getConfig().Title}` : title;
+}
+
 router.beforeEach(async (to: ToRouteType, from) => {
   to.meta.loaded = loadedPaths.has(to.path);
   if (!to.meta.loaded) NProgress.start();
@@ -112,14 +124,7 @@ router.beforeEach(async (to: ToRouteType, from) => {
     }
   }
 
-  to.matched.some(item => {
-    if (!item.meta.title) return false;
-    const title = transformI18n(item.meta.title);
-    document.title = getConfig().Title
-      ? `${title} | ${getConfig().Title}`
-      : title;
-    return true;
-  });
+  document.title = resolveRouteDocumentTitle(to);
 
   const userStore = useUserStoreHook();
   if (!userStore.initialized && loadSession()) {

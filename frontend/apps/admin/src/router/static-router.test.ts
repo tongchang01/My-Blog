@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { localesConfigs } from "@/plugins/i18n";
-import { constantMenus } from "./index";
+import { constantMenus, resolveRouteDocumentTitle } from "./index";
 
 describe("static admin routes", () => {
   it("contains dashboard without permission demo routes", () => {
@@ -68,5 +68,17 @@ describe("static admin routes", () => {
       expect(locale.comments.actions.approve).toBeTruthy();
       expect(locale.comments.errors.operation).toBeTruthy();
     }
+  });
+
+  it("uses the deepest matched route title for browser document title", () => {
+    expect(
+      resolveRouteDocumentTitle({
+        matched: [
+          { meta: { title: "menus.contentManagement" } },
+          { meta: { title: "menus.commentManagement" } }
+        ],
+        meta: { title: "menus.commentManagement" }
+      } as any)
+    ).toBe("Comments");
   });
 });
