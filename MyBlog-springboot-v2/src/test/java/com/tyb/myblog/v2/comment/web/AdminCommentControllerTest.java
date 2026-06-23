@@ -29,8 +29,10 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.hamcrest.Matchers.containsString;
 
 @WebMvcTest(AdminCommentController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -74,7 +76,10 @@ class AdminCommentControllerTest {
                 .andExpect(jsonPath("$.data.records[0].authorEmail")
                         .value("tyb@example.com"))
                 .andExpect(jsonPath("$.data.records[0].contentMd")
-                        .value("hello"));
+                        .value("hello"))
+                .andExpect(content().string(containsString("\"id\":\"9007199254740993\"")))
+                .andExpect(content().string(containsString("\"targetId\":\"9007199254740995\"")))
+                .andExpect(content().string(containsString("\"deleted\":false")));
     }
 
     @Test
@@ -96,9 +101,9 @@ class AdminCommentControllerTest {
 
     private static AdminCommentPageResult.Item item() {
         return new AdminCommentPageResult.Item(
-                10L,
+                9007199254740993L,
                 CommentTargetType.ARTICLE,
-                100L,
+                9007199254740995L,
                 null,
                 null,
                 null,
