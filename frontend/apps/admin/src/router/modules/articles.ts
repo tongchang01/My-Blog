@@ -34,6 +34,16 @@ export default {
       }
     },
     {
+      path: "/comments/list",
+      name: "CommentManagement",
+      component: () => import("@/features/comments/index.vue"),
+      meta: {
+        title: $t("menus.commentManagement"),
+        showLink: true,
+        roles: ["ADMIN", "DEMO"]
+      }
+    },
+    {
       path: "/articles/new",
       name: "ArticleCreate",
       component: () => import("@/features/articles/editor/index.vue"),

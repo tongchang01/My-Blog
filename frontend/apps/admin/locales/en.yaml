@@ -73,6 +73,7 @@ menus:
   pureAbnormal: Abnormal Page
   purePageNotFound: "404"
   pureAccessDenied: "403"
+  commentManagement: Comments
   pureServerError: "500"
   purePermission: Permission Manage
   purePermissionPage: Page Permission
@@ -224,6 +225,49 @@ taxonomy:
     deleteConflict: This item is still referenced by active articles
     forbidden: This account does not have write permission
     request: The operation failed. Please retry
+comments:
+  filter:
+    title: Comment Filters
+    targetType: Target Type
+    targetId: Target ID
+    targetIdPlaceholder: Enter article ID or guestbook target ID
+    auditStatus: Audit Status
+    keyword: Keyword
+    keywordPlaceholder: Match author nickname or Markdown content
+    includeDeleted: Include deleted
+  result:
+    total: Total comments
+  target:
+    all: All
+    article: Article
+    guestbook: Guestbook
+  audit:
+    all: All
+    pass: Passed
+    pending: Pending
+    hidden: Hidden
+  columns:
+    content: Content
+    author: Author
+    target: Target
+    auditStatus: Status
+    deleted: Deleted
+    createdAt: Created at
+  deleted:
+    yes: Deleted
+    no: Active
+  actions:
+    confirmTitle: Confirm comment operation
+    approve: Approve
+    hide: Hide
+    approveConfirm: Approve this comment?
+    hideConfirm: Hide this comment?
+    deleteConfirm: Delete this comment?
+    restoreConfirm: Restore this comment?
+  errors:
+    load: Unable to load comments. Please retry
+    operation: Comment operation failed. Please retry
+  empty: No comments match the current filters
 login:
   pureUsername: Username
   purePassword: Password

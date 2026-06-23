@@ -73,6 +73,7 @@ menus:
   pureAbnormal: エラーページ
   purePageNotFound: "404"
   pureAccessDenied: "403"
+  commentManagement: コメント管理
   pureServerError: "500"
   purePermission: 権限管理
   purePermissionPage: ページ権限
@@ -224,6 +225,49 @@ taxonomy:
     deleteConflict: 公開中の記事から参照されているため削除できません
     forbidden: このアカウントには書き込み権限がありません
     request: 操作に失敗しました。再試行してください
+comments:
+  filter:
+    title: コメント絞り込み
+    targetType: 対象タイプ
+    targetId: 対象 ID
+    targetIdPlaceholder: 記事 ID またはゲストブック対象 ID を入力
+    auditStatus: 審査状態
+    keyword: キーワード
+    keywordPlaceholder: 投稿者名または Markdown 本文を検索
+    includeDeleted: 削除済みを含める
+  result:
+    total: コメント総数
+  target:
+    all: すべて
+    article: 記事
+    guestbook: ゲストブック
+  audit:
+    all: すべて
+    pass: 承認済み
+    pending: 審査待ち
+    hidden: 非表示
+  columns:
+    content: 内容
+    author: 投稿者
+    target: 対象
+    auditStatus: 状態
+    deleted: 削除状態
+    createdAt: 作成日時
+  deleted:
+    yes: 削除済み
+    no: 有効
+  actions:
+    confirmTitle: コメント操作の確認
+    approve: 承認
+    hide: 非表示
+    approveConfirm: このコメントを承認しますか
+    hideConfirm: このコメントを非表示にしますか
+    deleteConfirm: このコメントを削除しますか
+    restoreConfirm: このコメントを復元しますか
+  errors:
+    load: コメント一覧の読み込みに失敗しました。再試行してください
+    operation: コメント操作に失敗しました。再試行してください
+  empty: 条件に一致するコメントはありません
 login:
   pureUsername: ユーザー名
   purePassword: パスワード

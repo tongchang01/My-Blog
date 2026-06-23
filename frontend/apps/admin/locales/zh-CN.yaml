@@ -73,6 +73,7 @@ menus:
   pureAbnormal: 异常页面
   purePageNotFound: "404"
   pureAccessDenied: "403"
+  commentManagement: 评论管理
   pureServerError: "500"
   purePermission: 权限管理
   purePermissionPage: 页面权限
@@ -224,6 +225,49 @@ taxonomy:
     deleteConflict: 仍被活动文章引用，无法删除
     forbidden: 当前账号没有写权限
     request: 操作失败，请重试
+comments:
+  filter:
+    title: 评论筛选
+    targetType: 目标类型
+    targetId: 目标 ID
+    targetIdPlaceholder: 输入文章 ID 或留言板目标 ID
+    auditStatus: 审核状态
+    keyword: 关键词
+    keywordPlaceholder: 匹配作者昵称或 Markdown 原文
+    includeDeleted: 包含已删除
+  result:
+    total: 评论总数
+  target:
+    all: 全部
+    article: 文章
+    guestbook: 留言板
+  audit:
+    all: 全部
+    pass: 已通过
+    pending: 待审核
+    hidden: 已隐藏
+  columns:
+    content: 内容
+    author: 作者
+    target: 目标
+    auditStatus: 状态
+    deleted: 删除状态
+    createdAt: 创建时间
+  deleted:
+    yes: 已删除
+    no: 正常
+  actions:
+    confirmTitle: 评论操作确认
+    approve: 通过
+    hide: 隐藏
+    approveConfirm: 确认通过这条评论吗
+    hideConfirm: 确认隐藏这条评论吗
+    deleteConfirm: 删除后评论将进入软删除状态，确认继续吗
+    restoreConfirm: 确认恢复这条评论吗
+  errors:
+    load: 评论列表加载失败，请重试
+    operation: 评论操作失败，请重试
+  empty: 没有符合条件的评论
 login:
   pureUsername: 账号
   purePassword: 密码
