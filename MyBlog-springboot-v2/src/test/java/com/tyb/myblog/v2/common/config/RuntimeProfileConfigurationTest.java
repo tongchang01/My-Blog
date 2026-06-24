@@ -14,10 +14,10 @@ class RuntimeProfileConfigurationTest {
     private final YamlPropertySourceLoader loader = new YamlPropertySourceLoader();
 
     @Test
-    void doesNotActivateLocalProfileByDefault() throws Exception {
+    void usesLocalProfileByDefaultWhenNoProfileIsSpecified() throws Exception {
         PropertySource<?> application = load("application.yml");
 
-        assertThat(application.getProperty("spring.profiles.default")).isNull();
+        assertThat(application.getProperty("spring.profiles.default")).isEqualTo("local");
     }
 
     @Test
