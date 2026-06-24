@@ -74,6 +74,7 @@ menus:
   purePageNotFound: "404"
   pureAccessDenied: "403"
   commentManagement: Comments
+  friendLinkManagement: Friend Links
   pureServerError: "500"
   purePermission: Permission Manage
   purePermissionPage: Page Permission
@@ -268,6 +269,50 @@ comments:
     load: Unable to load comments. Please retry
     operation: Comment operation failed. Please retry
   empty: No comments match the current filters
+friendLinks:
+  filter:
+    title: Friend link filters
+    keyword: Keyword
+    keywordPlaceholder: Match name, URL or description
+    status: Visibility
+  result:
+    total: Total friend links
+  status:
+    all: All
+    visible: Visible
+    hidden: Hidden
+  columns:
+    name: Friend link
+    description: Description
+    status: Status
+    sortOrder: Sort order
+    updatedAt: Updated at
+  fields:
+    name: Name
+    url: Site URL
+    avatarUrl: Avatar URL
+    description: Description
+    sortOrder: Sort order
+    status: Status
+  dialog:
+    create: Create friend link
+    edit: Edit friend link
+  actions:
+    confirmTitle: Friend link operation
+    create: Create friend link
+    show: Show
+    hide: Hide
+    saveSort: Save sort
+    statusConfirm: Confirm changing this friend link visibility?
+    deleteConfirm: Confirm deleting this friend link?
+  validation:
+    required: This field is required
+    url: Enter an http or https URL
+    sortOrderRange: Sort order must be an integer from 0 to 1000000
+  errors:
+    load: Failed to load friend links. Please retry.
+    operation: Friend link operation failed. Please retry.
+  empty: No friend links match the current filters
 login:
   pureUsername: Username
   purePassword: Password

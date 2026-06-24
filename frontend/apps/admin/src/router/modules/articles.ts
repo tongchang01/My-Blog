@@ -44,6 +44,16 @@ export default {
       }
     },
     {
+      path: "/friend-links/list",
+      name: "FriendLinkManagement",
+      component: () => import("@/features/friend-links/index.vue"),
+      meta: {
+        title: $t("menus.friendLinkManagement"),
+        showLink: true,
+        roles: ["ADMIN", "DEMO"]
+      }
+    },
+    {
       path: "/articles/new",
       name: "ArticleCreate",
       component: () => import("@/features/articles/editor/index.vue"),

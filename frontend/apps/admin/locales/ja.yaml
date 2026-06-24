@@ -74,6 +74,7 @@ menus:
   purePageNotFound: "404"
   pureAccessDenied: "403"
   commentManagement: コメント管理
+  friendLinkManagement: 友リンク管理
   pureServerError: "500"
   purePermission: 権限管理
   purePermissionPage: ページ権限
@@ -268,6 +269,50 @@ comments:
     load: コメント一覧の読み込みに失敗しました。再試行してください
     operation: コメント操作に失敗しました。再試行してください
   empty: 条件に一致するコメントはありません
+friendLinks:
+  filter:
+    title: 友リンク絞り込み
+    keyword: キーワード
+    keywordPlaceholder: 名前、URL、説明を検索
+    status: 表示状態
+  result:
+    total: 友リンク総数
+  status:
+    all: すべて
+    visible: 表示
+    hidden: 非表示
+  columns:
+    name: 友リンク
+    description: 説明
+    status: 状態
+    sortOrder: 並び順
+    updatedAt: 更新日時
+  fields:
+    name: 名前
+    url: サイトURL
+    avatarUrl: アバターURL
+    description: 説明
+    sortOrder: 並び順
+    status: 状態
+  dialog:
+    create: 友リンクを追加
+    edit: 友リンクを編集
+  actions:
+    confirmTitle: 友リンク操作の確認
+    create: 友リンクを追加
+    show: 表示
+    hide: 非表示
+    saveSort: 並び順を保存
+    statusConfirm: この友リンクの表示状態を切り替えますか？
+    deleteConfirm: この友リンクを削除しますか？
+  validation:
+    required: 必須項目です
+    url: http または https のURLを入力してください
+    sortOrderRange: 並び順は 0 から 1000000 の整数で入力してください
+  errors:
+    load: 友リンク一覧の読み込みに失敗しました。再試行してください
+    operation: 友リンク操作に失敗しました。再試行してください
+  empty: 条件に一致する友リンクはありません
 login:
   pureUsername: ユーザー名
   purePassword: パスワード

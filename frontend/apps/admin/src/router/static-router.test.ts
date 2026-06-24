@@ -44,6 +44,9 @@ describe("static admin routes", () => {
     const commentManagement = articles?.children?.find(
       route => route.name === "CommentManagement"
     );
+    const friendLinkManagement = articles?.children?.find(
+      route => route.name === "FriendLinkManagement"
+    );
     expect(categoryList?.path).toBe("/categories/list");
     expect(categoryList?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
     expect(tagList?.path).toBe("/tags/list");
@@ -51,6 +54,9 @@ describe("static admin routes", () => {
     expect(commentManagement?.path).toBe("/comments/list");
     expect(commentManagement?.meta?.showLink).toBe(true);
     expect(commentManagement?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
+    expect(friendLinkManagement?.path).toBe("/friend-links/list");
+    expect(friendLinkManagement?.meta?.showLink).toBe(true);
+    expect(friendLinkManagement?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
   });
 
   it("provides article lifecycle labels in all admin locales", () => {
@@ -67,6 +73,10 @@ describe("static admin routes", () => {
       expect(locale.comments.filter.title).toBeTruthy();
       expect(locale.comments.actions.approve).toBeTruthy();
       expect(locale.comments.errors.operation).toBeTruthy();
+      expect(locale.menus.friendLinkManagement).toBeTruthy();
+      expect(locale.friendLinks.filter.title).toBeTruthy();
+      expect(locale.friendLinks.actions.saveSort).toBeTruthy();
+      expect(locale.friendLinks.errors.operation).toBeTruthy();
     }
   });
 

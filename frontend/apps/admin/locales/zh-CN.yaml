@@ -74,6 +74,7 @@ menus:
   purePageNotFound: "404"
   pureAccessDenied: "403"
   commentManagement: 评论管理
+  friendLinkManagement: 友链管理
   pureServerError: "500"
   purePermission: 权限管理
   purePermissionPage: 页面权限
@@ -268,6 +269,50 @@ comments:
     load: 评论列表加载失败，请重试
     operation: 评论操作失败，请重试
   empty: 没有符合条件的评论
+friendLinks:
+  filter:
+    title: 友链筛选
+    keyword: 关键词
+    keywordPlaceholder: 匹配名称、URL 或描述
+    status: 显示状态
+  result:
+    total: 友链总数
+  status:
+    all: 全部
+    visible: 显示
+    hidden: 隐藏
+  columns:
+    name: 友链
+    description: 描述
+    status: 状态
+    sortOrder: 排序值
+    updatedAt: 更新时间
+  fields:
+    name: 名称
+    url: 站点地址
+    avatarUrl: 头像地址
+    description: 描述
+    sortOrder: 排序值
+    status: 状态
+  dialog:
+    create: 新增友链
+    edit: 编辑友链
+  actions:
+    confirmTitle: 友链操作确认
+    create: 新增友链
+    show: 显示
+    hide: 隐藏
+    saveSort: 保存排序
+    statusConfirm: 确认切换这条友链的显示状态？
+    deleteConfirm: 确认删除这条友链？
+  validation:
+    required: 此项为必填项
+    url: 请输入 http 或 https 地址
+    sortOrderRange: 排序值必须是 0 到 1000000 之间的整数
+  errors:
+    load: 友链列表加载失败，请重试
+    operation: 友链操作失败，请重试
+  empty: 没有符合条件的友链
 login:
   pureUsername: 账号
   purePassword: 密码
