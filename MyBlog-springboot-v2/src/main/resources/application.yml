@@ -1,6 +1,8 @@
 spring:
   application:
     name: myblog-v2
+  profiles:
+    default: local
   servlet:
     multipart:
       max-file-size: 10MB
