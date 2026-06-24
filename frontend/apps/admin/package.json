@@ -5,9 +5,9 @@
   "packageManager": "pnpm@9.15.9",
   "type": "module",
   "scripts": {
-    "dev": "NODE_OPTIONS=--max-old-space-size=4096 vite",
+    "dev": "node --max-old-space-size=4096 ./node_modules/vite/bin/vite.js",
     "serve": "pnpm dev",
-    "build": "rimraf dist && NODE_OPTIONS=--max-old-space-size=8192 vite build",
+    "build": "rimraf dist && node --max-old-space-size=8192 ./node_modules/vite/bin/vite.js build",
     "build:staging": "rimraf dist && vite build --mode staging",
     "report": "rimraf dist && vite build",
     "preview": "vite preview",
