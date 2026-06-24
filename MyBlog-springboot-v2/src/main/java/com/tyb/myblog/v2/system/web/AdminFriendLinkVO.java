@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
  * 后台友链响应。
  */
 public record AdminFriendLinkVO(
-        long id,
+        String id,
         String name,
         String url,
         String avatarUrl,
@@ -17,14 +17,14 @@ public record AdminFriendLinkVO(
         int sortOrder,
         FriendLinkStatus status,
         LocalDateTime createdAt,
-        Long createdBy,
+        String createdBy,
         LocalDateTime updatedAt,
-        Long updatedBy
+        String updatedBy
 ) {
 
     public static AdminFriendLinkVO from(FriendLinkResult result) {
         return new AdminFriendLinkVO(
-                result.id(),
+                Long.toString(result.id()),
                 result.name(),
                 result.url(),
                 result.avatarUrl(),
@@ -32,8 +32,12 @@ public record AdminFriendLinkVO(
                 result.sortOrder(),
                 result.status(),
                 result.createdAt(),
-                result.createdBy(),
+                result.createdBy() == null
+                        ? null
+                        : Long.toString(result.createdBy()),
                 result.updatedAt(),
-                result.updatedBy());
+                result.updatedBy() == null
+                        ? null
+                        : Long.toString(result.updatedBy()));
     }
 }

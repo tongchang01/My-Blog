@@ -88,7 +88,7 @@ class AdminFriendLinkControllerTest {
         mockMvc.perform(get("/api/admin/friend-links"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records[0].id")
-                        .value(10))
+                        .value("10"))
                 .andExpect(jsonPath("$.data.records[0].status")
                         .value("VISIBLE"))
                 .andExpect(jsonPath("$.data.records[0].sortOrder")
@@ -113,13 +113,13 @@ class AdminFriendLinkControllerTest {
 
         mockMvc.perform(get("/api/admin/friend-links/10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(10))
+                .andExpect(jsonPath("$.data.id").value("10"))
                 .andExpect(jsonPath("$.data.name")
                         .value("Example"))
                 .andExpect(jsonPath("$.data.createdBy")
-                        .value(1001))
+                        .value("1001"))
                 .andExpect(jsonPath("$.data.updatedBy")
-                        .value(1001));
+                        .value("1001"));
     }
 
     @Test
