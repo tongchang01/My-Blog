@@ -77,6 +77,8 @@ class AttachmentOpenApiTest {
         assertThat(attachment.path("properties").fieldNames())
                 .toIterable()
                 .containsExactlyInAnyOrderElementsOf(ATTACHMENT_FIELDS);
+        assertStringInt64(attachment.path("properties").path("id"));
+        assertStringInt64(attachment.path("properties").path("createdBy"));
         assertThat(page.path("properties").fieldNames())
                 .toIterable()
                 .containsExactlyInAnyOrder(
@@ -108,5 +110,10 @@ class AttachmentOpenApiTest {
         return root.path("components")
                 .path("schemas")
                 .path(ref.substring(ref.lastIndexOf('/') + 1));
+    }
+
+    private void assertStringInt64(JsonNode schema) {
+        assertThat(schema.path("type").asText()).isEqualTo("string");
+        assertThat(schema.path("format").asText()).isEqualTo("int64");
     }
 }

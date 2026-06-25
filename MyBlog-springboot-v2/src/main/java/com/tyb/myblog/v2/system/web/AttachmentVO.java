@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.system.web;
 
 import com.tyb.myblog.v2.system.application.attachment.AttachmentResult;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
  * 后台附件响应。
  */
 public record AttachmentVO(
-        long id,
+        @Schema(format = "int64") String id,
         String publicUrl,
         String contentType,
         long fileSize,
@@ -16,11 +17,11 @@ public record AttachmentVO(
         int height,
         String originalFilename,
         LocalDateTime createdAt,
-        Long createdBy
+        @Schema(format = "int64") String createdBy
 ) {
     public static AttachmentVO from(AttachmentResult result) {
         return new AttachmentVO(
-                result.id(),
+                Long.toString(result.id()),
                 result.publicUrl(),
                 result.contentType(),
                 result.fileSize(),
@@ -28,6 +29,8 @@ public record AttachmentVO(
                 result.height(),
                 result.originalFilename(),
                 result.createdAt(),
-                result.createdBy());
+                result.createdBy() == null
+                        ? null
+                        : Long.toString(result.createdBy()));
     }
 }

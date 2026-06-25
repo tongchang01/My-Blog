@@ -28,7 +28,7 @@
 
 ```json
 {
-  "id": 123,
+  "id": "123",
   "publicUrl": "https://static.example.com/attachments/2026/06/uuid.webp",
   "contentType": "image/webp",
   "fileSize": 102400,
@@ -36,7 +36,7 @@
   "height": 900,
   "originalFilename": "cover.webp",
   "createdAt": "2026-06-14T12:00:00",
-  "createdBy": 1001
+  "createdBy": "1001"
 }
 ```
 
