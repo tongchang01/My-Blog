@@ -21,6 +21,7 @@ class LocalDatasourceConfigurationTest {
         String datasourceUrl = environment.getProperty("spring.datasource.url");
 
         assertThat(datasourceUrl)
+                .contains("allowPublicKeyRetrieval=true")
                 .contains("connectionTimeZone=Asia/Tokyo")
                 .contains("forceConnectionTimeToSession=true")
                 .contains("sessionVariables=time_zone='%2B09:00'")

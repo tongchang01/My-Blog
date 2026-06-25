@@ -27,6 +27,7 @@ class RuntimeProfileConfigurationTest {
         assertThat(local.getProperty("spring.datasource.url"))
                 .asString()
                 .contains("/myblog_v2_dev?")
+                .contains("allowPublicKeyRetrieval=true")
                 .startsWith("${MYBLOG_DATASOURCE_URL:");
         assertThat(local.getProperty("spring.datasource.username"))
                 .isEqualTo("${MYBLOG_DATASOURCE_USERNAME}");

@@ -25,7 +25,7 @@ TO 'myblog_dev'@'localhost';
 PowerShell 示例：
 
 ```powershell
-$env:MYBLOG_DATASOURCE_URL = "jdbc:mysql://localhost:3306/myblog_v2_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&connectionTimeZone=Asia/Tokyo&forceConnectionTimeToSession=true&sessionVariables=time_zone='%2B09:00'"
+$env:MYBLOG_DATASOURCE_URL = "jdbc:mysql://localhost:3306/myblog_v2_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=Asia/Tokyo&forceConnectionTimeToSession=true&sessionVariables=time_zone='%2B09:00'"
 $env:MYBLOG_DATASOURCE_USERNAME = "root"
 $databasePassword = Read-Host "请输入本机 MySQL root 密码" -AsSecureString
 $env:MYBLOG_DATASOURCE_PASSWORD = [Net.NetworkCredential]::new("", $databasePassword).Password

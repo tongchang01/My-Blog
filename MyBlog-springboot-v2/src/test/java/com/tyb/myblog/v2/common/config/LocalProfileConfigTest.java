@@ -21,6 +21,10 @@ class LocalProfileConfigTest {
                 .isEqualTo(true);
         assertThat(properties.getProperty("spring.datasource.url"))
                 .asString()
-                .contains("myblog_v2_dev", "Asia/Tokyo", "time_zone='%2B09:00'");
+                .contains(
+                        "myblog_v2_dev",
+                        "allowPublicKeyRetrieval=true",
+                        "Asia/Tokyo",
+                        "time_zone='%2B09:00'");
     }
 }
