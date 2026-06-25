@@ -377,6 +377,10 @@ attachments:
   actions:
     copyUrl: Copy URL
     open: Open
+  picker:
+    title: Choose attachment
+    description: Choose an image from the attachment library for this field
+    select: Select
   errors:
     load: Unable to load attachments. Please retry.
     upload: Unable to upload attachment. Please check the file and retry.

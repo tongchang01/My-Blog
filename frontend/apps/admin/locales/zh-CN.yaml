@@ -377,6 +377,10 @@ attachments:
   actions:
     copyUrl: 复制 URL
     open: 打开
+  picker:
+    title: 选择附件
+    description: 从附件库中选择一张图片作为当前字段的引用
+    select: 选择
   errors:
     load: 附件列表加载失败，请重试
     upload: 附件上传失败，请检查文件后重试

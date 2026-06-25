@@ -377,6 +377,10 @@ attachments:
   actions:
     copyUrl: URL をコピー
     open: 開く
+  picker:
+    title: 添付ファイルを選択
+    description: 添付ライブラリからこの項目に使う画像を選択します
+    select: 選択
   errors:
     load: 添付ファイル一覧を読み込めませんでした。再試行してください
     upload: 添付ファイルをアップロードできませんでした。ファイルを確認して再試行してください
