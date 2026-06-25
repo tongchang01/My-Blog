@@ -1,7 +1,9 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
+import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
+import type { AttachmentItem } from "@/features/attachments/model";
 import type { AdminLocale, ArticleStatus, LocalizedNames } from "../model";
 import { localizedName, statusTranslationKey } from "../presentation";
 import { useArticleEditor } from "./useArticleEditor";
@@ -28,6 +30,7 @@ const {
 const locale = computed(
   () => (i18n.global.locale as unknown as { value: AdminLocale }).value
 );
+const coverPickerOpen = ref(false);
 const pageTitle = computed(() =>
   transformI18n(
     mode === "edit" ? "articles.editor.editTitle" : "articles.editor.createTitle"
@@ -41,6 +44,16 @@ function dictionaryName(item: LocalizedNames): string {
 function fieldError(field: keyof typeof form): string {
   const code = errors.value[field];
   return code ? transformI18n(`articles.editor.validation.${code}`) : "";
+}
+
+function selectCover(item: AttachmentItem): void {
+  form.coverAttachmentId = item.id;
+  form.coverUrl = item.publicUrl;
+}
+
+function clearCover(): void {
+  form.coverAttachmentId = null;
+  form.coverUrl = null;
 }
 
 async function submit(): Promise<void> {
@@ -172,6 +185,50 @@ onMounted(() => initialize().catch(() => undefined));
             />
           </el-select>
         </el-form-item>
+        <el-form-item :label="transformI18n('articles.editor.cover')">
+          <div class="cover-selector">
+            <div v-if="form.coverAttachmentId" class="cover-preview">
+              <el-image
+                v-if="form.coverUrl"
+                class="cover-image"
+                :src="form.coverUrl"
+                fit="cover"
+              />
+              <div class="cover-meta">
+                <strong>{{ transformI18n("articles.editor.coverSelected") }}</strong>
+                <span>#{{ form.coverAttachmentId }}</span>
+                <a
+                  v-if="form.coverUrl"
+                  :href="form.coverUrl"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {{ form.coverUrl }}
+                </a>
+              </div>
+            </div>
+            <p v-else class="field-hint">
+              {{ transformI18n("articles.editor.coverEmpty") }}
+            </p>
+            <div class="cover-actions">
+              <el-button
+                data-testid="article-cover-open-picker"
+                type="primary"
+                plain
+                @click="coverPickerOpen = true"
+              >
+                {{ transformI18n("articles.editor.coverChoose") }}
+              </el-button>
+              <el-button
+                v-if="form.coverAttachmentId"
+                data-testid="article-cover-clear"
+                @click="clearCover"
+              >
+                {{ transformI18n("articles.editor.coverClear") }}
+              </el-button>
+            </div>
+          </div>
+        </el-form-item>
         <el-form-item
           v-if="form.status === 'SCHEDULED'"
           :label="transformI18n('articles.editor.publishAt')"
@@ -196,6 +253,10 @@ onMounted(() => initialize().catch(() => undefined));
         </el-form-item>
       </el-card>
     </el-form>
+    <AttachmentPickerDialog
+      v-model="coverPickerOpen"
+      @select="selectCover"
+    />
   </section>
 </template>
 
@@ -259,6 +320,47 @@ onMounted(() => initialize().catch(() => undefined));
   margin: 6px 0 0;
   font-size: 12px;
   color: var(--el-text-color-secondary);
+}
+
+.cover-selector {
+  display: grid;
+  gap: 10px;
+  width: 100%;
+}
+
+.cover-preview {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.cover-image {
+  flex: 0 0 96px;
+  width: 96px;
+  height: 56px;
+  border-radius: 6px;
+  background: var(--el-fill-color-light);
+}
+
+.cover-meta {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+
+  span,
+  a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+    white-space: nowrap;
+  }
+}
+
+.cover-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 @media (width <= 1000px) {

@@ -177,6 +177,11 @@ articles:
     slug: Article slug
     category: Category
     tags: Tags
+    cover: Cover attachment
+    coverEmpty: No cover selected
+    coverSelected: Cover selected
+    coverChoose: Choose cover
+    coverClear: Clear cover
     publishAt: Scheduled publish time
     password: Access password
     passwordKeepHint: Leave blank to keep the current password

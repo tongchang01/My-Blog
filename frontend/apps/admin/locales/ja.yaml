@@ -177,6 +177,11 @@ articles:
     slug: 記事スラッグ
     category: カテゴリ
     tags: タグ
+    cover: カバー添付
+    coverEmpty: カバーは未選択です
+    coverSelected: カバー選択済み
+    coverChoose: カバーを選択
+    coverClear: カバーをクリア
     publishAt: 公開予約日時
     password: 閲覧パスワード
     passwordKeepHint: 空欄の場合は現在のパスワードを保持します

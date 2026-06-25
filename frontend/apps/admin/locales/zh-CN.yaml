@@ -177,6 +177,11 @@ articles:
     slug: 文章路径
     category: 分类
     tags: 标签
+    cover: 封面附件
+    coverEmpty: 未选择封面
+    coverSelected: 已选择封面
+    coverChoose: 选择封面
+    coverClear: 清除封面
     publishAt: 定时发布时间
     password: 访问密码
     passwordKeepHint: 留空将保留当前密码
