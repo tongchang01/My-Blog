@@ -75,6 +75,9 @@ menus:
   pureAccessDenied: "403"
   commentManagement: 评论管理
   friendLinkManagement: 友链管理
+  systemManagement: 系统管理
+  siteConfigManagement: 站点配置
+  profileManagement: 作者资料
   pureServerError: "500"
   purePermission: 权限管理
   purePermissionPage: 页面权限
@@ -313,6 +316,51 @@ friendLinks:
     load: 友链列表加载失败，请重试
     operation: 友链操作失败，请重试
   empty: 没有符合条件的友链
+settings:
+  readonlyDemo: 当前演示账号为只读模式
+  updatedAt: "更新时间："
+  validation:
+    required: 此项为必填项
+  siteConfig:
+    basic: 站点基础配置
+    about: 关于内容
+    loadError: 站点配置加载失败，请重试
+    saveError: 站点配置保存失败，请重试
+    siteTitleZh: 中文标题
+    siteTitleJa: 日文标题
+    siteTitleEn: 英文标题
+    siteSubtitleZh: 中文副标题
+    siteSubtitleJa: 日文副标题
+    siteSubtitleEn: 英文副标题
+    aboutMdZh: 中文 About Markdown
+    aboutMdJa: 日文 About Markdown
+    aboutMdEn: 英文 About Markdown
+    logoUrl: Logo 地址
+    faviconUrl: Favicon 地址
+    icpNo: 备案号
+    spotifyPlaylistId: Spotify 播放列表 ID
+  profile:
+    account: 账号概览
+    form: 作者资料
+    loadError: 作者资料加载失败，请重试
+    saveError: 作者资料保存失败，请重试
+    id: ID
+    username: 账号
+    role: 角色
+    nickname: 昵称
+    avatarUrl: 头像地址
+    bioZh: 中文简介
+    bioJa: 日文简介
+    bioEn: 英文简介
+    location: 所在地
+    website: 个人主页
+    emailPublic: 公开邮箱
+    githubUrl: GitHub 地址
+    twitterUrl: Twitter 地址
+    linkedinUrl: LinkedIn 地址
+    zhihuUrl: 知乎地址
+    qiitaUrl: Qiita 地址
+    juejinUrl: 掘金地址
 login:
   pureUsername: 账号
   purePassword: 密码

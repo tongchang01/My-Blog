@@ -75,6 +75,9 @@ menus:
   pureAccessDenied: "403"
   commentManagement: コメント管理
   friendLinkManagement: 友リンク管理
+  systemManagement: システム管理
+  siteConfigManagement: サイト設定
+  profileManagement: 作者プロフィール
   pureServerError: "500"
   purePermission: 権限管理
   purePermissionPage: ページ権限
@@ -313,6 +316,51 @@ friendLinks:
     load: 友リンク一覧の読み込みに失敗しました。再試行してください
     operation: 友リンク操作に失敗しました。再試行してください
   empty: 条件に一致する友リンクはありません
+settings:
+  readonlyDemo: 現在のデモアカウントは読み取り専用です
+  updatedAt: "更新日時："
+  validation:
+    required: 必須項目です
+  siteConfig:
+    basic: サイト基本設定
+    about: About コンテンツ
+    loadError: サイト設定を読み込めませんでした。再試行してください
+    saveError: サイト設定を保存できませんでした。再試行してください
+    siteTitleZh: 中国語タイトル
+    siteTitleJa: 日本語タイトル
+    siteTitleEn: 英語タイトル
+    siteSubtitleZh: 中国語サブタイトル
+    siteSubtitleJa: 日本語サブタイトル
+    siteSubtitleEn: 英語サブタイトル
+    aboutMdZh: 中国語 About Markdown
+    aboutMdJa: 日本語 About Markdown
+    aboutMdEn: 英語 About Markdown
+    logoUrl: Logo URL
+    faviconUrl: Favicon URL
+    icpNo: ICP 番号
+    spotifyPlaylistId: Spotify プレイリスト ID
+  profile:
+    account: アカウント概要
+    form: 作者プロフィール
+    loadError: プロフィールを読み込めませんでした。再試行してください
+    saveError: プロフィールを保存できませんでした。再試行してください
+    id: ID
+    username: ユーザー名
+    role: ロール
+    nickname: ニックネーム
+    avatarUrl: アバター URL
+    bioZh: 中国語プロフィール
+    bioJa: 日本語プロフィール
+    bioEn: 英語プロフィール
+    location: 所在地
+    website: Web サイト
+    emailPublic: 公開メール
+    githubUrl: GitHub URL
+    twitterUrl: Twitter URL
+    linkedinUrl: LinkedIn URL
+    zhihuUrl: Zhihu URL
+    qiitaUrl: Qiita URL
+    juejinUrl: Juejin URL
 login:
   pureUsername: ユーザー名
   purePassword: パスワード

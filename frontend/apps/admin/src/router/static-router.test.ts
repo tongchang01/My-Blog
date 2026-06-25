@@ -80,6 +80,42 @@ describe("static admin routes", () => {
     }
   });
 
+  it("contains system settings routes for site config and profile", () => {
+    const settings = (constantMenus as any[]).find(
+      route => route.name === "Settings"
+    );
+    const siteConfig = settings?.children?.find(
+      route => route.name === "SiteConfigManagement"
+    );
+    const profile = settings?.children?.find(
+      route => route.name === "ProfileManagement"
+    );
+
+    expect(settings?.path).toBe("/settings");
+    expect(siteConfig?.path).toBe("/settings/site-config");
+    expect(siteConfig?.meta?.showLink).toBe(true);
+    expect(siteConfig?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
+    expect(profile?.path).toBe("/settings/profile");
+    expect(profile?.meta?.showLink).toBe(true);
+    expect(profile?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
+  });
+
+  it("provides settings labels in all admin locales", () => {
+    for (const locale of [
+      localesConfigs.zh,
+      localesConfigs.ja,
+      localesConfigs.en
+    ]) {
+      expect(locale.menus.systemManagement).toBeTruthy();
+      expect(locale.menus.siteConfigManagement).toBeTruthy();
+      expect(locale.menus.profileManagement).toBeTruthy();
+      expect(locale.settings.readonlyDemo).toBeTruthy();
+      expect(locale.settings.siteConfig.basic).toBeTruthy();
+      expect(locale.settings.profile.form).toBeTruthy();
+      expect(locale.settings.validation.required).toBeTruthy();
+    }
+  });
+
   it("uses the deepest matched route title for browser document title", () => {
     expect(
       resolveRouteDocumentTitle({

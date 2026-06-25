@@ -75,6 +75,9 @@ menus:
   pureAccessDenied: "403"
   commentManagement: Comments
   friendLinkManagement: Friend Links
+  systemManagement: System Management
+  siteConfigManagement: Site Config
+  profileManagement: Author Profile
   pureServerError: "500"
   purePermission: Permission Manage
   purePermissionPage: Page Permission
@@ -313,6 +316,51 @@ friendLinks:
     load: Failed to load friend links. Please retry.
     operation: Friend link operation failed. Please retry.
   empty: No friend links match the current filters
+settings:
+  readonlyDemo: The current demo account is read-only
+  updatedAt: "Updated at:"
+  validation:
+    required: This field is required
+  siteConfig:
+    basic: Site basics
+    about: About content
+    loadError: Unable to load site config. Please retry.
+    saveError: Unable to save site config. Please retry.
+    siteTitleZh: Chinese title
+    siteTitleJa: Japanese title
+    siteTitleEn: English title
+    siteSubtitleZh: Chinese subtitle
+    siteSubtitleJa: Japanese subtitle
+    siteSubtitleEn: English subtitle
+    aboutMdZh: Chinese about Markdown
+    aboutMdJa: Japanese about Markdown
+    aboutMdEn: English about Markdown
+    logoUrl: Logo URL
+    faviconUrl: Favicon URL
+    icpNo: ICP number
+    spotifyPlaylistId: Spotify playlist ID
+  profile:
+    account: Account overview
+    form: Author profile
+    loadError: Unable to load profile. Please retry.
+    saveError: Unable to save profile. Please retry.
+    id: ID
+    username: Username
+    role: Role
+    nickname: Nickname
+    avatarUrl: Avatar URL
+    bioZh: Chinese bio
+    bioJa: Japanese bio
+    bioEn: English bio
+    location: Location
+    website: Website
+    emailPublic: Public email
+    githubUrl: GitHub URL
+    twitterUrl: Twitter URL
+    linkedinUrl: LinkedIn URL
+    zhihuUrl: Zhihu URL
+    qiitaUrl: Qiita URL
+    juejinUrl: Juejin URL
 login:
   pureUsername: Username
   purePassword: Password
