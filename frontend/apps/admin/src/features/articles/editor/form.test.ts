@@ -23,7 +23,7 @@ const detail: ArticleDetail = {
   status: "PASSWORD",
   publishAt: "2026-06-21T10:00:00",
   coverAttachmentId: "30",
-  coverUrl: null,
+  coverUrl: "http://localhost/media/cover.png",
   commentCount: 2,
   tagIds: ["20"],
   createdAt: "2026-06-20T10:00:00",
@@ -39,7 +39,8 @@ describe("article editor form", () => {
       categoryId: null,
       tagIds: [],
       password: "",
-      coverAttachmentId: null
+      coverAttachmentId: null,
+      coverUrl: null
     });
 
     expect(articleDetailToForm(detail)).toMatchObject({
@@ -50,7 +51,8 @@ describe("article editor form", () => {
       categoryId: "10",
       tagIds: ["20"],
       password: "",
-      coverAttachmentId: "30"
+      coverAttachmentId: "30",
+      coverUrl: "http://localhost/media/cover.png"
     });
   });
 
@@ -77,6 +79,7 @@ describe("article editor form", () => {
       publishAt: "2026-06-21T10:00:00",
       coverAttachmentId: "30"
     });
+    expect(articleFormToPayload(form)).not.toHaveProperty("coverUrl");
   });
 
   it("validates required content and status-specific fields", () => {

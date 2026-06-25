@@ -26,6 +26,7 @@ export interface ArticleForm {
   password: string;
   publishAt: string | null;
   coverAttachmentId: string | null;
+  coverUrl: string | null;
 }
 
 export type ArticleFormErrors = Partial<
@@ -47,7 +48,8 @@ export function createEmptyArticleForm(): ArticleForm {
     status: "DRAFT",
     password: "",
     publishAt: null,
-    coverAttachmentId: null
+    coverAttachmentId: null,
+    coverUrl: null
   };
 }
 
@@ -66,7 +68,8 @@ export function articleDetailToForm(detail: ArticleDetail): ArticleForm {
     status: detail.status,
     password: "",
     publishAt: detail.publishAt,
-    coverAttachmentId: detail.coverAttachmentId
+    coverAttachmentId: detail.coverAttachmentId,
+    coverUrl: detail.coverUrl
   };
 }
 
