@@ -107,6 +107,15 @@ corepack pnpm build
 - 后端友链响应中的 `id`、`createdBy`、`updatedBy` 使用字符串契约，避免浏览器端 Snowflake ID 精度损失。
 - 当前不提供拖拽排序、批量删除、图片上传选择器或友链可用性检测。
 
+## 站点配置与作者资料管理（2026-06-25）
+
+- `/settings/site-config` 和 `/settings/profile` 作为系统管理下的独立页面，ADMIN 和 DEMO 均可访问。
+- 站点配置页复用 `GET/PUT /api/admin/site-config`，维护三语标题、副标题、About Markdown、Logo、Favicon、备案号和 Spotify 播放列表 ID。
+- 作者资料页复用 `GET /api/auth/me` 和 `PATCH /api/auth/me/profile`，维护昵称、头像、三语简介、所在地、个人主页、公开邮箱和社交链接。
+- ADMIN 可保存；DEMO 只读，不渲染保存入口。后端权限仍是最终安全边界。
+- 保存作者资料成功后同步 Pinia 当前用户状态，导航栏和仪表盘可立即反映新昵称。
+- 当前不提供主题颜色、布局开关、导航菜单、站点内容块编排或头像上传选择器，这些等待后端表结构和后台配置模型扩展后再做。
+
 ## 后续边界
 
 下一阶段可继续完善留言、附件、站点配置、真实统计仪表盘，以及 Markdown 编辑器与预览、自动保存和离开页面确认。
