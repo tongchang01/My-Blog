@@ -4,6 +4,7 @@ import type {
   LoginRequest,
   TokenPair
 } from "@/features/auth/model";
+import type { UserProfilePayload } from "@/features/profile/form";
 import { http } from "@/utils/http";
 
 export const login = (request: LoginRequest) =>
@@ -26,3 +27,10 @@ export const logout = () => http.post<ApiResponse<null>>("/api/auth/logout");
 
 export const getCurrentUser = () =>
   http.get<ApiResponse<CurrentUser>>("/api/auth/me");
+
+export const updateCurrentUserProfile = (payload: UserProfilePayload) =>
+  http.request<ApiResponse<CurrentUser["profile"]>>(
+    "patch",
+    "/api/auth/me/profile",
+    { data: payload }
+  );

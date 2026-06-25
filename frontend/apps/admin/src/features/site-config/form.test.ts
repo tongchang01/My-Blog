@@ -1,0 +1,85 @@
+import { describe, expect, it } from "vitest";
+import type { SiteConfig } from "./model";
+import {
+  createSiteConfigForm,
+  siteConfigFormToPayload,
+  siteConfigToForm,
+  validateSiteConfigForm
+} from "./form";
+
+const config: SiteConfig = {
+  siteTitleZh: "中文标题",
+  siteTitleJa: "日本語タイトル",
+  siteTitleEn: "English title",
+  siteSubtitleZh: "中文副标题",
+  siteSubtitleJa: "日本語サブタイトル",
+  siteSubtitleEn: "English subtitle",
+  aboutMdZh: "中文关于",
+  aboutMdJa: "日本語 About",
+  aboutMdEn: "English About",
+  logoUrl: null,
+  faviconUrl: "https://example.com/favicon.ico",
+  icpNo: null,
+  spotifyPlaylistId: "playlist-id",
+  updatedAt: "2026-06-25T10:00:00",
+  updatedBy: "1001"
+};
+
+describe("site config form", () => {
+  it("creates defaults and maps nullable detail fields to editable strings", () => {
+    expect(createSiteConfigForm()).toEqual({
+      siteTitleZh: "",
+      siteTitleJa: "",
+      siteTitleEn: "",
+      siteSubtitleZh: "",
+      siteSubtitleJa: "",
+      siteSubtitleEn: "",
+      aboutMdZh: "",
+      aboutMdJa: "",
+      aboutMdEn: "",
+      logoUrl: "",
+      faviconUrl: "",
+      icpNo: "",
+      spotifyPlaylistId: ""
+    });
+    expect(siteConfigToForm(config)).toMatchObject({
+      siteTitleZh: "中文标题",
+      logoUrl: "",
+      faviconUrl: "https://example.com/favicon.ico",
+      icpNo: ""
+    });
+  });
+
+  it("requires all three site titles", () => {
+    expect(validateSiteConfigForm(createSiteConfigForm())).toEqual({
+      siteTitleZh: "required",
+      siteTitleJa: "required",
+      siteTitleEn: "required"
+    });
+  });
+
+  it("normalizes whitespace and emits a complete PUT payload", () => {
+    expect(
+      siteConfigFormToPayload({
+        ...siteConfigToForm(config),
+        siteTitleZh: " 中文标题 ",
+        logoUrl: " ",
+        icpNo: " ICP  "
+      })
+    ).toEqual({
+      siteTitleZh: "中文标题",
+      siteTitleJa: "日本語タイトル",
+      siteTitleEn: "English title",
+      siteSubtitleZh: "中文副标题",
+      siteSubtitleJa: "日本語サブタイトル",
+      siteSubtitleEn: "English subtitle",
+      aboutMdZh: "中文关于",
+      aboutMdJa: "日本語 About",
+      aboutMdEn: "English About",
+      logoUrl: null,
+      faviconUrl: "https://example.com/favicon.ico",
+      icpNo: "ICP",
+      spotifyPlaylistId: "playlist-id"
+    });
+  });
+});
