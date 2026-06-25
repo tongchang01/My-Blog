@@ -31,6 +31,16 @@ export default {
         showLink: true,
         roles: ["ADMIN", "DEMO"]
       }
+    },
+    {
+      path: "/settings/attachments",
+      name: "AttachmentManagement",
+      component: () => import("@/features/attachments/index.vue"),
+      meta: {
+        title: $t("menus.attachmentManagement"),
+        showLink: true,
+        roles: ["ADMIN", "DEMO"]
+      }
     }
   ]
 } satisfies RouteConfigsTable;

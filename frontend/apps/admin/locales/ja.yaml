@@ -78,6 +78,7 @@ menus:
   systemManagement: システム管理
   siteConfigManagement: サイト設定
   profileManagement: 作者プロフィール
+  attachmentManagement: 添付ファイル管理
   pureServerError: "500"
   purePermission: 権限管理
   purePermissionPage: ページ権限
@@ -361,6 +362,20 @@ settings:
     zhihuUrl: Zhihu URL
     qiitaUrl: Qiita URL
     juejinUrl: Juejin URL
+attachments:
+  readonlyDemo: 現在のデモアカウントは読み取り専用のため、添付ファイルをアップロードできません
+  upload:
+    title: 画像添付をアップロード
+    description: JPEG、PNG、WebP、GIF に対応します。サーバー側で画像内容とサイズ制限を検証します。
+  result:
+    total: 添付ファイル数
+  actions:
+    copyUrl: URL をコピー
+    open: 開く
+  errors:
+    load: 添付ファイル一覧を読み込めませんでした。再試行してください
+    upload: 添付ファイルをアップロードできませんでした。ファイルを確認して再試行してください
+  empty: 添付ファイルはまだありません
 login:
   pureUsername: ユーザー名
   purePassword: パスワード

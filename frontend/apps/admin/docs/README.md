@@ -116,6 +116,15 @@ corepack pnpm build
 - 保存作者资料成功后同步 Pinia 当前用户状态，导航栏和仪表盘可立即反映新昵称。
 - 当前不提供主题颜色、布局开关、导航菜单、站点内容块编排或头像上传选择器，这些等待后端表结构和后台配置模型扩展后再做。
 
+## 附件管理（2026-06-25）
+
+- `/settings/attachments` 作为系统管理下的独立页面，ADMIN 和 DEMO 均可访问。
+- 页面复用 `GET /api/admin/attachments`、`GET /api/admin/attachments/{id}` 和 `POST /api/admin/attachments`。
+- 后端附件响应中的 `id`、`createdBy` 使用字符串契约，避免浏览器端 Snowflake ID 精度损失。
+- ADMIN 可上传 JPEG、PNG、WebP、GIF 图片附件；DEMO 只读，不渲染上传入口。
+- 附件列表展示图片预览、文件名、尺寸、大小、MIME、上传时间、ID 和公开 URL，并支持复制 URL 与打开公开地址。
+- 当前不提供删除、批量操作、附件回收站、物理清理或文章封面/头像/Logo 的选择器接入；这些作为后续集成步骤处理。
+
 ## 后续边界
 
-下一阶段可继续完善留言、附件、站点配置、真实统计仪表盘，以及 Markdown 编辑器与预览、自动保存和离开页面确认。
+下一阶段可继续完善附件选择器接入、真实统计仪表盘，以及 Markdown 编辑器与预览、自动保存和离开页面确认。

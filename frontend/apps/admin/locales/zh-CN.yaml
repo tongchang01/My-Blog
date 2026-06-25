@@ -78,6 +78,7 @@ menus:
   systemManagement: 系统管理
   siteConfigManagement: 站点配置
   profileManagement: 作者资料
+  attachmentManagement: 附件管理
   pureServerError: "500"
   purePermission: 权限管理
   purePermissionPage: 页面权限
@@ -361,6 +362,20 @@ settings:
     zhihuUrl: 知乎地址
     qiitaUrl: Qiita 地址
     juejinUrl: 掘金地址
+attachments:
+  readonlyDemo: 当前演示账号为只读模式，不能上传附件
+  upload:
+    title: 上传图片附件
+    description: 支持 JPEG、PNG、WebP、GIF；服务端会校验真实图片内容和大小限制
+  result:
+    total: 附件总数
+  actions:
+    copyUrl: 复制 URL
+    open: 打开
+  errors:
+    load: 附件列表加载失败，请重试
+    upload: 附件上传失败，请检查文件后重试
+  empty: 暂无附件
 login:
   pureUsername: 账号
   purePassword: 密码

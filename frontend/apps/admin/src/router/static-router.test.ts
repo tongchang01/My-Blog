@@ -90,6 +90,9 @@ describe("static admin routes", () => {
     const profile = settings?.children?.find(
       route => route.name === "ProfileManagement"
     );
+    const attachments = settings?.children?.find(
+      route => route.name === "AttachmentManagement"
+    );
 
     expect(settings?.path).toBe("/settings");
     expect(siteConfig?.path).toBe("/settings/site-config");
@@ -98,6 +101,9 @@ describe("static admin routes", () => {
     expect(profile?.path).toBe("/settings/profile");
     expect(profile?.meta?.showLink).toBe(true);
     expect(profile?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
+    expect(attachments?.path).toBe("/settings/attachments");
+    expect(attachments?.meta?.showLink).toBe(true);
+    expect(attachments?.meta?.roles).toEqual(["ADMIN", "DEMO"]);
   });
 
   it("provides settings labels in all admin locales", () => {
@@ -109,10 +115,14 @@ describe("static admin routes", () => {
       expect(locale.menus.systemManagement).toBeTruthy();
       expect(locale.menus.siteConfigManagement).toBeTruthy();
       expect(locale.menus.profileManagement).toBeTruthy();
+      expect(locale.menus.attachmentManagement).toBeTruthy();
       expect(locale.settings.readonlyDemo).toBeTruthy();
       expect(locale.settings.siteConfig.basic).toBeTruthy();
       expect(locale.settings.profile.form).toBeTruthy();
       expect(locale.settings.validation.required).toBeTruthy();
+      expect(locale.attachments.upload.title).toBeTruthy();
+      expect(locale.attachments.actions.copyUrl).toBeTruthy();
+      expect(locale.attachments.errors.upload).toBeTruthy();
     }
   });
 

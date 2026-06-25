@@ -78,6 +78,7 @@ menus:
   systemManagement: System Management
   siteConfigManagement: Site Config
   profileManagement: Author Profile
+  attachmentManagement: Attachments
   pureServerError: "500"
   purePermission: Permission Manage
   purePermissionPage: Page Permission
@@ -361,6 +362,20 @@ settings:
     zhihuUrl: Zhihu URL
     qiitaUrl: Qiita URL
     juejinUrl: Juejin URL
+attachments:
+  readonlyDemo: The current demo account is read-only and cannot upload attachments
+  upload:
+    title: Upload image attachment
+    description: Supports JPEG, PNG, WebP, and GIF. The server validates real image content and size limits.
+  result:
+    total: Total attachments
+  actions:
+    copyUrl: Copy URL
+    open: Open
+  errors:
+    load: Unable to load attachments. Please retry.
+    upload: Unable to upload attachment. Please check the file and retry.
+  empty: No attachments yet
 login:
   pureUsername: Username
   purePassword: Password
