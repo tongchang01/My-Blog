@@ -191,6 +191,7 @@ articles:
     draftFound: Local draft detected
     draftRestore: Restore draft
     draftClear: Clear draft
+    leaveConfirm: This article has unsaved changes. Leave anyway?
     status: Article status
     slug: Article slug
     category: Category

@@ -191,6 +191,7 @@ articles:
     draftFound: ローカル下書きが見つかりました
     draftRestore: 下書きを復元
     draftClear: 下書きを削除
+    leaveConfirm: 記事に未保存の変更があります。移動しますか？
     status: 記事ステータス
     slug: 記事スラッグ
     category: カテゴリ

@@ -8,16 +8,21 @@ import ArticleEditor from "./index.vue";
 
 const routerState = vi.hoisted(() => ({
   push: vi.fn(),
-  route: { name: "ArticleCreate", params: {} as Record<string, string> }
+  route: { name: "ArticleCreate", params: {} as Record<string, string> },
+  leaveGuard: undefined as undefined | ((...args: any[]) => void)
 }));
 
 vi.mock("vue-router", () => ({
+  onBeforeRouteLeave: (guard: (...args: any[]) => void) => {
+    routerState.leaveGuard = guard;
+  },
   useRoute: () => routerState.route,
   useRouter: () => ({ push: routerState.push })
 }));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
+const mountedWrappers: Array<ReturnType<typeof mount>> = [];
 const stubs = {
   "el-alert": true,
   "el-button": true,
@@ -48,10 +53,18 @@ function dictionaries() {
   });
 }
 
+function mountEditor() {
+  const wrapper = mount(ArticleEditor, { global: { stubs } });
+  mountedWrappers.push(wrapper);
+  return wrapper;
+}
+
 afterEach(() => {
+  mountedWrappers.splice(0).forEach(wrapper => wrapper.unmount());
   mock.reset();
   localStorage.clear();
   routerState.push.mockReset();
+  routerState.leaveGuard = undefined;
   routerState.route = { name: "ArticleCreate", params: {} };
 });
 
@@ -63,7 +76,7 @@ describe("article editor page", () => {
       msg: "success",
       data: { id: "101" }
     });
-    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    const wrapper = mountEditor();
     await flushPromises();
 
     expect(wrapper.find('[data-testid="article-editor"]').exists()).toBe(true);
@@ -112,7 +125,7 @@ describe("article editor page", () => {
       }
     });
 
-    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    const wrapper = mountEditor();
     await flushPromises();
 
     expect((wrapper.vm as any).form.titleZh).toBe("已有标题");
@@ -152,7 +165,7 @@ describe("article editor page", () => {
       return [200, { code: "00000", msg: "success", data: { id: "101" } }];
     });
 
-    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    const wrapper = mountEditor();
     await flushPromises();
     await wrapper.get('[data-testid="article-cover-open-picker"]').trigger("click");
     await flushPromises();
@@ -178,7 +191,7 @@ describe("article editor page", () => {
       return [200, { code: "00000", msg: "success", data: { id: "101" } }];
     });
 
-    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    const wrapper = mountEditor();
     await flushPromises();
     Object.assign((wrapper.vm as any).form, {
       titleZh: "标题",
@@ -197,7 +210,7 @@ describe("article editor page", () => {
 
   it("renders a safe markdown preview for the body", async () => {
     dictionaries();
-    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    const wrapper = mountEditor();
     await flushPromises();
 
     Object.assign((wrapper.vm as any).form, {
@@ -213,7 +226,7 @@ describe("article editor page", () => {
 
   it("autosaves a local draft while editing", async () => {
     dictionaries();
-    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    const wrapper = mountEditor();
     await flushPromises();
 
     Object.assign((wrapper.vm as any).form, {
@@ -253,7 +266,7 @@ describe("article editor page", () => {
       })
     );
 
-    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    const wrapper = mountEditor();
     await flushPromises();
 
     expect(wrapper.find('[data-testid="article-draft-restore"]').exists()).toBe(true);
@@ -294,7 +307,7 @@ describe("article editor page", () => {
       msg: "success",
       data: { id: "101" }
     });
-    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    const wrapper = mountEditor();
     await flushPromises();
     Object.assign((wrapper.vm as any).form, {
       titleZh: "标题",
@@ -306,5 +319,49 @@ describe("article editor page", () => {
     await flushPromises();
 
     expect(localStorage.getItem(articleDraftKey("create"))).toBeNull();
+  });
+
+  it("does not block browser unload before the form changes", async () => {
+    dictionaries();
+    mountEditor();
+    await flushPromises();
+
+    const event = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(false);
+  });
+
+  it("blocks browser unload after the form changes", async () => {
+    dictionaries();
+    const wrapper = mountEditor();
+    await flushPromises();
+
+    Object.assign((wrapper.vm as any).form, {
+      titleZh: "未保存标题"
+    });
+    await nextTick();
+    const event = new Event("beforeunload", { cancelable: true });
+    window.dispatchEvent(event);
+
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it("cancels route leave when the user rejects the unsaved-change confirmation", async () => {
+    dictionaries();
+    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
+    const wrapper = mountEditor();
+    await flushPromises();
+    Object.assign((wrapper.vm as any).form, {
+      titleZh: "未保存标题"
+    });
+    await nextTick();
+    const next = vi.fn();
+
+    routerState.leaveGuard?.({}, {}, next);
+
+    expect(confirm).toHaveBeenCalled();
+    expect(next).toHaveBeenCalledWith(false);
+    confirm.mockRestore();
   });
 });

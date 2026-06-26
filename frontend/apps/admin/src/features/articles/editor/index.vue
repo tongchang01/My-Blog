@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
 import type { AttachmentItem } from "@/features/attachments/model";
@@ -40,6 +40,7 @@ const locale = computed(
 const coverPickerOpen = ref(false);
 const draft = ref<ArticleForm | null>(null);
 const autosaveReady = ref(false);
+const baselineSnapshot = ref<string | null>(null);
 const pageTitle = computed(() =>
   transformI18n(
     mode === "edit" ? "articles.editor.editTitle" : "articles.editor.createTitle"
@@ -47,6 +48,13 @@ const pageTitle = computed(() =>
 );
 const previewHtml = computed(() => renderMarkdownPreview(form.body));
 const hasDraft = computed(() => Boolean(draft.value));
+const isDirty = computed(
+  () => baselineSnapshot.value !== null && snapshotForm() !== baselineSnapshot.value
+);
+
+function snapshotForm(): string {
+  return JSON.stringify({ ...form, tagIds: [...form.tagIds] });
+}
 
 function dictionaryName(item: LocalizedNames): string {
   return localizedName(item, locale.value);
@@ -85,6 +93,7 @@ async function submit(): Promise<void> {
     const result = await save();
     if (result) {
       clearDraft();
+      baselineSnapshot.value = snapshotForm();
       await router.push("/articles/list");
     }
   } catch {
@@ -104,12 +113,33 @@ watch(
 onMounted(async () => {
   try {
     await initialize();
+    baselineSnapshot.value = snapshotForm();
     draft.value = loadArticleDraft(mode, articleId);
   } catch {
     // 请求错误由页面中的 alert 展示，表单数据保持不变。
   } finally {
     autosaveReady.value = true;
   }
+});
+
+function handleBeforeUnload(event: BeforeUnloadEvent): void {
+  if (!isDirty.value) return;
+  event.preventDefault();
+  event.returnValue = "";
+}
+
+window.addEventListener("beforeunload", handleBeforeUnload);
+
+onBeforeUnmount(() => {
+  window.removeEventListener("beforeunload", handleBeforeUnload);
+});
+
+onBeforeRouteLeave((_to, _from, next) => {
+  if (!isDirty.value || window.confirm(transformI18n("articles.editor.leaveConfirm"))) {
+    next();
+    return;
+  }
+  next(false);
 });
 </script>
 
