@@ -1,11 +1,17 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
 import type { AttachmentItem } from "@/features/attachments/model";
 import type { AdminLocale, ArticleStatus, LocalizedNames } from "../model";
 import { localizedName, statusTranslationKey } from "../presentation";
+import {
+  clearArticleDraft,
+  loadArticleDraft,
+  saveArticleDraft
+} from "./draftStorage";
+import type { ArticleForm } from "./form";
 import { renderMarkdownPreview } from "./markdownPreview";
 import { useArticleEditor } from "./useArticleEditor";
 
@@ -32,12 +38,15 @@ const locale = computed(
   () => (i18n.global.locale as unknown as { value: AdminLocale }).value
 );
 const coverPickerOpen = ref(false);
+const draft = ref<ArticleForm | null>(null);
+const autosaveReady = ref(false);
 const pageTitle = computed(() =>
   transformI18n(
     mode === "edit" ? "articles.editor.editTitle" : "articles.editor.createTitle"
   )
 );
 const previewHtml = computed(() => renderMarkdownPreview(form.body));
+const hasDraft = computed(() => Boolean(draft.value));
 
 function dictionaryName(item: LocalizedNames): string {
   return localizedName(item, locale.value);
@@ -58,16 +67,50 @@ function clearCover(): void {
   form.coverUrl = null;
 }
 
+function restoreDraft(): void {
+  if (!draft.value) return;
+  Object.assign(form, {
+    ...draft.value,
+    tagIds: [...draft.value.tagIds]
+  });
+}
+
+function clearDraft(): void {
+  clearArticleDraft(mode, articleId);
+  draft.value = null;
+}
+
 async function submit(): Promise<void> {
   try {
     const result = await save();
-    if (result) await router.push("/articles/list");
+    if (result) {
+      clearDraft();
+      await router.push("/articles/list");
+    }
   } catch {
     // 请求错误由页面中的 alert 展示，表单数据保持不变。
   }
 }
 
-onMounted(() => initialize().catch(() => undefined));
+watch(
+  form,
+  () => {
+    if (!autosaveReady.value) return;
+    saveArticleDraft(mode, articleId, form);
+  },
+  { deep: true }
+);
+
+onMounted(async () => {
+  try {
+    await initialize();
+    draft.value = loadArticleDraft(mode, articleId);
+  } catch {
+    // 请求错误由页面中的 alert 展示，表单数据保持不变。
+  } finally {
+    autosaveReady.value = true;
+  }
+});
 </script>
 
 <template>
@@ -100,6 +143,22 @@ onMounted(() => initialize().catch(() => undefined));
       :title="transformI18n('articles.editor.requestError')"
       show-icon
     />
+
+    <el-alert
+      v-if="hasDraft"
+      data-testid="article-draft-alert"
+      type="info"
+      :closable="false"
+      :title="transformI18n('articles.editor.draftFound')"
+      show-icon
+    >
+      <el-button data-testid="article-draft-restore" type="primary" link @click="restoreDraft">
+        {{ transformI18n("articles.editor.draftRestore") }}
+      </el-button>
+      <el-button data-testid="article-draft-clear" link @click="clearDraft">
+        {{ transformI18n("articles.editor.draftClear") }}
+      </el-button>
+    </el-alert>
 
     <el-skeleton v-if="loading" :rows="10" animated />
     <el-form v-else :model="form" label-position="top" class="editor-grid">

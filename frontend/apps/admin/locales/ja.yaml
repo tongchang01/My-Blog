@@ -188,6 +188,9 @@ articles:
     summaryEn: 英語概要
     body: Markdown本文
     preview: Markdownプレビュー
+    draftFound: ローカル下書きが見つかりました
+    draftRestore: 下書きを復元
+    draftClear: 下書きを削除
     status: 記事ステータス
     slug: 記事スラッグ
     category: カテゴリ

@@ -188,6 +188,9 @@ articles:
     summaryEn: 英文摘要
     body: Markdown 正文
     preview: Markdown 预览
+    draftFound: 检测到本地草稿
+    draftRestore: 恢复草稿
+    draftClear: 清除草稿
     status: 文章状态
     slug: 文章路径
     category: 分类

@@ -3,6 +3,7 @@ import { config, flushPromises, mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { http } from "@/utils/http";
+import { articleDraftKey } from "./draftStorage";
 import ArticleEditor from "./index.vue";
 
 const routerState = vi.hoisted(() => ({
@@ -49,6 +50,7 @@ function dictionaries() {
 
 afterEach(() => {
   mock.reset();
+  localStorage.clear();
   routerState.push.mockReset();
   routerState.route = { name: "ArticleCreate", params: {} };
 });
@@ -207,5 +209,102 @@ describe("article editor page", () => {
     expect(preview.html()).toContain("<h1>标题</h1>");
     expect(preview.html()).not.toContain("<script>");
     expect(preview.text()).toContain("<script>alert(1)</script>");
+  });
+
+  it("autosaves a local draft while editing", async () => {
+    dictionaries();
+    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    await flushPromises();
+
+    Object.assign((wrapper.vm as any).form, {
+      titleZh: "本地草稿",
+      body: "草稿正文"
+    });
+    await nextTick();
+
+    const raw = localStorage.getItem(articleDraftKey("create"));
+    expect(raw).toBeTruthy();
+    expect(JSON.parse(raw as string).form.titleZh).toBe("本地草稿");
+  });
+
+  it("restores an existing local draft", async () => {
+    dictionaries();
+    localStorage.setItem(
+      articleDraftKey("create"),
+      JSON.stringify({
+        savedAt: "2026-06-26T10:00:00.000Z",
+        form: {
+          titleZh: "恢复标题",
+          titleJa: "",
+          titleEn: "",
+          summaryZh: "恢复摘要",
+          summaryJa: "",
+          summaryEn: "",
+          body: "恢复正文",
+          categoryId: null,
+          tagIds: [],
+          slug: "",
+          status: "DRAFT",
+          password: "",
+          publishAt: null,
+          coverAttachmentId: null,
+          coverUrl: null
+        }
+      })
+    );
+
+    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="article-draft-restore"]').exists()).toBe(true);
+    await wrapper.get('[data-testid="article-draft-restore"]').trigger("click");
+    await nextTick();
+
+    expect((wrapper.vm as any).form.titleZh).toBe("恢复标题");
+    expect((wrapper.vm as any).form.body).toBe("恢复正文");
+  });
+
+  it("clears the local draft after a successful save", async () => {
+    dictionaries();
+    localStorage.setItem(
+      articleDraftKey("create"),
+      JSON.stringify({
+        savedAt: "2026-06-26T10:00:00.000Z",
+        form: {
+          titleZh: "旧草稿",
+          titleJa: "",
+          titleEn: "",
+          summaryZh: "旧摘要",
+          summaryJa: "",
+          summaryEn: "",
+          body: "旧正文",
+          categoryId: null,
+          tagIds: [],
+          slug: "",
+          status: "DRAFT",
+          password: "",
+          publishAt: null,
+          coverAttachmentId: null,
+          coverUrl: null
+        }
+      })
+    );
+    mock.onPost("/api/admin/articles").reply(200, {
+      code: "00000",
+      msg: "success",
+      data: { id: "101" }
+    });
+    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    await flushPromises();
+    Object.assign((wrapper.vm as any).form, {
+      titleZh: "标题",
+      summaryZh: "摘要",
+      body: "正文"
+    });
+
+    await wrapper.get('[data-testid="article-save"]').trigger("click");
+    await flushPromises();
+
+    expect(localStorage.getItem(articleDraftKey("create"))).toBeNull();
   });
 });

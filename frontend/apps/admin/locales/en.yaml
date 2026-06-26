@@ -188,6 +188,9 @@ articles:
     summaryEn: English summary
     body: Markdown body
     preview: Markdown preview
+    draftFound: Local draft detected
+    draftRestore: Restore draft
+    draftClear: Clear draft
     status: Article status
     slug: Article slug
     category: Category
