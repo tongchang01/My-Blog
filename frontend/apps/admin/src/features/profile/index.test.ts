@@ -15,9 +15,13 @@ const stubs = {
   "el-card": { template: "<div><slot name='header' /><slot /></div>" },
   "el-descriptions": true,
   "el-descriptions-item": true,
+  "el-dialog": { template: "<div><slot /></div>" },
+  "el-empty": true,
   "el-form": true,
   "el-form-item": true,
+  "el-image": true,
   "el-input": true,
+  "el-pagination": true,
   "el-skeleton": true,
   "el-tag": true
 };
@@ -40,6 +44,25 @@ const profile = {
 };
 
 const ok = (data: unknown) => ({ code: "00000", msg: "success", data });
+
+const attachmentPage = {
+  records: [
+    {
+      id: "9007199254743001",
+      publicUrl: "http://localhost/media/avatar.png",
+      contentType: "image/png",
+      fileSize: 1024,
+      width: 400,
+      height: 400,
+      originalFilename: "avatar.png",
+      createdAt: "2026-06-26T12:00:00",
+      createdBy: "1001"
+    }
+  ],
+  total: 1,
+  page: 1,
+  size: 20
+};
 
 function currentUser(type: "ADMIN" | "DEMO") {
   return {
@@ -74,5 +97,29 @@ describe("profile management page", () => {
 
     expect(wrapper.find('[data-testid="profile-save"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="profile-readonly"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="profile-avatar-choose"]').exists()).toBe(false);
+  });
+
+  it("selects an avatar attachment and saves the public URL", async () => {
+    mock.onGet("/api/auth/me").reply(200, ok(currentUser("ADMIN")));
+    mock.onGet("/api/admin/attachments").reply(200, ok(attachmentPage));
+    mock.onPatch("/api/auth/me/profile").reply(config => {
+      expect(JSON.parse(config.data).avatarUrl).toBe(
+        "http://localhost/media/avatar.png"
+      );
+      return [200, ok(profile)];
+    });
+    const wrapper = mount(ProfileManagement, { global: { stubs } });
+    await flushPromises();
+
+    await wrapper.get('[data-testid="profile-avatar-choose"]').trigger("click");
+    await flushPromises();
+    await wrapper
+      .get('[data-testid="attachment-picker-select-9007199254743001"]')
+      .trigger("click");
+    await wrapper.get('[data-testid="profile-save"]').trigger("click");
+    await flushPromises();
+
+    expect(mock.history.patch).toHaveLength(1);
   });
 });

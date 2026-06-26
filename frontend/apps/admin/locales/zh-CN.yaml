@@ -327,6 +327,10 @@ settings:
   updatedAt: "更新时间："
   validation:
     required: 此项为必填项
+  image:
+    choose: 选择附件
+    clear: 清除图片
+    currentUrl: 当前图片地址
   siteConfig:
     basic: 站点基础配置
     about: 关于内容

@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
+import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
+import type { AttachmentItem } from "@/features/attachments/model";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { useProfileManagement } from "./useProfileManagement";
@@ -23,10 +25,19 @@ const {
 } = state;
 
 const readonly = computed(() => !isAdmin.value);
+const avatarPickerOpen = ref(false);
 
 function fieldError(field: keyof typeof form): string {
   const code = formErrors[field];
   return code ? transformI18n(`settings.validation.${code}`) : "";
+}
+
+function selectAvatar(item: AttachmentItem): void {
+  form.avatarUrl = item.publicUrl;
+}
+
+function clearAvatar(): void {
+  form.avatarUrl = "";
 }
 
 onMounted(initialize);
@@ -132,7 +143,34 @@ onMounted(initialize);
             <el-input v-model="form.nickname" :disabled="readonly" />
           </el-form-item>
           <el-form-item :label="transformI18n('settings.profile.avatarUrl')">
-            <el-input v-model="form.avatarUrl" :disabled="readonly" />
+            <div class="image-url-field">
+              <el-input
+                v-model="form.avatarUrl"
+                :disabled="readonly"
+                :placeholder="transformI18n('settings.image.currentUrl')"
+              />
+              <div v-if="form.avatarUrl" class="image-preview image-preview-avatar">
+                <el-avatar :src="form.avatarUrl" :size="64">
+                  {{ form.nickname?.slice(0, 1) || currentUser?.username?.slice(0, 1) }}
+                </el-avatar>
+                <span class="image-url">{{ form.avatarUrl }}</span>
+              </div>
+              <div v-if="isAdmin" class="image-actions">
+                <el-button
+                  data-testid="profile-avatar-choose"
+                  @click="avatarPickerOpen = true"
+                >
+                  {{ transformI18n("settings.image.choose") }}
+                </el-button>
+                <el-button
+                  v-if="form.avatarUrl"
+                  data-testid="profile-avatar-clear"
+                  @click="clearAvatar"
+                >
+                  {{ transformI18n("settings.image.clear") }}
+                </el-button>
+              </div>
+            </div>
           </el-form-item>
           <el-form-item :label="transformI18n('settings.profile.location')">
             <el-input v-model="form.location" :disabled="readonly" />
@@ -173,6 +211,11 @@ onMounted(initialize);
         </el-form>
       </el-card>
     </template>
+
+    <AttachmentPickerDialog
+      v-model="avatarPickerOpen"
+      @select="selectAvatar"
+    />
   </section>
 </template>
 
@@ -207,6 +250,39 @@ onMounted(initialize);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+}
+
+.image-url-field {
+  display: grid;
+  width: 100%;
+  gap: 10px;
+}
+
+.image-preview {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  overflow: hidden;
+  background: var(--el-fill-color-lighter);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+}
+
+.image-url {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.image-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 @media (width <= 900px) {

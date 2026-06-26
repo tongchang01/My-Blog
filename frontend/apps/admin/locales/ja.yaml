@@ -327,6 +327,10 @@ settings:
   updatedAt: "更新日時："
   validation:
     required: 必須項目です
+  image:
+    choose: 添付ファイルを選択
+    clear: 画像をクリア
+    currentUrl: 現在の画像URL
   siteConfig:
     basic: サイト基本設定
     about: About コンテンツ

@@ -327,6 +327,10 @@ settings:
   updatedAt: "Updated at:"
   validation:
     required: This field is required
+  image:
+    choose: Choose attachment
+    clear: Clear image
+    currentUrl: Current image URL
   siteConfig:
     basic: Site basics
     about: About content
