@@ -187,6 +187,7 @@ articles:
     summaryJa: Japanese summary
     summaryEn: English summary
     body: Markdown body
+    preview: Markdown preview
     status: Article status
     slug: Article slug
     category: Category

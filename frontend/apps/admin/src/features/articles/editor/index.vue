@@ -6,6 +6,7 @@ import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialo
 import type { AttachmentItem } from "@/features/attachments/model";
 import type { AdminLocale, ArticleStatus, LocalizedNames } from "../model";
 import { localizedName, statusTranslationKey } from "../presentation";
+import { renderMarkdownPreview } from "./markdownPreview";
 import { useArticleEditor } from "./useArticleEditor";
 
 defineOptions({ name: "ArticleEditor" });
@@ -36,6 +37,7 @@ const pageTitle = computed(() =>
     mode === "edit" ? "articles.editor.editTitle" : "articles.editor.createTitle"
   )
 );
+const previewHtml = computed(() => renderMarkdownPreview(form.body));
 
 function dictionaryName(item: LocalizedNames): string {
   return localizedName(item, locale.value);
@@ -135,13 +137,25 @@ onMounted(() => initialize().catch(() => undefined));
           :label="transformI18n('articles.editor.body')"
           :error="fieldError('body')"
         >
-          <el-input
-            v-model="form.body"
-            data-testid="article-body"
-            type="textarea"
-            :rows="18"
-            resize="vertical"
-          />
+          <div class="markdown-workspace">
+            <el-input
+              v-model="form.body"
+              data-testid="article-body"
+              type="textarea"
+              :rows="18"
+              resize="vertical"
+            />
+            <div class="markdown-preview-card">
+              <div class="markdown-preview-heading">
+                {{ transformI18n("articles.editor.preview") }}
+              </div>
+              <div
+                data-testid="article-markdown-preview"
+                class="markdown-preview"
+                v-html="previewHtml"
+              />
+            </div>
+          </div>
         </el-form-item>
       </el-card>
 
@@ -363,9 +377,71 @@ onMounted(() => initialize().catch(() => undefined));
   flex-wrap: wrap;
 }
 
+.markdown-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.8fr);
+  gap: 14px;
+  width: 100%;
+}
+
+.markdown-preview-card {
+  min-height: 100%;
+  overflow: hidden;
+  background: var(--el-bg-color);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+}
+
+.markdown-preview-heading {
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--el-text-color-secondary);
+  border-bottom: 1px solid var(--el-border-color-lighter);
+}
+
+.markdown-preview {
+  min-height: 330px;
+  padding: 12px;
+  overflow: auto;
+  color: var(--el-text-color-primary);
+
+  :deep(h1),
+  :deep(h2),
+  :deep(h3) {
+    margin: 0 0 12px;
+  }
+
+  :deep(p),
+  :deep(ul),
+  :deep(pre) {
+    margin: 0 0 12px;
+  }
+
+  :deep(code) {
+    padding: 2px 4px;
+    font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+    background: var(--el-fill-color-light);
+    border-radius: 4px;
+  }
+
+  :deep(pre) {
+    padding: 10px;
+    overflow: auto;
+    background: var(--el-fill-color-light);
+    border-radius: 6px;
+  }
+
+  :deep(pre code) {
+    padding: 0;
+    background: transparent;
+  }
+}
+
 @media (width <= 1000px) {
   .editor-grid,
-  .language-grid {
+  .language-grid,
+  .markdown-workspace {
     grid-template-columns: 1fr;
   }
 }

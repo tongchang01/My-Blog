@@ -192,4 +192,20 @@ describe("article editor page", () => {
 
     expect(mock.history.post).toHaveLength(1);
   });
+
+  it("renders a safe markdown preview for the body", async () => {
+    dictionaries();
+    const wrapper = mount(ArticleEditor, { global: { stubs } });
+    await flushPromises();
+
+    Object.assign((wrapper.vm as any).form, {
+      body: "# 标题\n\n<script>alert(1)</script>"
+    });
+    await nextTick();
+
+    const preview = wrapper.get('[data-testid="article-markdown-preview"]');
+    expect(preview.html()).toContain("<h1>标题</h1>");
+    expect(preview.html()).not.toContain("<script>");
+    expect(preview.text()).toContain("<script>alert(1)</script>");
+  });
 });

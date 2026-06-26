@@ -187,6 +187,7 @@ articles:
     summaryJa: 日文摘要
     summaryEn: 英文摘要
     body: Markdown 正文
+    preview: Markdown 预览
     status: 文章状态
     slug: 文章路径
     category: 分类

@@ -187,6 +187,7 @@ articles:
     summaryJa: 日本語概要
     summaryEn: 英語概要
     body: Markdown本文
+    preview: Markdownプレビュー
     status: 記事ステータス
     slug: 記事スラッグ
     category: カテゴリ
