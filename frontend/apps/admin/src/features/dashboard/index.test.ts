@@ -29,6 +29,16 @@ const statsDashboard = {
   languageDistribution: [{ language: "zh", pv: 800, ratio: 0.648 }]
 };
 
+const emptyStatsDashboard = {
+  periodPv: 0,
+  todayPv: 0,
+  todayUv: 0,
+  averageDailyUv: 0,
+  trend: [],
+  topArticles: [],
+  languageDistribution: []
+};
+
 const stubs = {
   "el-alert": true,
   "el-button": { template: "<button><slot /></button>" },
@@ -111,5 +121,40 @@ describe("admin dashboard", () => {
       "800"
     );
     expect(mock.history.get[0].params).toEqual({ from: undefined, to: undefined });
+  });
+
+  it("shows an empty state when stats are all empty", async () => {
+    setUser("ADMIN");
+    mock.onGet("/api/admin/stats/dashboard").reply(200, ok(emptyStatsDashboard));
+
+    const wrapper = mount(Dashboard, { global: { stubs } });
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="dashboard-empty"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="dashboard-metric-period-pv"]').exists()).toBe(
+      false
+    );
+  });
+
+  it("shows a load error and retries stats dashboard loading", async () => {
+    setUser("ADMIN");
+    mock
+      .onGet("/api/admin/stats/dashboard")
+      .replyOnce(500)
+      .onGet("/api/admin/stats/dashboard")
+      .reply(200, ok(statsDashboard));
+
+    const wrapper = mount(Dashboard, { global: { stubs } });
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="dashboard-error"]').exists()).toBe(true);
+    await wrapper.get('[data-testid="dashboard-retry"]').trigger("click");
+    await flushPromises();
+
+    expect(wrapper.find('[data-testid="dashboard-error"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="dashboard-metric-period-pv"]').exists()).toBe(
+      true
+    );
+    expect(mock.history.get).toHaveLength(2);
   });
 });

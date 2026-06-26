@@ -1,6 +1,6 @@
 # MyBlog Admin
 
-MyBlog V2 后台管理端位于 `frontend/apps/admin/`。当前已完成可运行的后台基础闭环，以及文章、分类、标签、评论和友链管理闭环。
+MyBlog V2 后台管理端位于 `frontend/apps/admin/`。当前已完成可运行的后台基础闭环，以及文章、分类、标签、评论、友链和真实统计仪表盘管理闭环。
 
 ## 技术基线
 
@@ -19,7 +19,7 @@ src/api/                 API 契约和认证请求
 src/features/auth/       会话模型、存储和认证编排
 src/features/articles/   文章列表、编辑表单、请求状态和写入页面
 src/features/friend-links/ 友链列表、表单、排序和状态管理
-src/features/dashboard/  当前空仪表盘
+src/features/dashboard/  后台真实统计仪表盘
 src/features/i18n/       系统语言映射和语言持久化
 src/router/              静态路由和权限守卫
 src/store/               Pinia 状态
@@ -54,7 +54,7 @@ corepack pnpm build
 - refresh 失败会原子清理 token 和当前用户。
 - logout 调用服务端全端退出；即使接口失败，本地会话也会在 `finally` 中清理。
 - 路由由前端静态维护。ADMIN 可进入管理写操作页；DEMO 只读。后端授权仍是最终安全边界。
-- 当前仪表盘只显示真实当前用户和连接状态，不展示伪造统计数字。
+- 当前仪表盘复用 `/api/admin/stats/dashboard` 展示真实访问统计，不展示伪造统计数字。
 
 ## 阶段验收（2026-06-20）
 
@@ -130,4 +130,4 @@ corepack pnpm build
 
 ## 后续边界
 
-下一阶段可继续完善真实统计仪表盘，以及 Markdown 编辑器与预览、自动保存和离开页面确认。
+下一阶段可继续完善 Markdown 编辑器与预览、自动保存和离开页面确认。
