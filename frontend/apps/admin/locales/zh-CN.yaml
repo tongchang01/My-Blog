@@ -100,6 +100,20 @@ dashboard:
   role: 角色
   backendStatus: 后端连接
   connected: 已连接
+  loadError: 统计数据加载失败，请重试
+  empty: 暂无统计数据
+  trend: 访问趋势
+  topArticles: TOP 文章
+  languageDistribution: 语言分布
+  metrics:
+    periodPv: 区间 PV
+    todayPv: 今日 PV
+    todayUv: 今日 UV
+    averageDailyUv: 平均日 UV
+  languages:
+    zh: 中文
+    ja: 日文
+    en: 英文
 articles:
   filter:
     eyebrow: Query Workspace

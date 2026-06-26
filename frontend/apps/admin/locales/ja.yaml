@@ -100,6 +100,20 @@ dashboard:
   role: ロール
   backendStatus: バックエンド接続
   connected: 接続済み
+  loadError: 統計データの読み込みに失敗しました。再試行してください
+  empty: 統計データはまだありません
+  trend: アクセス推移
+  topArticles: 上位記事
+  languageDistribution: 言語分布
+  metrics:
+    periodPv: 期間 PV
+    todayPv: 今日の PV
+    todayUv: 今日の UV
+    averageDailyUv: 平均日次 UV
+  languages:
+    zh: 中国語
+    ja: 日本語
+    en: 英語
 articles:
   filter:
     eyebrow: Query Workspace

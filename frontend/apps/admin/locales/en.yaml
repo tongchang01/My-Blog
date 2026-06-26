@@ -100,6 +100,20 @@ dashboard:
   role: Role
   backendStatus: Backend connection
   connected: Connected
+  loadError: Failed to load stats. Please retry.
+  empty: No stats data yet
+  trend: Traffic trend
+  topArticles: Top articles
+  languageDistribution: Language distribution
+  metrics:
+    periodPv: Period PV
+    todayPv: Today PV
+    todayUv: Today UV
+    averageDailyUv: Average daily UV
+  languages:
+    zh: Chinese
+    ja: Japanese
+    en: English
 articles:
   filter:
     eyebrow: Query Workspace
