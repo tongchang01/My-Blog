@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
+import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
+import type { AttachmentItem } from "@/features/attachments/model";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { formatJstDateTime } from "@/features/articles/presentation";
 import { useSiteConfigManagement } from "./useSiteConfigManagement";
 
 defineOptions({ name: "SiteConfigManagement" });
+
+type ImageField = "logoUrl" | "faviconUrl";
 
 const userStore = useUserStoreHook();
 const isAdmin = computed(() => userStore.isAdmin);
@@ -24,10 +28,26 @@ const {
 } = state;
 
 const readonly = computed(() => !isAdmin.value);
+const imagePickerOpen = ref(false);
+const imagePickerTarget = ref<ImageField | null>(null);
 
 function fieldError(field: keyof typeof form): string {
   const code = formErrors[field];
   return code ? transformI18n(`settings.validation.${code}`) : "";
+}
+
+function openImagePicker(field: ImageField): void {
+  imagePickerTarget.value = field;
+  imagePickerOpen.value = true;
+}
+
+function selectImage(item: AttachmentItem): void {
+  if (!imagePickerTarget.value) return;
+  form[imagePickerTarget.value] = item.publicUrl;
+}
+
+function clearImage(field: ImageField): void {
+  form[field] = "";
 }
 
 onMounted(initialize);
@@ -129,10 +149,68 @@ onMounted(initialize);
             <el-input v-model="form.siteSubtitleEn" :disabled="readonly" />
           </el-form-item>
           <el-form-item :label="transformI18n('settings.siteConfig.logoUrl')">
-            <el-input v-model="form.logoUrl" :disabled="readonly" />
+            <div class="image-url-field">
+              <el-input
+                v-model="form.logoUrl"
+                :disabled="readonly"
+                :placeholder="transformI18n('settings.image.currentUrl')"
+              />
+              <div v-if="form.logoUrl" class="image-preview">
+                <el-image
+                  class="site-image-preview"
+                  :src="form.logoUrl"
+                  fit="contain"
+                />
+                <span class="image-url">{{ form.logoUrl }}</span>
+              </div>
+              <div v-if="isAdmin" class="image-actions">
+                <el-button
+                  data-testid="site-config-logo-choose"
+                  @click="openImagePicker('logoUrl')"
+                >
+                  {{ transformI18n("settings.image.choose") }}
+                </el-button>
+                <el-button
+                  v-if="form.logoUrl"
+                  data-testid="site-config-logo-clear"
+                  @click="clearImage('logoUrl')"
+                >
+                  {{ transformI18n("settings.image.clear") }}
+                </el-button>
+              </div>
+            </div>
           </el-form-item>
           <el-form-item :label="transformI18n('settings.siteConfig.faviconUrl')">
-            <el-input v-model="form.faviconUrl" :disabled="readonly" />
+            <div class="image-url-field">
+              <el-input
+                v-model="form.faviconUrl"
+                :disabled="readonly"
+                :placeholder="transformI18n('settings.image.currentUrl')"
+              />
+              <div v-if="form.faviconUrl" class="image-preview">
+                <el-image
+                  class="favicon-image-preview"
+                  :src="form.faviconUrl"
+                  fit="contain"
+                />
+                <span class="image-url">{{ form.faviconUrl }}</span>
+              </div>
+              <div v-if="isAdmin" class="image-actions">
+                <el-button
+                  data-testid="site-config-favicon-choose"
+                  @click="openImagePicker('faviconUrl')"
+                >
+                  {{ transformI18n("settings.image.choose") }}
+                </el-button>
+                <el-button
+                  v-if="form.faviconUrl"
+                  data-testid="site-config-favicon-clear"
+                  @click="clearImage('faviconUrl')"
+                >
+                  {{ transformI18n("settings.image.clear") }}
+                </el-button>
+              </div>
+            </div>
           </el-form-item>
           <el-form-item :label="transformI18n('settings.siteConfig.icpNo')">
             <el-input v-model="form.icpNo" :disabled="readonly" />
@@ -164,6 +242,11 @@ onMounted(initialize);
         </el-form>
       </el-card>
     </template>
+
+    <AttachmentPickerDialog
+      v-model="imagePickerOpen"
+      @select="selectImage"
+    />
   </section>
 </template>
 
@@ -202,6 +285,53 @@ onMounted(initialize);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+}
+
+.image-url-field {
+  display: grid;
+  width: 100%;
+  gap: 10px;
+}
+
+.image-preview {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  overflow: hidden;
+  background: var(--el-fill-color-lighter);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+}
+
+.site-image-preview {
+  width: 96px;
+  height: 48px;
+  background: var(--el-bg-color);
+  border-radius: 6px;
+}
+
+.favicon-image-preview {
+  width: 48px;
+  height: 48px;
+  background: var(--el-bg-color);
+  border-radius: 6px;
+}
+
+.image-url {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.image-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 @media (width <= 900px) {
