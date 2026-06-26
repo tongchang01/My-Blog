@@ -1,4 +1,4 @@
-import { cdn } from "./cdn";
+import { createCdnPlugin } from "./cdn";
 import vue from "@vitejs/plugin-vue";
 import { pathResolve } from "./utils";
 import { viteBuildInfo } from "./info";
@@ -51,7 +51,7 @@ export function getPluginsList(
       compiler: "vue3",
       scale: 1
     }),
-    VITE_CDN ? cdn : null,
+    VITE_CDN ? createCdnPlugin() : null,
     configCompressPlugin(VITE_COMPRESSION),
     // 线上环境删除console
     removeConsole({ external: ["src/assets/iconfont/iconfont.js"] }),
