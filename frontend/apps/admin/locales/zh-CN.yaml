@@ -287,6 +287,7 @@ comments:
     no: 正常
   actions:
     confirmTitle: 评论操作确认
+    reply: 回复
     approve: 通过
     hide: 隐藏
     approveConfirm: 确认通过这条评论吗
@@ -296,6 +297,12 @@ comments:
   errors:
     load: 评论列表加载失败，请重试
     operation: 评论操作失败，请重试
+  reply:
+    title: 回复评论
+    target: 回复对象
+    replyTo: 回复
+    placeholder: 输入站长回复内容，支持 Markdown
+    submit: 发布回复
   empty: 没有符合条件的评论
 friendLinks:
   filter:

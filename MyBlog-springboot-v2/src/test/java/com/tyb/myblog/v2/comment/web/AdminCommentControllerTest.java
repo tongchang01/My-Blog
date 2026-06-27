@@ -1,6 +1,8 @@
 package com.tyb.myblog.v2.comment.web;
 
 import com.tyb.myblog.v2.comment.application.AdminCommentCommandService;
+import com.tyb.myblog.v2.comment.application.AdminCommentReplyCommand;
+import com.tyb.myblog.v2.comment.application.AdminCommentReplyResult;
 import com.tyb.myblog.v2.comment.application.AdminCommentPageResult;
 import com.tyb.myblog.v2.comment.application.AdminCommentQueryService;
 import com.tyb.myblog.v2.comment.domain.CommentAuditStatus;
@@ -14,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -97,6 +100,26 @@ class AdminCommentControllerTest {
         verify(commandService).hide(principal, 10L);
         verify(commandService).restore(principal, 10L);
         verify(commandService).delete(principal, 10L);
+    }
+
+    @Test
+    void delegatesReplyCommand() throws Exception {
+        when(commandService.reply(eq(principal), eq(10L), any()))
+                .thenReturn(new AdminCommentReplyResult(
+                        9007199254740997L,
+                        CommentAuditStatus.PASS));
+
+        mockMvc.perform(post("/api/admin/comments/10/reply")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"contentMd\":\"谢谢反馈\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id").value("9007199254740997"))
+                .andExpect(jsonPath("$.data.auditStatus").value("PASS"));
+
+        verify(commandService).reply(
+                eq(principal),
+                eq(10L),
+                any(AdminCommentReplyCommand.class));
     }
 
     private static AdminCommentPageResult.Item item() {

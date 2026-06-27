@@ -2,13 +2,16 @@ package com.tyb.myblog.v2.comment.application;
 
 import com.tyb.myblog.v2.comment.domain.Comment;
 import com.tyb.myblog.v2.comment.domain.CommentAuditStatus;
+import com.tyb.myblog.v2.comment.domain.CommentMarkdownRenderer;
 import com.tyb.myblog.v2.comment.domain.CommentRepository;
 import com.tyb.myblog.v2.comment.domain.CommentTargetType;
+import com.tyb.myblog.v2.comment.domain.NewComment;
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentCountService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +25,8 @@ public class AdminCommentCommandService {
     private final CommentRepository repository;
     private final ArticleCommentCountService articleCommentCountService;
     private final CommentAuthorization authorization;
+    private final CommentMarkdownRenderer markdownRenderer;
+    private final ApplicationEventPublisher eventPublisher;
     private final Clock clock;
 
     @Transactional
@@ -69,6 +74,50 @@ public class AdminCommentCommandService {
         if (isPublicArticleComment(comment)) {
             articleCommentCountService.increment(comment.target().targetId(), 1);
         }
+    }
+
+    @Transactional
+    public AdminCommentReplyResult reply(
+            AuthenticatedPrincipal principal,
+            long replyToCommentId,
+            AdminCommentReplyCommand command) {
+        long operatorId = authorization.requireAdmin(principal);
+        Comment replyTo = requireActive(replyToCommentId);
+        if (!replyTo.auditStatus().publiclyVisible()) {
+            throw new ApiException(ApiErrorCode.CONFLICT, "不能回复该评论");
+        }
+        long parentId = replyTo.parentId() == null
+                ? replyTo.id()
+                : replyTo.parentId();
+        Comment inserted = repository.insert(NewComment.create(
+                replyTo.target(),
+                parentId,
+                replyTo.id(),
+                replyTo.author().userId(),
+                replyTo.author().nickname(),
+                operatorId,
+                "站长",
+                "admin@myblog.local",
+                null,
+                null,
+                null,
+                command.contentMd(),
+                markdownRenderer.render(command.contentMd()),
+                CommentAuditStatus.PASS,
+                LocalDateTime.now(clock),
+                operatorId));
+        if (inserted.target().targetType() == CommentTargetType.ARTICLE) {
+            articleCommentCountService.increment(inserted.target().targetId(), 1);
+        }
+        eventPublisher.publishEvent(new CommentNotificationEvent(
+                inserted.id(),
+                replyTo.id(),
+                inserted.author().nickname(),
+                inserted.content().safeHtml(),
+                inserted.auditStatus()));
+        return new AdminCommentReplyResult(
+                inserted.id(),
+                inserted.auditStatus());
     }
 
     private void updateStatus(

@@ -4,6 +4,7 @@ import com.tyb.myblog.v2.comment.application.AdminCommentCommandService;
 import com.tyb.myblog.v2.comment.application.AdminCommentPageQuery;
 import com.tyb.myblog.v2.comment.application.AdminCommentPageResult;
 import com.tyb.myblog.v2.comment.application.AdminCommentQueryService;
+import com.tyb.myblog.v2.comment.application.AdminCommentReplyCommand;
 import com.tyb.myblog.v2.comment.domain.CommentAuditStatus;
 import com.tyb.myblog.v2.comment.domain.CommentTargetType;
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
@@ -11,11 +12,13 @@ import com.tyb.myblog.v2.common.auth.CurrentUser;
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.common.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -83,6 +86,19 @@ public class AdminCommentController {
             @PathVariable long id) {
         commandService.restore(principal, id);
         return ApiResponse.ok(null);
+    }
+
+    @Operation(summary = "后台回复评论")
+    @PostMapping("/{id:\\d+}/reply")
+    public ApiResponse<AdminCommentReplyVO> reply(
+            @CurrentUser AuthenticatedPrincipal principal,
+            @PathVariable long id,
+            @Valid @RequestBody AdminCommentReplyRequest request) {
+        return ApiResponse.ok(AdminCommentReplyVO.from(
+                commandService.reply(
+                        principal,
+                        id,
+                        new AdminCommentReplyCommand(request.contentMd()))));
     }
 
     @Operation(summary = "删除评论")

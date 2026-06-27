@@ -1,7 +1,8 @@
 import type { ApiResponse } from "./contract";
 import type {
   CommentListFilters,
-  CommentPageResponse
+  CommentPageResponse,
+  CommentReplyResponse
 } from "@/features/comments/model";
 import { buildCommentListParams } from "@/features/comments/query";
 import { http } from "@/utils/http";
@@ -19,6 +20,12 @@ export const hideComment = (id: string) =>
 
 export const restoreComment = (id: string) =>
   http.post<ApiResponse<null>>(`/api/admin/comments/${id}/restore`);
+
+export const replyComment = (id: string, contentMd: string) =>
+  http.post<ApiResponse<CommentReplyResponse>>(
+    `/api/admin/comments/${id}/reply`,
+    { data: { contentMd } }
+  );
 
 export const deleteComment = (id: string) =>
   http.request<ApiResponse<null>>("delete", `/api/admin/comments/${id}`);

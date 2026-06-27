@@ -287,6 +287,7 @@ comments:
     no: Active
   actions:
     confirmTitle: Confirm comment operation
+    reply: Reply
     approve: Approve
     hide: Hide
     approveConfirm: Approve this comment?
@@ -296,6 +297,12 @@ comments:
   errors:
     load: Unable to load comments. Please retry
     operation: Comment operation failed. Please retry
+  reply:
+    title: Reply to comment
+    target: Reply target
+    replyTo: Reply to
+    placeholder: Enter the owner reply. Markdown is supported.
+    submit: Publish reply
   empty: No comments match the current filters
 friendLinks:
   filter:

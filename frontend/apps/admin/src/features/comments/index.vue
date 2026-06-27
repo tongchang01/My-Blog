@@ -20,11 +20,18 @@ const {
   error,
   operationError,
   operatingId,
+  replyDialogVisible,
+  replyTarget,
+  replyContent,
+  replySubmitting,
   initialize,
   search,
   reset,
   refresh,
-  changePage
+  changePage,
+  openReplyDialog,
+  closeReplyDialog,
+  submitReply
 } = state;
 
 const auditStatuses: Array<CommentAuditStatus | "ALL"> = [
@@ -64,6 +71,16 @@ function canApprove(item: CommentListItem): boolean {
 
 function canHide(item: CommentListItem): boolean {
   return !item.deleted && item.auditStatus !== "HIDDEN";
+}
+
+function canReply(item: CommentListItem): boolean {
+  return isAdmin.value && !item.deleted && item.auditStatus === "PASS";
+}
+
+function handleReplyDialogBeforeClose(done: () => void): void {
+  if (replySubmitting.value) return;
+  closeReplyDialog();
+  done();
 }
 
 async function confirmAction(
@@ -231,6 +248,10 @@ onMounted(initialize);
               <template #default="{ row }">
                 <div class="comment-content-cell">
                   <strong>{{ commentSummary(row) }}</strong>
+                  <span v-if="row.replyToNickname" class="reply-meta">
+                    {{ transformI18n("comments.reply.replyTo") }}
+                    @{{ row.replyToNickname }}
+                  </span>
                   <span>#{{ row.id }}</span>
                 </div>
               </template>
@@ -291,9 +312,19 @@ onMounted(initialize);
               data-testid="comment-operation-column"
               :label="transformI18n('articles.columns.operations')"
               fixed="right"
-              width="230"
+              width="280"
             >
               <template #default="{ row }">
+                <el-button
+                  v-if="canReply(row)"
+                  :data-testid="`comment-reply-${row.id}`"
+                  link
+                  type="primary"
+                  :disabled="operatingId !== null"
+                  @click="openReplyDialog(row)"
+                >
+                  {{ transformI18n("comments.actions.reply") }}
+                </el-button>
                 <el-button
                   v-if="canApprove(row)"
                   :data-testid="`comment-approve-${row.id}`"
@@ -362,6 +393,41 @@ onMounted(initialize);
         />
       </template>
     </el-card>
+
+    <el-dialog
+      v-model="replyDialogVisible"
+      data-testid="comment-reply-dialog"
+      :title="transformI18n('comments.reply.title')"
+      width="520px"
+      :before-close="handleReplyDialogBeforeClose"
+    >
+      <p v-if="replyTarget" class="reply-target">
+        {{ transformI18n("comments.reply.target") }}：{{
+          replyTarget.authorNickname
+        }}
+      </p>
+      <el-input
+        v-model="replyContent"
+        data-testid="comment-reply-content"
+        type="textarea"
+        :rows="5"
+        :placeholder="transformI18n('comments.reply.placeholder')"
+      />
+      <template #footer>
+        <el-button @click="closeReplyDialog">
+          {{ transformI18n("articles.actions.cancel") }}
+        </el-button>
+        <el-button
+          data-testid="comment-reply-submit"
+          type="primary"
+          :loading="replySubmitting"
+          :disabled="!replyContent.trim()"
+          @click="submitReply"
+        >
+          {{ transformI18n("comments.reply.submit") }}
+        </el-button>
+      </template>
+    </el-dialog>
   </section>
 </template>
 
@@ -429,6 +495,15 @@ onMounted(initialize);
     color: var(--el-text-color-secondary);
     white-space: nowrap;
   }
+}
+
+.reply-meta {
+  color: var(--el-color-primary);
+}
+
+.reply-target {
+  margin: 0 0 12px;
+  color: var(--el-text-color-secondary);
 }
 
 .comment-pagination {

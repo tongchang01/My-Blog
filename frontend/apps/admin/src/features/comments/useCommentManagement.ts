@@ -5,12 +5,14 @@ import {
   deleteComment,
   hideComment,
   listComments,
+  replyComment,
   restoreComment
 } from "@/api/comment";
 import type {
   CommentListFilters,
   CommentListItem,
-  CommentPageResponse
+  CommentPageResponse,
+  CommentReplyResponse
 } from "./model";
 
 export interface CommentManagementApi {
@@ -21,6 +23,10 @@ export interface CommentManagementApi {
   hideComment(id: string): Promise<ApiResponse<null>>;
   deleteComment(id: string): Promise<ApiResponse<null>>;
   restoreComment(id: string): Promise<ApiResponse<null>>;
+  replyComment(
+    id: string,
+    contentMd: string
+  ): Promise<ApiResponse<CommentReplyResponse>>;
 }
 
 const defaultApi: CommentManagementApi = {
@@ -28,7 +34,8 @@ const defaultApi: CommentManagementApi = {
   approveComment,
   hideComment,
   deleteComment,
-  restoreComment
+  restoreComment,
+  replyComment
 };
 
 const DEFAULT_FILTERS: CommentListFilters = {
@@ -53,6 +60,10 @@ export function useCommentManagement(api: CommentManagementApi = defaultApi) {
   const error = ref<Error | null>(null);
   const operationError = ref<Error | null>(null);
   const operatingId = ref<string | null>(null);
+  const replyDialogVisible = ref(false);
+  const replyTarget = ref<CommentListItem | null>(null);
+  const replyContent = ref("");
+  const replySubmitting = ref(false);
   let requestVersion = 0;
 
   async function loadComments(): Promise<void> {
@@ -128,6 +139,44 @@ export function useCommentManagement(api: CommentManagementApi = defaultApi) {
     }
   }
 
+  function openReplyDialog(item: CommentListItem): void {
+    operationError.value = null;
+    replyTarget.value = item;
+    replyContent.value = "";
+    replyDialogVisible.value = true;
+  }
+
+  function closeReplyDialog(): void {
+    if (replySubmitting.value) return;
+    replyDialogVisible.value = false;
+    replyTarget.value = null;
+    replyContent.value = "";
+  }
+
+  async function submitReply(): Promise<boolean> {
+    if (!replyTarget.value || !replyContent.value.trim()) {
+      return false;
+    }
+    operationError.value = null;
+    replySubmitting.value = true;
+    try {
+      await api.replyComment(
+        replyTarget.value.id,
+        replyContent.value.trim()
+      );
+      replyDialogVisible.value = false;
+      replyTarget.value = null;
+      replyContent.value = "";
+      await refreshAfterOperation();
+      return true;
+    } catch (reason) {
+      operationError.value = asError(reason);
+      return false;
+    } finally {
+      replySubmitting.value = false;
+    }
+  }
+
   return {
     filters,
     items,
@@ -136,6 +185,10 @@ export function useCommentManagement(api: CommentManagementApi = defaultApi) {
     error,
     operationError,
     operatingId,
+    replyDialogVisible,
+    replyTarget,
+    replyContent,
+    replySubmitting,
     initialize,
     search,
     reset,
@@ -144,6 +197,9 @@ export function useCommentManagement(api: CommentManagementApi = defaultApi) {
     approve: (id: string) => runOperation(id, api.approveComment),
     hide: (id: string) => runOperation(id, api.hideComment),
     remove: (id: string) => runOperation(id, api.deleteComment),
-    restore: (id: string) => runOperation(id, api.restoreComment)
+    restore: (id: string) => runOperation(id, api.restoreComment),
+    openReplyDialog,
+    closeReplyDialog,
+    submitReply
   };
 }
