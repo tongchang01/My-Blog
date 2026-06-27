@@ -45,3 +45,8 @@ export interface CommentListItem {
 }
 
 export type CommentPageResponse = PageResponse<CommentListItem>;
+
+export interface CommentReplyResponse {
+  id: string;
+  auditStatus: CommentAuditStatus;
+}

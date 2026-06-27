@@ -1,6 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ApiResponse } from "@/api/contract";
-import type { CommentListItem, CommentPageResponse } from "./model";
+import type {
+  CommentListItem,
+  CommentPageResponse,
+  CommentReplyResponse
+} from "./model";
 import {
   useCommentManagement,
   type CommentManagementApi
@@ -49,6 +53,12 @@ function api(
     hideComment: vi.fn().mockResolvedValue(ok(null)),
     deleteComment: vi.fn().mockResolvedValue(ok(null)),
     restoreComment: vi.fn().mockResolvedValue(ok(null)),
+    replyComment: vi.fn().mockResolvedValue(
+      ok<CommentReplyResponse>({
+        id: "reply-1",
+        auditStatus: "PASS"
+      })
+    ),
     ...overrides
   };
 }
@@ -158,6 +168,70 @@ describe("comment management state", () => {
     expect(state.items.value[0].id).toBe("1");
     expect(state.operationError.value?.message).toBe("hide failed");
     expect(source.listComments).toHaveBeenCalledOnce();
+  });
+
+  it("opens and closes the reply dialog with a clean draft", async () => {
+    const source = api();
+    const state = useCommentManagement(source);
+    const target = comment("1");
+    state.replyContent.value = "old draft";
+
+    state.openReplyDialog(target);
+
+    expect(state.replyDialogVisible.value).toBe(true);
+    expect(state.replyTarget.value).toEqual(target);
+    expect(state.replyContent.value).toBe("");
+
+    state.closeReplyDialog();
+
+    expect(state.replyDialogVisible.value).toBe(false);
+    expect(state.replyTarget.value).toBeNull();
+    expect(state.replyContent.value).toBe("");
+  });
+
+  it("submits a trimmed reply and refreshes comments", async () => {
+    const source = api();
+    const state = useCommentManagement(source);
+    await state.initialize();
+    state.openReplyDialog(comment("1"));
+    state.replyContent.value = "  谢谢反馈  ";
+
+    await expect(state.submitReply()).resolves.toBe(true);
+
+    expect(source.replyComment).toHaveBeenCalledWith("1", "谢谢反馈");
+    expect(source.listComments).toHaveBeenCalledTimes(2);
+    expect(state.replyDialogVisible.value).toBe(false);
+    expect(state.replyTarget.value).toBeNull();
+    expect(state.replyContent.value).toBe("");
+    expect(state.replySubmitting.value).toBe(false);
+  });
+
+  it("does not submit an empty reply", async () => {
+    const source = api();
+    const state = useCommentManagement(source);
+    state.openReplyDialog(comment("1"));
+    state.replyContent.value = "   ";
+
+    await expect(state.submitReply()).resolves.toBe(false);
+
+    expect(source.replyComment).not.toHaveBeenCalled();
+    expect(state.replyDialogVisible.value).toBe(true);
+  });
+
+  it("keeps the reply dialog open when submit fails", async () => {
+    const source = api({
+      replyComment: vi.fn().mockRejectedValue(new Error("reply failed"))
+    });
+    const state = useCommentManagement(source);
+    state.openReplyDialog(comment("1"));
+    state.replyContent.value = "谢谢反馈";
+
+    await expect(state.submitReply()).resolves.toBe(false);
+
+    expect(state.replyDialogVisible.value).toBe(true);
+    expect(state.replyTarget.value?.id).toBe("1");
+    expect(state.operationError.value?.message).toBe("reply failed");
+    expect(state.replySubmitting.value).toBe(false);
   });
 
   it("exposes list request failure for retry", async () => {
