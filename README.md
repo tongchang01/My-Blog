@@ -1,71 +1,78 @@
-# MyBlog
+# MyBlog V2
 
-语言版本：
+MyBlog V2 是当前仓库的主线工程，包含三个日常开发与启动入口：
 
-- [中文](./README.zh-CN.md)
-- [English](./README.en.md)
-- [日本語](./README.ja.md)
+| 工程 | 路径 | 说明 |
+| --- | --- | --- |
+| 后端 | `MyBlog-springboot-v2` | Spring Boot 3 / Java 17 后端服务 |
+| 博客前台 | `frontend/apps/blog` | 面向访客的博客前台 |
+| 管理后台 | `frontend/apps/admin` | 面向站长的后台管理端 |
 
-## 项目简介
+旧版 V1 代码仍保留在仓库历史和旧目录中，用于回溯、对照和数据迁移参考；新开发默认不再从 V1 目录启动。
 
-MyBlog 是一个包含前台博客、后台管理端和 Spring Boot 后端服务的完整博客系统。
+## 本地启动
 
-当前仓库包含三个工程：
+推荐先阅读：
 
-- `MyBlog-vue/MyBlog-blog`：博客前台
-- `MyBlog-vue/MyBlog-admin`：后台管理端
-- `MyBlog-springboot`：后端服务
+- [本地开发与三端启动指南](./docs/local-development.md)
+- [仓库分支治理策略](./docs/repository-governance/branch-policy.md)
+- [仓库整理计划](./docs/repository-governance/2026-06-26-repository-reorganization-plan.md)
 
-## 当前技术栈
+最小启动顺序：
 
-### 前台 `MyBlog-blog`
+```powershell
+# 1. 后端
+cd MyBlog-springboot-v2
+mvn spring-boot:run -Dspring-boot.run.profiles=local
 
-- Vue 3
-- TypeScript
-- Pinia
-- Vue Router 4
-- Element Plus
-- Tailwind CSS
+# 2. 博客前台
+cd frontend/apps/blog
+corepack pnpm install --frozen-lockfile
+corepack pnpm dev
 
-### 后台 `MyBlog-admin`
+# 3. 管理后台
+cd frontend/apps/admin
+corepack pnpm install --frozen-lockfile
+corepack pnpm dev
+```
 
-- Vue 2
-- Vuex
-- Vue Router 3
-- Element UI
-- mavon-editor
-- ECharts
+默认地址：
 
-### 后端 `MyBlog-springboot`
+- 后端：`http://localhost:8080`
+- 博客前台：`http://localhost:5173`
+- 管理后台：`http://localhost:5174`
 
-- Java 8
-- Spring Boot 2.3.7
-- Spring Security
-- MyBatis-Plus
-- MySQL / Redis / RabbitMQ / Quartz
+## 本地环境变量
 
-## 当前项目现状
+后端本地运行需要提供数据库账号和密钥。示例见：
 
-项目已经具备完整的博客、评论、说说、相册、友链、权限、定时任务和网站配置能力，但三端都存在不同程度的技术债：
+- [`MyBlog-springboot-v2/.env.example`](./MyBlog-springboot-v2/.env.example)
 
-- 前台已经升级到 Vue 3，但仍有较多重复逻辑、类型边界薄弱、事件耦合较重的问题
-- 后台仍停留在 Vue 2 + Vuex + Element UI 体系，后续维护和升级成本会继续上升
-- 后端基于 Spring Boot 2.3.7 和 Java 8，功能完整，但依赖版本、模块边界和测试体系仍有较大的优化空间
+真实密码和密钥只放在本机环境变量或 IDE 运行配置中，不提交到仓库。
 
-## 文档导航
+## 验证命令
 
-- [中文完整说明](./README.zh-CN.md)
-- [项目重构执行计划（中文）](./docs/refactor-plan.zh-CN.md)
-- [项目展示文章（中文）](./docs/MyBlog-项目展示.md)
+```powershell
+cd MyBlog-springboot-v2
+mvn test
 
-## 下一阶段方向
+cd frontend/apps/blog
+corepack pnpm install --frozen-lockfile
+corepack pnpm run build
 
-- 梳理三端现状与重构优先级
-- 优先修复高频维护痛点，而不是一次性大迁移
-- 前台逐步收敛类型、接口层和公共逻辑
-- 后台以 Vue 3 化为长期目标，但不建议只为“语法糖”单独迁移
-- 后端逐步补齐架构边界、配置治理和测试能力
+cd frontend/apps/admin
+corepack pnpm install --frozen-lockfile
+corepack pnpm test
+corepack pnpm run typecheck
+corepack pnpm run build
+```
 
-详细方案见：
+## 分支约定
 
-- [项目重构执行计划（中文）](./docs/refactor-plan.zh-CN.md)
+整理后的长期目标：
+
+- `main`：V2 默认主线。
+- `archive/v1-master-2026-06-26`：V1 master 归档。
+- `feature/*`、`fix/*`、`refactor/*`、`docs/*`：后续功能、修复、重构和文档分支。
+
+不再把 `*-clean`、`*-ready`、`*-integration-ready` 作为长期主线名称。
