@@ -78,6 +78,25 @@ class AdminArticleQueryServiceTest {
     }
 
     @Test
+    void returnsAdminPageWhenArticleHasNoCover() {
+        AdminArticleQuery query = query(1, 20);
+        when(repository.findActivePage(criteria(query)))
+                .thenReturn(new AdminArticlePage(
+                        List.of(pageItem(10L, null)),
+                        1,
+                        1,
+                        20));
+        when(attachmentService.resolvePublicUrls(Set.of()))
+                .thenReturn(Map.of());
+
+        assertThat(service.adminPage(
+                principal("ADMIN"), query).records())
+                .singleElement()
+                .extracting("coverUrl")
+                .isNull();
+    }
+
+    @Test
     void returnsDetailWithoutPasswordHashAndWithCoverUrl() {
         when(repository.findActiveDetail(10L))
                 .thenReturn(Optional.of(detail(

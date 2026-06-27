@@ -6,7 +6,7 @@ import com.tyb.myblog.v2.system.application.friendlink.PublicFriendLinkResult;
  * 公开友链响应。
  */
 public record PublicFriendLinkVO(
-        long id,
+        String id,
         String name,
         String url,
         String avatarUrl,
@@ -16,7 +16,7 @@ public record PublicFriendLinkVO(
     public static PublicFriendLinkVO from(
             PublicFriendLinkResult result) {
         return new PublicFriendLinkVO(
-                result.id(),
+                Long.toString(result.id()),
                 result.name(),
                 result.url(),
                 result.avatarUrl(),

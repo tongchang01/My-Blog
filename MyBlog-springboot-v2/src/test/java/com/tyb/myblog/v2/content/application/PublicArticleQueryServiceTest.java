@@ -88,6 +88,29 @@ class PublicArticleQueryServiceTest {
     }
 
     @Test
+    void returnsPublicPageWhenArticleHasNoCover() {
+        PublicArticleQuery query = new PublicArticleQuery(
+                1, 20, "zh", null, null, null, null);
+        PublicArticlePageItem item = pageItem(
+                100L,
+                ArticleStatus.PUBLISHED,
+                null);
+        when(repository.findPublicPage(query.toCriteria(NOW)))
+                .thenReturn(new PublicArticlePage(
+                        List.of(item),
+                        1,
+                        1,
+                        20));
+        when(attachmentService.resolvePublicUrls(Set.of()))
+                .thenReturn(Map.of());
+
+        assertThat(service.page(query).records())
+                .singleElement()
+                .extracting("coverUrl")
+                .isNull();
+    }
+
+    @Test
     void returnsPublishedDetailBodyAndRejectsPasswordDetail() {
         when(repository.findPublicAccessMetadata(100L, NOW))
                 .thenReturn(Optional.of(new PublicArticleAccessMetadata(
@@ -144,6 +167,13 @@ class PublicArticleQueryServiceTest {
     private PublicArticlePageItem pageItem(
             long id,
             ArticleStatus status) {
+        return pageItem(id, status, 300L);
+    }
+
+    private PublicArticlePageItem pageItem(
+            long id,
+            ArticleStatus status,
+            Long coverAttachmentId) {
         return new PublicArticlePageItem(
                 id,
                 "中文标题",
@@ -159,7 +189,7 @@ class PublicArticleQueryServiceTest {
                 "article-" + id,
                 status,
                 NOW.minusDays(1),
-                300L,
+                coverAttachmentId,
                 null,
                 2,
                 List.of(tag()),

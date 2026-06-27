@@ -110,6 +110,26 @@ class FriendLinkOpenApiTest {
                         .path("enum"))
                 .extracting(JsonNode::asText)
                 .containsExactly("VISIBLE", "HIDDEN");
+        assertThat(publicSchema.path("properties")
+                        .path("id")
+                        .path("type")
+                        .asText())
+                .isEqualTo("string");
+        assertThat(adminSchema.path("properties")
+                        .path("id")
+                        .path("type")
+                        .asText())
+                .isEqualTo("string");
+        assertThat(adminSchema.path("properties")
+                        .path("createdBy")
+                        .path("type")
+                        .asText())
+                .isEqualTo("string");
+        assertThat(adminSchema.path("properties")
+                        .path("updatedBy")
+                        .path("type")
+                        .asText())
+                .isEqualTo("string");
     }
 
     @Test

@@ -7,11 +7,11 @@ import com.tyb.myblog.v2.comment.domain.CommentTargetType;
 import java.time.LocalDateTime;
 
 public record AdminCommentPageItemVO(
-        long id,
+        String id,
         CommentTargetType targetType,
-        long targetId,
-        Long parentId,
-        Long replyToCommentId,
+        String targetId,
+        String parentId,
+        String replyToCommentId,
         String replyToNickname,
         String authorNickname,
         String authorEmail,
@@ -21,15 +21,16 @@ public record AdminCommentPageItemVO(
         String contentMd,
         String contentHtml,
         CommentAuditStatus auditStatus,
-        LocalDateTime createdAt) {
+        LocalDateTime createdAt,
+        boolean deleted) {
 
     public static AdminCommentPageItemVO from(AdminCommentPageResult.Item item) {
         return new AdminCommentPageItemVO(
-                item.id(),
+                Long.toString(item.id()),
                 item.targetType(),
-                item.targetId(),
-                item.parentId(),
-                item.replyToCommentId(),
+                Long.toString(item.targetId()),
+                item.parentId() == null ? null : Long.toString(item.parentId()),
+                item.replyToCommentId() == null ? null : Long.toString(item.replyToCommentId()),
                 item.replyToNickname(),
                 item.authorNickname(),
                 item.authorEmail(),
@@ -39,6 +40,7 @@ public record AdminCommentPageItemVO(
                 item.contentMd(),
                 item.contentHtml(),
                 item.auditStatus(),
-                item.createdAt());
+                item.createdAt(),
+                item.deleted());
     }
 }

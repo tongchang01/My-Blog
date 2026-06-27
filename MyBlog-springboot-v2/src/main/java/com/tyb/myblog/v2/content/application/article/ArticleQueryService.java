@@ -43,7 +43,9 @@ public class ArticleQueryService {
                 page.records().stream()
                         .map(item -> withCoverUrl(
                                 item,
-                                coverUrls.get(item.coverAttachmentId())))
+                                item.coverAttachmentId() == null
+                                        ? null
+                                        : coverUrls.get(item.coverAttachmentId())))
                         .toList(),
                 page.total(),
                 page.page(),
