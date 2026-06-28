@@ -39,6 +39,25 @@ public class AttachmentQueryService {
     }
 
     /**
+     * 分页查询回收站附件，允许 ADMIN 和 DEMO 只读访问。
+     */
+    public AttachmentPageResult deletedPage(
+            AuthenticatedPrincipal principal,
+            int page,
+            int size) {
+        requireReadableRole(principal);
+        validatePage(page, size);
+        AttachmentPage result = repository.findDeletedPage(page, size);
+        return new AttachmentPageResult(
+                result.records().stream()
+                        .map(AttachmentResult::from)
+                        .toList(),
+                result.total(),
+                result.page(),
+                result.size());
+    }
+
+    /**
      * 查询单个 active 附件。
      */
     public AttachmentResult detail(

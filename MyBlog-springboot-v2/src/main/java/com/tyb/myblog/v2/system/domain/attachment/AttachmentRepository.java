@@ -19,7 +19,11 @@ public interface AttachmentRepository {
 
     AttachmentPage findActivePage(int page, int size);
 
+    AttachmentPage findDeletedPage(int page, int size);
+
     Attachment insert(NewAttachment attachment);
+
+    boolean softDelete(long id, LocalDateTime deletedAt, long deletedBy);
 
     boolean restoreDeleted(long id, LocalDateTime updatedAt, long updatedBy);
 }

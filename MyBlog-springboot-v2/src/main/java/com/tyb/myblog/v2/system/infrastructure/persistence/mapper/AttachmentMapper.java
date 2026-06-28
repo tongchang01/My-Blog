@@ -29,6 +29,17 @@ public interface AttachmentMapper extends BaseMapper<AttachmentEntity> {
 
     long countActive();
 
+    List<AttachmentEntity> selectDeletedPage(
+            @Param("offset") long offset,
+            @Param("size") int size);
+
+    long countDeleted();
+
+    int softDelete(
+            @Param("id") long id,
+            @Param("deletedAt") LocalDateTime deletedAt,
+            @Param("deletedBy") long deletedBy);
+
     int restoreDeleted(
             @Param("id") long id,
             @Param("updatedAt") LocalDateTime updatedAt,

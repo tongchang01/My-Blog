@@ -69,6 +69,35 @@ class DatabaseAttachmentRepositoryTest {
     }
 
     @Test
+    void pagesDeletedAttachmentsInStableNewestFirstOrder() {
+        insert(101L, "1".repeat(64), false, "2026-06-14 10:00:00");
+        insert(102L, "2".repeat(64), true, "2026-06-14 11:00:00");
+        insert(103L, "3".repeat(64), true, "2026-06-14 12:00:00");
+
+        AttachmentPage page = repository.findDeletedPage(1, 20);
+
+        assertThat(page.total()).isEqualTo(2);
+        assertThat(page.records()).extracting(Attachment::id)
+                .containsExactly(103L, 102L);
+    }
+
+    @Test
+    void softDeletesActiveAttachmentOnlyOnce() {
+        insert(101L, ACTIVE_HASH, false, "2026-06-14 10:00:00");
+        LocalDateTime deletedAt = LocalDateTime.of(2026, 6, 14, 13, 0);
+
+        assertThat(repository.softDelete(101L, deletedAt, 3001L)).isTrue();
+        assertThat(repository.softDelete(101L, deletedAt, 3001L)).isFalse();
+        assertThat(jdbcTemplate.queryForMap("""
+                SELECT deleted, deleted_at, deleted_by, updated_by
+                FROM t_attachment WHERE id = 101
+                """))
+                .containsEntry("DELETED", 1)
+                .containsEntry("DELETED_BY", 3001L)
+                .containsEntry("UPDATED_BY", 3001L);
+    }
+
+    @Test
     void insertsWithAssignedIdAndExplicitCreator() {
         Attachment inserted = repository.insert(NewAttachment.create(
                 StorageType.LOCAL,
