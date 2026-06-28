@@ -404,9 +404,15 @@ attachments:
     description: 支持 JPEG、PNG、WebP、GIF；服务端会校验真实图片内容和大小限制
   result:
     total: 附件总数
+    deletedTotal: 回收站附件总数
   actions:
     copyUrl: 复制 URL
     open: 打开
+    delete: 删除
+    recycleBin: 回收站
+    activeList: 附件库
+    confirmTitle: 附件操作确认
+    deleteConfirm: 删除后附件将进入回收站，不会立刻删除物理文件，确认继续吗
   picker:
     title: 选择附件
     description: 从附件库中选择一张图片作为当前字段的引用
@@ -414,6 +420,7 @@ attachments:
   errors:
     load: 附件列表加载失败，请重试
     upload: 附件上传失败，请检查文件后重试
+    operation: 附件操作失败，请重试
   empty: 暂无附件
 login:
   pureUsername: 账号

@@ -5,6 +5,15 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { http } from "@/utils/http";
 import AttachmentManagement from "./index.vue";
 
+const { confirm } = vi.hoisted(() => ({
+  confirm: vi.fn().mockResolvedValue("confirm")
+}));
+
+vi.mock("element-plus", async importOriginal => ({
+  ...(await importOriginal<typeof import("element-plus")>()),
+  ElMessageBox: { confirm }
+}));
+
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
 
@@ -70,6 +79,7 @@ function setUser(type: "ADMIN" | "DEMO") {
 
 afterEach(() => {
   mock.reset();
+  confirm.mockClear();
   vi.unstubAllGlobals();
   useUserStoreHook().CLEAR_USER();
 });
@@ -81,9 +91,15 @@ describe("attachment management page", () => {
     const wrapper = mount(AttachmentManagement, { global: { stubs } });
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="attachment-upload-card"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="attachment-file-input"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="attachment-readonly"]').exists()).toBe(false);
+    expect(
+      wrapper.find('[data-testid="attachment-upload-card"]').exists()
+    ).toBe(true);
+    expect(wrapper.find('[data-testid="attachment-file-input"]').exists()).toBe(
+      true
+    );
+    expect(wrapper.find('[data-testid="attachment-readonly"]').exists()).toBe(
+      false
+    );
     expect(wrapper.text()).toContain("a.png");
     expect(wrapper.text()).toContain("800 × 450");
     expect(wrapper.text()).toContain("1 KB");
@@ -95,8 +111,12 @@ describe("attachment management page", () => {
     const wrapper = mount(AttachmentManagement, { global: { stubs } });
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="attachment-file-input"]').exists()).toBe(false);
-    expect(wrapper.find('[data-testid="attachment-readonly"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="attachment-file-input"]').exists()).toBe(
+      false
+    );
+    expect(wrapper.find('[data-testid="attachment-readonly"]').exists()).toBe(
+      true
+    );
   });
 
   it("uploads the selected file and refreshes the list", async () => {
@@ -130,8 +150,54 @@ describe("attachment management page", () => {
     const wrapper = mount(AttachmentManagement, { global: { stubs } });
     await flushPromises();
 
-    await wrapper.get('[data-testid="attachment-copy-9007199254743001"]').trigger("click");
+    await wrapper
+      .get('[data-testid="attachment-copy-9007199254743001"]')
+      .trigger("click");
 
     expect(writeText).toHaveBeenCalledWith("http://localhost/media/a.png");
+  });
+
+  it("lets admin soft delete an attachment", async () => {
+    setUser("ADMIN");
+    mock
+      .onGet("/api/admin/attachments")
+      .reply(200, ok(page()))
+      .onDelete("/api/admin/attachments/9007199254743001")
+      .reply(200, ok(null));
+    const wrapper = mount(AttachmentManagement, { global: { stubs } });
+    await flushPromises();
+
+    await wrapper
+      .get('[data-testid="attachment-delete-9007199254743001"]')
+      .trigger("click");
+    await flushPromises();
+
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(mock.history.delete[0].url).toBe(
+      "/api/admin/attachments/9007199254743001"
+    );
+  });
+
+  it("switches to the deleted attachment list", async () => {
+    setUser("ADMIN");
+    mock
+      .onGet("/api/admin/attachments")
+      .reply(200, ok(page()))
+      .onGet("/api/admin/attachments/deleted")
+      .reply(200, ok(page()));
+    const wrapper = mount(AttachmentManagement, { global: { stubs } });
+    await flushPromises();
+
+    await wrapper
+      .get('[data-testid="attachment-show-deleted"]')
+      .trigger("click");
+    await flushPromises();
+
+    expect(mock.history.get[1].url).toBe("/api/admin/attachments/deleted");
+    expect(
+      wrapper
+        .find('[data-testid="attachment-delete-9007199254743001"]')
+        .exists()
+    ).toBe(false);
   });
 });

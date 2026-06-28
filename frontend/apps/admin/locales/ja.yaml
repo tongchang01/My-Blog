@@ -404,9 +404,15 @@ attachments:
     description: JPEG、PNG、WebP、GIF に対応します。サーバー側で画像内容とサイズ制限を検証します。
   result:
     total: 添付ファイル数
+    deletedTotal: 回収済み添付ファイル数
   actions:
     copyUrl: URL をコピー
     open: 開く
+    delete: 削除
+    recycleBin: 回収箱
+    activeList: 添付ライブラリ
+    confirmTitle: 添付ファイル操作の確認
+    deleteConfirm: 添付ファイルを回収箱に移動します。物理ファイルはまだ削除しません。続行しますか？
   picker:
     title: 添付ファイルを選択
     description: 添付ライブラリからこの項目に使う画像を選択します
@@ -414,6 +420,7 @@ attachments:
   errors:
     load: 添付ファイル一覧を読み込めませんでした。再試行してください
     upload: 添付ファイルをアップロードできませんでした。ファイルを確認して再試行してください
+    operation: 添付ファイル操作に失敗しました。再試行してください
   empty: 添付ファイルはまだありません
 login:
   pureUsername: ユーザー名

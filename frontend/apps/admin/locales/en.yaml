@@ -404,9 +404,15 @@ attachments:
     description: Supports JPEG, PNG, WebP, and GIF. The server validates real image content and size limits.
   result:
     total: Total attachments
+    deletedTotal: Deleted attachments
   actions:
     copyUrl: Copy URL
     open: Open
+    delete: Delete
+    recycleBin: Recycle bin
+    activeList: Attachment library
+    confirmTitle: Attachment confirmation
+    deleteConfirm: The attachment will move to the recycle bin. Physical files are not deleted now. Continue?
   picker:
     title: Choose attachment
     description: Choose an image from the attachment library for this field
@@ -414,6 +420,7 @@ attachments:
   errors:
     load: Unable to load attachments. Please retry.
     upload: Unable to upload attachment. Please check the file and retry.
+    operation: Unable to complete attachment operation. Please retry.
   empty: No attachments yet
 login:
   pureUsername: Username

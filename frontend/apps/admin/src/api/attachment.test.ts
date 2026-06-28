@@ -2,7 +2,9 @@ import MockAdapter from "axios-mock-adapter";
 import { afterEach, describe, expect, it } from "vitest";
 import { http } from "@/utils/http";
 import {
+  deleteAttachment,
   getAttachment,
+  listDeletedAttachments,
   listAttachments,
   uploadAttachment
 } from "./attachment";
@@ -42,11 +44,13 @@ describe("attachment API", () => {
       ];
     });
 
-    await expect(listAttachments({ page: 2, size: 50 })).resolves.toMatchObject({
-      data: {
-        records: [{ id: "9007199254743001", createdBy: "1001" }]
+    await expect(listAttachments({ page: 2, size: 50 })).resolves.toMatchObject(
+      {
+        data: {
+          records: [{ id: "9007199254743001", createdBy: "1001" }]
+        }
       }
-    });
+    );
   });
 
   it("requests attachment detail and multipart upload", async () => {
@@ -90,11 +94,37 @@ describe("attachment API", () => {
       ];
     });
 
-    await expect(
-      getAttachment("9007199254743001")
-    ).resolves.toMatchObject({ data: { id: "9007199254743001" } });
+    await expect(getAttachment("9007199254743001")).resolves.toMatchObject({
+      data: { id: "9007199254743001" }
+    });
     await expect(
       uploadAttachment(new File(["png"], "b.png", { type: "image/png" }))
     ).resolves.toMatchObject({ data: { id: "9007199254743002" } });
+  });
+
+  it("requests deleted attachments and soft delete", async () => {
+    mock.onGet("/api/admin/attachments/deleted").reply(config => {
+      expect(config.params).toEqual({ page: 1, size: 20 });
+      return [
+        200,
+        {
+          code: "00000",
+          msg: "success",
+          data: { records: [], total: 0, page: 1, size: 20 }
+        }
+      ];
+    });
+    mock.onDelete("/api/admin/attachments/9007199254743001").reply(200, {
+      code: "00000",
+      msg: "success",
+      data: null
+    });
+
+    await expect(
+      listDeletedAttachments({ page: 1, size: 20 })
+    ).resolves.toMatchObject({ data: { total: 0 } });
+    await expect(deleteAttachment("9007199254743001")).resolves.toMatchObject({
+      data: null
+    });
   });
 });
