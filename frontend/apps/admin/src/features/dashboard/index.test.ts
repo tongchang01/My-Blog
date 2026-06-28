@@ -115,25 +115,41 @@ describe("admin dashboard", () => {
       wrapper.get('[data-testid="dashboard-metric-today-uv"]').text()
     ).toContain("34");
     expect(
-      wrapper.get('[data-testid="dashboard-top-article-9007199254743001"]').text()
+      wrapper
+        .get('[data-testid="dashboard-top-article-9007199254743001"]')
+        .text()
     ).toContain("文章 A");
-    expect(wrapper.get('[data-testid="dashboard-language-zh"]').text()).toContain(
-      "800"
+    expect(
+      wrapper.get('[data-testid="dashboard-language-zh"]').text()
+    ).toContain("800");
+    expect(wrapper.find('[data-testid="dashboard-trend-chart"]').exists()).toBe(
+      true
     );
-    expect(mock.history.get[0].params).toEqual({ from: undefined, to: undefined });
+    expect(
+      wrapper.find('[data-testid="dashboard-top-articles-chart"]').exists()
+    ).toBe(true);
+    expect(
+      wrapper.find('[data-testid="dashboard-language-chart"]').exists()
+    ).toBe(true);
+    expect(mock.history.get[0].params).toEqual({
+      from: undefined,
+      to: undefined
+    });
   });
 
   it("shows an empty state when stats are all empty", async () => {
     setUser("ADMIN");
-    mock.onGet("/api/admin/stats/dashboard").reply(200, ok(emptyStatsDashboard));
+    mock
+      .onGet("/api/admin/stats/dashboard")
+      .reply(200, ok(emptyStatsDashboard));
 
     const wrapper = mount(Dashboard, { global: { stubs } });
     await flushPromises();
 
     expect(wrapper.find('[data-testid="dashboard-empty"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="dashboard-metric-period-pv"]').exists()).toBe(
-      false
-    );
+    expect(
+      wrapper.find('[data-testid="dashboard-metric-period-pv"]').exists()
+    ).toBe(false);
   });
 
   it("shows a load error and retries stats dashboard loading", async () => {
@@ -151,10 +167,12 @@ describe("admin dashboard", () => {
     await wrapper.get('[data-testid="dashboard-retry"]').trigger("click");
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="dashboard-error"]').exists()).toBe(false);
-    expect(wrapper.find('[data-testid="dashboard-metric-period-pv"]').exists()).toBe(
-      true
+    expect(wrapper.find('[data-testid="dashboard-error"]').exists()).toBe(
+      false
     );
+    expect(
+      wrapper.find('[data-testid="dashboard-metric-period-pv"]').exists()
+    ).toBe(true);
     expect(mock.history.get).toHaveLength(2);
   });
 });
