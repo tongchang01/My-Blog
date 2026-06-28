@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted } from "vue";
+import { ElMessageBox } from "element-plus";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { formatJstDateTime } from "@/features/articles/presentation";
@@ -19,10 +20,16 @@ const {
   uploading,
   error,
   uploadError,
+  operationError,
+  showDeleted,
   initialize,
   refresh,
   changePage,
-  upload
+  upload,
+  showDeletedAttachments,
+  showActiveAttachments,
+  remove,
+  restore
 } = state;
 
 function formatFileSize(bytes: number): string {
@@ -47,6 +54,19 @@ async function handleFileChange(event: Event): Promise<void> {
 
 async function copyUrl(item: AttachmentItem): Promise<void> {
   await navigator.clipboard?.writeText(item.publicUrl);
+}
+
+async function confirmRemove(item: AttachmentItem): Promise<void> {
+  try {
+    await ElMessageBox.confirm(
+      `${transformI18n("attachments.actions.deleteConfirm")}：${item.originalFilename}`,
+      transformI18n("attachments.actions.confirmTitle"),
+      { type: "warning" }
+    );
+  } catch {
+    return;
+  }
+  await remove(item.id);
 }
 
 onMounted(initialize);
@@ -103,18 +123,50 @@ onMounted(initialize);
       <template #header>
         <div class="card-heading result-heading">
           <h2>
-            {{ transformI18n("attachments.result.total") }}
+            {{
+              transformI18n(
+                showDeleted
+                  ? "attachments.result.deletedTotal"
+                  : "attachments.result.total"
+              )
+            }}
             <span class="result-count">{{ total }}</span>
           </h2>
-          <el-button
-            data-testid="attachment-refresh"
-            :loading="loading"
-            @click="refresh"
-          >
-            {{ transformI18n("articles.actions.refresh") }}
-          </el-button>
+          <div class="result-actions">
+            <el-button
+              v-if="!showDeleted"
+              data-testid="attachment-show-deleted"
+              @click="showDeletedAttachments"
+            >
+              {{ transformI18n("attachments.actions.recycleBin") }}
+            </el-button>
+            <el-button
+              v-else
+              data-testid="attachment-show-active"
+              @click="showActiveAttachments"
+            >
+              {{ transformI18n("attachments.actions.activeList") }}
+            </el-button>
+            <el-button
+              data-testid="attachment-refresh"
+              :loading="loading"
+              @click="refresh"
+            >
+              {{ transformI18n("articles.actions.refresh") }}
+            </el-button>
+          </div>
         </div>
       </template>
+
+      <el-alert
+        v-if="operationError"
+        data-testid="attachment-operation-error"
+        class="upload-error"
+        type="error"
+        :closable="false"
+        :title="transformI18n('attachments.errors.operation')"
+        show-icon
+      />
 
       <el-skeleton
         v-if="loading && items.length === 0"
@@ -165,7 +217,10 @@ onMounted(initialize);
             <div class="attachment-body">
               <strong>{{ item.originalFilename }}</strong>
               <span>#{{ item.id }}</span>
-              <span>{{ dimensions(item) }} · {{ formatFileSize(item.fileSize) }}</span>
+              <span
+                >{{ dimensions(item) }} ·
+                {{ formatFileSize(item.fileSize) }}</span
+              >
               <span>{{ item.contentType }}</span>
               <span>{{ formatJstDateTime(item.createdAt) }}</span>
               <a :href="item.publicUrl" target="_blank" rel="noreferrer">
@@ -181,8 +236,32 @@ onMounted(initialize);
               >
                 {{ transformI18n("attachments.actions.copyUrl") }}
               </el-button>
-              <el-button link type="primary" tag="a" :href="item.publicUrl" target="_blank">
+              <el-button
+                link
+                type="primary"
+                tag="a"
+                :href="item.publicUrl"
+                target="_blank"
+              >
                 {{ transformI18n("attachments.actions.open") }}
+              </el-button>
+              <el-button
+                v-if="isAdmin && !showDeleted"
+                :data-testid="`attachment-delete-${item.id}`"
+                link
+                type="danger"
+                @click="confirmRemove(item)"
+              >
+                {{ transformI18n("attachments.actions.delete") }}
+              </el-button>
+              <el-button
+                v-if="isAdmin && showDeleted"
+                :data-testid="`attachment-restore-${item.id}`"
+                link
+                type="primary"
+                @click="restore(item.id)"
+              >
+                {{ transformI18n("attachments.actions.restore") }}
               </el-button>
             </div>
           </article>
@@ -219,7 +298,8 @@ onMounted(initialize);
 }
 
 .card-heading,
-.result-heading {
+.result-heading,
+.result-actions {
   display: flex;
   gap: 12px;
   align-items: center;

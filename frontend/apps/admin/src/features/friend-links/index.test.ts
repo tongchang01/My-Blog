@@ -31,6 +31,25 @@ const row = {
   updatedBy: "1001"
 };
 
+const attachmentPage = {
+  records: [
+    {
+      id: "9007199254743001",
+      publicUrl: "http://localhost/media/friend.png",
+      contentType: "image/png",
+      fileSize: 1024,
+      width: 400,
+      height: 400,
+      originalFilename: "friend.png",
+      createdAt: "2026-06-26T12:00:00",
+      createdBy: "1001"
+    }
+  ],
+  total: 1,
+  page: 1,
+  size: 20
+};
+
 const stubs = {
   "el-alert": true,
   "el-avatar": true,
@@ -40,6 +59,7 @@ const stubs = {
   "el-empty": true,
   "el-form": true,
   "el-form-item": true,
+  "el-image": true,
   "el-input": true,
   "el-input-number": true,
   "el-option": true,
@@ -76,13 +96,11 @@ describe("friend link management page", () => {
       profile: null
     });
     replyPage();
-    mock
-      .onPatch("/api/admin/friend-links/9007199254742501/status")
-      .reply(200, {
-        code: "00000",
-        msg: "success",
-        data: { ...row, status: "HIDDEN" }
-      });
+    mock.onPatch("/api/admin/friend-links/9007199254742501/status").reply(200, {
+      code: "00000",
+      msg: "success",
+      data: { ...row, status: "HIDDEN" }
+    });
 
     const wrapper = mount(FriendLinkManagement, { global: { stubs } });
     await flushPromises();
@@ -166,5 +184,47 @@ describe("friend link management page", () => {
     expect(wrapper.find('[data-testid="friend-link-empty"]').exists()).toBe(
       true
     );
+  });
+
+  it("selects an avatar attachment before creating a friend link", async () => {
+    useUserStoreHook().SET_CURRENT_USER({
+      id: "1001",
+      username: "admin",
+      type: "ADMIN",
+      profile: null
+    });
+    replyPage();
+    mock.onGet("/api/admin/attachments").reply(200, {
+      code: "00000",
+      msg: "success",
+      data: attachmentPage
+    });
+    mock.onPost("/api/admin/friend-links").reply(config => {
+      expect(JSON.parse(config.data).avatarUrl).toBe(
+        "http://localhost/media/friend.png"
+      );
+      return [200, { code: "00000", msg: "success", data: row }];
+    });
+
+    const wrapper = mount(FriendLinkManagement, { global: { stubs } });
+    await flushPromises();
+
+    await wrapper.get('[data-testid="friend-link-create"]').trigger("click");
+    await wrapper
+      .get('[data-testid="friend-link-avatar-choose"]')
+      .trigger("click");
+    await flushPromises();
+    await wrapper
+      .get('[data-testid="attachment-picker-select-9007199254743001"]')
+      .trigger("click");
+    const vm = wrapper.vm as unknown as {
+      form: { name: string; url: string };
+    };
+    vm.form.name = "Example";
+    vm.form.url = "https://example.com";
+    await wrapper.get('[data-testid="friend-link-save"]').trigger("click");
+    await flushPromises();
+
+    expect(mock.history.post).toHaveLength(1);
   });
 });

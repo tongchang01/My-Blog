@@ -1,7 +1,10 @@
 import { reactive, ref } from "vue";
 import type { ApiResponse } from "@/api/contract";
 import {
+  deleteAttachment,
+  listDeletedAttachments,
   listAttachments,
+  restoreAttachment,
   uploadAttachment
 } from "@/api/attachment";
 import type {
@@ -14,12 +17,20 @@ export interface AttachmentManagementApi {
   listAttachments(
     params: AttachmentListParams
   ): Promise<ApiResponse<AttachmentPageResponse>>;
+  listDeletedAttachments(
+    params: AttachmentListParams
+  ): Promise<ApiResponse<AttachmentPageResponse>>;
   uploadAttachment(file: File): Promise<ApiResponse<AttachmentItem>>;
+  deleteAttachment(id: string): Promise<ApiResponse<null>>;
+  restoreAttachment(id: string): Promise<ApiResponse<null>>;
 }
 
 const defaultApi: AttachmentManagementApi = {
   listAttachments,
-  uploadAttachment
+  listDeletedAttachments,
+  uploadAttachment,
+  deleteAttachment,
+  restoreAttachment
 };
 
 function asError(error: unknown): Error {
@@ -39,6 +50,8 @@ export function useAttachmentManagement(
   const uploading = ref(false);
   const error = ref<Error | null>(null);
   const uploadError = ref<Error | null>(null);
+  const operationError = ref<Error | null>(null);
+  const showDeleted = ref(false);
   let requestVersion = 0;
 
   async function loadAttachments(): Promise<void> {
@@ -47,7 +60,9 @@ export function useAttachmentManagement(
     error.value = null;
     const requestParams = { ...pagination };
     try {
-      const response = await api.listAttachments(requestParams);
+      const response = showDeleted.value
+        ? await api.listDeletedAttachments(requestParams)
+        : await api.listAttachments(requestParams);
       if (version !== requestVersion) return;
       items.value = response.data.records;
       total.value = response.data.total;
@@ -92,6 +107,42 @@ export function useAttachmentManagement(
     }
   }
 
+  async function showDeletedAttachments(): Promise<void> {
+    showDeleted.value = true;
+    pagination.page = 1;
+    await loadAttachments();
+  }
+
+  async function showActiveAttachments(): Promise<void> {
+    showDeleted.value = false;
+    pagination.page = 1;
+    await loadAttachments();
+  }
+
+  async function remove(id: string): Promise<boolean> {
+    operationError.value = null;
+    try {
+      await api.deleteAttachment(id);
+      await loadAttachments();
+      return true;
+    } catch (reason) {
+      operationError.value = asError(reason);
+      return false;
+    }
+  }
+
+  async function restore(id: string): Promise<boolean> {
+    operationError.value = null;
+    try {
+      await api.restoreAttachment(id);
+      await loadAttachments();
+      return true;
+    } catch (reason) {
+      operationError.value = asError(reason);
+      return false;
+    }
+  }
+
   return {
     pagination,
     items,
@@ -100,9 +151,15 @@ export function useAttachmentManagement(
     uploading,
     error,
     uploadError,
+    operationError,
+    showDeleted,
     initialize,
     refresh,
     changePage,
-    upload
+    upload,
+    showDeletedAttachments,
+    showActiveAttachments,
+    remove,
+    restore
   };
 }

@@ -7,8 +7,13 @@ import type {
 import { http } from "@/utils/http";
 
 export const listAttachments = (params: AttachmentListParams) =>
+  http.get<ApiResponse<AttachmentPageResponse>>("/api/admin/attachments", {
+    params
+  });
+
+export const listDeletedAttachments = (params: AttachmentListParams) =>
   http.get<ApiResponse<AttachmentPageResponse>>(
-    "/api/admin/attachments",
+    "/api/admin/attachments/deleted",
     { params }
   );
 
@@ -25,3 +30,9 @@ export const uploadAttachment = (file: File) => {
     }
   });
 };
+
+export const deleteAttachment = (id: string) =>
+  http.request<ApiResponse<null>>("delete", `/api/admin/attachments/${id}`);
+
+export const restoreAttachment = (id: string) =>
+  http.post<ApiResponse<null>>(`/api/admin/attachments/${id}/restore`);

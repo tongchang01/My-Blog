@@ -1,5 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch
+} from "vue";
+import type { ECharts } from "echarts/core";
+import echarts from "@/plugins/echarts";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { useStatsDashboard } from "./useStatsDashboard";
@@ -11,7 +20,12 @@ const user = computed(() => userStore.currentUser);
 const displayName = computed(
   () => user.value?.profile.nickname || user.value?.username || "-"
 );
-const { dashboard, loading, error, isEmpty, refresh, load } = useStatsDashboard();
+const { dashboard, loading, error, isEmpty, refresh, load } =
+  useStatsDashboard();
+const trendChartRef = ref<HTMLElement | null>(null);
+const topArticlesChartRef = ref<HTMLElement | null>(null);
+const languageChartRef = ref<HTMLElement | null>(null);
+const chartInstances: ECharts[] = [];
 
 function languageLabel(language: string): string {
   return transformI18n(`dashboard.languages.${language}`);
@@ -21,7 +35,83 @@ function ratioLabel(ratio: number): string {
   return `${(ratio * 100).toFixed(1)}%`;
 }
 
+function chartFor(element: HTMLElement): ECharts {
+  const existing = echarts.getInstanceByDom(element);
+  if (existing) return existing;
+  const chart = echarts.init(element, undefined, { renderer: "svg" });
+  chartInstances.push(chart);
+  return chart;
+}
+
+function canRenderChart(element: HTMLElement): boolean {
+  return element.clientWidth > 0 || element.clientHeight > 0;
+}
+
+async function renderCharts(): Promise<void> {
+  const current = dashboard.value;
+  if (!current) return;
+  await nextTick();
+
+  if (trendChartRef.value && canRenderChart(trendChartRef.value)) {
+    chartFor(trendChartRef.value).setOption({
+      tooltip: { trigger: "axis" },
+      legend: { top: 0 },
+      grid: { left: 36, right: 12, top: 36, bottom: 28 },
+      xAxis: { type: "category", data: current.trend.map(item => item.date) },
+      yAxis: { type: "value" },
+      series: [
+        { name: "PV", type: "line", data: current.trend.map(item => item.pv) },
+        { name: "UV", type: "line", data: current.trend.map(item => item.uv) }
+      ]
+    });
+  }
+
+  if (topArticlesChartRef.value && canRenderChart(topArticlesChartRef.value)) {
+    chartFor(topArticlesChartRef.value).setOption({
+      tooltip: { trigger: "axis" },
+      grid: { left: 36, right: 12, top: 12, bottom: 28 },
+      xAxis: {
+        type: "category",
+        data: current.topArticles.map(item => item.title || item.articleId)
+      },
+      yAxis: { type: "value" },
+      series: [
+        {
+          name: "PV",
+          type: "bar",
+          data: current.topArticles.map(item => item.pv)
+        }
+      ]
+    });
+  }
+
+  if (languageChartRef.value && canRenderChart(languageChartRef.value)) {
+    chartFor(languageChartRef.value).setOption({
+      tooltip: { trigger: "item" },
+      legend: { bottom: 0 },
+      series: [
+        {
+          name: transformI18n("dashboard.languageDistribution"),
+          type: "pie",
+          radius: ["45%", "70%"],
+          data: current.languageDistribution.map(item => ({
+            name: languageLabel(item.language),
+            value: item.pv
+          }))
+        }
+      ]
+    });
+  }
+}
+
+watch(dashboard, () => {
+  void renderCharts();
+});
+
 onMounted(load);
+onBeforeUnmount(() => {
+  chartInstances.splice(0).forEach(chart => chart.dispose());
+});
 </script>
 
 <template>
@@ -71,7 +161,12 @@ onMounted(load);
       :title="transformI18n('dashboard.loadError')"
       show-icon
     >
-      <el-button data-testid="dashboard-retry" type="primary" link @click="refresh">
+      <el-button
+        data-testid="dashboard-retry"
+        type="primary"
+        link
+        @click="refresh"
+      >
         {{ transformI18n("articles.actions.retry") }}
       </el-button>
     </el-alert>
@@ -106,6 +201,11 @@ onMounted(load);
       <section class="dashboard-grid mt-4">
         <el-card shadow="never">
           <template #header>{{ transformI18n("dashboard.trend") }}</template>
+          <div
+            ref="trendChartRef"
+            data-testid="dashboard-trend-chart"
+            class="dashboard-chart"
+          />
           <ul class="stat-list">
             <li
               v-for="point in dashboard.trend"
@@ -119,7 +219,14 @@ onMounted(load);
         </el-card>
 
         <el-card shadow="never">
-          <template #header>{{ transformI18n("dashboard.topArticles") }}</template>
+          <template #header>{{
+            transformI18n("dashboard.topArticles")
+          }}</template>
+          <div
+            ref="topArticlesChartRef"
+            data-testid="dashboard-top-articles-chart"
+            class="dashboard-chart"
+          />
           <ul class="stat-list">
             <li
               v-for="article in dashboard.topArticles"
@@ -133,7 +240,14 @@ onMounted(load);
         </el-card>
 
         <el-card shadow="never">
-          <template #header>{{ transformI18n("dashboard.languageDistribution") }}</template>
+          <template #header>{{
+            transformI18n("dashboard.languageDistribution")
+          }}</template>
+          <div
+            ref="languageChartRef"
+            data-testid="dashboard-language-chart"
+            class="dashboard-chart"
+          />
           <ul class="stat-list">
             <li
               v-for="item in dashboard.languageDistribution"
@@ -179,6 +293,11 @@ onMounted(load);
 
 .dashboard-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.dashboard-chart {
+  height: 240px;
+  margin-bottom: 14px;
 }
 
 .stat-list {

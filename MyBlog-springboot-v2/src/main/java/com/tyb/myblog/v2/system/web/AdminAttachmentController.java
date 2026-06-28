@@ -5,6 +5,7 @@ import com.tyb.myblog.v2.common.auth.CurrentUser;
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.common.web.PageResponse;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentPageResult;
+import com.tyb.myblog.v2.system.application.attachment.AttachmentDeleteService;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentQueryService;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentResult;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentUploadCommand;
@@ -18,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,6 +39,7 @@ public class AdminAttachmentController {
 
     private final AttachmentUploadService uploadService;
     private final AttachmentQueryService queryService;
+    private final AttachmentDeleteService deleteService;
 
     /**
      * 分页查询 active 附件。
@@ -49,6 +52,26 @@ public class AdminAttachmentController {
             @RequestParam(defaultValue = "20") int size) {
         AttachmentPageResult result =
                 queryService.page(principal, page, size);
+        return ApiResponse.ok(new PageResponse<>(
+                result.records().stream()
+                        .map(AttachmentVO::from)
+                        .toList(),
+                result.total(),
+                result.page(),
+                result.size()));
+    }
+
+    /**
+     * 分页查询 deleted 附件。
+     */
+    @Operation(summary = "分页查询附件回收站")
+    @GetMapping("/deleted")
+    public ApiResponse<PageResponse<AttachmentVO>> deletedPage(
+            @CurrentUser AuthenticatedPrincipal principal,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        AttachmentPageResult result =
+                queryService.deletedPage(principal, page, size);
         return ApiResponse.ok(new PageResponse<>(
                 result.records().stream()
                         .map(AttachmentVO::from)
@@ -92,5 +115,26 @@ public class AdminAttachmentController {
                         new AttachmentUploadCommand(
                                 file.getOriginalFilename(),
                                 file.getInputStream()))));
+    }
+
+    /**
+     * 软删除附件。
+     */
+    @Operation(summary = "删除附件")
+    @DeleteMapping("/{id:\\d+}")
+    public ApiResponse<Void> delete(
+            @CurrentUser AuthenticatedPrincipal principal,
+            @PathVariable long id) {
+        deleteService.delete(principal, id);
+        return ApiResponse.ok(null);
+    }
+
+    @Operation(summary = "恢复已删除附件")
+    @PostMapping("/{id:\\d+}/restore")
+    public ApiResponse<Void> restore(
+            @CurrentUser AuthenticatedPrincipal principal,
+            @PathVariable long id) {
+        deleteService.restore(principal, id);
+        return ApiResponse.ok(null);
     }
 }

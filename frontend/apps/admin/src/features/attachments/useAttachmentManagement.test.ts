@@ -1,9 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import type { ApiResponse } from "@/api/contract";
-import type {
-  AttachmentItem,
-  AttachmentPageResponse
-} from "./model";
+import type { AttachmentItem, AttachmentPageResponse } from "./model";
 import {
   type AttachmentManagementApi,
   useAttachmentManagement
@@ -40,9 +37,12 @@ function api(
 ): AttachmentManagementApi {
   return {
     listAttachments: vi.fn().mockResolvedValue(ok(page())),
+    listDeletedAttachments: vi.fn().mockResolvedValue(ok(page([]))),
     uploadAttachment: vi
       .fn()
       .mockResolvedValue(ok(attachment("9007199254743002"))),
+    deleteAttachment: vi.fn().mockResolvedValue(ok(null)),
+    restoreAttachment: vi.fn().mockResolvedValue(ok(null)),
     ...overrides
   };
 }
@@ -95,6 +95,53 @@ describe("attachment management state", () => {
       size: 20
     });
     expect(state.uploadError.value).toBeNull();
+  });
+
+  it("loads deleted attachments and returns to active attachments", async () => {
+    const source = api();
+    const state = useAttachmentManagement(source);
+
+    await state.showDeletedAttachments();
+    await state.showActiveAttachments();
+
+    expect(state.showDeleted.value).toBe(false);
+    expect(source.listDeletedAttachments).toHaveBeenCalledWith({
+      page: 1,
+      size: 20
+    });
+    expect(source.listAttachments).toHaveBeenCalledWith({
+      page: 1,
+      size: 20
+    });
+  });
+
+  it("soft deletes an attachment and refreshes active list", async () => {
+    const source = api();
+    const state = useAttachmentManagement(source);
+
+    await expect(state.remove("9007199254743001")).resolves.toBe(true);
+
+    expect(source.deleteAttachment).toHaveBeenCalledWith("9007199254743001");
+    expect(source.listAttachments).toHaveBeenCalledWith({
+      page: 1,
+      size: 20
+    });
+    expect(state.operationError.value).toBeNull();
+  });
+
+  it("restores an attachment and refreshes deleted list", async () => {
+    const source = api();
+    const state = useAttachmentManagement(source);
+    await state.showDeletedAttachments();
+
+    await expect(state.restore("9007199254743001")).resolves.toBe(true);
+
+    expect(source.restoreAttachment).toHaveBeenCalledWith("9007199254743001");
+    expect(source.listDeletedAttachments).toHaveBeenLastCalledWith({
+      page: 1,
+      size: 20
+    });
+    expect(state.operationError.value).toBeNull();
   });
 
   it("keeps the current list when upload fails", async () => {

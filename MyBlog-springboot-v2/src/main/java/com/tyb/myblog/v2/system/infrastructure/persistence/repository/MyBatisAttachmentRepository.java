@@ -69,6 +69,18 @@ public class MyBatisAttachmentRepository implements AttachmentRepository {
     }
 
     @Override
+    public AttachmentPage findDeletedPage(int page, int size) {
+        long offset = Math.multiplyExact((long) page - 1L, size);
+        return new AttachmentPage(
+                mapper.selectDeletedPage(offset, size).stream()
+                        .map(this::toDomain)
+                        .toList(),
+                mapper.countDeleted(),
+                page,
+                size);
+    }
+
+    @Override
     public Attachment insert(NewAttachment attachment) {
         AttachmentEntity entity = toEntity(attachment);
         if (mapper.insert(entity) != 1
@@ -85,6 +97,14 @@ public class MyBatisAttachmentRepository implements AttachmentRepository {
             LocalDateTime updatedAt,
             long updatedBy) {
         return mapper.restoreDeleted(id, updatedAt, updatedBy) == 1;
+    }
+
+    @Override
+    public boolean softDelete(
+            long id,
+            LocalDateTime deletedAt,
+            long deletedBy) {
+        return mapper.softDelete(id, deletedAt, deletedBy) == 1;
     }
 
     private Attachment toDomain(AttachmentEntity entity) {

@@ -4,6 +4,7 @@ import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
 import com.tyb.myblog.v2.common.storage.StorageType;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentPageResult;
+import com.tyb.myblog.v2.system.application.attachment.AttachmentDeleteService;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentQueryService;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentResult;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentUploadService;
@@ -27,6 +28,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -45,6 +48,9 @@ class AdminAttachmentControllerTest {
 
     @MockitoBean
     private AttachmentQueryService queryService;
+
+    @MockitoBean
+    private AttachmentDeleteService deleteService;
 
     private AuthenticatedPrincipal principal;
 
@@ -125,6 +131,36 @@ class AdminAttachmentControllerTest {
                 .andExpect(jsonPath("$.data.bucket").doesNotExist())
                 .andExpect(jsonPath("$.data.objectKey").doesNotExist())
                 .andExpect(jsonPath("$.data.hashSha256").doesNotExist());
+    }
+
+    @Test
+    void softDeletesAttachment() throws Exception {
+        mockMvc.perform(delete("/api/admin/attachments/10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("00000"));
+
+        verify(deleteService).delete(principal, 10L);
+    }
+
+    @Test
+    void returnsDeletedAttachmentPage() throws Exception {
+        when(queryService.deletedPage(principal, 1, 20))
+                .thenReturn(new AttachmentPageResult(
+                        List.of(result()), 1, 1, 20));
+
+        mockMvc.perform(get("/api/admin/attachments/deleted"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].id").value("10"))
+                .andExpect(jsonPath("$.data.total").value(1));
+    }
+
+    @Test
+    void restoresDeletedAttachment() throws Exception {
+        mockMvc.perform(post("/api/admin/attachments/10/restore"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("00000"));
+
+        verify(deleteService).restore(principal, 10L);
     }
 
     private AttachmentResult result() {
