@@ -49,6 +49,8 @@ class AttachmentOpenApiTest {
                 root.at("/paths/~1api~1admin~1attachments~1deleted");
         JsonNode detail =
                 root.at("/paths/~1api~1admin~1attachments~1{id}");
+        JsonNode restore =
+                root.at("/paths/~1api~1admin~1attachments~1{id}~1restore");
 
         assertThat(collection.has("get")).isTrue();
         assertThat(collection.has("post")).isTrue();
@@ -59,6 +61,8 @@ class AttachmentOpenApiTest {
         assertThat(detail.has("get")).isTrue();
         assertThat(detail.has("delete")).isTrue();
         assertThat(detail.size()).isEqualTo(2);
+        assertThat(restore.has("post")).isTrue();
+        assertThat(restore.size()).isEqualTo(1);
 
         JsonNode multipartSchema = resolveSchema(
                 root,

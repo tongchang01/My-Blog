@@ -409,6 +409,7 @@ attachments:
     copyUrl: URL をコピー
     open: 開く
     delete: 削除
+    restore: 復元
     recycleBin: 回収箱
     activeList: 添付ライブラリ
     confirmTitle: 添付ファイル操作の確認

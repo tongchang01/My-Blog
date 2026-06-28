@@ -4,6 +4,7 @@ import {
   deleteAttachment,
   listDeletedAttachments,
   listAttachments,
+  restoreAttachment,
   uploadAttachment
 } from "@/api/attachment";
 import type {
@@ -21,13 +22,15 @@ export interface AttachmentManagementApi {
   ): Promise<ApiResponse<AttachmentPageResponse>>;
   uploadAttachment(file: File): Promise<ApiResponse<AttachmentItem>>;
   deleteAttachment(id: string): Promise<ApiResponse<null>>;
+  restoreAttachment(id: string): Promise<ApiResponse<null>>;
 }
 
 const defaultApi: AttachmentManagementApi = {
   listAttachments,
   listDeletedAttachments,
   uploadAttachment,
-  deleteAttachment
+  deleteAttachment,
+  restoreAttachment
 };
 
 function asError(error: unknown): Error {
@@ -128,6 +131,18 @@ export function useAttachmentManagement(
     }
   }
 
+  async function restore(id: string): Promise<boolean> {
+    operationError.value = null;
+    try {
+      await api.restoreAttachment(id);
+      await loadAttachments();
+      return true;
+    } catch (reason) {
+      operationError.value = asError(reason);
+      return false;
+    }
+  }
+
   return {
     pagination,
     items,
@@ -144,6 +159,7 @@ export function useAttachmentManagement(
     upload,
     showDeletedAttachments,
     showActiveAttachments,
-    remove
+    remove,
+    restore
   };
 }

@@ -409,6 +409,7 @@ attachments:
     copyUrl: Copy URL
     open: Open
     delete: Delete
+    restore: Restore
     recycleBin: Recycle bin
     activeList: Attachment library
     confirmTitle: Attachment confirmation

@@ -6,6 +6,7 @@ import {
   getAttachment,
   listDeletedAttachments,
   listAttachments,
+  restoreAttachment,
   uploadAttachment
 } from "./attachment";
 
@@ -102,7 +103,7 @@ describe("attachment API", () => {
     ).resolves.toMatchObject({ data: { id: "9007199254743002" } });
   });
 
-  it("requests deleted attachments and soft delete", async () => {
+  it("requests deleted attachments, soft delete, and restore", async () => {
     mock.onGet("/api/admin/attachments/deleted").reply(config => {
       expect(config.params).toEqual({ page: 1, size: 20 });
       return [
@@ -119,11 +120,19 @@ describe("attachment API", () => {
       msg: "success",
       data: null
     });
+    mock.onPost("/api/admin/attachments/9007199254743001/restore").reply(200, {
+      code: "00000",
+      msg: "success",
+      data: null
+    });
 
     await expect(
       listDeletedAttachments({ page: 1, size: 20 })
     ).resolves.toMatchObject({ data: { total: 0 } });
     await expect(deleteAttachment("9007199254743001")).resolves.toMatchObject({
+      data: null
+    });
+    await expect(restoreAttachment("9007199254743001")).resolves.toMatchObject({
       data: null
     });
   });

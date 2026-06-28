@@ -28,7 +28,8 @@ const {
   upload,
   showDeletedAttachments,
   showActiveAttachments,
-  remove
+  remove,
+  restore
 } = state;
 
 function formatFileSize(bytes: number): string {
@@ -252,6 +253,15 @@ onMounted(initialize);
                 @click="confirmRemove(item)"
               >
                 {{ transformI18n("attachments.actions.delete") }}
+              </el-button>
+              <el-button
+                v-if="isAdmin && showDeleted"
+                :data-testid="`attachment-restore-${item.id}`"
+                link
+                type="primary"
+                @click="restore(item.id)"
+              >
+                {{ transformI18n("attachments.actions.restore") }}
               </el-button>
             </div>
           </article>

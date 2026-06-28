@@ -42,6 +42,7 @@ function api(
       .fn()
       .mockResolvedValue(ok(attachment("9007199254743002"))),
     deleteAttachment: vi.fn().mockResolvedValue(ok(null)),
+    restoreAttachment: vi.fn().mockResolvedValue(ok(null)),
     ...overrides
   };
 }
@@ -122,6 +123,21 @@ describe("attachment management state", () => {
 
     expect(source.deleteAttachment).toHaveBeenCalledWith("9007199254743001");
     expect(source.listAttachments).toHaveBeenCalledWith({
+      page: 1,
+      size: 20
+    });
+    expect(state.operationError.value).toBeNull();
+  });
+
+  it("restores an attachment and refreshes deleted list", async () => {
+    const source = api();
+    const state = useAttachmentManagement(source);
+    await state.showDeletedAttachments();
+
+    await expect(state.restore("9007199254743001")).resolves.toBe(true);
+
+    expect(source.restoreAttachment).toHaveBeenCalledWith("9007199254743001");
+    expect(source.listDeletedAttachments).toHaveBeenLastCalledWith({
       page: 1,
       size: 20
     });

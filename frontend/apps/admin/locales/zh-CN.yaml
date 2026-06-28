@@ -409,6 +409,7 @@ attachments:
     copyUrl: 复制 URL
     open: 打开
     delete: 删除
+    restore: 恢复
     recycleBin: 回收站
     activeList: 附件库
     confirmTitle: 附件操作确认

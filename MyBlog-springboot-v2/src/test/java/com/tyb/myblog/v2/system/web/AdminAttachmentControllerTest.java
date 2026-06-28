@@ -29,6 +29,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -151,6 +152,15 @@ class AdminAttachmentControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records[0].id").value("10"))
                 .andExpect(jsonPath("$.data.total").value(1));
+    }
+
+    @Test
+    void restoresDeletedAttachment() throws Exception {
+        mockMvc.perform(post("/api/admin/attachments/10/restore"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("00000"));
+
+        verify(deleteService).restore(principal, 10L);
     }
 
     private AttachmentResult result() {

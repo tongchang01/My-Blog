@@ -200,4 +200,30 @@ describe("attachment management page", () => {
         .exists()
     ).toBe(false);
   });
+
+  it("lets admin restore a deleted attachment", async () => {
+    setUser("ADMIN");
+    mock
+      .onGet("/api/admin/attachments")
+      .reply(200, ok(page()))
+      .onGet("/api/admin/attachments/deleted")
+      .reply(200, ok(page()))
+      .onPost("/api/admin/attachments/9007199254743001/restore")
+      .reply(200, ok(null));
+    const wrapper = mount(AttachmentManagement, { global: { stubs } });
+    await flushPromises();
+
+    await wrapper
+      .get('[data-testid="attachment-show-deleted"]')
+      .trigger("click");
+    await flushPromises();
+    await wrapper
+      .get('[data-testid="attachment-restore-9007199254743001"]')
+      .trigger("click");
+    await flushPromises();
+
+    expect(mock.history.post[0].url).toBe(
+      "/api/admin/attachments/9007199254743001/restore"
+    );
+  });
 });

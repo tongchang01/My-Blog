@@ -47,6 +47,24 @@ public class AttachmentDeleteService {
         }
     }
 
+    @Transactional
+    public void restore(
+            AuthenticatedPrincipal principal,
+            long id) {
+        long actorId = requireAdmin(principal);
+        if (id <= 0) {
+            throw new ApiException(
+                    ApiErrorCode.VALIDATION_ERROR,
+                    "附件 ID 必须为正数");
+        }
+        LocalDateTime now = LocalDateTime.now(clock);
+        if (!repository.restoreDeleted(id, now, actorId)) {
+            throw new ApiException(
+                    ApiErrorCode.NOT_FOUND,
+                    "附件不存在");
+        }
+    }
+
     private long requireAdmin(AuthenticatedPrincipal principal) {
         if (principal == null) {
             throw new ApiException(ApiErrorCode.INVALID_TOKEN);

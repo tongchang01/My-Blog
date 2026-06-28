@@ -52,12 +52,34 @@ class AttachmentDeleteServiceTest {
     }
 
     @Test
+    void restoresDeletedAttachmentForAdmin() {
+        when(repository.restoreDeleted(
+                10L,
+                LocalDateTime.of(2026, 6, 28, 11, 0),
+                1001L))
+                .thenReturn(true);
+
+        service.restore(principal("1001", "ADMIN"), 10L);
+
+        verify(repository).restoreDeleted(
+                10L,
+                LocalDateTime.of(2026, 6, 28, 11, 0),
+                1001L);
+    }
+
+    @Test
     void rejectsDemoAndInvalidId() {
         assertError(
                 () -> service.delete(principal("1002", "DEMO"), 10L),
                 ApiErrorCode.FORBIDDEN);
         assertError(
                 () -> service.delete(principal("1001", "ADMIN"), 0L),
+                ApiErrorCode.VALIDATION_ERROR);
+        assertError(
+                () -> service.restore(principal("1002", "DEMO"), 10L),
+                ApiErrorCode.FORBIDDEN);
+        assertError(
+                () -> service.restore(principal("1001", "ADMIN"), 0L),
                 ApiErrorCode.VALIDATION_ERROR);
     }
 

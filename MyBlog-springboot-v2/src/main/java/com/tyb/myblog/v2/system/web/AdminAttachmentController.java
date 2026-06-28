@@ -128,4 +128,13 @@ public class AdminAttachmentController {
         deleteService.delete(principal, id);
         return ApiResponse.ok(null);
     }
+
+    @Operation(summary = "恢复已删除附件")
+    @PostMapping("/{id:\\d+}/restore")
+    public ApiResponse<Void> restore(
+            @CurrentUser AuthenticatedPrincipal principal,
+            @PathVariable long id) {
+        deleteService.restore(principal, id);
+        return ApiResponse.ok(null);
+    }
 }
