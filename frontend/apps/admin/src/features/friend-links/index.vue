@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { ElMessageBox } from "element-plus";
+import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
+import type { AttachmentItem } from "@/features/attachments/model";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { formatJstDateTime } from "@/features/articles/presentation";
@@ -40,11 +42,8 @@ const {
   saveSortOrders
 } = state;
 
-const statuses: Array<FriendLinkStatus | "ALL"> = [
-  "ALL",
-  "VISIBLE",
-  "HIDDEN"
-];
+const statuses: Array<FriendLinkStatus | "ALL"> = ["ALL", "VISIBLE", "HIDDEN"];
+const avatarPickerOpen = ref(false);
 
 function statusKey(status: FriendLinkStatus | "ALL"): string {
   if (status === "VISIBLE") return "friendLinks.status.visible";
@@ -75,6 +74,14 @@ function statusButtonTestId(item: FriendLinkItem): string {
 function fieldError(field: keyof typeof form): string {
   const code = formErrors[field];
   return code ? transformI18n(`friendLinks.validation.${code}`) : "";
+}
+
+function selectAvatar(item: AttachmentItem): void {
+  form.avatarUrl = item.publicUrl;
+}
+
+function clearAvatar(): void {
+  form.avatarUrl = "";
 }
 
 async function confirmStatus(item: FriendLinkItem): Promise<void> {
@@ -125,15 +132,14 @@ onMounted(initialize);
             v-model="filters.keyword"
             data-testid="friend-link-keyword"
             clearable
-            :placeholder="transformI18n('friendLinks.filter.keywordPlaceholder')"
+            :placeholder="
+              transformI18n('friendLinks.filter.keywordPlaceholder')
+            "
             @keyup.enter="search"
           />
         </el-form-item>
         <el-form-item :label="transformI18n('friendLinks.filter.status')">
-          <el-select
-            v-model="filters.status"
-            data-testid="friend-link-status"
-          >
+          <el-select v-model="filters.status" data-testid="friend-link-status">
             <el-option
               v-for="status in statuses"
               :key="status"
@@ -146,7 +152,11 @@ onMounted(initialize);
 
       <div class="filter-actions">
         <div class="filter-buttons">
-          <el-button data-testid="friend-link-search" type="primary" @click="search">
+          <el-button
+            data-testid="friend-link-search"
+            type="primary"
+            @click="search"
+          >
             {{ transformI18n("articles.actions.search") }}
           </el-button>
           <el-button data-testid="friend-link-reset" @click="reset">
@@ -287,7 +297,9 @@ onMounted(initialize);
                   :min="0"
                   :max="1000000"
                   :step="1"
-                  @update:model-value="value => setSortOrder(row.id, value ?? row.sortOrder)"
+                  @update:model-value="
+                    value => setSortOrder(row.id, value ?? row.sortOrder)
+                  "
                 />
                 <span v-else>{{ row.sortOrder }}</span>
               </template>
@@ -352,7 +364,11 @@ onMounted(initialize);
 
     <el-dialog
       v-model="dialogOpen"
-      :title="transformI18n(editingId ? 'friendLinks.dialog.edit' : 'friendLinks.dialog.create')"
+      :title="
+        transformI18n(
+          editingId ? 'friendLinks.dialog.edit' : 'friendLinks.dialog.create'
+        )
+      "
       width="560px"
       @closed="closeDialog"
     >
@@ -373,7 +389,33 @@ onMounted(initialize);
           :label="transformI18n('friendLinks.fields.avatarUrl')"
           :error="fieldError('avatarUrl')"
         >
-          <el-input v-model="form.avatarUrl" />
+          <div class="image-url-field">
+            <el-input
+              v-model="form.avatarUrl"
+              :placeholder="transformI18n('settings.image.currentUrl')"
+            />
+            <div v-if="form.avatarUrl" class="image-preview">
+              <el-avatar :src="form.avatarUrl" :size="48">
+                {{ form.name.slice(0, 1).toUpperCase() }}
+              </el-avatar>
+              <span class="image-url">{{ form.avatarUrl }}</span>
+            </div>
+            <div class="image-actions">
+              <el-button
+                data-testid="friend-link-avatar-choose"
+                @click="avatarPickerOpen = true"
+              >
+                {{ transformI18n("settings.image.choose") }}
+              </el-button>
+              <el-button
+                v-if="form.avatarUrl"
+                data-testid="friend-link-avatar-clear"
+                @click="clearAvatar"
+              >
+                {{ transformI18n("settings.image.clear") }}
+              </el-button>
+            </div>
+          </div>
         </el-form-item>
         <el-form-item :label="transformI18n('friendLinks.fields.description')">
           <el-input v-model="form.description" type="textarea" :rows="3" />
@@ -404,11 +446,18 @@ onMounted(initialize);
         <el-button @click="closeDialog">
           {{ transformI18n("taxonomy.actions.cancel") }}
         </el-button>
-        <el-button type="primary" :loading="saving" @click="save">
+        <el-button
+          data-testid="friend-link-save"
+          type="primary"
+          :loading="saving"
+          @click="save"
+        >
           {{ transformI18n("taxonomy.actions.save") }}
         </el-button>
       </template>
     </el-dialog>
+
+    <AttachmentPickerDialog v-model="avatarPickerOpen" @select="selectAvatar" />
   </section>
 </template>
 
@@ -489,6 +538,39 @@ onMounted(initialize);
 .friend-link-pagination {
   justify-content: flex-end;
   margin-top: 18px;
+}
+
+.image-url-field {
+  display: grid;
+  width: 100%;
+  gap: 10px;
+}
+
+.image-preview {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  overflow: hidden;
+  background: var(--el-fill-color-lighter);
+  border: 1px solid var(--el-border-color-lighter);
+  border-radius: 8px;
+}
+
+.image-url {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.image-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 @media (width <= 900px) {
