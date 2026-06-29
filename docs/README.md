@@ -27,7 +27,7 @@ MyBlog 当前主线是 V2 开发：
 | `docs/archive/` | 历史资料和旧迁移过程 | 否 |
 | `docs/governance/` | 分支策略、仓库治理、发布协作规则 | 视主题而定 |
 | `docs/showcase/` | 项目展示文档，可多语言 | 否 |
-| `docs/project-handbook/` | 旧权威手册来源，迁移中 | 暂时参考，最终由 `handbook/` 接管 |
+| `docs/project-handbook/` | 旧手册跳转入口 | 否 |
 | `docs/archive/superpowers/` | 旧阶段计划、设计和 review | 否 |
 
 ## 推荐阅读顺序
@@ -43,6 +43,6 @@ MyBlog 当前主线是 V2 开发：
 当前文档正在从旧结构迁移到新结构。迁移期间：
 
 - 新增权威文档优先放入 `docs/handbook/`。
-- 旧 `docs/project-handbook/` 中的有效内容会逐步迁移并校准。
+- 旧 `docs/project-handbook/` 中的有效内容已迁入 `docs/handbook/`，原文归档到 `docs/archive/project-handbook/`。
 - 旧 `docs/superpowers/` 中的过程材料已归档到 `docs/archive/superpowers/`。
 - 未完成和有争议的事项统一登记到 `open-issues.md`。
