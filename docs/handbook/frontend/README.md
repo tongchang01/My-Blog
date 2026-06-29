@@ -17,5 +17,4 @@
 | `blog/README.md` | 前台 blog 范围和当前方向 |
 | `blog/integration-status.md` | 前台已接入页面与未完成读者链路 |
 | `admin/README.md` | 后台 admin 技术基线和范围 |
-| `admin/integration-status.md` | 后台业务页完成度与待校准项 |
-
+| `admin/integration-status.md` | 后台业务页完成度与剩余跟踪项 |

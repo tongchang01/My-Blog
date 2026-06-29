@@ -26,13 +26,13 @@ handbook/
 
 ## 当前迁移状态
 
-本目录正在建立中，旧权威来源仍位于 `docs/project-handbook/`。迁移原则：
+本目录正在建立中，旧 `docs/project-handbook/` 已降级为跳转入口，历史原文已归档到 `docs/archive/project-handbook/`。迁移原则：
 
 1. 只把当前仍有效的结论迁入 `handbook/`。
 2. 与代码不一致的内容必须先校准再迁入。
 3. 阶段计划和历史 review 不直接作为权威文档，只提炼结论。
 4. 未完成和争议事项统一进入 `start-here/open-issues.md`。
-5. 迁移完成后，`docs/project-handbook/` 应降级为归档或跳转入口。
+5. `docs/project-handbook/` 只保留跳转入口，不再新增长期权威内容。
 
 ## 阅读顺序
 
