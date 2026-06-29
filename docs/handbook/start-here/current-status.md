@@ -53,7 +53,7 @@
 - `GET /api/public/site-config` 接入，失败时使用 typed defaults 降级。
 - 公开文章列表、分页、loading、empty、error、retry。
 - 公开文章详情、canonical slug、PASSWORD 锁定态、404、网络错误、retry。
-- 文章、分类、标签 ID 在前端公开 JSON 契约中按 string 使用。
+- 前台契约目标是文章、分类、标签 ID 按 string 使用；当前后端公开 content/comment/stats 部分响应仍返回 number，已登记到 `open-issues.md` 的 O-010、O-011、O-012。
 - 正文通过 `markdown-it` 渲染，禁用原始 HTML，并补充外链安全属性。
 - 首页已停止请求旧 Hexo/Aurora 的 `site.json`、`posts/1.json`、`features.json`、旧搜索索引和旧友链页面数据。
 
