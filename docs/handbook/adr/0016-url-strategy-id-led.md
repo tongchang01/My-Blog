@@ -1,4 +1,4 @@
-# ADR-0016: 文章 URL 策略——id 主导 + slug 可读性增强
+﻿# ADR-0016: 文章 URL 策略——id 主导 + slug 可读性增强
 
 - 状态：accepted
 - 日期：2026-06
@@ -90,5 +90,5 @@ V2 采用 **id 主导 + slug 可读性增强**：
 
 ## 相关
 
-- 关联决定：`product/decisions-draft.md` R3 #6
+- 关联决定：`../../archive/project-handbook/product/decisions-draft.md` R3 #6
 - 关联 pitfalls：无（新设计）

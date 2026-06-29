@@ -1,4 +1,4 @@
-# ADR-0009: OpenAPI 基于 springdoc + UI 使用 Knife4j 4.x
+﻿# ADR-0009: OpenAPI 基于 springdoc + UI 使用 Knife4j 4.x
 
 - 状态：accepted（**2026-06 修订**：原"用 springdoc 替换 knife4j"修订为"springdoc 提供 OpenAPI 规范 + Knife4j 4.x 提供增强 UI"）
 - 日期：2026-04（2026-06 修订）
@@ -70,4 +70,4 @@ UI 访问路径：
 ## 相关
 
 - 相关 rules：`rules/api-response.md` § Swagger/OpenAPI
-- 关联决定：`product/decisions-draft.md` R7 D9
+- 关联决定：`../../archive/project-handbook/product/decisions-draft.md` R7 D9

@@ -1,4 +1,4 @@
-# ADR-0015: 审计列规范与软删三件套
+﻿# ADR-0015: 审计列规范与软删三件套
 
 - 状态：accepted
 - 日期：2026-06
@@ -101,5 +101,5 @@ ADR-0014 给出了 schema 重设计的总原则，但在以下几点早期决定
 
 - 依赖：ADR-0014（被本 ADR 部分超越）
 - 依赖：ADR-0018（时区统一 Asia/Tokyo）
-- 关联 rules：`rules/security-baseline.md`、`product/decisions-draft.md` 审计列规范
+- 关联 rules：`rules/security-baseline.md`、`../../archive/project-handbook/product/decisions-draft.md` 审计列规范
 - 关联 pitfalls：R-011（不得直接 `LocalDateTime.now()`）

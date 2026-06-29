@@ -1,4 +1,4 @@
-# ADR-0018: 时区统一 Asia/Tokyo（五层模型）
+﻿# ADR-0018: 时区统一 Asia/Tokyo（五层模型）
 
 - 状态：accepted
 - 日期：2026-06
@@ -130,6 +130,6 @@ spring:
 
 ## 相关
 
-- 关联决定：`product/decisions-draft.md` R7 D11
+- 关联决定：`../../archive/project-handbook/product/decisions-draft.md` R7 D11
 - 关联 ADR：ADR-0015（DATETIME 时间列）
 - 关联 pitfalls：R-011（不得直接 `LocalDateTime.now()`）

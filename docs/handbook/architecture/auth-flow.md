@@ -2,7 +2,7 @@
 
 > 本文档回答："登录怎么走？JWT 怎么签发与校验？审计在哪？PASSWORD 文章怎么解锁？"
 > 适用范围：V2 identity 模块 + common-infra 安全组件。
-> 相关：`product/decisions-draft.md` R1 / R6 C1 / R7 D6、`../adr/0007-jwt-via-spring-security-jose.md`、`../rules/security-baseline.md`
+> 相关：`../../archive/project-handbook/product/decisions-draft.md` R1 / R6 C1 / R7 D6、`../adr/0007-jwt-via-spring-security-jose.md`、`../rules/security-baseline.md`
 
 ## 1. 总览（双 Token 机制）
 

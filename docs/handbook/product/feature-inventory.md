@@ -150,7 +150,7 @@ V1 是套**企业级博客系统**（原作者按公司项目套路写的），2
 
 - **V1 现状**：前台带 vue-i18n
 - **AI 推荐**：**删**。你不会真运营多语言，i18n 增加大量重复维护
-- **你的决定**：多语言需要留着且V1版本有大问题，本次需要讨论着重新搞。**已重设计（R2 #7 - #19）**：三语 zh / ja / en；路径前缀 `/{lang}/posts/...`；UI 文案 vue-i18n 构建期打包，业务内容 DB 三语副本（文章 title+summary、分类/标签 name、站点配置展示字段、关于我）；正文单中文（不翻译）；字体 CSS `:lang()` + Noto Sans SC/JP/Sans；默认语言 `navigator.language` 自动跳 + `localStorage` 记忆；翻译走 DeepL 打底 + 人工校对 + `frontend-user/i18n-glossary.md` 术语表
+- **你的决定**：多语言需要留着且V1版本有大问题，本次需要讨论着重新搞。**已重设计（R2 #7 - #19）**：三语 zh / ja / en；路径前缀 `/{lang}/posts/...`；UI 文案 vue-i18n 构建期打包，业务内容 DB 三语副本（文章 title+summary、分类/标签 name、站点配置展示字段、关于我）；正文单中文（不翻译）；字体 CSS `:lang()` + Noto Sans SC/JP/Sans；默认语言 `navigator.language` 自动跳 + `localStorage` 记忆；翻译走 DeepL 打底 + 人工校对 + `frontend/blog/i18n-glossary.md` 术语表
 
 ### ⑲ 头像裁剪 / 富头像管理
 

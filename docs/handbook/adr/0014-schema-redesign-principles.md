@@ -11,7 +11,7 @@
 > - §4 时间字段统一（`created_at` / `updated_at` only）→ **ADR-0015 改为 8 列审计基线（含 `created_by` / `updated_by` / `deleted_*`）**
 > - §5 软删除统一（单列 `deleted_at TIMESTAMP NULL`）→ **ADR-0015 改为三件套 `deleted TINYINT + deleted_at DATETIME + deleted_by BIGINT`，配合 MyBatis-Plus `@TableLogic`**
 > - §6 字段命名（`is_xxx` 布尔）→ 仍有效，但状态枚举字段命名见 R3 / R4
-> - "例：标准业务表模板"中的 `t_article` 示例 → **已过时**，三语字段 / slug / cover_attachment_id / status 5 态 / 8 列审计 / DATETIME / ASSIGN_ID 等详见 `product/decisions-draft.md` R2-R3 与 `../architecture/schema-design.md`
+> - "例：标准业务表模板"中的 `t_article` 示例 → **已过时**，三语字段 / slug / cover_attachment_id / status 5 态 / 8 列审计 / DATETIME / ASSIGN_ID 等详见 `../../archive/project-handbook/product/decisions-draft.md` R2-R3 与 `../architecture/schema-design.md`
 >
 > 本 ADR 的"表命名 / 索引规范 / 字符集 / COMMENT / 关联表"原则仍有效。
 

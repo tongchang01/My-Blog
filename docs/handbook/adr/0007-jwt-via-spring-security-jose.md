@@ -1,4 +1,4 @@
-# ADR-0007: JWT 改用 spring-security-oauth2-jose
+﻿# ADR-0007: JWT 改用 spring-security-oauth2-jose
 
 - 状态：accepted
 - 日期：2026-04
@@ -56,10 +56,10 @@ V2 需要重新设计认证体系。
 
 **原 `TokenRevocationStore` 内存实现废弃**。Redis 不再是"必须迁移项"，DB 方案已能满足跨重启 + 跨实例（如未来水平扩展）撤销需求。
 
-详见：`product/decisions-draft.md` R6 C1、`arch/auth-flow.md`、`pitfalls.md` P-001 状态更新。
+详见：`../../archive/project-handbook/product/decisions-draft.md` R6 C1、`../architecture/auth-flow.md`、`pitfalls.md` P-001 状态更新。
 
 ## 相关
 
 - 相关 rules：`rules/security-baseline.md`
 - 相关 pitfalls：`pitfalls.md` P-001
-- 相关 arch：`arch/auth-flow.md`
+- 相关 arch：`../architecture/auth-flow.md`

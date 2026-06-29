@@ -2,7 +2,7 @@
 
 > 本文档回答："V2 的物理表 schema 长什么样？DDL 在哪里？"
 > 状态：✅ **DDL 已冻结（R1–R8 决策合并版）**，已产出并烟测通过 `Flyway V1__init.sql`。后续 schema 变更另起 `V2__xxx.sql` / `V3__xxx.sql`，不再修改 V1。
-> 权威源：所有字段、索引、约束追溯到 `product/decisions-draft.md` R1–R8 + `../adr/` ADR-0014/0015/0017/0018。
+> 权威源：所有字段、索引、约束追溯到 `../../archive/project-handbook/product/decisions-draft.md` R1–R8 + `../adr/` ADR-0014/0015/0017/0018。
 
 ## 一、横切约束（写 DDL 前必读）
 
@@ -454,7 +454,7 @@ INSERT INTO `t_site_config` (`id`, `site_title_zh`) VALUES (1, 'MyBlog');
 
 ## 六、相关文档
 
-- 决策草案：`product/decisions-draft.md` R1–R8
+- 决策草案：`../../archive/project-handbook/product/decisions-draft.md` R1–R8
 - ADR：`../adr/0014` / `0015` / `0017` / `0018`
 - 持久化策略：`arch/persistence-strategy.md`
 - 路线：`roadmap.md` S3 / M1

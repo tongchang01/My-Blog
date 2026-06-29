@@ -1,4 +1,4 @@
-# 未完成和争议项
+﻿# 未完成和争议项
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后续开发
@@ -46,7 +46,7 @@
 - 影响范围：前台 blog、公开 API
 - 当前判断：首页、公开文章列表、文章详情和站点配置已接入；分类、标签、归档、友链、关于、搜索仍待补齐。
 - 下一步：按页面垂直切片推进，每个页面同步校准 API、store、路由、加载态、空态和错误态。
-- 来源：`frontend-user/README.md`、`roadmap.md`
+- 来源：`../frontend/blog/integration-status.md`、`roadmap.md`
 
 ## O-004 前台评论、留言和统计接入
 
@@ -55,7 +55,7 @@
 - 影响范围：前台 blog、comment、stats
 - 当前判断：后端评论、留言板和统计基础能力已经完成，但前台接入仍未形成完整读者交互闭环。
 - 下一步：在前台读者主链路稳定后，接入评论列表、评论提交、留言板和访问统计打点。
-- 来源：`roadmap.md`、`frontend-user/README.md`
+- 来源：`roadmap.md`、`../frontend/blog/integration-status.md`
 
 ## O-005 后台内容生产闭环
 

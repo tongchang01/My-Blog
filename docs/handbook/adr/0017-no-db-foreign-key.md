@@ -1,4 +1,4 @@
-# ADR-0017: 不使用 DB FOREIGN KEY 约束
+﻿# ADR-0017: 不使用 DB FOREIGN KEY 约束
 
 - 状态：accepted
 - 日期：2026-06
@@ -67,5 +67,5 @@ FOREIGN KEY (category_id) REFERENCES t_category(id)
 
 ## 相关
 
-- 关联决定：`product/decisions-draft.md` R7 D2
+- 关联决定：`../../archive/project-handbook/product/decisions-draft.md` R7 D2
 - 关联 pitfalls：R-012（不得加 DB FOREIGN KEY）
