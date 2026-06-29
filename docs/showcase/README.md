@@ -1,6 +1,6 @@
 # 项目展示
 
-> 状态：迁移中
+> 状态：当前有效
 > 适用范围：作品集展示文档
 > 最后校准：2026-06-29
 > 权威程度：展示资料入口
@@ -16,4 +16,3 @@
 | `myblog-showcase.zh-CN.md` | 中文 |
 | `myblog-showcase.en.md` | 英文 |
 | `myblog-showcase.ja.md` | 日文 |
-

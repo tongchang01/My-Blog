@@ -1,6 +1,6 @@
 # V2 开发手册
 
-> 状态：迁移中
+> 状态：当前有效
 > 适用范围：MyBlog V2 开发
 > 最后校准：2026-06-29
 > 权威程度：权威手册入口
@@ -24,9 +24,9 @@ handbook/
 └── workflows/        可重复执行的开发 SOP
 ```
 
-## 当前迁移状态
+## 当前状态
 
-本目录正在建立中，旧 `docs/project-handbook/` 已降级为跳转入口，历史原文已归档到 `docs/archive/project-handbook/`。迁移原则：
+本目录是当前开发手册入口。旧 `docs/project-handbook/` 已降级为跳转入口，历史原文已归档到 `docs/archive/project-handbook/`。维护原则：
 
 1. 只把当前仍有效的结论迁入 `handbook/`。
 2. 与代码不一致的内容必须先校准再迁入。
@@ -45,4 +45,4 @@ handbook/
 
 ## 冲突处理
 
-迁移完成后，如其他目录内容与 `docs/handbook/` 冲突，以 `docs/handbook/` 为准。迁移期间发现冲突时，先登记到 `start-here/open-issues.md` 或 `docs/working/reviews/`，再在对应批次校准。
+如其他目录内容与 `docs/handbook/` 冲突，以 `docs/handbook/` 为准。发现冲突时，先登记到 `start-here/open-issues.md` 或 `docs/working/reviews/`，再在对应批次校准。

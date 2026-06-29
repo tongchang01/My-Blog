@@ -1,6 +1,6 @@
 # 仓库治理
 
-> 状态：迁移中
+> 状态：当前有效
 > 适用范围：分支策略、仓库整理、主线准备
 > 最后校准：2026-06-29
 > 权威程度：治理入口
@@ -16,4 +16,3 @@
 | `branch-policy.md` | 分支命名和协作策略 |
 | `2026-06-26-repository-reorganization-plan.md` | 仓库重组计划 |
 | `v2-main-prep-verification.md` | V2 主线准备验证 |
-

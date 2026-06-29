@@ -1,6 +1,6 @@
 # 前端规格
 
-> 状态：迁移中
+> 状态：当前有效
 > 适用范围：V2 前台 blog、V2 后台 admin
 > 最后校准：2026-06-29
 > 对应代码：`frontend/apps/blog/`、`frontend/apps/admin/`

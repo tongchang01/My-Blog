@@ -1,6 +1,6 @@
 # 运维与本地开发
 
-> 状态：迁移中
+> 状态：当前有效
 > 适用范围：MyBlog V2 本地开发、验证、发布准备
 > 最后校准：2026-06-29
 > 权威程度：运维入口
@@ -17,4 +17,3 @@
 | `local-mysql-development.md` | 本地 MySQL 调试步骤 |
 | `build-and-test.md` | 构建与测试命令 |
 | `release-checklist.md` | 发布前检查清单 |
-

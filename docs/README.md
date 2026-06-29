@@ -1,6 +1,6 @@
 # MyBlog 文档入口
 
-> 状态：迁移中
+> 状态：当前有效
 > 适用范围：全项目文档
 > 最后校准：2026-06-29
 > 权威程度：入口索引
@@ -38,11 +38,11 @@ MyBlog 当前主线是 V2 开发：
 4. 术语表：`docs/handbook/start-here/glossary.md`
 5. 文档维护规则：`docs/handbook/rules/documentation.md`
 
-## 迁移说明
+## 整理说明
 
-当前文档正在从旧结构迁移到新结构。迁移期间：
+当前文档已完成主要结构整理：
 
-- 新增权威文档优先放入 `docs/handbook/`。
+- 新增权威文档放入 `docs/handbook/`。
 - 旧 `docs/project-handbook/` 中的有效内容已迁入 `docs/handbook/`，原文归档到 `docs/archive/project-handbook/`。
 - 旧 `docs/superpowers/` 中的过程材料已归档到 `docs/archive/superpowers/`。
 - 未完成和有争议的事项统一登记到 `open-issues.md`。
