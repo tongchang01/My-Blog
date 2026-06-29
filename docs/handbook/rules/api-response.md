@@ -222,6 +222,6 @@ API 测试至少覆盖：
 ## 相关文档
 
 - 异常处理规则：`error-handling.md`
-- 安全基线：`security-baseline.md`（待迁移）
-- 接口契约目录：`../api/`（待迁移）
+- 安全基线：`security-baseline.md`
+- 接口契约目录：`../api/`
 - 包结构规则：`package-layout.md`

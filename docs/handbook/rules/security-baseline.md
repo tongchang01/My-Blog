@@ -303,4 +303,4 @@ CORS 当前规则：
 - API 响应规则：`api-response.md`
 - 异常处理规则：`error-handling.md`
 - 包结构规则：`package-layout.md`
-- 认证流程：`../architecture/auth-flow.md`（待迁移）
+- 认证流程：`../architecture/auth-flow.md`

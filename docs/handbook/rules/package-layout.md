@@ -252,4 +252,4 @@ identity.application.PersistentAccessTokenVerifier -> implements AccessTokenVeri
 
 - 模块地图：`../architecture/module-map.md`
 - 文档规则：`documentation.md`
-- ADR：`../adr/0002-package-base-com-tyb-myblog-v2.md`、`../adr/0003-four-layer-architecture.md`、`../adr/0004-six-business-modules.md`、`../adr/0012-archunit-guards.md`（待迁移）
+- ADR：`../adr/0002-package-base-com-tyb-myblog-v2.md`、`../adr/0003-four-layer-architecture.md`、`../adr/0004-six-business-modules.md`、`../adr/0012-archunit-guards.md`

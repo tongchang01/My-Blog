@@ -171,5 +171,5 @@ throw new RuntimeException("select * from t_article failed");
 ## 相关文档
 
 - API 响应规则：`api-response.md`
-- 安全基线：`security-baseline.md`（待迁移）
+- 安全基线：`security-baseline.md`
 - 包结构规则：`package-layout.md`

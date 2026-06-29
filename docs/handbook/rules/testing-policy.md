@@ -216,4 +216,4 @@ it("clears session when refresh fails", () => {})
 - 包结构规则：`package-layout.md`
 - API 响应规则：`api-response.md`
 - 安全基线：`security-baseline.md`
-- 构建与测试 SOP：`../ops/build-and-test.md`（待迁移）
+- 构建与测试 SOP：`../ops/build-and-test.md`

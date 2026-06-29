@@ -150,5 +150,5 @@ MyBlog-springboot-v2/src/main/resources/db/migration/
 
 - 包结构规则：`package-layout.md`
 - 测试策略：`testing-policy.md`
-- 持久化策略：`../architecture/persistence-strategy.md`（待迁移）
-- Schema 设计：`../architecture/schema-design.md`（待迁移）
+- 持久化策略：`../architecture/persistence-strategy.md`
+- Schema 设计：`../architecture/schema-design.md`
