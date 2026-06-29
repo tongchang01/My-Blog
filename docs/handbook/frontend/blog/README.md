@@ -1,6 +1,6 @@
 # 前台 Blog
 
-> 状态：待校准
+> 状态：当前有效
 > 适用范围：V2 前台读者端
 > 最后校准：2026-06-29
 > 对应代码：`frontend/apps/blog/`
@@ -16,13 +16,14 @@
 
 ## 当前方向
 
+- 本轮校准以 `E:\My-Blog\frontend\apps\blog/src/` 的前端集成分支源码为准。
 - 技术栈以当前 `frontend/apps/blog/` 为准。
 - 路由使用语言前缀 `/:lang`，支持 `zh`、`ja`、`en`。
 - 公开文章 URL 以文章 ID 为定位键，slug 只增强可读性。
 - UI 文案由前端 i18n 管理，业务内容来自后端公开 API。
 - 文章正文 Markdown 渲染禁用原始 HTML，外链补安全属性。
+- 当前只有站点配置、首页文章列表和文章详情完成 V2 API 接入；其余读者页面仍需按 `integration-status.md` 继续替换旧数据源。
 
 ## 后续边界
 
 未完成页面和争议事项统一登记到 `../../start-here/open-issues.md`，不在本文档重复维护。
-
