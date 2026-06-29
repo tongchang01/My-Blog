@@ -16,7 +16,7 @@
 
 1. 文档体系收口，建立可信 handbook。
 2. 前台读者主链路补齐。
-3. 后台管理端完成度校准和体验收口。
+3. 后台管理端体验边界裁决。
 4. 上线前 SEO、部署、备份和 CI/CD 准备。
 
 后端六大模块已完成第一版，后续后端工作以联调修正、缺口补齐和上线准备为主。
@@ -52,8 +52,8 @@
 ### M4：前后台骨架和首批业务页
 
 - 前台 blog 已完成首批公开接口联调：站点配置、文章列表、文章详情。
-- 后台 admin 已完成基础闭环和多项业务页，包括认证会话、文章、分类标签、友链、附件、站点配置、作者资料和统计仪表盘等实现材料。
-- 后台完成度仍需统一文档校准，见 O-005、O-006。
+- 后台 admin 已完成基础闭环和主要业务页，包括认证会话、文章、分类标签、评论、友链、附件、站点配置、作者资料和统计仪表盘。
+- 后台完成度已沉淀到 `../frontend/admin/integration-status.md`；剩余 DEMO 字段边界和统计 ID 契约分别见 O-002、O-012。
 
 ## 近期路线
 
@@ -64,11 +64,11 @@
 - [x] 建立文档整理计划。
 - [x] 建立文档盘点表。
 - [x] 建立 `docs/README.md`、`handbook/README.md`、`open-issues.md`、`glossary.md`、`documentation.md`。
-- [ ] 迁移并校准 `project-overview.md`、`current-status.md`、`roadmap.md`。
-- [ ] 迁移并校准 architecture、rules、api、product、ops、workflows。
-- [ ] 提炼 `frontend/apps/admin/docs/` 到 `handbook/frontend/admin/`。
-- [ ] 归档 `superpowers/` 和旧计划。
-- [ ] 更新旧入口和内部链接。
+- [x] 迁移并校准 `project-overview.md`、`current-status.md`、`roadmap.md`。
+- [x] 迁移并校准 architecture、rules、api、product、ops、workflows 的当前入口和核心规则。
+- [x] 提炼 `frontend/apps/admin/docs/` 到 `handbook/frontend/admin/`。
+- [x] 归档 `superpowers/` 和旧计划。
+- [x] 更新旧入口和内部链接。
 
 ### R2：前台读者主链路补齐
 
@@ -97,17 +97,15 @@
 
 关联 open issues：O-001、O-004。
 
-### R4：后台完成度校准和体验收口
+### R4：后台体验边界裁决
 
-目标：把后台当前已完成内容沉淀为可信文档，并补齐关键管理体验。
+目标：在后台主要业务页已完成的基础上，裁决剩余权限和契约边界。
 
-- [ ] 建立 `handbook/frontend/admin/integration-status.md`。
-- [ ] 提炼后台认证会话文档。
-- [ ] 提炼文章管理、分类标签、评论、友链、附件、站点配置和统计文档。
 - [ ] 校准 ADMIN/DEMO 页面和字段边界。
-- [ ] 评估评论回复工作流、友链头像附件选择器、统计图表化等增强项。
+- [ ] 裁决 `topArticles[].articleId` 是否改为 JSON string。
+- [ ] 若需要代码修改，同步补后端 Controller/OpenAPI 测试和前端 contract。
 
-关联 open issues：O-002、O-005、O-006。
+关联 open issues：O-002、O-012。
 
 ### R5：上线准备
 
