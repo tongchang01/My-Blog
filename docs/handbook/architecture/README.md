@@ -15,10 +15,10 @@
 | 文档 | 回答的问题 | 当前状态 |
 |------|------------|----------|
 | `module-map.md` | V2 有哪些模块、模块间能怎么依赖 | 已迁移校准 |
-| `auth-flow.md` | 登录、JWT、refresh、logout、改密怎么走 | 待迁移 |
-| `request-flow.md` | 一个请求从 Controller 到数据库如何流转 | 待迁移 |
-| `persistence-strategy.md` | MyBatis-Plus、XML、Repository、Flyway 如何分工 | 待迁移 |
-| `schema-design.md` | 当前 V2 表结构和 DDL 设计 | 待迁移 |
+| `auth-flow.md` | 登录、JWT、refresh、logout、改密怎么走 | 已迁移 |
+| `request-flow.md` | 一个请求从 Controller 到数据库如何流转 | 已迁移 |
+| `persistence-strategy.md` | MyBatis-Plus、XML、Repository、Flyway 如何分工 | 已迁移 |
+| `schema-design.md` | 当前 V2 表结构和 DDL 设计 | 已迁移 |
 
 ## 写作规则
 

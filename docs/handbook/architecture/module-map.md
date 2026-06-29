@@ -128,5 +128,5 @@ identity.application PersistentAccessTokenVerifier ── implements AccessToken
 
 - 术语表：`../start-here/glossary.md`
 - 文档维护规则：`../rules/documentation.md`
-- 包结构规则：`../rules/package-layout.md`（待迁移）
-- ADR：`../adr/0001-modular-monolith.md`、`../adr/0003-four-layer-architecture.md`、`../adr/0004-six-business-modules.md`、`../adr/0012-archunit-guards.md`（待迁移）
+- 包结构规则：`../rules/package-layout.md`
+- ADR：`../adr/0001-modular-monolith.md`、`../adr/0003-four-layer-architecture.md`、`../adr/0004-six-business-modules.md`、`../adr/0012-archunit-guards.md`
