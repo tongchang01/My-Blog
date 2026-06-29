@@ -59,20 +59,20 @@
 
 ## O-005 后台内容生产闭环
 
-- 状态：待校准
+- 状态：已关闭
 - 优先级：P0
 - 影响范围：后台 admin、content、system attachment
-- 当前判断：后台基础能力和部分文章管理能力已经完成，但文章详情/编辑、Markdown 编辑器、附件选择和上传的最终完成度需要对照代码确认。
-- 下一步：盘点 `frontend/apps/admin/docs/` 与 `frontend/apps/admin/src/`，将已完成内容沉淀到 `handbook/frontend/admin/`，未完成内容继续登记。
+- 关闭原因：已对照 `E:\My-Blog\frontend\apps\admin/src/` 校准；文章列表、新建、编辑、Markdown 预览、本地草稿、回收站、附件管理、文章封面选择、站点图片选择均已有实现记录。剩余争议不再放在本条展开。
+- 后续跟踪：DEMO 字段裁剪见 O-002，统计 TOP 文章 ID 类型见 O-012。
 - 来源：后台 article/editor/attachment 设计与计划文档
 
 ## O-006 后台其他业务页完成度
 
-- 状态：待校准
+- 状态：已关闭
 - 优先级：P1
 - 影响范围：后台 admin、category/tag、comment、friend-link、site-config、stats
-- 当前判断：后台目录下已有大量设计、计划和验收文档，但哪些页面已完成、哪些只是计划，需要统一校准。
-- 下一步：建立 `handbook/frontend/admin/integration-status.md`，按业务页列出已完成、未完成、待验证。
+- 关闭原因：已建立并校准 `../frontend/admin/integration-status.md`；分类、标签、评论、友链、站点配置、作者资料、附件和统计仪表盘均已有当前状态。
+- 后续跟踪：DEMO 字段裁剪见 O-002，统计 TOP 文章 ID 类型见 O-012。
 - 来源：`frontend/apps/admin/docs/`
 
 ## O-007 上线前 SEO、发布和运维准备

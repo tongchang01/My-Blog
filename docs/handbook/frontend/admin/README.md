@@ -1,6 +1,6 @@
 # 后台 Admin
 
-> 状态：待校准
+> 状态：当前有效
 > 适用范围：V2 后台管理端
 > 最后校准：2026-06-29
 > 对应代码：`frontend/apps/admin/`
@@ -24,3 +24,5 @@
 ## 文档收口
 
 `frontend/apps/admin/docs/` 中的日期计划、设计和验收材料属于过程材料，已归档到 `../../../archive/frontend-admin/`。后续只把当前事实提炼到本目录；原文不继续作为长期权威源。
+
+本轮校准以 `E:\My-Blog\frontend\apps\admin/src/` 的前端集成分支源码为准；当前后端 worktree 中只有 admin 工程外壳、依赖和构建产物，没有可用于校准的 `src/`。
