@@ -13,6 +13,7 @@
 
 | 目录 | 内容 |
 |------|------|
+| `frontend-admin/` | 后台 admin 的阶段计划、设计、验收记录和 QA 截图 |
 | `frontend-user-v2-migration/` | 前台从旧 Hexo/Aurora 数据和实现迁移到 V2 的历史过程材料 |
 | `project-handbook/` | 旧手册中仍被 ADR 或架构文档追溯引用的历史草案、计划和设计 |
 | `superpowers/` | 旧阶段计划、设计和 review |
