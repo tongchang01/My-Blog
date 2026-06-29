@@ -39,7 +39,8 @@ handbook/
 1. `start-here/current-status.md`：当前 V2 进度。
 2. `start-here/open-issues.md`：未完成和有争议的事项。
 3. `start-here/glossary.md`：统一术语。
-4. `rules/documentation.md`：文档维护规则。
+4. `start-here/pitfalls.md`：红线和历史踩坑。
+5. `rules/documentation.md`：文档维护规则。
 5. 按任务读取对应的 architecture、api、frontend、ops 或 workflows 文档。
 
 ## 冲突处理

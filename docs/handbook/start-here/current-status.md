@@ -117,4 +117,5 @@
 - 路线图：`roadmap.md`
 - 未完成和争议项：`open-issues.md`
 - 术语表：`glossary.md`
+- 红线与历史踩坑：`pitfalls.md`
 - 文档维护规则：`../rules/documentation.md`
