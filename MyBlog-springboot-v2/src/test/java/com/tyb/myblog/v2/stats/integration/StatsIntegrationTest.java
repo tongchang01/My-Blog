@@ -106,7 +106,7 @@ class StatsIntegrationTest {
                 .andExpect(jsonPath("$.data.todayUv").value(3))
                 .andExpect(jsonPath("$.data.trend.length()").value(30))
                 .andExpect(jsonPath("$.data.topArticles[0].articleId")
-                        .value(100))
+                        .value("100"))
                 .andExpect(jsonPath("$.data.topArticles[0].title")
                         .value("公开文章"))
                 .andExpect(jsonPath(

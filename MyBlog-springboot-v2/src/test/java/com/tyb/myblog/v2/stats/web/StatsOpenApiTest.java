@@ -46,6 +46,7 @@ class StatsOpenApiTest {
                         "/components/schemas/TopArticle/properties")
                 .fieldNames()).toIterable()
                 .contains("articleId", "title", "pv", "dailyUvSum");
+        assertStringId(root, "TopArticle", "articleId");
         assertThat(root.toString()).doesNotContain(
                 "PageViewEntity",
                 "PageViewMapper",
@@ -64,6 +65,17 @@ class StatsOpenApiTest {
             String... methods) {
         assertThat(root.at(pointer).fieldNames()).toIterable()
                 .containsExactlyInAnyOrder(methods);
+    }
+
+    private void assertStringId(
+            JsonNode root,
+            String schema,
+            String field) {
+        JsonNode property = root.at(
+                "/components/schemas/" + schema
+                        + "/properties/" + field);
+        assertThat(property.path("type").asText()).isEqualTo("string");
+        assertThat(property.path("format").asText()).isEqualTo("int64");
     }
 
     private JsonNode apiDocument() throws Exception {

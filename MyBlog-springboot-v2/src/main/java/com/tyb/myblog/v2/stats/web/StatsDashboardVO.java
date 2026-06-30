@@ -31,7 +31,7 @@ public record StatsDashboardVO(
                         .toList(),
                 result.topArticles().stream()
                         .map(article -> new TopArticle(
-                                article.articleId(),
+                                Long.toString(article.articleId()),
                                 article.title(),
                                 article.pv(),
                                 article.dailyUvSum()))
@@ -50,7 +50,7 @@ public record StatsDashboardVO(
 
     /** TOP 文章访问数据；标题不存在时保留统计行并返回 null。 */
     public record TopArticle(
-            long articleId,
+            @Schema(format = "int64") String articleId,
             String title,
             long pv,
             @Schema(description = "区间内各日 UV 之和，不代表跨日独立访客")

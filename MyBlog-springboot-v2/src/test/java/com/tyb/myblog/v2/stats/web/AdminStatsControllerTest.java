@@ -79,6 +79,8 @@ class AdminStatsControllerTest {
                         .param("to", "2026-06-18"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.periodPv").value(100))
+                .andExpect(jsonPath("$.data.topArticles[0].articleId")
+                        .value("100"))
                 .andExpect(jsonPath(
                         "$.data.topArticles[0].dailyUvSum")
                         .value(50))
