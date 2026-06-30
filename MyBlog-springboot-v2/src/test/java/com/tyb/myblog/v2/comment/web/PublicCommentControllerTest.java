@@ -35,6 +35,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Import(GlobalExceptionHandler.class)
 class PublicCommentControllerTest {
 
+    private static final long COMMENT_ID = 9007199254740993L;
+    private static final long REPLY_ID = 9007199254740995L;
+    private static final long CREATED_ARTICLE_COMMENT_ID = 9007199254740997L;
+    private static final long CREATED_GUESTBOOK_COMMENT_ID = 9007199254740999L;
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -58,6 +63,18 @@ class PublicCommentControllerTest {
 
         mockMvc.perform(get("/api/public/articles/100/comments"))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].id")
+                        .value(Long.toString(COMMENT_ID)))
+                .andExpect(jsonPath("$.data.records[0].parentId")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.records[0].replyToCommentId")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.records[0].replies[0].id")
+                        .value(Long.toString(REPLY_ID)))
+                .andExpect(jsonPath("$.data.records[0].replies[0].parentId")
+                        .value(Long.toString(COMMENT_ID)))
+                .andExpect(jsonPath("$.data.records[0].replies[0].replyToCommentId")
+                        .value(Long.toString(COMMENT_ID)))
                 .andExpect(jsonPath("$.data.records[0].contentHtml")
                         .value("<p>hello</p>"))
                 .andExpect(jsonPath("$.data.records[0].contentMd")
@@ -69,9 +86,13 @@ class PublicCommentControllerTest {
     @Test
     void createsArticleAndGuestbookComments() throws Exception {
         when(createService.createArticleComment(any(CommentCreateCommand.class)))
-                .thenReturn(new CommentCreateResult(200L, CommentAuditStatus.PASS));
+                .thenReturn(new CommentCreateResult(
+                        CREATED_ARTICLE_COMMENT_ID,
+                        CommentAuditStatus.PASS));
         when(createService.createGuestbookComment(any(CommentCreateCommand.class)))
-                .thenReturn(new CommentCreateResult(201L, CommentAuditStatus.PASS));
+                .thenReturn(new CommentCreateResult(
+                        CREATED_GUESTBOOK_COMMENT_ID,
+                        CommentAuditStatus.PASS));
         when(clientIpResolver.resolve(any()))
                 .thenReturn("127.0.0.1");
         String body = """
@@ -82,12 +103,14 @@ class PublicCommentControllerTest {
                         .contentType("application/json")
                         .content(body))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(200));
+                .andExpect(jsonPath("$.data.id")
+                        .value(Long.toString(CREATED_ARTICLE_COMMENT_ID)));
         mockMvc.perform(post("/api/public/guestbook/comments")
                         .contentType("application/json")
                         .content(body))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data.id").value(201));
+                .andExpect(jsonPath("$.data.id")
+                        .value(Long.toString(CREATED_GUESTBOOK_COMMENT_ID)));
 
         verify(createService).createArticleComment(any(CommentCreateCommand.class));
         verify(createService).createGuestbookComment(any(CommentCreateCommand.class));
@@ -95,7 +118,7 @@ class PublicCommentControllerTest {
 
     private static CommentPageResult.Item item() {
         return new CommentPageResult.Item(
-                1L,
+                COMMENT_ID,
                 null,
                 null,
                 null,
@@ -103,6 +126,15 @@ class PublicCommentControllerTest {
                 "https://example.com",
                 "<p>hello</p>",
                 LocalDateTime.of(2026, 6, 17, 19, 40),
-                List.of());
+                List.of(new CommentPageResult.Item(
+                        REPLY_ID,
+                        COMMENT_ID,
+                        COMMENT_ID,
+                        "TYB",
+                        "Reader",
+                        null,
+                        "<p>reply</p>",
+                        LocalDateTime.of(2026, 6, 17, 19, 41),
+                        List.of())));
     }
 }

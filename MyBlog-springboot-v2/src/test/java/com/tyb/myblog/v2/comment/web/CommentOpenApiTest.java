@@ -72,6 +72,10 @@ class CommentOpenApiTest {
                 "authorEmail",
                 "authorIp",
                 "authorUserAgent");
+        assertStringId(root, "PublicCommentVO", "id");
+        assertStringId(root, "PublicCommentVO", "parentId");
+        assertStringId(root, "PublicCommentVO", "replyToCommentId");
+        assertStringId(root, "PublicCommentCreateVO", "id");
     }
 
     private void assertMethods(
@@ -80,6 +84,17 @@ class CommentOpenApiTest {
             String... methods) {
         assertThat(root.at(pointer).fieldNames()).toIterable()
                 .containsExactlyInAnyOrder(methods);
+    }
+
+    private void assertStringId(
+            JsonNode root,
+            String schema,
+            String field) {
+        JsonNode property = root.at(
+                "/components/schemas/" + schema
+                        + "/properties/" + field);
+        assertThat(property.path("type").asText()).isEqualTo("string");
+        assertThat(property.path("format").asText()).isEqualTo("int64");
     }
 
     private JsonNode apiDocument() throws Exception {
