@@ -14,7 +14,12 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface CategoryWebMapping {
 
-    PublicCategoryVO toPublicVO(PublicCategoryResult source);
+    default PublicCategoryVO toPublicVO(PublicCategoryResult source) {
+        return new PublicCategoryVO(
+                Long.toString(source.id()),
+                source.name(),
+                source.slug());
+    }
 
     default AdminCategoryVO toAdminVO(CategoryResult source) {
         return new AdminCategoryVO(

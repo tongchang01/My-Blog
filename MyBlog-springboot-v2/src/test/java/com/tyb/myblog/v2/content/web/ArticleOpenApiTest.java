@@ -75,6 +75,11 @@ class ArticleOpenApiTest {
         assertNoFields(root, "AdminArticleDetailVO", "deleted");
         assertNoFields(root, "PublicArticlePageItemVO", "deleted");
         assertNoFields(root, "PublicArticleDetailVO", "deleted");
+        assertStringId(root, "PublicArticlePageItemVO", "id");
+        assertStringId(root, "PublicArticlePageItemVO", "categoryId");
+        assertStringId(root, "PublicArticleDetailVO", "id");
+        assertStringId(root, "PublicArticleDetailVO", "categoryId");
+        assertStringId(root, "PublicArticleTagVO", "id");
         assertStringId(root, "AdminArticlePageItemVO", "id");
         assertStringId(root, "AdminArticlePageItemVO", "categoryId");
         assertStringId(root, "AdminArticlePageItemVO", "coverAttachmentId");
@@ -95,6 +100,12 @@ class ArticleOpenApiTest {
         assertThat(root.at(
                         "/components/schemas/AdminArticleDetailVO/properties/tagIds/items/type")
                 .asText()).isEqualTo("string");
+        assertThat(root.at(
+                        "/components/schemas/PublicArticlePageItemVO/properties/tags/items/$ref")
+                .asText()).isEqualTo("#/components/schemas/PublicArticleTagVO");
+        assertThat(root.at(
+                        "/components/schemas/PublicArticleDetailVO/properties/tags/items/$ref")
+                .asText()).isEqualTo("#/components/schemas/PublicArticleTagVO");
     }
 
     private void assertMethods(

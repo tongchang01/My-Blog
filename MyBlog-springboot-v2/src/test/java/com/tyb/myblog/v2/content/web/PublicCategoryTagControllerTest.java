@@ -53,12 +53,12 @@ class PublicCategoryTagControllerTest {
                 .thenReturn(List.of(result));
         when(categoryMapping.toPublicVO(result))
                 .thenReturn(new PublicCategoryVO(
-                        101L, "后端", "backend"));
+                        "101", "后端", "backend"));
 
         mockMvc.perform(get("/api/public/categories")
                         .queryParam("lang", "zh"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].id").value(101))
+                .andExpect(jsonPath("$.data[0].id").value("101"))
                 .andExpect(jsonPath("$.data[0].name").value("后端"))
                 .andExpect(jsonPath("$.data[0].slug")
                         .value("backend"))
@@ -80,12 +80,12 @@ class PublicCategoryTagControllerTest {
                 .thenReturn(List.of(result));
         when(tagMapping.toPublicVO(result))
                 .thenReturn(new PublicTagVO(
-                        201L, "Java", "java"));
+                        "201", "Java", "java"));
 
         mockMvc.perform(get("/api/public/tags")
                         .queryParam("lang", "en"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].id").value(201))
+                .andExpect(jsonPath("$.data[0].id").value("201"))
                 .andExpect(jsonPath("$.data[0].name").value("Java"))
                 .andExpect(jsonPath("$.data[0].slug").value("java"))
                 .andExpect(jsonPath("$.data[0].nameEn")

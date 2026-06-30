@@ -104,6 +104,8 @@ class CategoryTagOpenApiTest {
                 root,
                 "TagWriteOpenApiRequest",
                 TAG_WRITE_FIELDS);
+        assertStringId(root, "PublicCategoryVO", "id");
+        assertStringId(root, "PublicTagVO", "id");
         assertStringId(root, "AdminCategoryVO", "id");
         assertStringId(root, "AdminCategoryVO", "createdBy");
         assertStringId(root, "AdminCategoryVO", "updatedBy");

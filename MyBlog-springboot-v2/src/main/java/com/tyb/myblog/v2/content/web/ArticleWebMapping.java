@@ -6,6 +6,7 @@ import com.tyb.myblog.v2.content.application.article.AdminArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticlePageResult;
+import com.tyb.myblog.v2.content.application.article.PublicArticleTagResult;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -67,17 +68,17 @@ public class ArticleWebMapping {
     public PublicArticleDetailVO toPublicDetail(
             PublicArticleDetailResult result) {
         return new PublicArticleDetailVO(
-                result.id(),
+                id(result.id()),
                 result.title(),
                 result.summary(),
                 result.body(),
-                result.categoryId(),
+                nullableId(result.categoryId()),
                 result.categoryName(),
                 result.slug(),
                 result.publishAt(),
                 result.coverUrl(),
                 result.commentCount(),
-                result.tags(),
+                publicTags(result.tags()),
                 result.createdAt(),
                 result.updatedAt(),
                 result.locked());
@@ -122,16 +123,16 @@ public class ArticleWebMapping {
     private PublicArticlePageItemVO toPublicPageItem(
             PublicArticlePageResult.Item item) {
         return new PublicArticlePageItemVO(
-                item.id(),
+                id(item.id()),
                 item.title(),
                 item.summary(),
-                item.categoryId(),
+                nullableId(item.categoryId()),
                 item.categoryName(),
                 item.slug(),
                 item.publishAt(),
                 item.coverUrl(),
                 item.commentCount(),
-                item.tags(),
+                publicTags(item.tags()),
                 item.createdAt(),
                 item.locked());
     }
@@ -149,6 +150,15 @@ public class ArticleWebMapping {
                 .map(this::id)
                 .toList();
     }
+
+    private List<PublicArticleTagVO> publicTags(
+            List<PublicArticleTagResult> values) {
+        return values.stream()
+                .map(tag -> new PublicArticleTagVO(
+                        id(tag.id()), tag.name(), tag.slug()))
+                .toList();
+    }
+
     private DeletedArticlePageItemVO toDeletedPageItem(
             DeletedArticlePageResult.Item item) {
         return new DeletedArticlePageItemVO(

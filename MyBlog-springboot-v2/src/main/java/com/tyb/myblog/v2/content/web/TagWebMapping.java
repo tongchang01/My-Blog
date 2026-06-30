@@ -14,7 +14,12 @@ import org.mapstruct.ReportingPolicy;
         unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface TagWebMapping {
 
-    PublicTagVO toPublicVO(PublicTagResult source);
+    default PublicTagVO toPublicVO(PublicTagResult source) {
+        return new PublicTagVO(
+                Long.toString(source.id()),
+                source.name(),
+                source.slug());
+    }
 
     default AdminTagVO toAdminVO(TagResult source) {
         return new AdminTagVO(
