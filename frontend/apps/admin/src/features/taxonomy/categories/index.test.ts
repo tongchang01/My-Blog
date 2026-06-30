@@ -16,7 +16,10 @@ const stubs = {
   "el-empty": true,
   "el-form": true,
   "el-form-item": true,
-  "el-input": true,
+  "el-input": {
+    props: { disabled: Boolean },
+    template: "<input :data-testid='$attrs[\"data-testid\"]' :disabled='disabled' />"
+  },
   "el-input-number": true,
   "el-skeleton": true,
   "el-table": true,
@@ -121,5 +124,34 @@ describe("category management page", () => {
 
     expect(ElMessageBox.confirm).toHaveBeenCalledOnce();
     expect(remove).toHaveBeenCalledWith("100");
+  });
+
+  it("locks the slug input while editing a category", async () => {
+    useUserStoreHook().SET_CURRENT_USER({
+      id: "1001",
+      username: "admin",
+      type: "ADMIN",
+      profile
+    });
+    replyList();
+    const wrapper = mount(CategoryManagement, { global: { stubs } });
+    await flushPromises();
+
+    (wrapper.vm as any).state.openEdit({
+      id: "100",
+      nameZh: "后端",
+      nameJa: null,
+      nameEn: "Backend",
+      slug: "backend",
+      sortOrder: 20,
+      createdAt: "2026-06-20T10:00:00",
+      createdBy: "1001",
+      updatedAt: "2026-06-21T10:00:00",
+      updatedBy: "1001"
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('[data-testid="category-slug-input"]')
+      .attributes("disabled")).toBeDefined();
   });
 });

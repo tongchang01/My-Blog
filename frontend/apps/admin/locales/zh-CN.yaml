@@ -231,6 +231,8 @@ taxonomy:
     nameZh: 中文名称
     nameJa: 日文名称
     nameEn: 英文名称
+    slug: Slug
+    slugLockHint: Slug 会作为公开 URL 的一部分，创建后将锁定。
     sortOrder: 排序值
   categories:
     title: 分类总数

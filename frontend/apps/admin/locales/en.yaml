@@ -231,6 +231,8 @@ taxonomy:
     nameZh: Chinese name
     nameJa: Japanese name
     nameEn: English name
+    slug: Slug
+    slugLockHint: Slug is part of the public URL and is locked after creation.
     sortOrder: Sort order
   categories:
     title: Total categories

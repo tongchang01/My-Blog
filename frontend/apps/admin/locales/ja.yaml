@@ -231,6 +231,8 @@ taxonomy:
     nameZh: 中国語名
     nameJa: 日本語名
     nameEn: 英語名
+    slug: Slug
+    slugLockHint: Slug は公開 URL の一部として使われ、作成後は固定されます。
     sortOrder: 並び順
   categories:
     title: カテゴリ総数

@@ -16,7 +16,10 @@ const stubs = {
   "el-empty": true,
   "el-form": true,
   "el-form-item": true,
-  "el-input": true,
+  "el-input": {
+    props: { disabled: Boolean },
+    template: "<input :data-testid='$attrs[\"data-testid\"]' :disabled='disabled' />"
+  },
   "el-skeleton": true,
   "el-table": true,
   "el-table-column": { template: "<div />" },
@@ -97,5 +100,27 @@ describe("tag management page", () => {
     await (wrapper.vm as any).confirmRemove("200");
     expect(ElMessageBox.confirm).toHaveBeenCalledOnce();
     expect(remove).toHaveBeenCalledWith("200");
+  });
+
+  it("locks the slug input while editing a tag", async () => {
+    useUserStoreHook().SET_CURRENT_USER({ id: "1001", username: "admin", type: "ADMIN", profile });
+    replyList();
+    const wrapper = mount(TagManagement, { global: { stubs } });
+    await flushPromises();
+    (wrapper.vm as any).state.openEdit({
+      id: "200",
+      nameZh: "Vue",
+      nameJa: null,
+      nameEn: "Vue",
+      slug: "vue",
+      createdAt: "2026-06-20T10:00:00",
+      createdBy: "1001",
+      updatedAt: "2026-06-21T10:00:00",
+      updatedBy: "1001"
+    });
+    await wrapper.vm.$nextTick();
+
+    expect(wrapper.find('[data-testid="tag-slug-input"]')
+      .attributes("disabled")).toBeDefined();
   });
 });

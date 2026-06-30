@@ -153,7 +153,16 @@ defineExpose({ state, confirmRemove });
         </el-form-item>
         <el-form-item :label="transformI18n('taxonomy.fields.nameJa')"><el-input v-model="form.nameJa" /></el-form-item>
         <el-form-item :label="transformI18n('taxonomy.fields.nameEn')"><el-input v-model="form.nameEn" /></el-form-item>
-        <el-form-item label="Slug" :error="fieldError('slug')"><el-input v-model="form.slug" /></el-form-item>
+        <el-form-item :label="transformI18n('taxonomy.fields.slug')" :error="fieldError('slug')">
+          <el-input
+            v-model="form.slug"
+            data-testid="tag-slug-input"
+            :disabled="Boolean(editingId)"
+          />
+          <p class="field-hint">
+            {{ transformI18n("taxonomy.fields.slugLockHint") }}
+          </p>
+        </el-form-item>
       </el-form>
       <template #footer>
         <el-button @click="closeDialog">{{ transformI18n("taxonomy.actions.cancel") }}</el-button>
@@ -186,6 +195,13 @@ defineExpose({ state, confirmRemove });
 .card-heading { justify-content: space-between; }
 h2 { margin: 0; font-size: 18px; }
 .card-heading h2 span { color: var(--el-color-primary); }
+
+.field-hint {
+  margin: 6px 0 0;
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
 
 @media (width <= 760px) {
   .taxonomy-page { padding: 12px; }

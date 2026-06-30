@@ -222,8 +222,15 @@ defineExpose({ state, confirmRemove });
         <el-form-item :label="transformI18n('taxonomy.fields.nameEn')">
           <el-input v-model="form.nameEn" />
         </el-form-item>
-        <el-form-item label="Slug" :error="fieldError('slug')">
-          <el-input v-model="form.slug" />
+        <el-form-item :label="transformI18n('taxonomy.fields.slug')" :error="fieldError('slug')">
+          <el-input
+            v-model="form.slug"
+            data-testid="category-slug-input"
+            :disabled="Boolean(editingId)"
+          />
+          <p class="field-hint">
+            {{ transformI18n("taxonomy.fields.slugLockHint") }}
+          </p>
         </el-form-item>
         <el-form-item :label="transformI18n('taxonomy.fields.sortOrder')" :error="fieldError('sortOrder')">
           <el-input-number v-model="form.sortOrder" :min="0" :max="1000000" />
@@ -271,6 +278,13 @@ h2 {
 
 .card-heading h2 span {
   color: var(--el-color-primary);
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  color: var(--el-text-color-secondary);
+  font-size: 12px;
+  line-height: 1.5;
 }
 
 @media (width <= 760px) {
