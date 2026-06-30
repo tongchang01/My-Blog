@@ -1,13 +1,13 @@
 # 仓库清理维护计划
 
 > 日期：2026-06-30
-> 状态：临时维护计划
+> 状态：已执行记录
 > 适用范围：远端分支与仓库治理清理
 > 依据：`origin` 远端分支扫描、`docs/governance/branch-policy.md`、`docs/governance/2026-06-26-repository-reorganization-plan.md`
 
 ## 1. 目的
 
-当前远端分支数量较多，且存在旧候选分支、归档分支、已合入功能分支和仍待裁决分支混在一起的问题。本计划用于记录本次仓库清理维护任务的现状、执行顺序和确认点。
+当前远端分支数量较多，且存在旧候选分支、归档分支、已合入功能分支和仍待裁决分支混在一起的问题。本文件记录本次仓库清理维护任务的现状、执行顺序、裁决依据和最终结果。
 
 本计划只处理远端分支与仓库治理相关事项，不处理业务代码、功能实现、文档重组或本地工作区清理。
 
@@ -25,13 +25,13 @@ origin  https://github.com/tongchang01/My-Blog.git
 origin/HEAD -> origin/main
 ```
 
-当前本地工作区：
+执行时所在本地工作区：
 
 ```text
-main...origin/main
+docs/sync-frontend-integration-docs...origin/docs/sync-frontend-integration-docs
 ```
 
-工作区存在未提交文档变更和新增计划/review 文件。本次分支清理前不得混入这些本地变更。
+执行前后均通过 `git status --short --branch` 确认没有未提交变更。
 
 ## 3. 长期保留分支
 
@@ -42,20 +42,20 @@ main...origin/main
 | `origin/archive/backend-v2-refactor-2026-06-26` | 旧后端 V2 过程分支归档 | 保留 |
 | `origin/archive/frontend-v2-integration-2026-06-26` | 旧前端引入过程分支归档 | 保留 |
 
-## 4. 第一批删除候选
+## 4. 第一批删除结果
 
-以下分支已并入 `origin/main`，或已有对应归档分支，适合作为第一批清理对象。
+以下分支已并入 `origin/main`，或已有对应归档分支，已完成远端删除。
 
-| 分支 | 判断 | 建议 |
+| 分支 | 判断 | 结果 |
 | --- | --- | --- |
-| `origin/backend-v2-refactor` | 与 `archive/backend-v2-refactor-2026-06-26` 同提交，且已并入 `main` | 删除 |
-| `origin/frontend-v2-clean` | 已并入 `main`，名称不再符合长期分支约定 | 删除 |
-| `origin/integration/v2-main-prep` | 已并入 `main`，主线候选任务已结束 | 删除 |
-| `origin/feature/admin-comment-reply` | 已并入 `main` | 删除 |
-| `origin/feature/admin-phase-2` | 已并入 `main` | 删除 |
-| `origin/frontend-v2-integration` | 与 `archive/frontend-v2-integration-2026-06-26` 同提交，属于旧过程分支 | 删除 |
+| `origin/backend-v2-refactor` | 与 `archive/backend-v2-refactor-2026-06-26` 同提交，且已并入 `main` | 已删除 |
+| `origin/frontend-v2-clean` | 已并入 `main`，名称不再符合长期分支约定 | 已删除 |
+| `origin/integration/v2-main-prep` | 已并入 `main`，主线候选任务已结束 | 已删除 |
+| `origin/feature/admin-comment-reply` | 已并入 `main` | 已删除 |
+| `origin/feature/admin-phase-2` | 已并入 `main` | 已删除 |
+| `origin/frontend-v2-integration` | 与 `archive/frontend-v2-integration-2026-06-26` 同提交，属于旧过程分支 | 已删除 |
 
-建议命令：
+已执行命令：
 
 ```powershell
 git push origin --delete backend-v2-refactor
@@ -66,17 +66,17 @@ git push origin --delete feature/admin-phase-2
 git push origin --delete frontend-v2-integration
 ```
 
-## 5. 暂缓裁决分支
+## 5. 裁决后删除结果
 
-以下分支相对 `origin/main` 仍有独有提交，删除前必须先确认是否吸收、重做或废弃。
+以下分支相对 `origin/main` 曾有独有提交，已逐个确认是否吸收、替代或废弃。
 
-| 分支 | 独有内容 | 暂缓原因 |
+| 分支 | 独有内容 | 裁决与结果 |
 | --- | --- | --- |
-| `origin/backend-v2-integration-ready` | `39b9f2a 修复本地 MySQL 公钥检索配置` | 涉及本地 MySQL 配置，需确认是否已由其他提交替代 |
-| `origin/feature/frontend-v2-backend-integration` | `e0310fb 补充前台数据源盘点文档` | 涉及前台数据源盘点文档，需确认是否要并入当前文档体系 |
-| `origin/docs-reorganization` | 文档整理平行线，仍显示相对 `main` 有独有提交 | 需要比对是否只是重复迁移提交，不能只按分支名删除 |
+| `origin/backend-v2-integration-ready` | `39b9f2a 修复本地 MySQL 公钥检索配置` | 当前 `application-local.yml` 和本地 MySQL 手册已包含 `allowPublicKeyRetrieval=true`，已删除 |
+| `origin/feature/frontend-v2-backend-integration` | `e0310fb 补充前台数据源盘点文档` | 当前前台差异盘点和批次计划已覆盖有效结论，旧单文件盘点不再保留远端分支，已删除 |
+| `origin/docs-reorganization` | 文档整理平行线 | 17 个提交与当前文档分支 patch 等价；剩余非等价内容已由当前分支覆盖或属于旧树回退，已删除 |
 
-## 6. `master` 处理
+## 6. `master` 处理结果
 
 当前：
 
@@ -84,23 +84,23 @@ git push origin --delete frontend-v2-integration
 origin/master == origin/archive/v1-master-2026-06-26
 ```
 
-`master` 不再是远端默认分支。根据分支治理策略，GitHub 默认分支切到 `main` 后，`master` 应冻结或删除。
-
-建议作为单独确认项处理：
+`master` 不再是远端默认分支。已确认：
 
 1. 确认 GitHub 默认分支仍为 `main`。
 2. 确认 `archive/v1-master-2026-06-26` 和 `v1-final-before-v2` tag 均存在。
-3. 决定删除 `origin/master`，或保留但标注废弃。
+3. `origin/master`、`origin/archive/v1-master-2026-06-26` 和 `v1-final-before-v2` 指向同一提交 `54054e9e38d2cba0920ac55fc20a42fe239b5a15`。
 
-如果确认删除：
+处理结果：`origin/master` 已删除。
+
+已执行命令：
 
 ```powershell
 git push origin --delete master
 ```
 
-## 7. 执行前检查
+## 7. 执行检查
 
-每次清理前运行：
+清理前后运行：
 
 ```powershell
 git fetch origin --prune
@@ -108,17 +108,17 @@ git branch -r --sort=-committerdate -vv
 git status --short --branch
 ```
 
-删除前必须再次明确列出本批次要删除的远端分支，不使用通配符删除。
+删除前均明确列出本批次要删除的远端分支，未使用通配符删除。
 
-## 8. 执行顺序
+## 8. 实际保留远端分支
 
-1. 再次刷新远端引用。
-2. 确认本批次只删除第一批删除候选。
-3. 执行逐条 `git push origin --delete <branch>`。
-4. 再次运行 `git fetch origin --prune`。
-5. 记录清理后的远端分支列表。
-6. 对暂缓裁决分支分别做差异审查。
-7. 单独确认是否删除或冻结 `master`。
+```text
+origin/archive/backend-v2-refactor-2026-06-26
+origin/archive/frontend-v2-integration-2026-06-26
+origin/archive/v1-master-2026-06-26
+origin/docs/sync-frontend-integration-docs
+origin/main
+```
 
 ## 9. 风险控制
 
@@ -129,10 +129,10 @@ git status --short --branch
 - 不把本地未提交文档变更混入远端清理任务。
 - 删除前后都保留命令输出或分支列表，方便回溯。
 
-## 10. 待确认问题
+## 10. 已关闭确认项
 
-1. 第一批删除候选是否可以直接执行删除。
-2. `backend-v2-integration-ready` 的 MySQL 配置修复是否需要并入 `main`。
-3. `feature/frontend-v2-backend-integration` 的数据源盘点文档是否需要并入当前 `docs/working/` 或 `docs/handbook/`。
-4. `docs-reorganization` 是否仍有当前有效内容，还是可以在比对后删除。
-5. `master` 是删除，还是保留并在仓库说明中标注废弃。
+1. 第一批删除候选已删除。
+2. `backend-v2-integration-ready` 的 MySQL 配置修复已由当前分支覆盖，分支已删除。
+3. `feature/frontend-v2-backend-integration` 的有效内容已由当前前台差异盘点和批次计划覆盖，分支已删除。
+4. `docs-reorganization` 已完成 patch 等价和树级差异确认，分支已删除。
+5. `master` 已确认由 `main` 取代，且 V1 归档分支和 tag 均存在，分支已删除。
