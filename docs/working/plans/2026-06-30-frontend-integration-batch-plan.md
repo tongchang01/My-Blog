@@ -19,6 +19,8 @@
 
 ### Batch 0：契约地基与文档校准
 
+状态：已完成后端与后台管理侧地基，前台页面接入按后续批次继续。
+
 目标：让后续前台接入不再反复处理 ID 类型、slug 生命周期和已裁决文档漂移。
 
 包含事项：
@@ -43,16 +45,18 @@
 
 验证：
 
-- 后端公开 content/comment/stats VO 测试确认 ID 为 JSON string。
-- 分类/标签 slug 锁定规则的后端应用层测试。
-- 前台 contract 测试确认 ID 类型和 slug 路由一致。
+- 已通过后端公开 content/comment/stats VO 测试，确认 ID 为 JSON string。
+- 已通过分类/标签 slug 锁定规则的后端应用层与集成测试。
+- 已通过后台 admin taxonomy 页面测试和 typecheck，确认编辑态 slug 禁用并显示提示。
+- 前台 blog 的 slug 路由接入不在 Batch 0 代码范围内，继续跟随后续分类/标签页面批次验证。
 
 建议提交拆分：
 
-- 提交 1：公开 content ID string。
-- 提交 2：公开 comment ID string。
-- 提交 3：stats dashboard top article ID string。
-- 提交 4：分类/标签 slug 锁定规则和后台提示。
+- 已提交 1：公开 content ID string。
+- 已提交 2：公开 comment ID string。
+- 已提交 3：stats dashboard top article ID string。
+- 已提交 4：分类/标签 slug 锁定规则。
+- 已提交 5：后台分类/标签 slug 锁定提示。
 
 ### Batch 1：首页首屏与公开文章主列表
 

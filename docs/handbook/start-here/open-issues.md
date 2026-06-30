@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后续开发
-> 最后校准：2026-06-29
+> 最后校准：2026-06-30
 > 权威程度：未完成事项权威登记表
 
 ## 本文档回答什么问题
@@ -108,33 +108,30 @@
 
 ## O-010 公开内容接口 ID 类型不一致
 
-- 状态：未完成 / 方案已定
+- 状态：已关闭
 - 优先级：P1
 - 影响范围：后端 content、前台 blog、API 契约
-- 当前判断：后端内部继续使用 `long` / `Long` 是合理的；问题只在 HTTP JSON 边界。规则要求前端可见 Snowflake ID 使用 JSON string，但当前 `PublicArticlePageItemVO`、`PublicArticleDetailVO`、`PublicArticleTagResult`、`PublicCategoryVO` 和 `PublicTagVO` 仍使用 `long` / `Long`，公开接口会返回 JSON number。
-- 风险：前台 article contract 已按 string 处理文章、分类和标签 ID，后续接入公开分类/标签页或继续扩展文章筛选时可能出现类型不一致。
-- 下一步：保留后端 Entity / Domain / Application 的数值 ID；在公开 content 响应 VO 或 Web mapping 边界把前端可见 Snowflake ID 转成 string。若修改代码，同步补 Controller/OpenAPI/前端测试。
-- 来源：`handbook/api/article.md`、`handbook/api/category-tag.md`、当前 content web 代码
+- 关闭原因：已在 `feature/blog-contract-foundation` 落实 HTTP JSON 边界转换。后端 Entity / Domain / Application 继续使用数值 ID，公开文章、公开分类、公开标签响应 VO 和 Web mapping 将前端可见 Snowflake ID 输出为 JSON string；公开文章标签改为 web 层 VO，避免 application result 直接暴露到 HTTP 契约。
+- 验证：已补 `PublicArticleControllerTest`、`PublicCategoryTagControllerTest`、`ArticleOpenApiTest`、`CategoryTagOpenApiTest`，并通过定向测试。
+- 来源：`handbook/api/article.md`、`handbook/api/category-tag.md`、content web 代码
 
 ## O-011 公开评论接口 ID 类型不一致
 
-- 状态：未完成 / 方案已定
+- 状态：已关闭
 - 优先级：P1
 - 影响范围：后端 comment、前台 blog、API 契约
-- 当前判断：后端内部继续使用 `long` / `Long` 是合理的；问题只在 HTTP JSON 边界。后台评论响应使用 string ID，但公开评论列表和提交响应中的 `id`、`parentId`、`replyToCommentId` 仍是 `long` / `Long`，公开接口会返回 JSON number。
-- 风险：前台评论尚未接入，若后续统一前端可见 Snowflake ID 为 string，需要在接入前修正公开评论契约或前端类型。
-- 下一步：保留后端 Entity / Domain / Application 的数值 ID；在公开 comment 响应 VO 或 Web mapping 边界把前端可见 Snowflake ID 转成 string。若修改代码，同步补公开评论 Controller 测试和前端 contract。
-- 来源：`handbook/api/comment.md`、当前 comment web 代码
+- 关闭原因：已在 `feature/blog-contract-foundation` 落实 HTTP JSON 边界转换。公开评论列表和提交响应中的 `id`、`parentId`、`replyToCommentId` 均输出为 JSON string；空父级和空回复目标继续保持 `null` / 不输出。
+- 验证：已补 `PublicCommentControllerTest` 和 `CommentOpenApiTest`，覆盖嵌套回复和评论创建响应，并通过定向测试。
+- 来源：`handbook/api/comment.md`、comment web 代码
 
 ## O-012 统计 TOP 文章 ID 类型不一致
 
-- 状态：未完成 / 方案已定
+- 状态：已关闭
 - 优先级：P2
 - 影响范围：后端 stats、后台 admin、API 契约
-- 当前判断：后端内部继续使用 `long` / `Long` 是合理的；问题只在 HTTP JSON 边界。后台多数 Snowflake ID 响应已经使用 string，但 `StatsDashboardVO.TopArticle.articleId` 当前仍是 `long`，后台统计接口会返回 JSON number。
-- 风险：后台统计图表或跳转文章详情时可能需要把 `articleId` 与其它后台文章 ID 类型对齐。
-- 下一步：保留后端 Entity / Domain / Application 的数值 ID；在 stats dashboard 响应 VO 或 Web mapping 边界把 `topArticles[].articleId` 转成 string。若修改代码，同步补 dashboard API 测试和前端类型。
-- 来源：`handbook/api/stats.md`、当前 stats web 代码
+- 关闭原因：已在 `feature/blog-contract-foundation` 落实 HTTP JSON 边界转换。`StatsDashboardVO.TopArticle.articleId` 输出为 JSON string，统计聚合、查询和 `articleId=0` 的首页/非文章页汇总语义不变。
+- 验证：已补 `AdminStatsControllerTest`、`StatsOpenApiTest`、`StatsIntegrationTest`，并通过定向测试。
+- 来源：`handbook/api/stats.md`、stats web 代码
 
 ## O-013 文章置顶和推荐能力缺失
 
@@ -148,12 +145,12 @@
 
 ## O-014 公开 URL 标识策略与 slug 生命周期
 
-- 状态：未完成 / 部分方案已定 / 细节待设计
+- 状态：未完成 / 后端与后台已落实 / 前台接入待实现
 - 优先级：P0
 - 影响范围：前台 blog、后端 content、公开 API、SEO、分享链接、后台分类标签编辑
-- 当前判断：公开 URL 采用混合策略。文章继续沿用现有 ID 主导路径 `/:lang/posts/:id/:slug?`，slug 只增强可读性，不作为文章业务唯一标识；分类和标签公开页采用 slug 主导路径 `/:lang/categories/:slug`、`/:lang/tags/:slug`。后台 admin 内部管理接口继续使用 ID。
+- 当前判断：公开 URL 采用混合策略。文章继续沿用现有 ID 主导路径 `/:lang/posts/:id/:slug?`，slug 只增强可读性，不作为文章业务唯一标识；分类和标签公开页采用 slug 主导路径 `/:lang/categories/:slug`、`/:lang/tags/:slug`。后台 admin 内部管理接口继续使用 ID。分类和标签更新服务已拒绝修改已创建 slug，后台分类/标签表单已在编辑态禁用 slug 并提示其公开 URL 重要性。
 - 风险：如果把文章也改成 slug 主导，需要追加文章 slug 全局唯一、发布后锁定、旧 ID URL 兼容、空 slug/重复 slug 迁移和误填修正工具，当前收益不足；如果分类/标签 slug 允许随意修改，会导致导航入口、外链和搜索收录路径失效。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-url-slug-implementation-plan.md` 的混合策略拆分实现。文章侧保留 BR-203，不强制改为 slug 主导；分类和标签创建后锁定 slug，公开列表、侧栏和筛选页面统一使用 slug URL。后台分类/标签页面需要提示 slug 的公开 URL 重要性，提醒尽量一次性确定。
+- 下一步：按 `docs/working/plans/2026-06-30-frontend-url-slug-implementation-plan.md` 的混合策略继续前台接入。文章侧保留 BR-203，不强制改为 slug 主导；后续分类和标签公开列表、侧栏和筛选页面统一使用 slug URL。
 - 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-002/G-011、`docs/working/plans/2026-06-30-frontend-url-slug-implementation-plan.md`、`ContentSlug`、当前 category/tag/content 代码
 
 ## O-015 公开分类和标签缺少文章数量
