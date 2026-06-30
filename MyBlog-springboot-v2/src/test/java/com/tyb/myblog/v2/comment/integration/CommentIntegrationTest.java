@@ -101,7 +101,7 @@ class CommentIntegrationTest {
         mockMvc.perform(get("/api/public/guestbook/comments"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records[0].replies[0].replyToCommentId")
-                        .value((int) guestbookId));
+                        .value(Long.toString(guestbookId)));
 
         long pendingId = response(post("/api/public/articles/100/comments")
                 .header("User-Agent", "JUnit")
