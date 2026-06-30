@@ -161,20 +161,20 @@ class CategoryTagWriteServiceTest {
                 category(101L, "backend", "后端", "バックエンド", 10);
         when(categoryRepository.findActiveByIdForUpdate(101L))
                 .thenReturn(Optional.of(current));
-        when(categoryRepository.findBySlugIncludingDeleted("server"))
-                .thenReturn(Optional.empty());
+        when(categoryRepository.findBySlugIncludingDeleted("backend"))
+                .thenReturn(Optional.of(current));
         when(categoryRepository.update(
                 any(Category.class), any(LocalDateTime.class), anyLong()))
                 .thenReturn(true);
         when(categoryRepository.findActiveById(101L))
                 .thenReturn(Optional.of(
-                        category(101L, "server", "服务端", null, 20)));
+                        category(101L, "backend", "服务端", null, 20)));
 
         categoryUpdateService.update(
                 principal("1001", "ADMIN"),
                 101L,
                 new UpdateCategoryCommand(
-                        "服务端", null, null, "server", 20));
+                        "服务端", null, null, "backend", 20));
 
         ArgumentCaptor<Category> categoryCaptor =
                 ArgumentCaptor.forClass(Category.class);
@@ -183,6 +183,24 @@ class CategoryTagWriteServiceTest {
         assertThat(categoryCaptor.getValue().name().ja()).isNull();
         assertThat(categoryCaptor.getValue().name().en()).isNull();
         assertThat(categoryCaptor.getValue().sortOrder()).isEqualTo(20);
+    }
+
+    @Test
+    void rejectsCategorySlugChangeDuringUpdate() {
+        Category current =
+                category(101L, "backend", "后端", null, 10);
+        when(categoryRepository.findActiveByIdForUpdate(101L))
+                .thenReturn(Optional.of(current));
+
+        assertError(
+                () -> categoryUpdateService.update(
+                        principal("1001", "ADMIN"),
+                        101L,
+                        new UpdateCategoryCommand(
+                                "服务端", null, null, "server", 20)),
+                ApiErrorCode.CONFLICT);
+        verify(categoryRepository, never())
+                .update(any(), any(), anyLong());
     }
 
     @Test
@@ -208,6 +226,23 @@ class CategoryTagWriteServiceTest {
         verify(tagRepository).findActiveByIdForUpdate(201L);
         verify(tagRepository).update(
                 any(Tag.class), any(LocalDateTime.class), anyLong());
+    }
+
+    @Test
+    void rejectsTagSlugChangeDuringUpdate() {
+        Tag current = tag(201L, "java", "Java", null);
+        when(tagRepository.findActiveByIdForUpdate(201L))
+                .thenReturn(Optional.of(current));
+
+        assertError(
+                () -> tagUpdateService.update(
+                        principal("1001", "ADMIN"),
+                        201L,
+                        new UpdateTagCommand(
+                                "JVM", null, null, "jvm")),
+                ApiErrorCode.CONFLICT);
+        verify(tagRepository, never())
+                .update(any(), any(), anyLong());
     }
 
     @Test

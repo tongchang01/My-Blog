@@ -47,6 +47,7 @@ public class TagUpdateService {
                     command.nameJa(),
                     command.nameEn(),
                     command.slug());
+            rejectSlugChange(current, replacement);
             ensureSlugAvailable(replacement.slug().value(), id);
             LocalDateTime now = LocalDateTime.now(clock);
             if (!repository.update(replacement, now, actorId)) {
@@ -75,6 +76,14 @@ public class TagUpdateService {
                 .ifPresent(tag -> {
                     throw new ContentSlugConflictException();
                 });
+    }
+
+    private void rejectSlugChange(Tag current, Tag replacement) {
+        if (!current.slug().value().equals(replacement.slug().value())) {
+            throw new ApiException(
+                    ApiErrorCode.CONFLICT,
+                    "标签 slug 创建后不能修改");
+        }
     }
 
     private void validateRequest(long id, UpdateTagCommand command) {

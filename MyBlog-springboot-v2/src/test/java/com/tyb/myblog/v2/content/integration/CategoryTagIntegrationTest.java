@@ -125,6 +125,19 @@ class CategoryTagIntegrationTest {
                                 null,
                                 "server",
                                 30)))
+                .andExpect(status().isConflict());
+
+        mockMvc.perform(put(
+                                "/api/admin/categories/{id}",
+                                categoryId)
+                        .header("Authorization", bearer(admin))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(categoryRequest(
+                                "服务端",
+                                null,
+                                null,
+                                "backend",
+                                30)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.nameJa")
                         .doesNotExist())
@@ -198,7 +211,7 @@ class CategoryTagIntegrationTest {
                         .header("Authorization", bearer(admin))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(categoryRequest(
-                                "复用", null, null, "server", 0)))
+                                "复用", null, null, "backend", 0)))
                 .andExpect(status().isConflict());
         mockMvc.perform(post("/api/admin/tags")
                         .header("Authorization", bearer(admin))

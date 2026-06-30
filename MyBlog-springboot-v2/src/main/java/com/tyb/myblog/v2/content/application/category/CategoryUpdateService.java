@@ -48,6 +48,7 @@ public class CategoryUpdateService {
                     command.nameEn(),
                     command.slug(),
                     command.sortOrder());
+            rejectSlugChange(current, replacement);
             ensureSlugAvailable(replacement.slug().value(), id);
             LocalDateTime now = LocalDateTime.now(clock);
             if (!repository.update(replacement, now, actorId)) {
@@ -76,6 +77,14 @@ public class CategoryUpdateService {
                 .ifPresent(category -> {
                     throw new ContentSlugConflictException();
                 });
+    }
+
+    private void rejectSlugChange(Category current, Category replacement) {
+        if (!current.slug().value().equals(replacement.slug().value())) {
+            throw new ApiException(
+                    ApiErrorCode.CONFLICT,
+                    "分类 slug 创建后不能修改");
+        }
     }
 
     private void validateRequest(
