@@ -1,14 +1,20 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { loadPublicArticle, loadPublicArticles } from './api'
+import {
+  loadPublicArticle,
+  loadPublicHomeArticles,
+  loadPublicArticles
+} from './api'
 import { useArticleStore } from './store'
 import { ApiError } from '@/shared/http/error'
 
 vi.mock('./api', () => ({
   loadPublicArticles: vi.fn(),
+  loadPublicHomeArticles: vi.fn(),
   loadPublicArticle: vi.fn()
 }))
 const mockedLoad = vi.mocked(loadPublicArticles)
+const mockedLoadHome = vi.mocked(loadPublicHomeArticles)
 const mockedDetail = vi.mocked(loadPublicArticle)
 
 const page = (
@@ -24,6 +30,7 @@ describe('article store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     mockedLoad.mockReset()
+    mockedLoadHome.mockReset()
     mockedDetail.mockReset()
   })
 
@@ -84,6 +91,54 @@ describe('article store', () => {
 
     expect(firstSignal?.aborted).toBe(true)
     expect(store.status).toBe('empty')
+  })
+
+  it('loads homepage slots independently from paged articles', async () => {
+    mockedLoadHome.mockResolvedValueOnce({
+      pinnedArticle: null,
+      featuredArticles: [],
+      articles: [
+        {
+          id: '1',
+          title: 'A',
+          summary: null,
+          categoryId: null,
+          categoryName: null,
+          slug: 'a',
+          publishAt: '2026-06-15T10:00:00',
+          coverUrl: null,
+          commentCount: 0,
+          tags: [],
+          createdAt: '2026-06-15T10:00:00',
+          locked: false
+        }
+      ]
+    })
+    const store = useArticleStore()
+
+    await store.loadHome({ size: 12, lang: 'en' })
+
+    expect(store.homeStatus).toBe('ready')
+    expect(store.home.articles[0].id).toBe('1')
+    expect(store.page.records).toEqual([])
+  })
+
+  it('retries the last homepage query', async () => {
+    mockedLoadHome
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce({
+        pinnedArticle: null,
+        featuredArticles: [],
+        articles: []
+      })
+    const store = useArticleStore()
+
+    await store.loadHome({ size: 12, lang: 'zh' })
+    expect(store.homeStatus).toBe('error')
+    await store.retryHome()
+
+    expect(store.homeStatus).toBe('empty')
+    expect(mockedLoadHome).toHaveBeenCalledTimes(2)
   })
 
   it.each([

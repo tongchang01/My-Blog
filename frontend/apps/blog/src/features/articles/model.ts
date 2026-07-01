@@ -25,6 +25,12 @@ export interface ArticlePageViewModel {
   pages: number
 }
 
+export interface ArticleHomeViewModel {
+  pinnedArticle: ArticleCardViewModel | null
+  featuredArticles: ArticleCardViewModel[]
+  articles: ArticleCardViewModel[]
+}
+
 export interface ArticleDetailViewModel extends ArticleCardViewModel {
   bodyHtml: string
   updatedAt: string

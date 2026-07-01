@@ -4,11 +4,13 @@ import { formatJst } from '@/shared/time/jst'
 import { renderMarkdown } from '@/shared/markdown/render'
 import type {
   PublicArticleDetailDto,
+  PublicArticleHomeDto,
   PublicArticleListItemDto
 } from './contract'
 import type {
   ArticleCardViewModel,
   ArticleDetailViewModel,
+  ArticleHomeViewModel,
   ArticlePageViewModel
 } from './model'
 
@@ -40,6 +42,19 @@ export const mapArticlePage = (
   page: dto.page,
   size: dto.size,
   pages: dto.size > 0 ? Math.ceil(dto.total / dto.size) : 0
+})
+
+export const mapArticleHome = (
+  dto: PublicArticleHomeDto,
+  locale: SupportedLocale
+): ArticleHomeViewModel => ({
+  pinnedArticle: dto.pinnedArticle
+    ? mapArticle(dto.pinnedArticle, locale)
+    : null,
+  featuredArticles: dto.featuredArticles.map(article =>
+    mapArticle(article, locale)
+  ),
+  articles: dto.articles.map(article => mapArticle(article, locale))
 })
 
 export const mapArticleDetail = (

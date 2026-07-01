@@ -1,6 +1,12 @@
 <template>
-  <div class="inverted-main-grid py-7 gap-7 box-border">
+  <div
+    :class="[
+      semantic ? 'inverted-main-grid' : 'feature-card-grid',
+      'py-7 gap-7 box-border'
+    ]"
+  >
     <div
+      v-if="semantic"
       class="relative overflow-hidden h-56 lg:h-auto rounded-2xl bg-ob-deep-800 shadow-lg"
     >
       <div
@@ -42,11 +48,15 @@ const props = defineProps({
   data: {
     type: Array as PropType<ArticleCardViewModel[]>,
     required: true
+  },
+  semantic: {
+    type: Boolean,
+    default: true
   }
 })
 
 const appStore = useAppStore()
-const featurePosts = toRefs(props).data
+const { data: featurePosts, semantic } = toRefs(props)
 const { t } = useI18n()
 
 const gradientBackground = computed(() => ({
@@ -57,4 +67,8 @@ const gradientText = computed(
 )
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.feature-card-grid {
+  display: grid;
+}
+</style>

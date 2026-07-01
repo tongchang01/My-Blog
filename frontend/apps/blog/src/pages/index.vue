@@ -1,31 +1,31 @@
 <template>
   <div class="block mt-8">
-    <Feature v-if="showFeature && featuredArticle" :data="featuredArticle">
-      <FeatureList :data="secondaryFeatures" />
+    <Feature v-if="showFeature && mainArticle" :data="mainArticle">
+      <FeatureList
+        v-if="featureCards.length > 0"
+        :data="featureCards"
+        :semantic="hasFeaturedArticles"
+      />
     </Feature>
-    <HorizontalArticle
-      v-else-if="!showFeature && featuredArticle"
-      class="mb-8"
-      :data="featuredArticle"
-    />
+    <HorizontalArticle v-else-if="mainArticle" class="mb-8" :data="mainArticle" />
 
     <div id="article-list" class="flex flex-col relative">
       <ul
-        v-if="articleStore.status === 'loading'"
+        v-if="articleStore.homeStatus === 'loading'"
         class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
       >
         <li v-for="n in 6" :key="n"><ArticleCard :data="null" /></li>
       </ul>
 
       <div
-        v-else-if="articleStore.status === 'empty'"
+        v-else-if="articleStore.homeStatus === 'empty'"
         class="py-24 text-center text-ob-dim"
       >
         {{ emptyMessage }}
       </div>
 
       <div
-        v-else-if="articleStore.status === 'error'"
+        v-else-if="articleStore.homeStatus === 'error'"
         class="py-24 text-center text-ob-dim"
       >
         <p>{{ errorMessage }}</p>
@@ -43,14 +43,6 @@
           <ArticleCard :data="article" />
         </li>
       </ul>
-
-      <Paginator
-        v-if="articleStore.page.total > articleStore.page.size"
-        :pageSize="articleStore.page.size"
-        :pageTotal="articleStore.page.total"
-        :page="articleStore.page.page"
-        @pageChange="pageChangeHandler"
-      />
     </div>
   </div>
 </template>
@@ -60,7 +52,6 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { Feature, FeatureList } from '@/components/Feature'
 import { ArticleCard, HorizontalArticle } from '@/components/ArticleCard'
-import Paginator from '@/components/Paginator.vue'
 import { useArticleStore } from '@/features/articles/store'
 import { isSupportedLocale } from '@/shared/i18n/locale'
 import { useAppStore } from '@/stores/app'
@@ -79,11 +70,32 @@ const currentLocale = computed(() =>
   isSupportedLocale(route.params.lang) ? route.params.lang : appStore.locale
 )
 const showFeature = computed(() => appStore.themeConfig.theme.feature)
-const featuredArticle = computed(() => articleStore.page.records[0] ?? null)
-const secondaryFeatures = computed(() => articleStore.page.records.slice(1, 4))
-const listArticles = computed(() =>
-  articleStore.page.records.slice(showFeature.value ? 4 : 1)
+const hasPinnedArticle = computed(() => articleStore.home.pinnedArticle !== null)
+const hasFeaturedArticles = computed(
+  () => articleStore.home.featuredArticles.length > 0
 )
+const mainArticle = computed(
+  () => articleStore.home.pinnedArticle ?? articleStore.home.articles[0] ?? null
+)
+const ordinaryConsumedByMain = computed(() => (hasPinnedArticle.value ? 0 : 1))
+const featureCards = computed(() => {
+  if (hasFeaturedArticles.value) return articleStore.home.featuredArticles
+  if (!showFeature.value) return []
+  return articleStore.home.articles.slice(
+    ordinaryConsumedByMain.value,
+    ordinaryConsumedByMain.value + 2
+  )
+})
+const listArticles = computed(() => {
+  const articles = articleStore.home.articles
+  const consumed = showFeature.value
+    ? ordinaryConsumedByMain.value +
+      (hasFeaturedArticles.value ? 0 : featureCards.value.length)
+    : ordinaryConsumedByMain.value
+  return hasFeaturedArticles.value && !showFeature.value
+    ? [...articleStore.home.featuredArticles, ...articles.slice(consumed)]
+    : articles.slice(consumed)
+})
 const emptyMessage = computed(() =>
   currentLocale.value === 'zh'
     ? '暂时没有公开文章'
@@ -114,9 +126,8 @@ const updateArticleOffset = async () => {
   articleOffset.value = document.getElementById('article-list')?.offsetTop ?? 0
 }
 
-const loadPage = async (page: number) => {
-  await articleStore.load({
-    page,
+const loadHome = async () => {
+  await articleStore.loadHome({
     size: DEFAULT_PAGE_SIZE,
     lang: currentLocale.value
   })
@@ -127,22 +138,20 @@ const backToArticleTop = () => {
   window.scrollTo({ top: articleOffset.value, behavior: 'smooth' })
 }
 
-const pageChangeHandler = async (page: number) => {
-  backToArticleTop()
-  await loadPage(page)
-}
-
-const retry = async () => articleStore.retry()
+const retry = async () => articleStore.retryHome()
 
 onMounted(async () => {
-  await loadPage(1)
+  await loadHome()
   updateTitleByText(appStore.siteSubtitle ?? '')
 })
 
 watch(
   () => route.params.lang,
   async (next, previous) => {
-    if (next !== previous && isSupportedLocale(next)) await loadPage(1)
+    if (next !== previous && isSupportedLocale(next)) {
+      backToArticleTop()
+      await loadHome()
+    }
   }
 )
 </script>
