@@ -8,7 +8,7 @@
 
 - [ ] `mvn clean test` 通过，并完成真实 MySQL 方言验证。
 - [ ] 前台执行 lint、typecheck 和 production build。
-- [ ] CI/CD 至少覆盖后端测试、前台 lint/typecheck/build，并保存失败日志。
+- [ ] CI 按 [CI/CD 规则](ci-cd.md) 通过；CD 上线前另行设计。
 - [ ] 生产环境显式激活 `prod` profile，必填密钥和数据库变量均由环境注入。
 - [ ] 所有 `LocalDateTime` 请求与响应按 `Asia/Tokyo` 本地时间解释，格式为
   `yyyy-MM-dd'T'HH:mm:ss`，不携带 offset。

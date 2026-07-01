@@ -16,4 +16,5 @@
 | `local-development.md` | 本机三端启动指南 |
 | `local-mysql-development.md` | 本地 MySQL 调试步骤 |
 | `build-and-test.md` | 构建与测试命令 |
+| `ci-cd.md` | CI/CD 边界与扩展规则 |
 | `release-checklist.md` | 发布前检查清单 |
