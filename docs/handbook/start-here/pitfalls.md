@@ -186,6 +186,24 @@
   - **翻译**：DeepL 打底 → 抄 Qiita / Zenn 现成术语 → 关键文案人工校对 → 维护 `../frontend/blog/i18n-glossary.md` 术语表。
 - **相关**：`../../archive/project-handbook/product/decisions-draft.md` Round 2 #18 + #19
 
+### ⚠️ P-010 GitHub runner 环境与本机不一致导致 CI 误判
+
+- **时间**：2026-07-01
+- **现象**：首次把 CI 合入 `main` 后，`Admin frontend tests` 通过，`Backend tests` 连续失败；GitHub annotations 只显示 `Process completed with exit code 1`。
+- **根因**：
+  1. 本机没有 Docker，`@Testcontainers(disabledWithoutDocker = true)` 的 `MySql*Test` 会跳过；GitHub runner 有 Docker，会真实执行 MySQL 专项测试，超出了当前“最小 CI”边界。
+  2. 本机 JVM 默认时区是 `Asia/Tokyo`，GitHub Ubuntu runner 默认不是；`MyBlogConfigStartupValidator` 要求默认时区为 `Asia/Tokyo`，导致 Spring `ApplicationContext` 批量启动失败。
+- **后果**：本机 `mvn test` 绿，不代表 GitHub runner 一定绿；runner 的 Docker、时区、系统环境差异会把隐藏假设放大成 CI 失败。
+- **禁止做法**：
+  - 不要只看 GitHub annotations 后盲猜失败原因。
+  - 不要因为 CI 失败就顺手扩大 CI 范围或塞入 CD。
+  - 不要用本机测试通过替代 runner 环境验证。
+- **正确做法**：
+  - 用 GitHub job logs 查完整失败日志。
+  - 当前最小 CI 显式排除 `MySql*Test`，真实 MySQL 方言验证保留在阶段结束或发布前检查。
+  - backend job 显式设置 `MAVEN_OPTS=-Duser.timezone=Asia/Tokyo` 和 `TZ=Asia/Tokyo`。
+- **相关**：`../ops/ci-cd.md`、`../ops/ci-troubleshooting.md`
+
 ---
 
 ## 未解决但已识别（需后续跟进）
