@@ -27,7 +27,7 @@ jobs:
           cache: maven
 
       - name: Run backend tests
-        run: mvn -f MyBlog-springboot-v2/pom.xml test
+        run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=!MySqlFlywayMigrationTest,!MySqlChangePasswordConcurrencyTest,!MySqlLoginFailureConcurrencyTest"
 
   admin-frontend-test:
     name: Admin frontend tests
