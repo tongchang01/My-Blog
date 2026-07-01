@@ -62,6 +62,40 @@ public record UpdateArticleCommand(
                 HomepageSlot.NONE);
     }
 
+    public UpdateArticleCommand(
+            String titleZh,
+            String titleJa,
+            String titleEn,
+            String summaryZh,
+            String summaryJa,
+            String summaryEn,
+            String body,
+            Long categoryId,
+            List<Long> tagIds,
+            String slug,
+            ArticleStatus status,
+            HomepageSlot homepageSlot,
+            String password,
+            LocalDateTime publishAt,
+            Long coverAttachmentId) {
+        this(
+                titleZh,
+                titleJa,
+                titleEn,
+                summaryZh,
+                summaryJa,
+                summaryEn,
+                body,
+                categoryId,
+                tagIds,
+                slug,
+                status,
+                password,
+                publishAt,
+                coverAttachmentId,
+                homepageSlot);
+    }
+
     public UpdateArticleCommand {
         homepageSlot = HomepageSlot.normalize(homepageSlot);
     }

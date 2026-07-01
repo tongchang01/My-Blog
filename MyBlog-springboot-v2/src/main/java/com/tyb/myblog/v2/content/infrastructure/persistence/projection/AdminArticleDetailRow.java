@@ -23,6 +23,7 @@ public class AdminArticleDetailRow {
     private Long authorId;
     private String slug;
     private Integer status;
+    private String homepageSlot;
     private LocalDateTime publishAt;
     private Long coverAttachmentId;
     private Integer commentCount;

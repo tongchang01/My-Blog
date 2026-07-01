@@ -17,6 +17,7 @@ import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticleQueryService;
 import com.tyb.myblog.v2.content.application.article.UpdateArticleCommand;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -110,6 +111,8 @@ class AdminArticleControllerTest {
                         .value(Long.toString(UNSAFE_BROWSER_ID)))
                 .andExpect(jsonPath("$.data.records[0].coverAttachmentId")
                         .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.records[0].homepageSlot")
+                        .value("PINNED"))
                 .andExpect(jsonPath("$.data.records[0].tagIds[0]")
                         .value(Long.toString(UNSAFE_BROWSER_ID)))
                 .andExpect(jsonPath("$.data.records[0].createdBy")
@@ -133,6 +136,8 @@ class AdminArticleControllerTest {
                         .value(Long.toString(UNSAFE_BROWSER_ID)))
                 .andExpect(jsonPath("$.data.coverAttachmentId")
                         .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.homepageSlot")
+                        .value("PINNED"))
                 .andExpect(jsonPath("$.data.tagIds[0]")
                         .value(Long.toString(UNSAFE_BROWSER_ID)))
                 .andExpect(jsonPath("$.data.createdBy")
@@ -179,6 +184,7 @@ class AdminArticleControllerTest {
                         List.of(20L),
                         "article",
                         ArticleStatus.PUBLISHED,
+                        HomepageSlot.PINNED,
                         null,
                         null,
                         300L));
@@ -197,6 +203,7 @@ class AdminArticleControllerTest {
                         List.of(20L),
                         "article",
                         ArticleStatus.PUBLISHED,
+                        HomepageSlot.PINNED,
                         null,
                         null,
                         300L));
@@ -295,6 +302,7 @@ class AdminArticleControllerTest {
                   "tagIds":[20],
                   "slug":"article",
                   "status":"PUBLISHED",
+                  "homepageSlot":"PINNED",
                   "password":null,
                   "publishAt":null,
                   "coverAttachmentId":300
@@ -315,6 +323,7 @@ class AdminArticleControllerTest {
                 "分类",
                 "article",
                 ArticleStatus.PUBLISHED,
+                HomepageSlot.PINNED,
                 LocalDateTime.of(2026, 6, 15, 10, 0),
                 UNSAFE_BROWSER_ID,
                 "https://cdn.example.com/c.png",
@@ -341,6 +350,7 @@ class AdminArticleControllerTest {
                 UNSAFE_BROWSER_ID,
                 "article",
                 ArticleStatus.PUBLISHED,
+                HomepageSlot.PINNED,
                 LocalDateTime.of(2026, 6, 15, 10, 0),
                 UNSAFE_BROWSER_ID,
                 "https://cdn.example.com/c.png",
@@ -366,6 +376,7 @@ class AdminArticleControllerTest {
                 1001L,
                 "article",
                 ArticleStatus.PUBLISHED,
+                HomepageSlot.PINNED,
                 LocalDateTime.of(2026, 6, 15, 10, 0),
                 300L,
                 2,

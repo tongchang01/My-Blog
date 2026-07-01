@@ -21,6 +21,7 @@ public class UpdateArticleRequest extends ArticleWriteRequestSupport {
                 values.tagIds(),
                 values.slug(),
                 values.status(),
+                values.homepageSlot(),
                 values.password(),
                 values.publishAt(),
                 values.coverAttachmentId());

@@ -140,6 +140,7 @@ public class ArticleQueryService {
                 item.categoryNameZh(),
                 item.slug(),
                 item.status(),
+                item.homepageSlot(),
                 item.publishAt(),
                 item.coverAttachmentId(),
                 coverUrl,
