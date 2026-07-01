@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend-test:
+    name: Backend tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Run backend tests
+        run: mvn -f MyBlog-springboot-v2/pom.xml test
+
+  admin-frontend-test:
+    name: Admin frontend tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: frontend/apps/admin/pnpm-lock.yaml
+
+      - name: Install admin dependencies
+        run: pnpm --dir frontend/apps/admin install --frozen-lockfile
+
+      - name: Typecheck admin
+        run: pnpm --dir frontend/apps/admin typecheck
+
+      - name: Test admin
+        run: pnpm --dir frontend/apps/admin test
