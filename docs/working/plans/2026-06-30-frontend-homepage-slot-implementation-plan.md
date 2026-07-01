@@ -204,3 +204,22 @@ FEATURED
 - 首页改接聚合接口。
 - 移除从普通分页切片生成推荐区的临时逻辑。
 - 按真实槽位数据渲染或隐藏置顶/推荐组件。
+
+## 实施结果
+
+> 最后更新：2026-07-01
+
+- P1 已完成：`docs/handbook/api/article.md` 已记录 `homepageSlot` 写入字段、`GET /api/public/articles/home` 响应结构和槽位冲突语义。
+- P2 已完成：后端新增 `homepage_slot` 持久化字段、`HomepageSlot` 枚举、写入校验和状态变更清空规则。
+- P3 已完成：公开首页聚合接口返回 `pinnedArticle`、`featuredArticles`、`articles`，普通文章列表排除已进入首页槽位的文章。
+- P4 已完成：`frontend/apps/admin` 文章列表显示首页槽位，文章新建/编辑表单支持选择 `NONE`、`PINNED`、`FEATURED`，非 `PUBLISHED` 状态自动回到 `NONE`。
+- P5 已完成：`frontend/apps/blog` 首页消费聚合接口，不再从普通分页切片推断置顶/推荐；普通文章可补位首屏卡片，但 `FeatureList` 只在真实 `FEATURED` 数据存在时显示推荐语义标题块。
+
+已执行验证：
+
+- `mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=!MySqlFlywayMigrationTest,!MySqlChangePasswordConcurrencyTest,!MySqlLoginFailureConcurrencyTest"`。
+- `corepack pnpm --dir frontend/apps/admin test`。
+- `corepack pnpm --dir frontend/apps/admin typecheck`。
+- `corepack pnpm --dir frontend/apps/blog exec vitest run`。
+- `corepack pnpm --dir frontend/apps/blog typecheck`。
+- `corepack pnpm --dir frontend/apps/blog build`。
