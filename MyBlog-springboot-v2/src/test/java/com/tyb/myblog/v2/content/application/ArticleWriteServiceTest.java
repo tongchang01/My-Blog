@@ -13,6 +13,7 @@ import com.tyb.myblog.v2.content.domain.article.Article;
 import com.tyb.myblog.v2.content.domain.article.ArticlePasswordHasher;
 import com.tyb.myblog.v2.content.domain.article.ArticleRepository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import com.tyb.myblog.v2.content.domain.article.NewArticle;
 import com.tyb.myblog.v2.content.domain.category.Category;
 import com.tyb.myblog.v2.content.domain.category.CategoryRepository;
@@ -228,6 +229,104 @@ class ArticleWriteServiceTest {
     }
 
     @Test
+    void rejectsHomepageSlotForNonPublishedArticle() {
+        assertError(
+                () -> createService.create(
+                        ADMIN,
+                        createCommand(
+                                ArticleStatus.DRAFT,
+                                null,
+                                null,
+                                List.of(),
+                                HomepageSlot.PINNED)),
+                ApiErrorCode.VALIDATION_ERROR);
+
+        verify(articleRepository, never()).insert(any());
+    }
+
+    @Test
+    void rejectsSecondPinnedHomepageArticle() {
+        when(articleRepository.countActiveHomepageSlot(
+                HomepageSlot.PINNED,
+                null))
+                .thenReturn(1);
+
+        assertError(
+                () -> createService.create(
+                        ADMIN,
+                        createCommand(
+                                ArticleStatus.PUBLISHED,
+                                null,
+                                null,
+                                List.of(),
+                                HomepageSlot.PINNED)),
+                ApiErrorCode.CONFLICT);
+
+        verify(articleRepository, never()).insert(any());
+    }
+
+    @Test
+    void clearsHomepageSlotWhenArticleBecomesNonPublished() {
+        Article current = currentArticle(
+                ArticleStatus.PUBLISHED,
+                HomepageSlot.PINNED,
+                null,
+                NOW.minusDays(1));
+        when(articleRepository.findActiveByIdForUpdate(100L))
+                .thenReturn(Optional.of(current));
+        when(categoryRepository.findActiveByIdsForUpdate(List.of(10L)))
+                .thenReturn(List.of(category(10L)));
+        when(articleRepository.update(any(), any(), any()))
+                .thenReturn(true);
+
+        updateService.update(
+                ADMIN,
+                100L,
+                updateCommand(
+                        ArticleStatus.PRIVATE,
+                        null,
+                        null,
+                        List.of(),
+                        HomepageSlot.PINNED));
+
+        ArgumentCaptor<Article> articleCaptor =
+                ArgumentCaptor.forClass(Article.class);
+        verify(articleRepository).update(
+                articleCaptor.capture(), any(), any());
+        assertThat(articleCaptor.getValue().homepageSlot())
+                .isEqualTo(HomepageSlot.NONE);
+    }
+
+    @Test
+    void rejectsThirdFeaturedHomepageArticleOnUpdate() {
+        Article current = currentArticle(
+                ArticleStatus.PUBLISHED,
+                HomepageSlot.NONE,
+                null,
+                NOW.minusDays(1));
+        when(articleRepository.findActiveByIdForUpdate(100L))
+                .thenReturn(Optional.of(current));
+        when(articleRepository.countActiveHomepageSlot(
+                HomepageSlot.FEATURED,
+                100L))
+                .thenReturn(2);
+
+        assertError(
+                () -> updateService.update(
+                        ADMIN,
+                        100L,
+                        updateCommand(
+                                ArticleStatus.PUBLISHED,
+                                null,
+                                null,
+                                List.of(),
+                                HomepageSlot.FEATURED)),
+                ApiErrorCode.CONFLICT);
+
+        verify(articleRepository, never()).update(any(), any(), any());
+    }
+
+    @Test
     void updatesPasswordHashByNullKeepingNewPasswordReplacingAndStatusLeavingClearing() {
         Article current = currentArticle(
                 ArticleStatus.PASSWORD,
@@ -350,6 +449,20 @@ class ArticleWriteServiceTest {
             Long coverAttachmentId,
             String password,
             List<Long> tagIds) {
+        return createCommand(
+                status,
+                coverAttachmentId,
+                password,
+                tagIds,
+                HomepageSlot.NONE);
+    }
+
+    private static CreateArticleCommand createCommand(
+            ArticleStatus status,
+            Long coverAttachmentId,
+            String password,
+            List<Long> tagIds,
+            HomepageSlot homepageSlot) {
         return new CreateArticleCommand(
                 "标题",
                 null,
@@ -364,7 +477,8 @@ class ArticleWriteServiceTest {
                 status,
                 password,
                 null,
-                coverAttachmentId);
+                coverAttachmentId,
+                homepageSlot);
     }
 
     private static UpdateArticleCommand updateCommand(
@@ -372,6 +486,20 @@ class ArticleWriteServiceTest {
             LocalDateTime publishAt,
             String password,
             List<Long> tagIds) {
+        return updateCommand(
+                status,
+                publishAt,
+                password,
+                tagIds,
+                HomepageSlot.NONE);
+    }
+
+    private static UpdateArticleCommand updateCommand(
+            ArticleStatus status,
+            LocalDateTime publishAt,
+            String password,
+            List<Long> tagIds,
+            HomepageSlot homepageSlot) {
         return new UpdateArticleCommand(
                 "新标题",
                 null,
@@ -386,7 +514,8 @@ class ArticleWriteServiceTest {
                 status,
                 password,
                 publishAt,
-                null);
+                null,
+                homepageSlot);
     }
 
     private Article articleFrom(NewArticle article, long id) {
@@ -421,6 +550,18 @@ class ArticleWriteServiceTest {
             ArticleStatus status,
             String passwordHash,
             LocalDateTime publishAt) {
+        return currentArticle(
+                status,
+                HomepageSlot.NONE,
+                passwordHash,
+                publishAt);
+    }
+
+    private static Article currentArticle(
+            ArticleStatus status,
+            HomepageSlot homepageSlot,
+            String passwordHash,
+            LocalDateTime publishAt) {
         return Article.reconstitute(
                 100L,
                 "旧标题",
@@ -434,6 +575,7 @@ class ArticleWriteServiceTest {
                 1001L,
                 "article",
                 status,
+                homepageSlot,
                 passwordHash,
                 publishAt,
                 null,

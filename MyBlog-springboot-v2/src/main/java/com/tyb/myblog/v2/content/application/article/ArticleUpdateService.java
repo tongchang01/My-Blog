@@ -8,6 +8,7 @@ import com.tyb.myblog.v2.content.domain.article.Article;
 import com.tyb.myblog.v2.content.domain.article.ArticlePasswordHasher;
 import com.tyb.myblog.v2.content.domain.article.ArticleRepository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,10 @@ public class ArticleUpdateService {
         LocalDateTime now = LocalDateTime.now(clock);
         String hashedPassword = resolvePassword(current, command);
         LocalDateTime publishAt = resolvePublishAt(current, command, now);
+        HomepageSlot homepageSlot = resolveHomepageSlot(
+                command.status(),
+                command.homepageSlot(),
+                id);
         referenceValidator.lockAndValidate(
                 command.status(),
                 command.categoryId(),
@@ -57,6 +62,7 @@ public class ArticleUpdateService {
                 command.categoryId(),
                 command.slug(),
                 command.status(),
+                homepageSlot,
                 hashedPassword,
                 publishAt,
                 command.coverAttachmentId(),
@@ -68,6 +74,27 @@ public class ArticleUpdateService {
         }
         repository.replaceTags(id, replacement.tagIds());
         return ArticleResult.from(replacement);
+    }
+
+    private HomepageSlot resolveHomepageSlot(
+            ArticleStatus status,
+            HomepageSlot requested,
+            long articleId) {
+        HomepageSlot homepageSlot = HomepageSlot.normalize(requested);
+        if (status != ArticleStatus.PUBLISHED) {
+            return HomepageSlot.NONE;
+        }
+        if (homepageSlot == HomepageSlot.NONE) {
+            return HomepageSlot.NONE;
+        }
+        if (repository.countActiveHomepageSlot(
+                homepageSlot,
+                articleId) >= homepageSlot.limit()) {
+            throw new ApiException(
+                    ApiErrorCode.CONFLICT,
+                    "首页槽位数量已达上限");
+        }
+        return homepageSlot;
     }
 
     private String resolvePassword(

@@ -73,6 +73,7 @@ final class ArticleValidation {
                 raw.authorId(),
                 slug,
                 Objects.requireNonNull(raw.status(), "文章状态不能为空"),
+                HomepageSlot.normalize(raw.homepageSlot()),
                 password,
                 raw.publishAt(),
                 raw.coverAttachmentId(),
@@ -107,6 +108,11 @@ final class ArticleValidation {
         } else if (values.accessPassword() != null) {
             throw new IllegalArgumentException(
                     "非密码文章不得保留密码哈希");
+        }
+        if (values.homepageSlot() != HomepageSlot.NONE
+                && values.status() != ArticleStatus.PUBLISHED) {
+            throw new IllegalArgumentException(
+                    "只有已发布文章可设置首页槽位");
         }
         if ((values.status() == ArticleStatus.PUBLISHED
                 || values.status() == ArticleStatus.PASSWORD
@@ -176,6 +182,7 @@ final class ArticleValidation {
             long authorId,
             String slug,
             ArticleStatus status,
+            HomepageSlot homepageSlot,
             String accessPassword,
             LocalDateTime publishAt,
             Long coverAttachmentId,
