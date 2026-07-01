@@ -47,6 +47,7 @@ const stubs = {
         categoryNameZh: null,
         slug: "article-100",
         status: "DRAFT",
+        homepageSlot: "NONE",
         publishAt: null,
         coverAttachmentId: null,
         coverUrl: null,
@@ -122,6 +123,7 @@ describe("article list page", () => {
             categoryNameZh: null,
             slug: "article-100",
             status: "DRAFT",
+            homepageSlot: "PINNED",
             publishAt: null,
             coverAttachmentId: null,
             coverUrl: null,
@@ -150,6 +152,9 @@ describe("article list page", () => {
     );
     expect(wrapper.find('[data-testid="title-filter"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="status-filter"]').exists()).toBe(true);
+    expect(
+      wrapper.find('[data-testid="article-homepage-slot-column"]').exists()
+    ).toBe(true);
     expect(wrapper.find('[data-testid="article-empty"]').exists()).toBe(false);
     expect(wrapper.find('[data-testid="article-create"]').exists()).toBe(true);
     expect(

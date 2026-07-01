@@ -81,7 +81,13 @@ describe("article editor page", () => {
 
     expect(wrapper.find('[data-testid="article-editor"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="article-save"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="article-homepage-slot"]').exists()).toBe(
+      true
+    );
     Object.assign((wrapper.vm as any).form, {
+      categoryId: "10",
+      status: "PUBLISHED",
+      homepageSlot: "PINNED",
       titleZh: "标题",
       summaryZh: "摘要",
       body: "正文"
@@ -90,6 +96,7 @@ describe("article editor page", () => {
     await flushPromises();
 
     expect(mock.history.post).toHaveLength(1);
+    expect(JSON.parse(mock.history.post[0].data).homepageSlot).toBe("PINNED");
     expect(routerState.push).toHaveBeenCalledWith("/articles/list");
   });
 
@@ -113,6 +120,7 @@ describe("article editor page", () => {
         authorId: "1001",
         slug: "article-100",
         status: "DRAFT",
+        homepageSlot: "NONE",
         publishAt: null,
         coverAttachmentId: "9007199254743001",
         coverUrl: "http://localhost/media/cover.png",
@@ -258,6 +266,7 @@ describe("article editor page", () => {
           tagIds: [],
           slug: "",
           status: "DRAFT",
+          homepageSlot: "NONE",
           password: "",
           publishAt: null,
           coverAttachmentId: null,
@@ -295,6 +304,7 @@ describe("article editor page", () => {
           tagIds: [],
           slug: "",
           status: "DRAFT",
+          homepageSlot: "NONE",
           password: "",
           publishAt: null,
           coverAttachmentId: null,

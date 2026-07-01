@@ -21,6 +21,7 @@ const detail: ArticleDetail = {
   authorId: "1001",
   slug: "hello-world",
   status: "PASSWORD",
+  homepageSlot: "FEATURED",
   publishAt: "2026-06-21T10:00:00",
   coverAttachmentId: "30",
   coverUrl: "http://localhost/media/cover.png",
@@ -39,6 +40,7 @@ describe("article editor form", () => {
       categoryId: null,
       tagIds: [],
       password: "",
+      homepageSlot: "NONE",
       coverAttachmentId: null,
       coverUrl: null
     });
@@ -50,6 +52,7 @@ describe("article editor form", () => {
       body: "# 正文",
       categoryId: "10",
       tagIds: ["20"],
+      homepageSlot: "FEATURED",
       password: "",
       coverAttachmentId: "30",
       coverUrl: "http://localhost/media/cover.png"
@@ -75,6 +78,7 @@ describe("article editor form", () => {
       tagIds: ["9007199254741202"],
       slug: "custom-slug",
       status: "PASSWORD",
+      homepageSlot: "FEATURED",
       password: null,
       publishAt: "2026-06-21T10:00:00",
       coverAttachmentId: "30"

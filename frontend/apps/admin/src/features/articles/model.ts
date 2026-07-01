@@ -18,6 +18,7 @@ export type ArticleStatus =
   | "SCHEDULED";
 
 export type ArticleStatusFilter = ArticleStatus | "ALL";
+export type ArticleHomepageSlot = "NONE" | "PINNED" | "FEATURED";
 export type AdminLocale = "zh" | "ja" | "en";
 
 export interface ArticleListFilters {
@@ -46,6 +47,7 @@ export interface ArticleListItem {
   categoryNameZh: string | null;
   slug: string;
   status: ArticleStatus;
+  homepageSlot: ArticleHomepageSlot;
   publishAt: string | null;
   coverAttachmentId: string | null;
   coverUrl: string | null;
@@ -85,6 +87,7 @@ export interface ArticleWritePayload {
   tagIds: string[];
   slug: string | null;
   status: ArticleStatus;
+  homepageSlot: ArticleHomepageSlot;
   password: string | null;
   publishAt: string | null;
   coverAttachmentId: string | null;

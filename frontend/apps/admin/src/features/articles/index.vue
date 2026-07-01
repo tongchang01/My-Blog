@@ -7,6 +7,7 @@ import { useUserStoreHook } from "@/store/modules/user";
 import type { AdminLocale, ArticleListItem, TagItem } from "./model";
 import {
   formatJstDateTime,
+  homepageSlotTranslationKey,
   localizedName,
   statusTranslationKey
 } from "./presentation";
@@ -80,6 +81,12 @@ function statusTagType(status: string) {
   if (status === "PASSWORD") return "warning";
   if (status === "SCHEDULED") return "primary";
   if (status === "PRIVATE") return "danger";
+  return "info";
+}
+
+function homepageSlotTagType(slot: string) {
+  if (slot === "PINNED") return "danger";
+  if (slot === "FEATURED") return "warning";
   return "info";
 }
 
@@ -297,6 +304,22 @@ onMounted(initialize);
               <template #default="{ row }">
                 <el-tag :type="statusTagType(row.status)" effect="light">
                   {{ transformI18n(statusTranslationKey(row.status)) }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column
+              data-testid="article-homepage-slot-column"
+              :label="transformI18n('articles.columns.homepageSlot')"
+              width="120"
+            >
+              <template #default="{ row }">
+                <el-tag
+                  :type="homepageSlotTagType(row.homepageSlot)"
+                  effect="light"
+                >
+                  {{
+                    transformI18n(homepageSlotTranslationKey(row.homepageSlot))
+                  }}
                 </el-tag>
               </template>
             </el-table-column>

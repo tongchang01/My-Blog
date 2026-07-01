@@ -1,4 +1,5 @@
 import type { ArticleEditorMode, ArticleForm } from "./form";
+import { createEmptyArticleForm } from "./form";
 
 const DRAFT_PREFIX = "myblog-admin:article-editor-draft";
 
@@ -33,7 +34,13 @@ export function loadArticleDraft(
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
-    return parsed?.form ?? null;
+    return parsed?.form
+      ? {
+          ...createEmptyArticleForm(),
+          ...parsed.form,
+          tagIds: [...(parsed.form.tagIds ?? [])]
+        }
+      : null;
   } catch {
     return null;
   }

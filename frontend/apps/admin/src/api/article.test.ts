@@ -78,6 +78,7 @@ describe("article API", () => {
       tagIds: ["20"],
       slug: "hello",
       status: "DRAFT",
+      homepageSlot: "NONE",
       password: null,
       publishAt: null,
       coverAttachmentId: null

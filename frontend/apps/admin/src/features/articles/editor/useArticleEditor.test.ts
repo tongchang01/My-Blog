@@ -28,6 +28,7 @@ const detail = {
   authorId: "1001",
   slug: "article-100",
   status: "DRAFT",
+  homepageSlot: "NONE",
   publishAt: null,
   coverAttachmentId: null,
   coverUrl: null,

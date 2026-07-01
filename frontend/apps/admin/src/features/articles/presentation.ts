@@ -1,5 +1,6 @@
 import type {
   AdminLocale,
+  ArticleHomepageSlot,
   ArticleStatus,
   LocalizedNames
 } from "./model";
@@ -10,6 +11,12 @@ const STATUS_KEYS: Record<ArticleStatus, string> = {
   PRIVATE: "articles.status.private",
   PASSWORD: "articles.status.password",
   SCHEDULED: "articles.status.scheduled"
+};
+
+const HOMEPAGE_SLOT_KEYS: Record<ArticleHomepageSlot, string> = {
+  NONE: "articles.homepageSlot.none",
+  PINNED: "articles.homepageSlot.pinned",
+  FEATURED: "articles.homepageSlot.featured"
 };
 
 function nonEmpty(value: string | null | undefined): string | undefined {
@@ -38,6 +45,13 @@ export function localizedName(
 
 export function statusTranslationKey(status: string): string {
   return STATUS_KEYS[status as ArticleStatus] ?? "articles.status.unknown";
+}
+
+export function homepageSlotTranslationKey(slot: string): string {
+  return (
+    HOMEPAGE_SLOT_KEYS[slot as ArticleHomepageSlot] ??
+    "articles.homepageSlot.unknown"
+  );
 }
 
 export function formatJstDateTime(value: string | null): string {

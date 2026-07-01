@@ -142,6 +142,7 @@ articles:
   columns:
     title: Title
     status: Status
+    homepageSlot: Homepage slot
     category: Category
     tags: Tags
     comments: Comments
@@ -155,6 +156,11 @@ articles:
     private: Private
     password: Password
     scheduled: Scheduled
+    unknown: Unknown
+  homepageSlot:
+    none: Normal
+    pinned: Pinned
+    featured: Featured
     unknown: Unknown
   states:
     empty: No articles match the current filters
@@ -193,6 +199,8 @@ articles:
     draftClear: Clear draft
     leaveConfirm: This article has unsaved changes. Leave anyway?
     status: Article status
+    homepageSlot: Homepage slot
+    homepageSlotHint: Pinned allows 1 article and Featured allows 2. Only published articles can use homepage slots.
     slug: Article slug
     category: Category
     tags: Tags
