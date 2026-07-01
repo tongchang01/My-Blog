@@ -5,6 +5,7 @@ import com.tyb.myblog.v2.content.application.article.AdminArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.AdminArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
+import com.tyb.myblog.v2.content.application.article.PublicArticleHomeResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleTagResult;
 import java.util.List;
@@ -63,6 +64,19 @@ public class ArticleWebMapping {
                 result.total(),
                 result.page(),
                 result.size());
+    }
+
+    public PublicArticleHomeVO toPublicHome(PublicArticleHomeResult result) {
+        return new PublicArticleHomeVO(
+                result.pinnedArticle() == null
+                        ? null
+                        : toPublicPageItem(result.pinnedArticle()),
+                result.featuredArticles().stream()
+                        .map(this::toPublicPageItem)
+                        .toList(),
+                result.articles().stream()
+                        .map(this::toPublicPageItem)
+                        .toList());
     }
 
     public PublicArticleDetailVO toPublicDetail(

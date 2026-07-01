@@ -102,6 +102,40 @@ class DatabasePublicArticleQueryRepositoryTest {
         assertThat(repository.findPublicDetail(102L, NOW)).isEmpty();
     }
 
+    @Test
+    void readsHomepageGroupsAndExcludesSlotArticlesFromOrdinaryList() {
+        insertCategory(10L, "鍚庣");
+        insertArticle(100L, "Pinned", 2, 10L,
+                "2026-06-16 10:00:00", false);
+        insertArticle(101L, "Featured Old", 2, 10L,
+                "2026-06-16 09:00:00", false);
+        insertArticle(102L, "Featured New", 2, 10L,
+                "2026-06-16 11:00:00", false);
+        insertArticle(103L, "Ordinary New", 2, 10L,
+                "2026-06-16 08:00:00", false);
+        insertArticle(104L, "Password Slot", 4, 10L,
+                "2026-06-16 12:00:00", false);
+        insertArticle(105L, "Draft Slot", 1, 10L,
+                "2026-06-16 12:00:00", false);
+        insertArticle(106L, "Ordinary Old", 2, 10L,
+                "2026-06-15 08:00:00", false);
+        setHomepageSlot(100L, "PINNED");
+        setHomepageSlot(101L, "FEATURED");
+        setHomepageSlot(102L, "FEATURED");
+        setHomepageSlot(104L, "FEATURED");
+        setHomepageSlot(105L, "PINNED");
+
+        var home = repository.findPublicHome(NOW, 2);
+
+        assertThat(home.pinnedArticle().id()).isEqualTo(100L);
+        assertThat(home.featuredArticles())
+                .extracting("id")
+                .containsExactly(102L, 101L);
+        assertThat(home.articles())
+                .extracting("id")
+                .containsExactly(103L, 106L);
+    }
+
     private PublicArticleCriteria criteria(
             Long categoryId,
             Long tagId,
@@ -183,5 +217,13 @@ class DatabasePublicArticleQueryRepositoryTest {
                 INSERT INTO t_article_tag (article_id, tag_id)
                 VALUES (?, ?)
                 """, articleId, tagId);
+    }
+
+    private void setHomepageSlot(long articleId, String slot) {
+        jdbcTemplate.update("""
+                UPDATE t_article
+                SET homepage_slot = ?
+                WHERE id = ?
+                """, slot, articleId);
     }
 }

@@ -254,6 +254,70 @@
         WHERE <include refid="publicArticleWhere"/>
     </select>
 
+    <select id="selectPublicHomepageSlot"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticlePageRow">
+        SELECT
+            a.id,
+            a.title_zh,
+            a.title_ja,
+            a.title_en,
+            a.summary_zh,
+            a.summary_ja,
+            a.summary_en,
+            a.category_id,
+            c.name_zh AS category_name_zh,
+            c.name_ja AS category_name_ja,
+            c.name_en AS category_name_en,
+            a.slug,
+            a.status,
+            a.publish_at,
+            a.cover_attachment_id,
+            a.comment_count,
+            a.created_at
+        FROM t_article a
+        LEFT JOIN t_category c
+            ON c.id = a.category_id
+           AND c.deleted = 0
+        WHERE a.deleted = 0
+          AND a.status = 2
+          AND a.publish_at <![CDATA[<=]]> #{now}
+          AND a.homepage_slot = #{slot}
+        ORDER BY a.publish_at DESC, a.id DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectPublicHomeArticles"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticlePageRow">
+        SELECT
+            a.id,
+            a.title_zh,
+            a.title_ja,
+            a.title_en,
+            a.summary_zh,
+            a.summary_ja,
+            a.summary_en,
+            a.category_id,
+            c.name_zh AS category_name_zh,
+            c.name_ja AS category_name_ja,
+            c.name_en AS category_name_en,
+            a.slug,
+            a.status,
+            a.publish_at,
+            a.cover_attachment_id,
+            a.comment_count,
+            a.created_at
+        FROM t_article a
+        LEFT JOIN t_category c
+            ON c.id = a.category_id
+           AND c.deleted = 0
+        WHERE a.deleted = 0
+          AND a.status = 2
+          AND a.publish_at <![CDATA[<=]]> #{now}
+          AND a.homepage_slot = 'NONE'
+        ORDER BY a.publish_at DESC, a.id DESC
+        LIMIT #{size}
+    </select>
+
     <!-- 公开详情预检只读取 ID 和状态，PASSWORD 正文不会进入应用内存。 -->
     <select id="selectPublicAccessMetadata"
             resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticleAccessMetadataRow">

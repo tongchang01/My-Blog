@@ -3,12 +3,14 @@ package com.tyb.myblog.v2.content.application;
 import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
+import com.tyb.myblog.v2.content.application.article.PublicArticleHomeResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQuery;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQueryService;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.ArticleTagView;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleAccessMetadata;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleDetail;
+import com.tyb.myblog.v2.content.domain.article.PublicArticleHome;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePage;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleQueryRepository;
@@ -108,6 +110,55 @@ class PublicArticleQueryServiceTest {
                 .singleElement()
                 .extracting("coverUrl")
                 .isNull();
+    }
+
+    @Test
+    void returnsHomepageArticlesWithPinnedFeaturedAndOrdinaryGroups() {
+        PublicArticlePageItem pinned = pageItem(
+                100L,
+                ArticleStatus.PUBLISHED,
+                300L);
+        PublicArticlePageItem featured = pageItem(
+                101L,
+                ArticleStatus.PUBLISHED,
+                null);
+        PublicArticlePageItem ordinary = pageItem(
+                102L,
+                ArticleStatus.PUBLISHED,
+                301L);
+        when(repository.findPublicHome(NOW, 10))
+                .thenReturn(new PublicArticleHome(
+                        pinned,
+                        List.of(featured),
+                        List.of(ordinary)));
+        when(attachmentService.resolvePublicUrls(Set.of(300L, 301L)))
+                .thenReturn(Map.of(
+                        300L, "https://cdn.example.com/pinned.png",
+                        301L, "https://cdn.example.com/article.png"));
+
+        PublicArticleHomeResult result = service.home("zh", 10);
+
+        assertThat(result.pinnedArticle()).isNotNull();
+        assertThat(result.pinnedArticle().coverUrl())
+                .isEqualTo("https://cdn.example.com/pinned.png");
+        assertThat(result.featuredArticles())
+                .singleElement()
+                .extracting("id")
+                .isEqualTo(101L);
+        assertThat(result.articles())
+                .singleElement()
+                .extracting("coverUrl")
+                .isEqualTo("https://cdn.example.com/article.png");
+    }
+
+    @Test
+    void validatesHomepageSize() {
+        assertError(
+                () -> service.home("zh", 0),
+                ApiErrorCode.VALIDATION_ERROR);
+        assertError(
+                () -> service.home("zh", 51),
+                ApiErrorCode.VALIDATION_ERROR);
     }
 
     @Test

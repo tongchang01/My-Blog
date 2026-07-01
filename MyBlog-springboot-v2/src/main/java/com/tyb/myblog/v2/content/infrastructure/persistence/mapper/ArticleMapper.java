@@ -57,6 +57,15 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
 
     long countPublicPage(@Param("query") PublicArticleCriteria query);
 
+    List<PublicArticlePageRow> selectPublicHomepageSlot(
+            @Param("slot") HomepageSlot slot,
+            @Param("now") LocalDateTime now,
+            @Param("limit") int limit);
+
+    List<PublicArticlePageRow> selectPublicHomeArticles(
+            @Param("now") LocalDateTime now,
+            @Param("size") int size);
+
     PublicArticleAccessMetadataRow selectPublicAccessMetadata(
             @Param("id") long id,
             @Param("now") LocalDateTime now);

@@ -44,6 +44,15 @@ public class PublicArticleController {
                         archiveMonth))));
     }
 
+    @Operation(summary = "查询公开首页文章")
+    @GetMapping("/home")
+    public ApiResponse<PublicArticleHomeVO> home(
+            @RequestParam(defaultValue = "zh") String lang,
+            @RequestParam(defaultValue = "10") int size) {
+        return ApiResponse.ok(mapping.toPublicHome(
+                queryService.home(lang, size)));
+    }
+
     @Operation(summary = "查询公开文章详情")
     @GetMapping("/{id:\\d+}")
     public ApiResponse<PublicArticleDetailVO> detail(
