@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后续开发
-> 最后校准：2026-06-30
+> 最后校准：2026-07-02
 > 权威程度：未完成事项权威登记表
 
 ## 本文档回答什么问题
@@ -135,13 +135,12 @@
 
 ## O-013 文章置顶和推荐能力缺失
 
-- 状态：未完成 / 方案已定 / 实现待设计
+- 状态：已关闭
 - 优先级：P0
 - 影响范围：后端 content、后台 admin、前台 blog、API 契约、Schema 迁移
-- 当前判断：前台 Aurora/Hexo 旧文章模型包含 `pinned` 和 `feature`，首页首屏实际需要“1 篇置顶大卡片 + 最多 2 篇推荐小卡片 + 普通文章列表”。该能力不属于文章生命周期状态，应使用独立首页展示槽位表达，建议为 `NONE / PINNED / FEATURED`。
-- 风险：如果继续用公开文章列表第一条冒充置顶或推荐，站长无法显式控制首页首屏内容，普通最新文章也可能被误展示为推荐；如果把槽位并入文章状态，又会污染 `DRAFT/PUBLISHED/PASSWORD/SCHEDULED` 等发布生命周期。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-homepage-slot-implementation-plan.md` 拆分实现。后端约束 `PINNED` 最多 1 篇、`FEATURED` 最多 2 篇，且只有 `PUBLISHED` 文章可进入槽位；首页接口明确返回 `pinnedArticle`、`featuredArticles`、`articles`；前台卡片区域可以由普通文章自然补位，但置顶/推荐语义标识只在真实槽位存在时显示；后台文章新建/编辑页增加槽位选择和数量提示，超限保存时拒绝，不自动替换旧文章。
-- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-001、`docs/working/plans/2026-06-30-frontend-homepage-slot-implementation-plan.md`、前台 `Post.feature` / `Post.pinned`、当前 content 代码
+- 关闭原因：已实现独立首页展示槽位 `NONE / PINNED / FEATURED`。后端新增 `homepage_slot`、写入校验和 `GET /api/public/articles/home`；后台文章列表和编辑表单支持维护槽位；前台首页消费聚合接口，不再从普通分页切片推断置顶或推荐语义。
+- 验证：后端 Maven 测试、后台 Vitest/typecheck、前台 Vitest/typecheck/build 通过；GitHub Actions `backend-mysql-test` 已纳入主线 CI。
+- 来源：`docs/working/plans/2026-06-30-frontend-homepage-slot-implementation-plan.md`、`docs/handbook/api/article.md`、当前 content/admin/blog 代码
 
 ## O-014 公开 URL 标识策略与 slug 生命周期
 
