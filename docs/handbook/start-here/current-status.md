@@ -54,13 +54,14 @@
 - `GET /api/public/articles/home` 首页聚合接口接入，后台文章编辑可维护 `homepageSlot`。
 - 公开文章列表、分页、loading、empty、error、retry。
 - 公开文章详情、canonical slug、PASSWORD 锁定态、404、网络错误、retry。
+- 分类和标签公开列表、文章数量展示、slug 路由筛选。
 - 公开 content/comment/stats 的前端可见 Snowflake ID 已在 HTTP JSON 边界输出为 string；后端内部仍使用数值 ID。
 - 正文通过 `markdown-it` 渲染，禁用原始 HTML，并补充外链安全属性。
 - 首页已停止请求旧 Hexo/Aurora 的 `site.json`、`posts/1.json`、`features.json`、旧搜索索引和旧友链页面数据。
 
 仍待补齐：
 
-- 分类、标签、归档、友链、关于、搜索。
+- 归档、友链、关于、搜索。
 - 评论、留言、访问统计前台接入。
 - PASSWORD 文章完整解锁流程。
 - Spotify Embed。
