@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 content 模块、前台 blog、后台 admin
-> 最后校准：2026-06-29
+> 最后校准：2026-07-02
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/*Article*`
 > 权威程度：API 契约
 
@@ -270,6 +270,8 @@ Query：
 | `lang` | string | `zh` | 支持 `zh`、`ja`、`en`；缺失或非法时按服务端规则回退 `zh` |
 | `categoryId` | number | 无 | 分类 ID |
 | `tagId` | number | 无 | 标签 ID |
+| `categorySlug` | string | 无 | 分类 slug；前台公开 URL 优先使用该参数 |
+| `tagSlug` | string | 无 | 标签 slug；前台公开 URL 优先使用该参数 |
 | `keyword` | string | 无 | 当前语言标题/摘要关键字 |
 | `archiveMonth` | string | 无 | 格式 `yyyy-MM` |
 
@@ -282,17 +284,17 @@ Query：
   "data": {
     "records": [
       {
-        "id": 123,
+        "id": "123",
         "title": "中文标题",
         "summary": "中文摘要",
-        "categoryId": 10,
+        "categoryId": "10",
         "categoryName": "后端",
         "slug": "hello-world",
         "publishAt": "2026-06-16T12:00:00",
         "coverUrl": "https://static.example.com/cover.webp",
         "commentCount": 2,
         "tags": [
-          { "id": 20, "name": "Java", "slug": "java" }
+          { "id": "20", "name": "Java", "slug": "java" }
         ],
         "createdAt": "2026-06-16T10:00:00",
         "locked": false
@@ -305,9 +307,7 @@ Query：
 }
 ```
 
-公开列表只返回 `PUBLISHED` 和 `PASSWORD` 状态文章，不返回正文和密码信息。PASSWORD 文章通过 `locked=true` 表示。
-
-当前公开文章响应中的 `id`、`categoryId` 和 `tags[].id` 是 number；这与前端可见 ID string 规则不一致，统一登记到 O-010。
+公开列表只返回 `PUBLISHED` 和 `PASSWORD` 状态文章，不返回正文和密码信息。PASSWORD 文章通过 `locked=true` 表示。公开筛选同时保留 `categoryId/tagId` 兼容参数和 `categorySlug/tagSlug` URL 语义参数；前台分类/标签页面优先使用 slug。
 
 ## 11. 公开首页文章
 

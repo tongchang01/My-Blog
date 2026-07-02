@@ -78,6 +78,33 @@ class PublicArticleControllerTest {
     }
 
     @Test
+    void passesTaxonomySlugFiltersToPublicPageQuery()
+            throws Exception {
+        when(queryService.page(new PublicArticleQuery(
+                2,
+                12,
+                "en",
+                null,
+                null,
+                "backend",
+                "java",
+                null,
+                null)))
+                .thenReturn(new PublicArticlePageResult(
+                        List.of(pageItem()), 1, 2, 12));
+
+        mockMvc.perform(get("/api/public/articles")
+                        .queryParam("page", "2")
+                        .queryParam("size", "12")
+                        .queryParam("lang", "en")
+                        .queryParam("categorySlug", "backend")
+                        .queryParam("tagSlug", "java"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].id")
+                        .value(Long.toString(ARTICLE_ID)));
+    }
+
+    @Test
     void returnsPublicHomeArticles() throws Exception {
         when(queryService.home("en", 10))
                 .thenReturn(new PublicArticleHomeResult(

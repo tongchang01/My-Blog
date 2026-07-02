@@ -13,6 +13,8 @@ public record PublicArticleCriteria(
         int size,
         Long categoryId,
         Long tagId,
+        String categorySlug,
+        String tagSlug,
         String keyword,
         String archiveMonth,
         LocalDateTime archiveFrom,
@@ -24,6 +26,28 @@ public record PublicArticleCriteria(
             int size,
             Long categoryId,
             Long tagId,
+            String keyword,
+            String archiveMonth,
+            LocalDateTime now) {
+        return from(
+                page,
+                size,
+                categoryId,
+                tagId,
+                null,
+                null,
+                keyword,
+                archiveMonth,
+                now);
+    }
+
+    public static PublicArticleCriteria from(
+            int page,
+            int size,
+            Long categoryId,
+            Long tagId,
+            String categorySlug,
+            String tagSlug,
             String keyword,
             String archiveMonth,
             LocalDateTime now) {
@@ -44,10 +68,19 @@ public record PublicArticleCriteria(
                 size,
                 categoryId,
                 tagId,
+                normalize(categorySlug),
+                normalize(tagSlug),
                 keyword,
                 archiveMonth,
                 from,
                 to,
                 now);
+    }
+
+    private static String normalize(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        return value.trim();
     }
 }

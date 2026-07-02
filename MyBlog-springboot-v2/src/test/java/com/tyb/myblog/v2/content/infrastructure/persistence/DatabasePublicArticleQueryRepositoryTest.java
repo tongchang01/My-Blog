@@ -68,6 +68,31 @@ class DatabasePublicArticleQueryRepositoryTest {
     }
 
     @Test
+    void pagesPublicArticlesByTaxonomySlugFilters() {
+        insertCategory(10L, "Backend");
+        insertCategory(11L, "Frontend");
+        insertTag(20L, "Java");
+        insertTag(21L, "Vue");
+        insertArticle(100L, "Spring Boot", 2, 10L,
+                "2026-06-15 10:00:00", false);
+        insertArticle(101L, "Vue", 2, 11L,
+                "2026-06-15 11:00:00", false);
+        linkTag(100L, 20L);
+        linkTag(101L, 21L);
+
+        assertThat(repository.findPublicPage(criteria(
+                null,
+                null,
+                "category-10",
+                "tag-20",
+                null,
+                null)).records())
+                .singleElement()
+                .extracting("id")
+                .isEqualTo(100L);
+    }
+
+    @Test
     void readsPasswordMetadataWithoutExposingPasswordDetail() {
         insertCategory(10L, "后端");
         insertTag(20L, "Java");
@@ -141,11 +166,29 @@ class DatabasePublicArticleQueryRepositoryTest {
             Long tagId,
             String keyword,
             String archiveMonth) {
+        return criteria(
+                categoryId,
+                tagId,
+                null,
+                null,
+                keyword,
+                archiveMonth);
+    }
+
+    private PublicArticleCriteria criteria(
+            Long categoryId,
+            Long tagId,
+            String categorySlug,
+            String tagSlug,
+            String keyword,
+            String archiveMonth) {
         return PublicArticleCriteria.from(
                 1,
                 20,
                 categoryId,
                 tagId,
+                categorySlug,
+                tagSlug,
                 keyword,
                 archiveMonth,
                 NOW);
