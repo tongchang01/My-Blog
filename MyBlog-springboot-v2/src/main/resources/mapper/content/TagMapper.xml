@@ -28,6 +28,47 @@
         ORDER BY name_zh ASC, id ASC
     </select>
 
+    <select id="selectPublicWithArticleCount"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.TagArticleCountRow">
+        SELECT
+            t.id,
+            t.name_zh,
+            t.name_ja,
+            t.name_en,
+            t.slug,
+            t.created_at,
+            t.created_by,
+            t.updated_at,
+            t.updated_by,
+            t.deleted,
+            t.deleted_at,
+            t.deleted_by,
+            COUNT(a.id) AS article_count
+        FROM t_tag t
+        INNER JOIN t_article_tag article_tag
+            ON article_tag.tag_id = t.id
+        INNER JOIN t_article a
+            ON a.id = article_tag.article_id
+           AND a.deleted = 0
+           AND a.status IN (2, 4)
+           AND a.publish_at <![CDATA[<=]]> #{now}
+        WHERE t.deleted = 0
+        GROUP BY
+            t.id,
+            t.name_zh,
+            t.name_ja,
+            t.name_en,
+            t.slug,
+            t.created_at,
+            t.created_by,
+            t.updated_at,
+            t.updated_by,
+            t.deleted,
+            t.deleted_at,
+            t.deleted_by
+        ORDER BY t.name_zh ASC, t.id ASC
+    </select>
+
     <select id="selectActiveById"
             resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.TagEntity">
         SELECT <include refid="tagColumns"/>

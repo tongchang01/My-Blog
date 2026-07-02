@@ -29,6 +29,47 @@
         ORDER BY sort_order ASC, id ASC
     </select>
 
+    <select id="selectPublicWithArticleCount"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.CategoryArticleCountRow">
+        SELECT
+            c.id,
+            c.name_zh,
+            c.name_ja,
+            c.name_en,
+            c.slug,
+            c.sort_order,
+            c.created_at,
+            c.created_by,
+            c.updated_at,
+            c.updated_by,
+            c.deleted,
+            c.deleted_at,
+            c.deleted_by,
+            COUNT(a.id) AS article_count
+        FROM t_category c
+        INNER JOIN t_article a
+            ON a.category_id = c.id
+           AND a.deleted = 0
+           AND a.status IN (2, 4)
+           AND a.publish_at <![CDATA[<=]]> #{now}
+        WHERE c.deleted = 0
+        GROUP BY
+            c.id,
+            c.name_zh,
+            c.name_ja,
+            c.name_en,
+            c.slug,
+            c.sort_order,
+            c.created_at,
+            c.created_by,
+            c.updated_at,
+            c.updated_by,
+            c.deleted,
+            c.deleted_at,
+            c.deleted_by
+        ORDER BY c.sort_order ASC, c.id ASC
+    </select>
+
     <select id="selectActiveById"
             resultType="com.tyb.myblog.v2.content.infrastructure.persistence.entity.CategoryEntity">
         SELECT <include refid="categoryColumns"/>

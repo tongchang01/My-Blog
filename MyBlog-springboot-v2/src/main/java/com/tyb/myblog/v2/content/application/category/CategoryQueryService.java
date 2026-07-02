@@ -9,6 +9,8 @@ import com.tyb.myblog.v2.content.domain.category.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -20,15 +22,19 @@ public class CategoryQueryService {
 
     private final CategoryRepository repository;
     private final ContentAuthorization authorization;
+    private final Clock clock;
 
     public List<PublicCategoryResult> publicList(
             String languageCode) {
         ContentLanguage language = parseLanguage(languageCode);
-        return repository.findAllActive().stream()
-                .map(category -> new PublicCategoryResult(
-                        category.id(),
-                        category.name().localized(language),
-                        category.slug().value()))
+        return repository.findPublicWithArticleCount(
+                        LocalDateTime.now(clock))
+                .stream()
+                .map(item -> new PublicCategoryResult(
+                        item.category().id(),
+                        item.category().name().localized(language),
+                        item.category().slug().value(),
+                        item.articleCount()))
                 .toList();
     }
 

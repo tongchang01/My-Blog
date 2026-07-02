@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.content.infrastructure.persistence.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.tyb.myblog.v2.content.infrastructure.persistence.entity.CategoryEntity;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.CategoryArticleCountRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,6 +16,9 @@ import java.util.List;
 public interface CategoryMapper extends BaseMapper<CategoryEntity> {
 
     List<CategoryEntity> selectAllActive();
+
+    List<CategoryArticleCountRow> selectPublicWithArticleCount(
+            @Param("now") LocalDateTime now);
 
     CategoryEntity selectActiveById(@Param("id") long id);
 

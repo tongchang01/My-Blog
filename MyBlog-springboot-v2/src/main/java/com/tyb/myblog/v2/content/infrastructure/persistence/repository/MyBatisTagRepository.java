@@ -33,6 +33,16 @@ public class MyBatisTagRepository implements TagRepository {
     }
 
     @Override
+    public List<PublicTagWithArticleCount> findPublicWithArticleCount(
+            LocalDateTime now) {
+        return mapper.selectPublicWithArticleCount(now).stream()
+                .map(row -> new PublicTagWithArticleCount(
+                        mapping.toDomain(row),
+                        row.getArticleCount()))
+                .toList();
+    }
+
+    @Override
     public Optional<Tag> findActiveById(long id) {
         return Optional.ofNullable(mapper.selectActiveById(id))
                 .map(mapping::toDomain);

@@ -11,6 +11,9 @@ public interface CategoryRepository {
 
     List<Category> findAllActive();
 
+    List<PublicCategoryWithArticleCount> findPublicWithArticleCount(
+            LocalDateTime now);
+
     Optional<Category> findActiveById(long id);
 
     Optional<Category> findActiveByIdForUpdate(long id);
@@ -38,4 +41,9 @@ public interface CategoryRepository {
             long id,
             LocalDateTime deletedAt,
             long deletedBy);
+
+    record PublicCategoryWithArticleCount(
+            Category category,
+            long articleCount) {
+    }
 }

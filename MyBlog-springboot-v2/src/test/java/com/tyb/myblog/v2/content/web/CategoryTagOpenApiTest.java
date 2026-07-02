@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CategoryTagOpenApiTest {
 
     private static final Set<String> PUBLIC_FIELDS =
-            Set.of("id", "name", "slug");
+            Set.of("id", "name", "slug", "articleCount");
     private static final Set<String> CATEGORY_ADMIN_FIELDS =
             Set.of(
                     "id", "nameZh", "nameJa", "nameEn", "slug",
@@ -106,6 +106,8 @@ class CategoryTagOpenApiTest {
                 TAG_WRITE_FIELDS);
         assertStringId(root, "PublicCategoryVO", "id");
         assertStringId(root, "PublicTagVO", "id");
+        assertInteger(root, "PublicCategoryVO", "articleCount");
+        assertInteger(root, "PublicTagVO", "articleCount");
         assertStringId(root, "AdminCategoryVO", "id");
         assertStringId(root, "AdminCategoryVO", "createdBy");
         assertStringId(root, "AdminCategoryVO", "updatedBy");
@@ -163,6 +165,16 @@ class CategoryTagOpenApiTest {
                         + "/properties/" + field);
         assertThat(property.path("type").asText()).isEqualTo("string");
         assertThat(property.path("format").asText()).isEqualTo("int64");
+    }
+
+    private void assertInteger(
+            JsonNode root,
+            String schema,
+            String field) {
+        JsonNode property = root.at(
+                "/components/schemas/" + schema
+                        + "/properties/" + field);
+        assertThat(property.path("type").asText()).isEqualTo("integer");
     }
 
     private JsonNode apiDocument() throws Exception {

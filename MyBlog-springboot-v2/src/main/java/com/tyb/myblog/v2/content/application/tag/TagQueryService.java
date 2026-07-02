@@ -9,6 +9,8 @@ import com.tyb.myblog.v2.content.domain.tag.TagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Clock;
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -20,15 +22,19 @@ public class TagQueryService {
 
     private final TagRepository repository;
     private final ContentAuthorization authorization;
+    private final Clock clock;
 
     public List<PublicTagResult> publicList(
             String languageCode) {
         ContentLanguage language = parseLanguage(languageCode);
-        return repository.findAllActive().stream()
-                .map(tag -> new PublicTagResult(
-                        tag.id(),
-                        tag.name().localized(language),
-                        tag.slug().value()))
+        return repository.findPublicWithArticleCount(
+                        LocalDateTime.now(clock))
+                .stream()
+                .map(item -> new PublicTagResult(
+                        item.tag().id(),
+                        item.tag().name().localized(language),
+                        item.tag().slug().value(),
+                        item.articleCount()))
                 .toList();
     }
 
