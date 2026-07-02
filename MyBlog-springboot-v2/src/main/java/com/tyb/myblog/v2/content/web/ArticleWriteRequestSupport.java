@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,7 @@ abstract class ArticleWriteRequestSupport {
     private SubmittedField<List<Long>> tagIds = SubmittedField.missing();
     private SubmittedField<String> slug = SubmittedField.missing();
     private SubmittedField<ArticleStatus> status = SubmittedField.missing();
+    private SubmittedField<HomepageSlot> homepageSlot = SubmittedField.missing();
     private SubmittedField<String> password = SubmittedField.missing();
     private SubmittedField<LocalDateTime> publishAt = SubmittedField.missing();
     private SubmittedField<Long> coverAttachmentId = SubmittedField.missing();
@@ -85,6 +87,11 @@ abstract class ArticleWriteRequestSupport {
         status = SubmittedField.present(value);
     }
 
+    @JsonSetter("homepageSlot")
+    public void setHomepageSlot(HomepageSlot value) {
+        homepageSlot = SubmittedField.present(value);
+    }
+
     @JsonSetter("password")
     public void setPassword(String value) {
         password = SubmittedField.present(value);
@@ -123,6 +130,7 @@ abstract class ArticleWriteRequestSupport {
                     normalizeTagIds(tagIds.value()),
                     slug.value(),
                     status.value(),
+                    homepageSlot.value(),
                     password.value(),
                     publishAt.value(),
                     coverAttachmentId.value());
@@ -143,6 +151,7 @@ abstract class ArticleWriteRequestSupport {
                 || !tagIds.submitted()
                 || !slug.submitted()
                 || !status.submitted()
+                || !homepageSlot.submitted()
                 || !password.submitted()
                 || !publishAt.submitted()
                 || !coverAttachmentId.submitted()) {
@@ -192,6 +201,7 @@ abstract class ArticleWriteRequestSupport {
             List<Long> tagIds,
             String slug,
             ArticleStatus status,
+            HomepageSlot homepageSlot,
             String password,
             LocalDateTime publishAt,
             Long coverAttachmentId) {

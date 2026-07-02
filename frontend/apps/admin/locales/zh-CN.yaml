@@ -142,6 +142,7 @@ articles:
   columns:
     title: 标题
     status: 状态
+    homepageSlot: 首页槽位
     category: 分类
     tags: 标签
     comments: 评论数
@@ -155,6 +156,11 @@ articles:
     private: 私密
     password: 密码访问
     scheduled: 定时发布
+    unknown: 未知
+  homepageSlot:
+    none: 普通
+    pinned: 置顶
+    featured: 推荐
     unknown: 未知
   states:
     empty: 没有符合条件的文章
@@ -193,6 +199,8 @@ articles:
     draftClear: 清除草稿
     leaveConfirm: 当前文章有未保存修改，确认离开？
     status: 文章状态
+    homepageSlot: 首页展示槽位
+    homepageSlotHint: 置顶最多 1 篇，推荐最多 2 篇；只有已发布文章可以进入首页槽位。
     slug: 文章路径
     category: 分类
     tags: 标签

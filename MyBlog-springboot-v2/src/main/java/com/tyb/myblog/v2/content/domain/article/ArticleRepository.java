@@ -22,6 +22,10 @@ public interface ArticleRepository {
             LocalDateTime updatedAt,
             Long updatedBy);
 
+    int countActiveHomepageSlot(
+            HomepageSlot slot,
+            Long excludeArticleId);
+
     boolean softDelete(
             long id,
             LocalDateTime deletedAt,

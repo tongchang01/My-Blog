@@ -2,9 +2,11 @@ package com.tyb.myblog.v2.content.infrastructure.persistence.repository;
 
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.ArticleTagView;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleCriteria;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleAccessMetadata;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleDetail;
+import com.tyb.myblog.v2.content.domain.article.PublicArticleHome;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePage;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleQueryRepository;
@@ -48,6 +50,48 @@ public class MyBatisPublicArticleQueryRepository
                 mapper.countPublicPage(criteria),
                 criteria.page(),
                 criteria.size());
+    }
+
+    @Override
+    public PublicArticleHome findPublicHome(LocalDateTime now, int size) {
+        List<PublicArticlePageRow> pinnedRows =
+                mapper.selectPublicHomepageSlot(
+                        HomepageSlot.PINNED,
+                        now,
+                        1);
+        List<PublicArticlePageRow> featuredRows =
+                mapper.selectPublicHomepageSlot(
+                        HomepageSlot.FEATURED,
+                        now,
+                        2);
+        List<PublicArticlePageRow> articleRows =
+                mapper.selectPublicHomeArticles(now, size);
+        List<PublicArticlePageRow> rows =
+                java.util.stream.Stream.of(
+                                pinnedRows,
+                                featuredRows,
+                                articleRows)
+                        .flatMap(List::stream)
+                        .toList();
+        Map<Long, List<ArticleTagView>> tags =
+                tags(rows.stream().map(PublicArticlePageRow::getId).toList());
+        return new PublicArticleHome(
+                pinnedRows.stream()
+                        .findFirst()
+                        .map(row -> toPageItem(
+                                row,
+                                tags.getOrDefault(row.getId(), List.of())))
+                        .orElse(null),
+                featuredRows.stream()
+                        .map(row -> toPageItem(
+                                row,
+                                tags.getOrDefault(row.getId(), List.of())))
+                        .toList(),
+                articleRows.stream()
+                        .map(row -> toPageItem(
+                                row,
+                                tags.getOrDefault(row.getId(), List.of())))
+                        .toList());
     }
 
     @Override

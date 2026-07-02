@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.content.web;
 
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -22,6 +23,7 @@ public record AdminArticlePageItemVO(
         String categoryNameZh,
         String slug,
         ArticleStatus status,
+        HomepageSlot homepageSlot,
         LocalDateTime publishAt,
         @Schema(format = "int64") String coverAttachmentId,
         String coverUrl,

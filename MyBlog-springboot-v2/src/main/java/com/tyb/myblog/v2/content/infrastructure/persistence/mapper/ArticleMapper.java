@@ -3,6 +3,7 @@ package com.tyb.myblog.v2.content.infrastructure.persistence.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleCriteria;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleCriteria;
 import com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagRow;
@@ -56,6 +57,15 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
 
     long countPublicPage(@Param("query") PublicArticleCriteria query);
 
+    List<PublicArticlePageRow> selectPublicHomepageSlot(
+            @Param("slot") HomepageSlot slot,
+            @Param("now") LocalDateTime now,
+            @Param("limit") int limit);
+
+    List<PublicArticlePageRow> selectPublicHomeArticles(
+            @Param("now") LocalDateTime now,
+            @Param("size") int size);
+
     PublicArticleAccessMetadataRow selectPublicAccessMetadata(
             @Param("id") long id,
             @Param("now") LocalDateTime now);
@@ -93,6 +103,10 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
             @Param("article") ArticleEntity article,
             @Param("updatedAt") LocalDateTime updatedAt,
             @Param("updatedBy") Long updatedBy);
+
+    int countActiveHomepageSlot(
+            @Param("slot") HomepageSlot slot,
+            @Param("excludeArticleId") Long excludeArticleId);
 
     int softDelete(
             @Param("id") long id,

@@ -41,6 +41,7 @@ class ArchitectureRulesTest {
     private static final Set<String> WEB_DOMAIN_ENUM_WHITELIST = Set.of(
             "com.tyb.myblog.v2.identity.domain.account.AccountType",
             "com.tyb.myblog.v2.content.domain.article.ArticleStatus",
+            "com.tyb.myblog.v2.content.domain.article.HomepageSlot",
             "com.tyb.myblog.v2.comment.domain.CommentAuditStatus",
             "com.tyb.myblog.v2.comment.domain.CommentTargetType",
             "com.tyb.myblog.v2.system.domain.friendlink.FriendLinkStatus");

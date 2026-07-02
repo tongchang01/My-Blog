@@ -8,6 +8,7 @@ import com.tyb.myblog.v2.content.domain.article.Article;
 import com.tyb.myblog.v2.content.domain.article.ArticlePasswordHasher;
 import com.tyb.myblog.v2.content.domain.article.ArticleRepository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import com.tyb.myblog.v2.content.domain.article.NewArticle;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,7 @@ public class ArticleCreateService {
         LocalDateTime now = LocalDateTime.now(clock);
         LocalDateTime publishAt = normalizePublishAt(
                 command.status(), command.publishAt(), now);
+        validateHomepageSlot(command.status(), command.homepageSlot(), null);
         String hashedPassword = resolvePassword(command);
         referenceValidator.lockAndValidate(
                 command.status(),
@@ -55,6 +57,7 @@ public class ArticleCreateService {
                 actorId,
                 command.slug(),
                 command.status(),
+                command.homepageSlot(),
                 hashedPassword,
                 publishAt,
                 command.coverAttachmentId(),
@@ -64,6 +67,28 @@ public class ArticleCreateService {
         Article inserted = repository.insert(candidate);
         repository.replaceTags(inserted.id(), inserted.tagIds());
         return ArticleResult.from(inserted);
+    }
+
+    private void validateHomepageSlot(
+            ArticleStatus status,
+            HomepageSlot slot,
+            Long excludeArticleId) {
+        HomepageSlot homepageSlot = HomepageSlot.normalize(slot);
+        if (homepageSlot == HomepageSlot.NONE) {
+            return;
+        }
+        if (status != ArticleStatus.PUBLISHED) {
+            throw new ApiException(
+                    ApiErrorCode.VALIDATION_ERROR,
+                    "只有已发布文章可设置首页槽位");
+        }
+        if (repository.countActiveHomepageSlot(
+                homepageSlot,
+                excludeArticleId) >= homepageSlot.limit()) {
+            throw new ApiException(
+                    ApiErrorCode.CONFLICT,
+                    "首页槽位数量已达上限");
+        }
     }
 
     private String resolvePassword(CreateArticleCommand command) {

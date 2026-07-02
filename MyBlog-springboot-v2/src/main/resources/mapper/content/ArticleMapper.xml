@@ -17,6 +17,7 @@
         author_id,
         slug,
         status,
+        homepage_slot,
         access_password,
         publish_at,
         cover_attachment_id,
@@ -130,6 +131,7 @@
             c.name_zh AS category_name_zh,
             a.slug,
             a.status,
+            a.homepage_slot,
             a.publish_at,
             a.cover_attachment_id,
             a.comment_count,
@@ -169,6 +171,7 @@
             a.author_id,
             a.slug,
             a.status,
+            a.homepage_slot,
             a.publish_at,
             a.cover_attachment_id,
             a.comment_count,
@@ -251,6 +254,70 @@
         SELECT COUNT(*)
         FROM t_article a
         WHERE <include refid="publicArticleWhere"/>
+    </select>
+
+    <select id="selectPublicHomepageSlot"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticlePageRow">
+        SELECT
+            a.id,
+            a.title_zh,
+            a.title_ja,
+            a.title_en,
+            a.summary_zh,
+            a.summary_ja,
+            a.summary_en,
+            a.category_id,
+            c.name_zh AS category_name_zh,
+            c.name_ja AS category_name_ja,
+            c.name_en AS category_name_en,
+            a.slug,
+            a.status,
+            a.publish_at,
+            a.cover_attachment_id,
+            a.comment_count,
+            a.created_at
+        FROM t_article a
+        LEFT JOIN t_category c
+            ON c.id = a.category_id
+           AND c.deleted = 0
+        WHERE a.deleted = 0
+          AND a.status = 2
+          AND a.publish_at <![CDATA[<=]]> #{now}
+          AND a.homepage_slot = #{slot}
+        ORDER BY a.publish_at DESC, a.id DESC
+        LIMIT #{limit}
+    </select>
+
+    <select id="selectPublicHomeArticles"
+            resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticlePageRow">
+        SELECT
+            a.id,
+            a.title_zh,
+            a.title_ja,
+            a.title_en,
+            a.summary_zh,
+            a.summary_ja,
+            a.summary_en,
+            a.category_id,
+            c.name_zh AS category_name_zh,
+            c.name_ja AS category_name_ja,
+            c.name_en AS category_name_en,
+            a.slug,
+            a.status,
+            a.publish_at,
+            a.cover_attachment_id,
+            a.comment_count,
+            a.created_at
+        FROM t_article a
+        LEFT JOIN t_category c
+            ON c.id = a.category_id
+           AND c.deleted = 0
+        WHERE a.deleted = 0
+          AND a.status = 2
+          AND a.publish_at <![CDATA[<=]]> #{now}
+          AND a.homepage_slot = 'NONE'
+        ORDER BY a.publish_at DESC, a.id DESC
+        LIMIT #{size}
     </select>
 
     <!-- 公开详情预检只读取 ID 和状态，PASSWORD 正文不会进入应用内存。 -->
@@ -391,6 +458,7 @@
             author_id = #{article.authorId},
             slug = #{article.slug},
             status = #{article.status},
+            homepage_slot = #{article.homepageSlot},
             access_password = #{article.accessPassword},
             publish_at = #{article.publishAt},
             cover_attachment_id = #{article.coverAttachmentId},
@@ -401,12 +469,24 @@
           AND deleted = 0
     </update>
 
+    <select id="countActiveHomepageSlot" resultType="int">
+        SELECT COUNT(*)
+        FROM t_article
+        WHERE deleted = 0
+          AND status = 2
+          AND homepage_slot = #{slot}
+        <if test="excludeArticleId != null">
+          AND id != #{excludeArticleId}
+        </if>
+    </select>
+
     <!-- 显式软删除文章，保留 t_article_tag 供回收站恢复。 -->
     <update id="softDelete">
         UPDATE t_article
         SET deleted = 1,
             deleted_at = #{deletedAt},
             deleted_by = #{deletedBy},
+            homepage_slot = 'NONE',
             updated_at = #{deletedAt},
             updated_by = #{deletedBy}
         WHERE id = #{id}
@@ -429,6 +509,10 @@
     <update id="updateStatus">
         UPDATE t_article
         SET status = #{target.databaseValue},
+            homepage_slot = CASE
+                WHEN #{target.databaseValue} = 2 THEN homepage_slot
+                ELSE 'NONE'
+            END,
             updated_at = #{updatedAt},
             updated_by = #{updatedBy}
         WHERE id = #{id}

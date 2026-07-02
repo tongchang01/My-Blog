@@ -4,8 +4,17 @@ import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
 import type { AttachmentItem } from "@/features/attachments/model";
-import type { AdminLocale, ArticleStatus, LocalizedNames } from "../model";
-import { localizedName, statusTranslationKey } from "../presentation";
+import type {
+  AdminLocale,
+  ArticleHomepageSlot,
+  ArticleStatus,
+  LocalizedNames
+} from "../model";
+import {
+  homepageSlotTranslationKey,
+  localizedName,
+  statusTranslationKey
+} from "../presentation";
 import {
   clearArticleDraft,
   loadArticleDraft,
@@ -46,6 +55,11 @@ const pageTitle = computed(() =>
     mode === "edit" ? "articles.editor.editTitle" : "articles.editor.createTitle"
   )
 );
+const homepageSlotOptions: ArticleHomepageSlot[] = [
+  "NONE",
+  "PINNED",
+  "FEATURED"
+];
 const previewHtml = computed(() => renderMarkdownPreview(form.body));
 const hasDraft = computed(() => Boolean(draft.value));
 const isDirty = computed(
@@ -63,6 +77,10 @@ function dictionaryName(item: LocalizedNames): string {
 function fieldError(field: keyof typeof form): string {
   const code = errors.value[field];
   return code ? transformI18n(`articles.editor.validation.${code}`) : "";
+}
+
+function homepageSlotDisabled(slot: ArticleHomepageSlot): boolean {
+  return slot !== "NONE" && form.status !== "PUBLISHED";
 }
 
 function selectCover(item: AttachmentItem): void {
@@ -108,6 +126,13 @@ watch(
     saveArticleDraft(mode, articleId, form);
   },
   { deep: true }
+);
+
+watch(
+  () => form.status,
+  status => {
+    if (status !== "PUBLISHED") form.homepageSlot = "NONE";
+  }
 );
 
 onMounted(async () => {
@@ -261,6 +286,24 @@ onBeforeRouteLeave((_to, _from, next) => {
               :value="status"
             />
           </el-select>
+        </el-form-item>
+        <el-form-item :label="transformI18n('articles.editor.homepageSlot')">
+          <el-select
+            v-model="form.homepageSlot"
+            data-testid="article-homepage-slot"
+            class="full-width"
+          >
+            <el-option
+              v-for="slot in homepageSlotOptions"
+              :key="slot"
+              :label="transformI18n(homepageSlotTranslationKey(slot))"
+              :value="slot"
+              :disabled="homepageSlotDisabled(slot)"
+            />
+          </el-select>
+          <p class="field-hint">
+            {{ transformI18n("articles.editor.homepageSlotHint") }}
+          </p>
         </el-form-item>
         <el-form-item :label="transformI18n('articles.editor.slug')">
           <el-input v-model="form.slug" placeholder="article-slug" />

@@ -58,7 +58,7 @@ class FlywayMigrationTest {
     }
 
     @Test
-    void appliesTwoMigrationsWithoutCreatingAccounts() {
+    void appliesMigrationsWithoutCreatingAccounts() {
         Integer migrationCount = jdbcTemplate.queryForObject(
                 """
                         select count(*)
@@ -77,8 +77,8 @@ class FlywayMigrationTest {
                 "select count(*) from t_user_info",
                 Integer.class);
 
-        assertThat(migrationCount).isEqualTo(2);
-        assertThat(latestVersion).isEqualTo("2");
+        assertThat(migrationCount).isEqualTo(3);
+        assertThat(latestVersion).isEqualTo("3");
         assertThat(userCount).isZero();
         assertThat(profileCount).isZero();
     }

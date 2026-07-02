@@ -4,6 +4,7 @@ import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
+import com.tyb.myblog.v2.content.application.article.PublicArticleHomeResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQuery;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQueryService;
@@ -73,6 +74,28 @@ class PublicArticleControllerTest {
                 .andExpect(jsonPath("$.data.records[0].coverAttachmentId")
                         .doesNotExist())
                 .andExpect(jsonPath("$.data.records[0].body")
+                        .doesNotExist());
+    }
+
+    @Test
+    void returnsPublicHomeArticles() throws Exception {
+        when(queryService.home("en", 10))
+                .thenReturn(new PublicArticleHomeResult(
+                        pageItem(),
+                        List.of(pageItem()),
+                        List.of(pageItem())));
+
+        mockMvc.perform(get("/api/public/articles/home")
+                        .queryParam("lang", "en")
+                        .queryParam("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.pinnedArticle.id")
+                        .value(Long.toString(ARTICLE_ID)))
+                .andExpect(jsonPath("$.data.featuredArticles[0].id")
+                        .value(Long.toString(ARTICLE_ID)))
+                .andExpect(jsonPath("$.data.articles[0].id")
+                        .value(Long.toString(ARTICLE_ID)))
+                .andExpect(jsonPath("$.data.pinnedArticle.body")
                         .doesNotExist());
     }
 

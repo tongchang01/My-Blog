@@ -27,6 +27,7 @@ function page(id: string, currentPage = 1): PageResponse<ArticleListItem> {
         categoryNameZh: null,
         slug: `article-${id}`,
         status: "DRAFT",
+        homepageSlot: "NONE",
         publishAt: null,
         coverAttachmentId: null,
         coverUrl: null,

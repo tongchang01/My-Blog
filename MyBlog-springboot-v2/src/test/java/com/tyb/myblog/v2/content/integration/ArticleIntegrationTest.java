@@ -238,6 +238,7 @@ class ArticleIntegrationTest {
                   "tagIds":[20],
                   "slug":null,
                   "status":%s,
+                  "homepageSlot":"NONE",
                   "password":%s,
                   "publishAt":%s,
                   "coverAttachmentId":300

@@ -15,6 +15,7 @@
 | Method | Path | 匿名 | DEMO | ADMIN |
 |--------|------|------|------|-------|
 | GET | `/api/public/articles` | 允许 | 允许 | 允许 |
+| GET | `/api/public/articles/home` | 允许 | 允许 | 允许 |
 | GET | `/api/public/articles/{id}` | 允许 | 允许 | 允许 |
 | GET | `/api/admin/articles` | 401 | 允许 | 允许 |
 | GET | `/api/admin/articles/{id}` | 401 | 允许 | 允许 |
@@ -194,8 +195,17 @@ Content-Type: application/json
 | `password` | string 或 `null`；PASSWORD 状态新建时必须非空 |
 | `publishAt` | ISO 本地时间或 `null` |
 | `coverAttachmentId` | number 或 `null` |
+| `homepageSlot` | `NONE`、`PINNED`、`FEATURED`；仅 `PUBLISHED` 可设置为 `PINNED` / `FEATURED` |
 
 注意：当前写请求中的关联 ID 在 OpenAPI 模型中为 number；后台响应中的 ID 为 string。
+
+首页展示槽位规则：
+
+- `PINNED` 最多 1 篇。
+- `FEATURED` 最多 2 篇。
+- 只有 `PUBLISHED` 文章可进入首页槽位。
+- 保存超限时返回 `409 + 90004`，不自动替换旧槽位文章。
+- 文章改为非 `PUBLISHED` 状态时，后端自动清空首页槽位为 `NONE`。
 
 ## 7. 完整编辑文章
 
@@ -299,7 +309,44 @@ Query：
 
 当前公开文章响应中的 `id`、`categoryId` 和 `tags[].id` 是 number；这与前端可见 ID string 规则不一致，统一登记到 O-010。
 
-## 11. 公开文章详情
+## 11. 公开首页文章
+
+```http
+GET /api/public/articles/home?lang=zh&size=10
+```
+
+鉴权：匿名。
+
+Query：
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| `lang` | string | `zh` | 支持 `zh`、`ja`、`en`；缺失或非法时按服务端规则回退 `zh` |
+| `size` | number | 10 | 普通文章数量，最大 50 |
+
+成功响应：HTTP 200。
+
+```json
+{
+  "code": "00000",
+  "msg": "success",
+  "data": {
+    "pinnedArticle": null,
+    "featuredArticles": [],
+    "articles": []
+  }
+}
+```
+
+字段语义：
+
+- `pinnedArticle`：`PublicArticlePageItemVO` 或 `null`，最多 1 篇。
+- `featuredArticles`：`PublicArticlePageItemVO[]`，最多 2 篇。
+- `articles`：`PublicArticlePageItemVO[]`，排除已进入 `PINNED` / `FEATURED` 槽位的文章。
+
+公开首页只返回 `PUBLISHED` 文章。PASSWORD 文章继续只进入普通公开列表，不进入首页置顶或推荐槽位。
+
+## 12. 公开文章详情
 
 ```http
 GET /api/public/articles/{id}?lang=zh
@@ -340,7 +387,7 @@ GET /api/public/articles/{id}?lang=zh
 - `PASSWORD`：返回 `403 + 10003`，完整解锁流程见 O-001。
 - `DRAFT`、`PRIVATE`、`SCHEDULED`、不存在或已删除：返回 `404 + 90003`。
 
-## 12. 状态规则摘要
+## 13. 状态规则摘要
 
 | 状态 | 公开列表 | 公开详情 | 后台读 | 后台写 |
 |------|----------|----------|--------|--------|
@@ -350,7 +397,7 @@ GET /api/public/articles/{id}?lang=zh
 | `PASSWORD` | 可见，`locked=true` | 403 | 可读 | ADMIN |
 | `SCHEDULED` | 到期前不可见 | 到期前 404 | 可读 | ADMIN |
 
-## 13. 错误码
+## 14. 错误码
 
 | 场景 | HTTP | code |
 |------|------|------|

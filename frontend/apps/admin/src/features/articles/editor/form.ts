@@ -1,5 +1,6 @@
 import type {
   ArticleDetail,
+  ArticleHomepageSlot,
   ArticleStatus,
   ArticleWritePayload
 } from "../model";
@@ -23,6 +24,7 @@ export interface ArticleForm {
   tagIds: string[];
   slug: string;
   status: ArticleStatus;
+  homepageSlot: ArticleHomepageSlot;
   password: string;
   publishAt: string | null;
   coverAttachmentId: string | null;
@@ -46,6 +48,7 @@ export function createEmptyArticleForm(): ArticleForm {
     tagIds: [],
     slug: "",
     status: "DRAFT",
+    homepageSlot: "NONE",
     password: "",
     publishAt: null,
     coverAttachmentId: null,
@@ -66,6 +69,7 @@ export function articleDetailToForm(detail: ArticleDetail): ArticleForm {
     tagIds: [...detail.tagIds],
     slug: detail.slug ?? "",
     status: detail.status,
+    homepageSlot: detail.homepageSlot,
     password: "",
     publishAt: detail.publishAt,
     coverAttachmentId: detail.coverAttachmentId,
@@ -115,6 +119,7 @@ export function articleFormToPayload(form: ArticleForm): ArticleWritePayload {
     tagIds: [...new Set(form.tagIds)],
     slug: optional(form.slug),
     status: form.status,
+    homepageSlot: form.homepageSlot,
     password: optional(form.password),
     publishAt: form.publishAt,
     coverAttachmentId: form.coverAttachmentId

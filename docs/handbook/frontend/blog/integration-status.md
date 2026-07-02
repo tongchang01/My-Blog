@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 前台读者端
-> 最后校准：2026-06-29
+> 最后校准：2026-07-01
 > 对应代码：`frontend/apps/blog/`
 > 权威程度：前台完成度记录
 
@@ -13,6 +13,8 @@
 - `/:lang` 首页和 `/:lang/posts/:id/:slug?` ID 主导文章路由。
 - `GET /api/public/site-config` 接入，失败时使用 typed defaults 降级。
 - 公开文章列表、分页、loading、empty、error、retry。
+- 首页已改接 `GET /api/public/articles/home` 聚合接口，使用 `pinnedArticle`、`featuredArticles`、`articles` 渲染首屏。
+- 首页不再用普通文章分页的 `records[0]` / `records.slice(...)` 推断置顶或推荐语义。
 - 公开文章详情、canonical slug、PASSWORD 锁定态、404、网络错误、retry。
 - 首页已停止请求旧 Hexo/Aurora mock 数据。
 - Markdown 正文通过 `markdown-it` 渲染，禁用原始 HTML。

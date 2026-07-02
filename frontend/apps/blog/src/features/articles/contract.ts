@@ -23,3 +23,9 @@ export interface PublicArticleDetailDto extends PublicArticleListItemDto {
   body: string
   updatedAt: string
 }
+
+export interface PublicArticleHomeDto {
+  pinnedArticle: PublicArticleListItemDto | null
+  featuredArticles: PublicArticleListItemDto[]
+  articles: PublicArticleListItemDto[]
+}

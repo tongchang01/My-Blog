@@ -8,6 +8,7 @@ import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.DeletedArticlePage;
 import com.tyb.myblog.v2.content.domain.article.DeletedArticlePageItem;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import com.tyb.myblog.v2.content.infrastructure.persistence.mapper.ArticleMapper;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticleDetailRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow;
@@ -85,6 +86,7 @@ public class MyBatisAdminArticleQueryRepository
                 row.getCategoryNameZh(),
                 row.getSlug(),
                 ArticleStatus.fromDatabase(row.getStatus()),
+                homepageSlot(row.getHomepageSlot()),
                 row.getPublishAt(),
                 row.getCoverAttachmentId(),
                 null,
@@ -127,6 +129,7 @@ public class MyBatisAdminArticleQueryRepository
                 row.getAuthorId(),
                 row.getSlug(),
                 ArticleStatus.fromDatabase(row.getStatus()),
+                homepageSlot(row.getHomepageSlot()),
                 row.getPublishAt(),
                 row.getCoverAttachmentId(),
                 null,
@@ -149,5 +152,9 @@ public class MyBatisAdminArticleQueryRepository
                 row.getCategoryId(),
                 row.getDeletedAt(),
                 row.getDeletedBy());
+    }
+
+    private HomepageSlot homepageSlot(String value) {
+        return value == null ? HomepageSlot.NONE : HomepageSlot.valueOf(value);
     }
 }

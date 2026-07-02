@@ -6,6 +6,7 @@ import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.ArticleTagView;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleAccessMetadata;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleDetail;
+import com.tyb.myblog.v2.content.domain.article.PublicArticleHome;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePage;
 import com.tyb.myblog.v2.content.domain.article.PublicArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleQueryRepository;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 public class PublicArticleQueryService {
 
     private static final int MAX_PAGE_SIZE = 100;
+    private static final int MAX_HOME_SIZE = 50;
 
     private final PublicArticleQueryRepository repository;
     private final AttachmentReferenceService attachmentService;
@@ -51,6 +53,29 @@ public class PublicArticleQueryService {
                 page.total(),
                 page.page(),
                 page.size());
+    }
+
+    public PublicArticleHomeResult home(String lang, int size) {
+        if (size < 1 || size > MAX_HOME_SIZE) {
+            throw new ApiException(
+                    ApiErrorCode.VALIDATION_ERROR,
+                    "首页文章数量必须在 1 到 50 之间");
+        }
+        PublicArticleHome home = repository.findPublicHome(
+                LocalDateTime.now(clock),
+                size);
+        Map<Long, String> coverUrls = resolveCoverUrls(home);
+        String normalizedLang = normalizeLang(lang);
+        return new PublicArticleHomeResult(
+                home.pinnedArticle() == null
+                        ? null
+                        : toItem(home.pinnedArticle(), normalizedLang, coverUrls),
+                home.featuredArticles().stream()
+                        .map(item -> toItem(item, normalizedLang, coverUrls))
+                        .toList(),
+                home.articles().stream()
+                        .map(item -> toItem(item, normalizedLang, coverUrls))
+                        .toList());
     }
 
     public PublicArticleDetailResult detail(long id, String lang) {
@@ -125,6 +150,18 @@ public class PublicArticleQueryService {
                 item.status() == ArticleStatus.PASSWORD);
     }
 
+    private PublicArticlePageResult.Item toItem(
+            PublicArticlePageItem item,
+            String lang,
+            Map<Long, String> coverUrls) {
+        return toItem(
+                item,
+                lang,
+                item.coverAttachmentId() == null
+                        ? null
+                        : coverUrls.get(item.coverAttachmentId()));
+    }
+
     private PublicArticleDetailResult toDetail(
             PublicArticleDetail detail,
             String lang,
@@ -190,6 +227,19 @@ public class PublicArticleQueryService {
 
     private Map<Long, String> resolveCoverUrls(PublicArticlePage page) {
         Set<Long> ids = page.records().stream()
+                .map(PublicArticlePageItem::coverAttachmentId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toUnmodifiableSet());
+        return attachmentService.resolvePublicUrls(ids);
+    }
+
+    private Map<Long, String> resolveCoverUrls(PublicArticleHome home) {
+        Set<Long> ids = java.util.stream.Stream.concat(
+                        java.util.stream.Stream.of(home.pinnedArticle()),
+                        java.util.stream.Stream.concat(
+                                home.featuredArticles().stream(),
+                                home.articles().stream()))
+                .filter(Objects::nonNull)
                 .map(PublicArticlePageItem::coverAttachmentId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toUnmodifiableSet());

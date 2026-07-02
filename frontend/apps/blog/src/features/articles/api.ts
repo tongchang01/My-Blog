@@ -4,11 +4,18 @@ import type { PageResponse } from '@/shared/http/contract'
 import type { SupportedLocale } from '@/shared/i18n/locale'
 import type {
   PublicArticleDetailDto,
+  PublicArticleHomeDto,
   PublicArticleListItemDto
 } from './contract'
 
 export interface LoadPublicArticlesParams {
   page: number
+  size: number
+  lang: SupportedLocale
+  signal?: AbortSignal
+}
+
+export interface LoadPublicHomeArticlesParams {
   size: number
   lang: SupportedLocale
   signal?: AbortSignal
@@ -29,6 +36,21 @@ export const loadPublicArticles = async ({
     signal
   })
   if (data === null) throw new ApiError('Article page response is empty')
+  return data
+}
+
+export const loadPublicHomeArticles = async ({
+  size,
+  lang,
+  signal
+}: LoadPublicHomeArticlesParams): Promise<PublicArticleHomeDto> => {
+  const data = await requestApi<PublicArticleHomeDto>({
+    method: 'GET',
+    url: '/public/articles/home',
+    params: { size, lang },
+    signal
+  })
+  if (data === null) throw new ApiError('Article home response is empty')
   return data
 }
 

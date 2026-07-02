@@ -36,4 +36,23 @@ describe("article editor draft storage", () => {
 
     expect(loadArticleDraft("create")).toBeNull();
   });
+
+  it("loads older drafts with current default fields", () => {
+    localStorage.setItem(
+      articleDraftKey("create"),
+      JSON.stringify({
+        savedAt: "2026-06-26T10:00:00.000Z",
+        form: {
+          titleZh: "legacy",
+          tagIds: undefined
+        }
+      })
+    );
+
+    expect(loadArticleDraft("create")).toMatchObject({
+      titleZh: "legacy",
+      homepageSlot: "NONE",
+      tagIds: []
+    });
+  });
 });

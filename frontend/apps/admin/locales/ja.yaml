@@ -142,6 +142,7 @@ articles:
   columns:
     title: タイトル
     status: ステータス
+    homepageSlot: ホーム枠
     category: カテゴリ
     tags: タグ
     comments: コメント数
@@ -155,6 +156,11 @@ articles:
     private: 非公開
     password: パスワード
     scheduled: 公開予約
+    unknown: 不明
+  homepageSlot:
+    none: 通常
+    pinned: 固定
+    featured: おすすめ
     unknown: 不明
   states:
     empty: 条件に一致する記事はありません
@@ -193,6 +199,8 @@ articles:
     draftClear: 下書きを削除
     leaveConfirm: 記事に未保存の変更があります。移動しますか？
     status: 記事ステータス
+    homepageSlot: ホーム表示枠
+    homepageSlotHint: 固定は最大 1 件、おすすめは最大 2 件です。公開済み記事だけがホーム枠を使えます。
     slug: 記事スラッグ
     category: カテゴリ
     tags: タグ

@@ -6,15 +6,18 @@ import type { SupportedLocale } from '@/shared/i18n/locale'
 import type {
   ArticleDetailStatus,
   ArticleDetailViewModel,
+  ArticleHomeViewModel,
   ArticleListStatus,
   ArticlePageViewModel
 } from './model'
 import {
   loadPublicArticle,
+  loadPublicHomeArticles,
   loadPublicArticles,
+  type LoadPublicHomeArticlesParams,
   type LoadPublicArticlesParams
 } from './api'
-import { mapArticleDetail, mapArticlePage } from './mapper'
+import { mapArticleDetail, mapArticleHome, mapArticlePage } from './mapper'
 
 const emptyPage = (): ArticlePageViewModel => ({
   records: [],
@@ -24,16 +27,28 @@ const emptyPage = (): ArticlePageViewModel => ({
   pages: 0
 })
 
+const emptyHome = (): ArticleHomeViewModel => ({
+  pinnedArticle: null,
+  featuredArticles: [],
+  articles: []
+})
+
 export const useArticleStore = defineStore('public-articles', () => {
   const page = ref<ArticlePageViewModel>(emptyPage())
   const status = ref<ArticleListStatus>('idle')
   const error = ref<ApiError | null>(null)
+  const home = ref<ArticleHomeViewModel>(emptyHome())
+  const homeStatus = ref<ArticleListStatus>('idle')
+  const homeError = ref<ApiError | null>(null)
   const detail = ref<ArticleDetailViewModel | null>(null)
   const detailStatus = ref<ArticleDetailStatus>('idle')
   const detailError = ref<ApiError | null>(null)
   let activeRequest: AbortController | null = null
+  let activeHomeRequest: AbortController | null = null
   let activeDetailRequest: AbortController | null = null
   let lastQuery: Omit<LoadPublicArticlesParams, 'signal'> | null = null
+  let lastHomeQuery: Omit<LoadPublicHomeArticlesParams, 'signal'> | null =
+    null
   let lastDetailQuery: { id: string; lang: SupportedLocale } | null = null
 
   const load = async (
@@ -63,6 +78,40 @@ export const useArticleStore = defineStore('public-articles', () => {
 
   const retry = async (): Promise<void> => {
     if (lastQuery) await load(lastQuery)
+  }
+
+  const loadHome = async (
+    query: Omit<LoadPublicHomeArticlesParams, 'signal'>
+  ): Promise<void> => {
+    activeHomeRequest?.abort()
+    const request = new AbortController()
+    activeHomeRequest = request
+    lastHomeQuery = query
+    homeStatus.value = 'loading'
+    homeError.value = null
+
+    try {
+      home.value = mapArticleHome(
+        await loadPublicHomeArticles({ ...query, signal: request.signal }),
+        query.lang
+      )
+      homeStatus.value =
+        home.value.pinnedArticle ||
+        home.value.featuredArticles.length > 0 ||
+        home.value.articles.length > 0
+          ? 'ready'
+          : 'empty'
+    } catch (cause) {
+      if (request.signal.aborted) return
+      homeError.value = normalizeApiError(cause)
+      homeStatus.value = 'error'
+    } finally {
+      if (activeHomeRequest === request) activeHomeRequest = null
+    }
+  }
+
+  const retryHome = async (): Promise<void> => {
+    if (lastHomeQuery) await loadHome(lastHomeQuery)
   }
 
   const loadDetail = async (
@@ -110,11 +159,16 @@ export const useArticleStore = defineStore('public-articles', () => {
     page,
     status,
     error,
+    home,
+    homeStatus,
+    homeError,
     detail,
     detailStatus,
     detailError,
     load,
     retry,
+    loadHome,
+    retryHome,
     loadDetail,
     retryDetail
   }

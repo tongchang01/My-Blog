@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.content.infrastructure.persistence.mapping;
 
 import com.tyb.myblog.v2.content.domain.article.Article;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import com.tyb.myblog.v2.content.domain.article.NewArticle;
 import com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity;
 import org.mapstruct.Mapper;
@@ -33,6 +34,9 @@ public interface ArticlePersistenceMapping {
                 entity.getAuthorId(),
                 entity.getSlug(),
                 ArticleStatus.fromDatabase(entity.getStatus()),
+                HomepageSlot.normalize(entity.getHomepageSlot() == null
+                        ? null
+                        : HomepageSlot.valueOf(entity.getHomepageSlot())),
                 entity.getAccessPassword(),
                 entity.getPublishAt(),
                 entity.getCoverAttachmentId(),
@@ -62,6 +66,7 @@ public interface ArticlePersistenceMapping {
                 article.authorId(),
                 article.slug(),
                 article.status(),
+                article.homepageSlot(),
                 article.accessPassword(),
                 article.publishAt(),
                 article.coverAttachmentId(),
@@ -87,6 +92,7 @@ public interface ArticlePersistenceMapping {
                 article.authorId(),
                 article.slug(),
                 article.status(),
+                article.homepageSlot(),
                 article.accessPassword(),
                 article.publishAt(),
                 article.coverAttachmentId(),
@@ -114,6 +120,7 @@ public interface ArticlePersistenceMapping {
             long authorId,
             String slug,
             ArticleStatus status,
+            HomepageSlot homepageSlot,
             String accessPassword,
             java.time.LocalDateTime publishAt,
             Long coverAttachmentId,
@@ -129,6 +136,7 @@ public interface ArticlePersistenceMapping {
         entity.setAuthorId(authorId);
         entity.setSlug(slug);
         entity.setStatus(status.databaseValue());
+        entity.setHomepageSlot(HomepageSlot.normalize(homepageSlot).name());
         entity.setAccessPassword(accessPassword);
         entity.setPublishAt(publishAt);
         entity.setCoverAttachmentId(coverAttachmentId);

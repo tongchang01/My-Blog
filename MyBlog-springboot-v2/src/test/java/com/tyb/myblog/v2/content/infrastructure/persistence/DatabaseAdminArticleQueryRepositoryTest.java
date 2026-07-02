@@ -3,6 +3,7 @@ package com.tyb.myblog.v2.content.infrastructure.persistence;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleCriteria;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ class DatabaseAdminArticleQueryRepositoryTest {
                 "2026-06-15 12:00:00", false);
         insertArticle(102L, "Deleted", 2, 10L,
                 "2026-06-15 13:00:00", true);
+        setHomepageSlot(100L, "PINNED");
         linkTag(100L, 20L);
         linkTag(101L, 21L);
 
@@ -56,6 +58,8 @@ class DatabaseAdminArticleQueryRepositoryTest {
                 .singleElement()
                 .satisfies(item -> {
                     assertThat(item.id()).isEqualTo(100L);
+                    assertThat(item.homepageSlot())
+                            .isEqualTo(HomepageSlot.PINNED);
                     assertThat(item.categoryNameZh()).isEqualTo("后端");
                     assertThat(item.tagIds()).containsExactly(20L);
                 });
@@ -68,6 +72,7 @@ class DatabaseAdminArticleQueryRepositoryTest {
         insertTag(21L, "Spring");
         insertArticle(100L, "Password", 4, 10L,
                 "2026-06-15 10:00:00", false);
+        setHomepageSlot(100L, "FEATURED");
         linkTag(100L, 21L);
         linkTag(100L, 20L);
 
@@ -78,6 +83,8 @@ class DatabaseAdminArticleQueryRepositoryTest {
                     assertThat(detail.categoryNameZh()).isEqualTo("后端");
                     assertThat(detail.status())
                             .isEqualTo(ArticleStatus.PASSWORD);
+                    assertThat(detail.homepageSlot())
+                            .isEqualTo(HomepageSlot.FEATURED);
                     assertThat(detail.tagIds()).containsExactly(20L, 21L);
                     assertThat(detail.coverAttachmentId()).isEqualTo(300L);
                 });
@@ -166,5 +173,13 @@ class DatabaseAdminArticleQueryRepositoryTest {
                 INSERT INTO t_article_tag (article_id, tag_id)
                 VALUES (?, ?)
                 """, articleId, tagId);
+    }
+
+    private void setHomepageSlot(long articleId, String slot) {
+        jdbcTemplate.update("""
+                UPDATE t_article
+                SET homepage_slot = ?
+                WHERE id = ?
+                """, slot, articleId);
     }
 }

@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.content.infrastructure.persistence.repository;
 
 import com.tyb.myblog.v2.content.domain.article.Article;
 import com.tyb.myblog.v2.content.domain.article.ArticleRepository;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import com.tyb.myblog.v2.content.domain.article.NewArticle;
 import com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity;
 import com.tyb.myblog.v2.content.infrastructure.persistence.mapper.ArticleMapper;
@@ -58,6 +59,13 @@ public class MyBatisArticleRepository implements ArticleRepository {
                 mapping.toEntity(article),
                 updatedAt,
                 updatedBy) == 1;
+    }
+
+    @Override
+    public int countActiveHomepageSlot(
+            HomepageSlot slot,
+            Long excludeArticleId) {
+        return mapper.countActiveHomepageSlot(slot, excludeArticleId);
     }
 
     @Override

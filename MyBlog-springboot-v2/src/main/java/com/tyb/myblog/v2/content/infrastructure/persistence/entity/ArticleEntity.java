@@ -37,6 +37,8 @@ public class ArticleEntity extends BaseEntity {
 
     private Integer status;
 
+    private String homepageSlot;
+
     private String accessPassword;
 
     private LocalDateTime publishAt;

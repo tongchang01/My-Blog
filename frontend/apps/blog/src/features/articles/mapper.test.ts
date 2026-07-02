@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { mapArticleDetail, mapArticlePage } from './mapper'
+import { mapArticleDetail, mapArticleHome, mapArticlePage } from './mapper'
 
 describe('article mapper', () => {
   it('preserves string IDs and computes pagination', () => {
@@ -35,6 +35,36 @@ describe('article mapper', () => {
     expect(mapped.records[0].coverUrl).toBeNull()
     expect(mapped.records[0].publishedAt).toContain('10:00')
     expect(mapped.pages).toBe(2)
+  })
+
+  it('maps homepage slots without mixing ordinary articles', () => {
+    const article = {
+      id: '1',
+      title: 'Pinned',
+      summary: null,
+      categoryId: null,
+      categoryName: null,
+      slug: 'pinned',
+      publishAt: '2026-06-15T10:00:00',
+      coverUrl: null,
+      commentCount: 0,
+      tags: [],
+      createdAt: '2026-06-15T09:00:00',
+      locked: false
+    }
+
+    const mapped = mapArticleHome(
+      {
+        pinnedArticle: article,
+        featuredArticles: [{ ...article, id: '2', slug: 'featured' }],
+        articles: [{ ...article, id: '3', slug: 'ordinary' }]
+      },
+      'en'
+    )
+
+    expect(mapped.pinnedArticle?.id).toBe('1')
+    expect(mapped.featuredArticles).toHaveLength(1)
+    expect(mapped.articles[0].slug).toBe('ordinary')
   })
 })
 
