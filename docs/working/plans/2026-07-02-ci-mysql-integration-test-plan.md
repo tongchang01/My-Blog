@@ -39,17 +39,16 @@ CI 拆成两个 job，不合并成一个、也不细拆到三个：
 
 - `runs-on: ubuntu-latest`
 - `timeout-minutes: 15`（硬上限，防止挂死占额度）
-- `continue-on-error: true`（观察期不阻塞其他 job；分支保护里不勾选）
+- 观察期不设 `continue-on-error`；失败应显示红灯，但暂不加入分支保护 required checks。
 - 环境变量：
   - `TZ: Asia/Tokyo`
   - `MAVEN_OPTS: -Duser.timezone=Asia/Tokyo`
-  - `TESTCONTAINERS_STARTUP_TIMEOUT: "180"`
 
 ### 步骤顺序
 
 1. `actions/checkout@v4`
 2. `actions/setup-java@v4`（Temurin 17 + maven cache）
-3. **Pre-pull 镜像**：`docker pull mysql:8.4 && docker pull testcontainers/ryuk:0.5.1`
+3. **Pre-pull 镜像**：`docker pull mysql:8.4`
    - 作用：把网络问题和测试失败分离，pre-pull 挂了就是镜像/网络问题，一眼可辨。
 4. `mvn -f MyBlog-springboot-v2/pom.xml test -Dtest=MySqlFlywayMigrationTest,MySqlChangePasswordConcurrencyTest,MySqlLoginFailureConcurrencyTest`
 
@@ -90,10 +89,8 @@ CI 拆成两个 job，不合并成一个、也不细拆到三个：
 
 - 连续 14 天内 `backend-mysql-test` flaky ≤ 1 次
 - 期间没有因基础设施波动被迫 rerun 超过 2 次
-- 至少有一次因该 job 抓到的真实业务问题（证明它有价值）
 
-满足后再单独提一次 `工程：CI MySQL集成测试转必需` 提交，改 CI 的 `continue-on-error`、
-同步分支保护规则、更新 handbook。
+满足后再同步分支保护规则、更新 handbook。
 
 ## 风险与放弃条件
 

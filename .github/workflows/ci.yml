@@ -32,6 +32,31 @@ jobs:
       - name: Run backend tests
         run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=!MySqlFlywayMigrationTest,!MySqlChangePasswordConcurrencyTest,!MySqlLoginFailureConcurrencyTest"
 
+  backend-mysql-test:
+    name: Backend MySQL integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      MAVEN_OPTS: -Duser.timezone=Asia/Tokyo
+      TZ: Asia/Tokyo
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Pre-pull MySQL image
+        run: docker pull mysql:8.4
+
+      - name: Run MySQL integration tests
+        run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=MySqlFlywayMigrationTest,MySqlChangePasswordConcurrencyTest,MySqlLoginFailureConcurrencyTest"
+
   admin-frontend-test:
     name: Admin frontend tests
     runs-on: ubuntu-latest
