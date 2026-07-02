@@ -53,7 +53,7 @@ const loading = ref(true)
 const router = useRouter()
 
 const fetchData = async () => {
-  await categoryStore.fetchCategories()
+  await categoryStore.fetchCategories(appStore.locale)
   loading.value = false
 }
 

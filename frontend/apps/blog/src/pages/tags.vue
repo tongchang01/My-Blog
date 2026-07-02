@@ -40,8 +40,10 @@ import { useCommonStore } from '@/stores/common'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import defaultCover from '@/assets/default-cover.jpg'
 import usePageTitle from '@/hooks/usePageTitle'
+import { useAppStore } from '@/stores/app'
 
 const commonStore = useCommonStore()
+const appStore = useAppStore()
 const { t } = useI18n()
 const tagStore = useTagStore()
 const { pageTitle, updateTitle } = usePageTitle()
@@ -52,7 +54,7 @@ const tags = computed(() => {
 })
 
 const fetchData = async () => {
-  await tagStore.fetchAllTags()
+  await tagStore.fetchAllTags(appStore.locale)
   updateTitle()
   commonStore.setHeaderImage(defaultCover)
 }

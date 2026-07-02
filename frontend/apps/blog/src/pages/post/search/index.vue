@@ -27,13 +27,13 @@
         </transition>
         <div class="flex flex-col relative">
           <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
-            <template v-if="isLoading || posts.data.length === 0">
+            <template v-if="isLoading || articles.length === 0">
               <li v-for="n in 12" :key="n">
                 <ArticleCard :data="{}" />
               </li>
             </template>
             <template v-else>
-              <li v-for="post in posts.data" :key="post.slug">
+              <li v-for="post in articles" :key="post.id">
                 <ArticleCard :data="post" />
               </li>
             </template>
@@ -68,52 +68,38 @@ import { useI18n } from 'vue-i18n'
 import { Sidebar, TagBox, CategoryBox } from '@/components/Sidebar'
 import Paginator from '@/components/Paginator.vue'
 import { ArticleCard } from '@/components/ArticleCard'
-import { SpecificPostsList } from '@/models/Post.class'
 import { useRoute } from 'vue-router'
-import { usePostStore } from '@/stores/post'
 import { useMetaStore } from '@/stores/meta'
 import SvgIcon from '@/components/SvgIcon/index.vue'
+import { useArticleStore } from '@/features/articles/store'
+import { useAppStore } from '@/stores/app'
 
 const { t } = useI18n()
 const route = useRoute()
-const postStore = usePostStore()
+const articleStore = useArticleStore()
+const appStore = useAppStore()
 const metaStore = useMetaStore()
 
-const isFetched = ref(false)
-const posts = ref(new SpecificPostsList())
-const pagination = ref({
-  pageSize: 12,
-  pageTotal: 0,
-  page: 1
-})
 const queryTagKey = 'aurora-query-tag'
 const queryCategoryKey = 'aurora-query-category'
-const queryTag = ref()
-const queryCategory = ref()
+const queryTag = ref('')
+const queryCategory = ref('')
 
-const fetchPostByTag = () => {
-  isFetched.value = false
-  postStore.fetchPostsByTag(queryTag.value).then(response => {
-    isFetched.value = true
-    posts.value = response
-    pagination.value.pageTotal = response.total
-  })
-}
-
-const fetchPostByCategory = () => {
-  isFetched.value = false
-  postStore.fetchPostsByCategory(queryCategory.value).then(response => {
-    isFetched.value = true
-    posts.value = response
-    pagination.value.pageTotal = response.total
-  })
-}
-
-const initPage = () => {
+const initPage = async (page = 1) => {
   if (queryTag.value) {
-    fetchPostByTag()
+    await articleStore.load({
+      page,
+      size: 12,
+      lang: appStore.locale,
+      tagSlug: queryTag.value
+    })
   } else if (queryCategory.value) {
-    fetchPostByCategory()
+    await articleStore.load({
+      page,
+      size: 12,
+      lang: appStore.locale,
+      categorySlug: queryCategory.value
+    })
   }
 
   window.scrollTo({
@@ -123,19 +109,24 @@ const initPage = () => {
   metaStore.setTitle('search')
 }
 
-const pageChangeHandler = () => {
+const firstQueryValue = (value: unknown): string => {
+  if (Array.isArray(value)) return value[0] ?? ''
+  return typeof value === 'string' ? value : ''
+}
+
+const pageChangeHandler = (page = 1) => {
   queryCategory.value = ''
   queryTag.value = ''
   const { tag, category } = route.query
 
   if (category) {
-    queryCategory.value = category
+    queryCategory.value = firstQueryValue(category)
   } else if (tag) {
-    queryTag.value = tag
+    queryTag.value = firstQueryValue(tag)
   }
 
   if (tag || category) {
-    initPage()
+    void initPage(page)
   }
 }
 
@@ -155,8 +146,14 @@ onUnmounted(() => {
   localStorage.removeItem(queryCategoryKey)
 })
 
-const isLoading = computed(() => !isFetched.value)
-const isEmpty = computed(() => posts.value.data.length === 0 && isFetched.value)
+const articles = computed(() => articleStore.page.records)
+const isLoading = computed(() => articleStore.status === 'loading')
+const isEmpty = computed(() => articleStore.status === 'empty')
+const pagination = computed(() => ({
+  pageSize: articleStore.page.size,
+  pageTotal: articleStore.page.total,
+  page: articleStore.page.page
+}))
 const categoryTitle = computed(() => queryCategory.value)
 const tagTitle = computed(() => queryTag.value)
 </script>

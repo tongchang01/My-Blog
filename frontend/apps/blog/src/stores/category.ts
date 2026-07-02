@@ -1,20 +1,18 @@
-import { fetchAllCategories } from '@/api'
-import { Categories } from '@/models/Post.class'
+import { useTaxonomyStore } from '@/features/taxonomy/store'
+import type { SupportedLocale } from '@/shared/i18n/locale'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useCategoryStore = defineStore('categoryStore', () => {
+  const taxonomyStore = useTaxonomyStore()
   const isLoaded = ref(false)
-  const categories = ref(new Categories().data)
+  const categories = computed(() => taxonomyStore.categories)
 
-  const fetchCategories = async () => {
+  const fetchCategories = async (locale: SupportedLocale = 'zh') => {
     isLoaded.value = false
-    const { data } = await fetchAllCategories()
-    return new Promise(resolve => {
-      isLoaded.value = true
-      categories.value = new Categories(data).data
-      resolve(categories.value)
-    })
+    await taxonomyStore.loadCategories(locale)
+    isLoaded.value = true
+    return categories.value
   }
 
   return {
