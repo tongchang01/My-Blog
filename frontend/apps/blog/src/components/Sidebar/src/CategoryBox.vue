@@ -58,7 +58,10 @@ const fetchData = async () => {
 }
 
 const navigateToCategory = (slug: string) => {
-  router.push({ name: 'post-search', query: { category: slug } })
+  router.push({
+    name: 'category-articles',
+    params: { lang: appStore.locale, slug }
+  })
 }
 
 onMounted(fetchData)

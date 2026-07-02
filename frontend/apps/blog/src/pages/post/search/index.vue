@@ -118,14 +118,19 @@ const pageChangeHandler = (page = 1) => {
   queryCategory.value = ''
   queryTag.value = ''
   const { tag, category } = route.query
+  const slug = firstQueryValue(route.params.slug)
 
-  if (category) {
+  if (route.name === 'category-articles' && slug) {
+    queryCategory.value = slug
+  } else if (route.name === 'tag-articles' && slug) {
+    queryTag.value = slug
+  } else if (category) {
     queryCategory.value = firstQueryValue(category)
   } else if (tag) {
     queryTag.value = firstQueryValue(tag)
   }
 
-  if (tag || category) {
+  if (queryTag.value || queryCategory.value) {
     void initPage(page)
   }
 }
