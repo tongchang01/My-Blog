@@ -1,90 +1,91 @@
-# Blog Archive Timeline Implementation Plan
+# 前台归档时间线实施计划
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **给执行者：** 实施本计划时必须使用 `superpowers:executing-plans`，按任务逐项执行。步骤使用 `- [ ]` 复选框，执行时逐步更新状态。
 
-**Goal:** Add the V2 public archive timeline API and migrate the Blog archive page away from old `/archives/{page}.json`.
+**目标：** 新增 V2 公开归档时间线接口，并把前台 Blog 归档页从旧 `/archives/{page}.json` 迁移到 V2 后端。
 
-**Architecture:** Keep this in the existing content/article and Blog article feature boundaries. Backend reuses the public article visibility criteria and returns a narrow archive DTO grouped by publish month. Frontend adds archive loading to the existing public article feature instead of introducing a new store.
+**架构：** 后端继续放在 content/article 边界内，复用公开文章列表的可见性口径，返回按发布年月分组的窄归档 DTO。前端继续复用 `features/articles`，不单独新建归档 store。
 
-**Tech Stack:** Spring Boot 3, MyBatis XML, MockMvc, OpenAPI tests, Vue 3, Pinia, Vitest, pnpm.
+**技术栈：** Spring Boot 3、MyBatis XML、MockMvc、OpenAPI 测试、Vue 3、Pinia、Vitest、pnpm。
 
 ---
 
-## Scope
+## 范围
 
-This plan implements O-016 only.
+本计划只实现 O-016：公开归档时间线。
 
-It does not implement search, about, friend links, comments, guestbook, stats, RSS, sitemap, or PASSWORD unlock. It also does not add a separate month index endpoint.
+本计划不实现搜索、关于、友链、评论、留言、统计、RSS、Sitemap 或 PASSWORD 完整解锁流程；也不新增独立月份索引接口。
 
-Important correction from the older archive plan: archive article items must include `id`. Current article detail routing is ID-led (`/:lang/posts/:id/:slug?`), so a slug-only archive response would force the frontend back to the legacy `post-slug` route.
+旧归档思路里建议归档文章项只返回 `title/slug/publishedAt/summary`，这里需要修正：当前文章详情路由已经是 ID 主导 `/:lang/posts/:id/:slug?`，所以归档文章项必须返回 `id`。否则前端只能退回旧 `post-slug` 路由，和 O-014 的已关闭结论冲突。
 
-## File Map
+## 文件范围
 
-### Backend
+### 后端
 
-- Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application/article/PublicArticleQueryService.java`
-  - Add `archives(PublicArticleQuery query)` that validates `page/size/lang`, queries the existing public page repository with no category/tag/search filters, and groups current-page articles by `publishAt` year-month.
-- Create: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application/article/PublicArchivePageResult.java`
-  - Application result with `records/total/page/size`, month groups, and narrow article items.
-- Create: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/PublicArchiveController.java`
-  - `GET /api/public/archives?page=1&size=12&lang=zh`.
-- Create: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/PublicArchivePageVO.java`
-  - HTTP VO with string IDs.
-- Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/ArticleWebMapping.java`
-  - Add mapping from `PublicArchivePageResult` to `PublicArchivePageVO`.
-- Modify: `MyBlog-springboot-v2/src/main/resources/application.yml`
-  - Add `GET /api/public/archives` to public endpoints.
-- Tests:
-  - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/application/PublicArticleQueryServiceTest.java`
-  - Create: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/web/PublicArchiveControllerTest.java`
-  - Modify: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/web/ArticleOpenApiTest.java`
-  - Modify public endpoint config/security tests only if they currently assert exact endpoint lists:
+- 修改：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application/article/PublicArticleQueryService.java`
+  - 新增 `archives(PublicArticleQuery query)`。
+  - 复用 `validateQuery(...)`。
+  - 查询当前页公开文章后按 `publishAt` 年月分组。
+- 新增：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application/article/PublicArchivePageResult.java`
+  - 应用层归档结果，包含 `records/total/page/size`、年月分组和文章项。
+- 新增：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/PublicArchiveController.java`
+  - 暴露 `GET /api/public/archives?page=1&size=12&lang=zh`。
+- 新增：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/PublicArchivePageVO.java`
+  - HTTP VO，文章 `id` 输出为 JSON string。
+- 修改：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/ArticleWebMapping.java`
+  - 增加 `PublicArchivePageResult -> PageResponse<PublicArchivePageVO.Group>` 映射。
+- 修改：`MyBlog-springboot-v2/src/main/resources/application.yml`
+  - 将 `GET /api/public/archives` 加入公开白名单。
+- 测试：
+  - 修改：`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/application/PublicArticleQueryServiceTest.java`
+  - 新增：`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/web/PublicArchiveControllerTest.java`
+  - 修改：`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/web/ArticleOpenApiTest.java`
+  - 如精确白名单断言失败，再修改：
     - `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/config/ApplicationConfigurationTest.java`
     - `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/config/BackendPropertiesTest.java`
     - `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/common/security/SecurityConfigTest.java`
 
-No new MyBatis query is planned for the first cut. Reuse `PublicArticleQueryRepository.findPublicPage(...)`; it already applies `PUBLISHED/PASSWORD + publish_at <= now + deleted=0` and stable `publish_at DESC, id DESC` ordering. This costs one existing tag query internally, but avoids duplicate SQL and visibility drift. Add a narrower SQL query only if profiling shows archive traffic needs it.
+第一版不新增 MyBatis 查询。直接复用 `PublicArticleQueryRepository.findPublicPage(...)`，因为它已经覆盖公开口径：`PUBLISHED/PASSWORD + publish_at <= now + deleted=0`，并按 `publish_at DESC, id DESC` 稳定排序。这样少写 SQL，避免公开口径漂移。只有实际压测证明归档页需要更窄查询时，再新增专用 SQL。
 
-### Frontend
+### 前端
 
-- Modify: `frontend/apps/blog/src/features/articles/contract.ts`
-  - Add archive DTO types.
-- Modify: `frontend/apps/blog/src/features/articles/api.ts`
-  - Add `loadPublicArchives(...)`.
-- Modify: `frontend/apps/blog/src/features/articles/model.ts`
-  - Add archive view models and status type reuse.
-- Modify: `frontend/apps/blog/src/features/articles/mapper.ts`
-  - Add `mapArchivePage(...)`.
-- Modify: `frontend/apps/blog/src/features/articles/store.ts`
-  - Add archive state/load/retry using the same abort/error pattern as articles and home.
-- Modify tests:
+- 修改：`frontend/apps/blog/src/features/articles/contract.ts`
+  - 新增归档 DTO。
+- 修改：`frontend/apps/blog/src/features/articles/api.ts`
+  - 新增 `loadPublicArchives(...)`。
+- 修改：`frontend/apps/blog/src/features/articles/model.ts`
+  - 新增归档 ViewModel。
+- 修改：`frontend/apps/blog/src/features/articles/mapper.ts`
+  - 新增 `mapArchivePage(...)`。
+- 修改：`frontend/apps/blog/src/features/articles/store.ts`
+  - 新增归档状态、加载和重试逻辑，复用现有 abort/error 模式。
+- 修改测试：
   - `frontend/apps/blog/src/features/articles/mapper.test.ts`
   - `frontend/apps/blog/src/features/articles/store.test.ts`
-- Modify: `frontend/apps/blog/src/pages/archives.vue`
-  - Replace `usePostStore().fetchArchives(...)` and old `Archives` model with `useArticleStore().loadArchives(...)`.
-  - Link archive items to `article-detail` with `{ lang, id, slug }`.
+- 修改：`frontend/apps/blog/src/pages/archives.vue`
+  - 移除 `usePostStore().fetchArchives(...)` 和旧 `Archives` 模型。
+  - 改用 `useArticleStore().loadArchives(...)`。
+  - 文章链接改到 `article-detail`，参数为 `{ lang, id, slug }`。
 
-### Docs
+### 文档
 
-- Modify: `docs/handbook/api/article.md`
-  - Add public archive timeline API.
-  - Fix public detail example IDs to string if touched.
-- Modify: `docs/handbook/frontend/blog/integration-status.md`
-  - Mark archive page as migrated after implementation.
-- Modify: `docs/handbook/start-here/open-issues.md`
-  - Close O-016 after implementation and verification.
-- Modify: `docs/handbook/start-here/current-status.md`
-  - Remove archive from remaining Blog main-link gaps after implementation.
+- 修改：`docs/handbook/api/article.md`
+  - 增加公开归档时间线接口。
+  - 如果触碰公开文章详情示例，顺手把示例 ID 修正为 JSON string。
+- 修改：`docs/handbook/frontend/blog/integration-status.md`
+  - 归档页迁移完成后从待补齐移到已完成。
+- 修改：`docs/handbook/start-here/open-issues.md`
+  - 关闭 O-016。
+- 修改：`docs/handbook/start-here/current-status.md`
+  - 归档完成后从前台剩余主链路中移除。
 
-## API Contract
-
-Endpoint:
+## API 契约
 
 ```http
 GET /api/public/archives?page=1&size=12&lang=zh
 ```
 
-Success response:
+成功响应：
 
 ```json
 {
@@ -114,75 +115,75 @@ Success response:
 }
 ```
 
-Rules:
+规则：
 
-- `page` starts at 1.
-- `size` range is 1 to 100; frontend uses 12.
-- `lang` supports `zh/ja/en`; invalid or missing falls back to `zh`, matching public article list behavior.
-- `total` is article count, not month group count.
-- Pagination is by article count before grouping.
-- Grouping is only for the current page.
-- Sorting is `publishAt DESC, id DESC`.
-- Public visibility matches article list: `PUBLISHED` and `PASSWORD`, `publish_at <= now`, not soft deleted.
-- Response does not include body, category, tags, cover, comment count, status, locked flag, password fields, or storage fields.
+- `page` 从 1 开始。
+- `size` 范围为 1 到 100；前端默认 12。
+- `lang` 支持 `zh/ja/en`；缺失或非法时按公开文章列表规则回退 `zh`。
+- `total` 是文章总数，不是月份分组总数。
+- 先按文章数分页，再对当前页文章按年月分组。
+- 排序为 `publishAt DESC, id DESC`。
+- 公开口径和公开文章列表一致：`PUBLISHED` / `PASSWORD`、`publish_at <= now`、未软删除。
+- 不返回正文、分类、标签、封面、评论数、状态、锁定标记、密码字段或存储字段。
 
-## Task 1: Backend Application Contract
+## 任务 1：后端应用层契约
 
-**Files:**
+**文件：**
 
-- Create: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application/article/PublicArchivePageResult.java`
-- Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application/article/PublicArticleQueryService.java`
-- Modify test: `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/application/PublicArticleQueryServiceTest.java`
+- 新增：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application/article/PublicArchivePageResult.java`
+- 修改：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application/article/PublicArticleQueryService.java`
+- 修改测试：`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/application/PublicArticleQueryServiceTest.java`
 
-- [ ] **Step 1: Add failing service test for archive grouping**
+- [ ] **步骤 1：先写失败测试**
 
-Add a test named `returnsArchiveTimelineGroupedByCurrentPageMonths`.
-
-Test shape:
+在 `PublicArticleQueryServiceTest` 增加：
 
 ```java
-PublicArticleQuery query = new PublicArticleQuery(
-        1, 3, "en", null, null, null, null, null, null);
-when(repository.findPublicPage(query.toCriteria(NOW)))
-        .thenReturn(new PublicArticlePage(
-                List.of(
-                        pageItem(103L, ArticleStatus.PASSWORD, null,
-                                LocalDateTime.of(2026, 6, 16, 10, 0)),
-                        pageItem(102L, ArticleStatus.PUBLISHED, null,
-                                LocalDateTime.of(2026, 6, 15, 10, 0)),
-                        pageItem(101L, ArticleStatus.PUBLISHED, null,
-                                LocalDateTime.of(2026, 5, 31, 10, 0))),
-                4,
-                1,
-                3));
+@Test
+void returnsArchiveTimelineGroupedByCurrentPageMonths() {
+    PublicArticleQuery query = new PublicArticleQuery(
+            1, 3, "en", null, null, null, null, null, null);
+    when(repository.findPublicPage(query.toCriteria(NOW)))
+            .thenReturn(new PublicArticlePage(
+                    List.of(
+                            pageItem(103L, ArticleStatus.PASSWORD, null,
+                                    LocalDateTime.of(2026, 6, 16, 10, 0)),
+                            pageItem(102L, ArticleStatus.PUBLISHED, null,
+                                    LocalDateTime.of(2026, 6, 15, 10, 0)),
+                            pageItem(101L, ArticleStatus.PUBLISHED, null,
+                                    LocalDateTime.of(2026, 5, 31, 10, 0))),
+                    4,
+                    1,
+                    3));
 
-PublicArchivePageResult result = service.archives(query);
+    PublicArchivePageResult result = service.archives(query);
 
-assertThat(result.total()).isEqualTo(4);
-assertThat(result.records()).extracting("yearMonth")
-        .containsExactly("2026-06", "2026-05");
-assertThat(result.records().get(0).articles())
-        .extracting("id")
-        .containsExactly(103L, 102L);
-assertThat(result.records().get(0).articles().get(0).title())
-        .isEqualTo("English Title");
-assertThat(result.records().get(0).articles().get(0).summary())
-        .isEqualTo("中文概要");
+    assertThat(result.total()).isEqualTo(4);
+    assertThat(result.records()).extracting("yearMonth")
+            .containsExactly("2026-06", "2026-05");
+    assertThat(result.records().get(0).articles())
+            .extracting("id")
+            .containsExactly(103L, 102L);
+    assertThat(result.records().get(0).articles().get(0).title())
+            .isEqualTo("English Title");
+    assertThat(result.records().get(0).articles().get(0).summary())
+            .isEqualTo("中文概要");
+}
 ```
 
-- [ ] **Step 2: Run the service test and confirm it fails**
+如现有 `pageItem(...)` helper 不支持自定义 `publishAt`，补一个重载，不改原测试语义。
 
-Run:
+- [ ] **步骤 2：运行测试确认失败**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=PublicArticleQueryServiceTest#returnsArchiveTimelineGroupedByCurrentPageMonths" test
 ```
 
-Expected: compile failure or missing `archives(...)` / `PublicArchivePageResult`.
+预期：缺少 `archives(...)` 或 `PublicArchivePageResult`，测试失败。
 
-- [ ] **Step 3: Add minimal application result and service method**
+- [ ] **步骤 3：实现最小应用层代码**
 
-Create `PublicArchivePageResult` as records:
+新增 `PublicArchivePageResult`：
 
 ```java
 public record PublicArchivePageResult(
@@ -216,27 +217,24 @@ public record PublicArchivePageResult(
 }
 ```
 
-Add `archives(PublicArticleQuery query)` to `PublicArticleQueryService`:
+在 `PublicArticleQueryService` 增加 `archives(PublicArticleQuery query)`：
 
-- call existing `validateQuery(query)`;
-- call `repository.findPublicPage(query.toCriteria(now))`;
-- normalize `lang`;
-- map each current-page `PublicArticlePageItem` to a narrow archive item;
-- group with insertion order by `YearMonth.from(item.publishAt())`.
+- 调用 `validateQuery(query)`。
+- 使用 `LocalDateTime.now(clock)`。
+- 调用 `repository.findPublicPage(query.toCriteria(now))`。
+- 使用现有 `normalizeLang(...)` 和 `localized(...)`。
+- 用 `YearMonth.from(item.publishAt())` 按当前页文章分组。
+- 不解析封面 URL，不读取正文。
 
-Do not resolve cover URLs. Do not read detail bodies.
-
-- [ ] **Step 4: Run service tests**
-
-Run:
+- [ ] **步骤 4：运行应用层测试**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=PublicArticleQueryServiceTest" test
 ```
 
-Expected: `BUILD SUCCESS`.
+预期：`BUILD SUCCESS`。
 
-- [ ] **Step 5: Commit backend application contract**
+- [ ] **步骤 5：提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application/article/PublicArchivePageResult.java `
@@ -245,24 +243,23 @@ git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/application
 git commit -m "后端：增加公开归档时间线应用结果"
 ```
 
-## Task 2: Backend HTTP API
+## 任务 2：后端 HTTP API
 
-**Files:**
+**文件：**
 
-- Create: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/PublicArchiveController.java`
-- Create: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/PublicArchivePageVO.java`
-- Modify: `MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/ArticleWebMapping.java`
-- Modify: `MyBlog-springboot-v2/src/main/resources/application.yml`
-- Modify tests:
-  - `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/web/PublicArchiveControllerTest.java`
-  - `MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/web/ArticleOpenApiTest.java`
-  - endpoint config/security tests if exact-list failures appear.
+- 新增：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/PublicArchiveController.java`
+- 新增：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/PublicArchivePageVO.java`
+- 修改：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/ArticleWebMapping.java`
+- 修改：`MyBlog-springboot-v2/src/main/resources/application.yml`
+- 新增测试：`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/web/PublicArchiveControllerTest.java`
+- 修改测试：`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/web/ArticleOpenApiTest.java`
+- 必要时修改公开白名单配置/安全测试。
 
-- [ ] **Step 1: Add failing controller test**
+- [ ] **步骤 1：先写 Controller 失败测试**
 
-Create `PublicArchiveControllerTest` with a mocked `PublicArticleQueryService`.
+`PublicArchiveControllerTest` 使用 `@WebMvcTest(PublicArchiveController.class)`，mock `PublicArticleQueryService`。
 
-Key assertions:
+关键断言：
 
 ```java
 mockMvc.perform(get("/api/public/archives")
@@ -270,8 +267,7 @@ mockMvc.perform(get("/api/public/archives")
                 .queryParam("size", "12")
                 .queryParam("lang", "en"))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.data.records[0].yearMonth")
-                .value("2026-06"))
+        .andExpect(jsonPath("$.data.records[0].yearMonth").value("2026-06"))
         .andExpect(jsonPath("$.data.records[0].articles[0].id")
                 .value("9007199254740993"))
         .andExpect(jsonPath("$.data.records[0].articles[0].title")
@@ -290,25 +286,23 @@ mockMvc.perform(get("/api/public/archives")
                 .doesNotExist());
 ```
 
-Also verify the service receives:
+同时 verify service 收到：
 
 ```java
 new PublicArticleQuery(2, 12, "en", null, null, null, null, null, null)
 ```
 
-- [ ] **Step 2: Run controller test and confirm it fails**
-
-Run:
+- [ ] **步骤 2：运行 Controller 测试确认失败**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=PublicArchiveControllerTest" test
 ```
 
-Expected: missing controller/VO.
+预期：缺少 Controller/VO。
 
-- [ ] **Step 3: Implement controller and VO**
+- [ ] **步骤 3：实现 Controller 和 VO**
 
-Controller:
+Controller：
 
 ```java
 @RestController
@@ -332,7 +326,7 @@ public class PublicArchiveController {
 }
 ```
 
-VO:
+VO：
 
 ```java
 public record PublicArchivePageVO() {
@@ -355,38 +349,36 @@ public record PublicArchivePageVO() {
 }
 ```
 
-Mapping returns `PageResponse<PublicArchivePageVO.Group>`.
+`ArticleWebMapping` 返回 `PageResponse<PublicArchivePageVO.Group>`。
 
-- [ ] **Step 4: Add public endpoint config**
+- [ ] **步骤 4：加入公开白名单**
 
-Add to `application.yml` under `myblog.security.public-endpoints`:
+在 `application.yml` 的 `myblog.security.public-endpoints` 增加：
 
 ```yaml
 - method: GET
   path: /api/public/archives
 ```
 
-If config tests assert exact indexes, update them to include this tuple. Prefer assertions by tuple over fragile numeric indexes if the local test already supports it.
+如果配置测试依赖精确索引，优先改成 tuple 断言，减少后续插入白名单时的维护成本。
 
-- [ ] **Step 5: Update OpenAPI coverage**
+- [ ] **步骤 5：更新 OpenAPI 测试**
 
-In `ArticleOpenApiTest`:
+在 `ArticleOpenApiTest`：
 
-- assert path `/api/public/archives` has `get`;
-- assert `PublicArchivePageVO.Item.id` is string int64;
-- assert archive item schema does not expose `body`, `categoryId`, `tags`, `coverUrl`, `commentCount`, `locked`, `status`.
+- 断言 `/api/public/archives` 有 `get`。
+- 断言 `PublicArchivePageVO.Item.id` 是 string/int64。
+- 断言归档文章项不暴露 `body/categoryId/tags/coverUrl/commentCount/locked/status`。
 
-- [ ] **Step 6: Run backend web/config tests**
-
-Run:
+- [ ] **步骤 6：运行后端 Web/配置测试**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=PublicArchiveControllerTest,ArticleOpenApiTest,ApplicationConfigurationTest,BackendPropertiesTest,SecurityConfigTest" test
 ```
 
-Expected: `BUILD SUCCESS`.
+预期：`BUILD SUCCESS`。
 
-- [ ] **Step 7: Commit backend HTTP API**
+- [ ] **步骤 7：提交**
 
 ```powershell
 git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web `
@@ -397,24 +389,24 @@ git add MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web `
 git commit -m "后端：公开归档时间线接口"
 ```
 
-## Task 3: Frontend Archive Data Layer
+## 任务 3：前端归档数据层
 
-**Files:**
+**文件：**
 
-- Modify: `frontend/apps/blog/src/features/articles/contract.ts`
-- Modify: `frontend/apps/blog/src/features/articles/api.ts`
-- Modify: `frontend/apps/blog/src/features/articles/model.ts`
-- Modify: `frontend/apps/blog/src/features/articles/mapper.ts`
-- Modify: `frontend/apps/blog/src/features/articles/store.ts`
-- Modify tests:
+- 修改：`frontend/apps/blog/src/features/articles/contract.ts`
+- 修改：`frontend/apps/blog/src/features/articles/api.ts`
+- 修改：`frontend/apps/blog/src/features/articles/model.ts`
+- 修改：`frontend/apps/blog/src/features/articles/mapper.ts`
+- 修改：`frontend/apps/blog/src/features/articles/store.ts`
+- 修改测试：
   - `frontend/apps/blog/src/features/articles/mapper.test.ts`
   - `frontend/apps/blog/src/features/articles/store.test.ts`
 
-- [ ] **Step 1: Add failing mapper test**
+- [ ] **步骤 1：先写 mapper 失败测试**
 
-Add `maps archive page into timeline groups`.
+新增 `maps archive page into timeline groups`。
 
-Expected view model:
+期望结果：
 
 ```ts
 expect(result.records[0]).toEqual({
@@ -437,36 +429,34 @@ expect(result.records[0]).toEqual({
 })
 ```
 
-- [ ] **Step 2: Add failing store test**
+- [ ] **步骤 2：先写 store 失败测试**
 
-Mock `loadPublicArchives`, call:
+mock `loadPublicArchives`，执行：
 
 ```ts
 await store.loadArchives({ page: 1, size: 12, lang: 'en' })
 ```
 
-Assert:
+断言：
 
 ```ts
 expect(store.archiveStatus).toBe('ready')
 expect(store.archive.records[0].posts[0].id).toBe('9007199254740993')
 ```
 
-Also add an error/retry assertion matching existing `load` and `retry` patterns.
+再补一个错误后 `retryArchives()` 的断言，模式参考现有 `retry()` 和 `retryHome()`。
 
-- [ ] **Step 3: Run frontend tests and confirm failure**
-
-Run:
+- [ ] **步骤 3：运行前端测试确认失败**
 
 ```powershell
 pnpm --dir frontend/apps/blog test
 ```
 
-Expected: missing archive types/functions.
+预期：缺少归档类型或函数。
 
-- [ ] **Step 4: Implement archive DTO/API/model/mapper/store**
+- [ ] **步骤 4：实现 DTO/API/model/mapper/store**
 
-DTOs:
+DTO：
 
 ```ts
 export interface PublicArchiveArticleDto {
@@ -485,7 +475,7 @@ export interface PublicArchiveGroupDto {
 }
 ```
 
-API:
+API：
 
 ```ts
 export const loadPublicArchives = async ({
@@ -505,51 +495,49 @@ export const loadPublicArchives = async ({
 }
 ```
 
-Mapper:
+Mapper：
 
-- Convert backend `month: 6` to `settings.months[5]`.
-- Parse `publishedAt` with `parseJst(...)`, not plain `new Date(...)`.
-- Preserve `id` for article-detail route.
+- 后端 `month: 6` 映射为 `settings.months[5]`。
+- `publishedAt` 使用 `parseJst(...)`，不要直接 `new Date(...)`。
+- 保留 `id`，供 `article-detail` 路由使用。
 
-Store:
+Store：
 
-- Reuse `ArticleListStatus`.
-- Add `archive`, `archiveStatus`, `archiveError`, `loadArchives`, `retryArchives`.
-- Use one `AbortController` for active archive request.
+- 复用 `ArticleListStatus`。
+- 新增 `archive/archiveStatus/archiveError/loadArchives/retryArchives`。
+- 使用独立 `AbortController` 管理归档请求。
 
-- [ ] **Step 5: Run frontend data tests**
-
-Run:
+- [ ] **步骤 5：运行前端数据层测试**
 
 ```powershell
 pnpm --dir frontend/apps/blog test
 ```
 
-Expected: `Test Files ... passed`.
+预期：测试通过。
 
-- [ ] **Step 6: Commit frontend archive data layer**
+- [ ] **步骤 6：提交**
 
 ```powershell
 git add frontend/apps/blog/src/features/articles
 git commit -m "前端：增加归档时间线数据层"
 ```
 
-## Task 4: Frontend Archive Page Migration
+## 任务 4：前端归档页迁移
 
-**Files:**
+**文件：**
 
-- Modify: `frontend/apps/blog/src/pages/archives.vue`
+- 修改：`frontend/apps/blog/src/pages/archives.vue`
 
-- [ ] **Step 1: Replace old JSON data source**
+- [ ] **步骤 1：替换旧数据源**
 
-Remove:
+移除：
 
 ```ts
 import { Archives } from '@/models/Post.class'
 import { usePostStore } from '@/stores/post'
 ```
 
-Use:
+改用：
 
 ```ts
 import { useArticleStore } from '@/features/articles/store'
@@ -557,15 +545,15 @@ import { isSupportedLocale } from '@/shared/i18n/locale'
 import { useAppStore } from '@/stores/app'
 ```
 
-- [ ] **Step 2: Route archive links to ID-led article detail**
+- [ ] **步骤 2：文章链接改成 ID 主导详情路由**
 
-Replace old link:
+旧链接：
 
 ```vue
 <router-link :to="{ name: 'post-slug', params: { slug: post.slug } }">
 ```
 
-with:
+替换为：
 
 ```vue
 <router-link
@@ -580,50 +568,48 @@ with:
 >
 ```
 
-- [ ] **Step 3: Wire loading/error/empty states**
+- [ ] **步骤 3：补齐 loading/error/empty 状态**
 
-Use existing archive store state:
+使用 store 状态：
 
-- `archiveStatus === 'loading'`: show a small timeline skeleton or existing `ob-skeleton`.
-- `archiveStatus === 'empty'`: show localized empty text.
-- `archiveStatus === 'error'`: show localized error text and retry button.
-- `ready`: render `articleStore.archive.records`.
+- `archiveStatus === 'loading'`：显示时间线 skeleton 或现有 `ob-skeleton`。
+- `archiveStatus === 'empty'`：显示本地化空状态。
+- `archiveStatus === 'error'`：显示本地化错误和重试按钮。
+- `ready`：渲染 `articleStore.archive.records`。
 
-Keep existing timeline CSS. Do not redesign the page.
+保留现有时间线 CSS，不重做视觉。
 
-- [ ] **Step 4: Run frontend verification**
-
-Run:
+- [ ] **步骤 4：运行前端验证**
 
 ```powershell
 pnpm --dir frontend/apps/blog typecheck
 pnpm --dir frontend/apps/blog test
 ```
 
-Expected: both pass.
+预期：全部通过。
 
-- [ ] **Step 5: Commit archive page migration**
+- [ ] **步骤 5：提交**
 
 ```powershell
 git add frontend/apps/blog/src/pages/archives.vue frontend/apps/blog/src/features/articles
 git commit -m "前端：迁移归档页到V2接口"
 ```
 
-## Task 5: Docs and Final Verification
+## 任务 5：文档回填和最终验证
 
-**Files:**
+**文件：**
 
-- Modify: `docs/handbook/api/article.md`
-- Modify: `docs/handbook/frontend/blog/integration-status.md`
-- Modify: `docs/handbook/start-here/open-issues.md`
-- Modify: `docs/handbook/start-here/current-status.md`
+- 修改：`docs/handbook/api/article.md`
+- 修改：`docs/handbook/frontend/blog/integration-status.md`
+- 修改：`docs/handbook/start-here/open-issues.md`
+- 修改：`docs/handbook/start-here/current-status.md`
 
-- [ ] **Step 1: Update API docs**
+- [ ] **步骤 1：更新 API 文档**
 
-Add section after public article list or before home:
+在公开文章列表附近增加：
 
 ```markdown
-## 11. 公开归档时间线
+## 公开归档时间线
 
 GET /api/public/archives?page=1&size=12&lang=zh
 
@@ -632,17 +618,15 @@ GET /api/public/archives?page=1&size=12&lang=zh
 分页单位是文章数，`total` 是公开可见文章总数，不是月份总数。
 ```
 
-Document the response fields exactly as in this plan. Also fix public detail example IDs to string if they still show JSON number.
+响应字段按本计划 API 契约写清楚。若公开详情示例仍显示 JSON number ID，顺手改成 string。
 
-- [ ] **Step 2: Update status docs**
+- [ ] **步骤 2：更新状态文档**
 
-- `frontend/blog/integration-status.md`: move archive from pending to completed.
-- `open-issues.md`: close O-016 with implementation and verification notes.
-- `current-status.md`: remove archive from Blog remaining list.
+- `frontend/blog/integration-status.md`：归档从待补齐移到已完成。
+- `open-issues.md`：关闭 O-016，写明验证命令。
+- `current-status.md`：从 Blog 剩余主链路里移除归档。
 
-- [ ] **Step 3: Run final local checks**
-
-Run:
+- [ ] **步骤 3：运行最终本地检查**
 
 ```powershell
 mvn -f MyBlog-springboot-v2/pom.xml "-Dtest=PublicArticleQueryServiceTest,PublicArchiveControllerTest,ArticleOpenApiTest,ApplicationConfigurationTest,BackendPropertiesTest,SecurityConfigTest" test
@@ -652,14 +636,14 @@ git diff --stat
 git status --short
 ```
 
-Expected:
+预期：
 
-- Maven `BUILD SUCCESS`.
-- Blog typecheck exits 0.
-- Blog test exits 0.
-- Diff only contains O-016 backend/frontend/docs files.
+- Maven `BUILD SUCCESS`。
+- Blog typecheck 退出码 0。
+- Blog test 退出码 0。
+- diff 只包含 O-016 后端、前端和文档文件。
 
-- [ ] **Step 4: Commit docs**
+- [ ] **步骤 4：提交文档**
 
 ```powershell
 git add docs/handbook/api/article.md `
@@ -669,7 +653,7 @@ git add docs/handbook/api/article.md `
 git commit -m "文档：关闭公开归档时间线问题"
 ```
 
-- [ ] **Step 5: Push and run CI**
+- [ ] **步骤 5：推送并跑 CI**
 
 ```powershell
 git push -u origin feature/blog-archive-timeline
@@ -677,11 +661,11 @@ gh workflow run CI --ref feature/blog-archive-timeline
 gh run watch --exit-status
 ```
 
-Expected: all CI jobs pass.
+预期：CI 全部通过。
 
-## Self-Review
+## 自检
 
-- Spec coverage: O-016 API, backend filtering, page-by-article grouping, frontend archive migration, article-detail route, docs, and verification are covered.
-- Placeholder scan: no placeholder markers are used as required steps.
-- Type consistency: backend uses `PublicArchivePageResult` -> `PublicArchivePageVO` -> `PageResponse<Group>`; frontend uses `PublicArchiveGroupDto` -> `ArchiveGroupViewModel`.
-- Simplification accepted: backend reuses existing public page repository instead of adding archive-specific SQL. This is intentional for the first cut and avoids visibility drift.
+- 需求覆盖：O-016 API、后端公开过滤、按文章分页后分组、前端归档页迁移、ID 主导详情路由、文档和验证均已覆盖。
+- 占位扫描：没有占位标记作为执行步骤。
+- 类型一致性：后端 `PublicArchivePageResult -> PublicArchivePageVO -> PageResponse<Group>`；前端 `PublicArchiveGroupDto -> ArchiveGroupViewModel`。
+- 简化说明：后端第一版复用公开文章分页 repository，不新增归档专用 SQL；这是为了减少重复公开口径。
