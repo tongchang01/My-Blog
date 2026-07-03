@@ -148,11 +148,6 @@ jobs:
       - name: Typecheck blog
         run: pnpm --dir frontend/apps/blog typecheck
 
-      # 注意：blog 的 package.json 中 "test" 是裸 vitest，会进 watch 模式导致 CI 挂死。
-      # CI 里必须用 vitest run；改法：把这行换成
-      #   pnpm --dir frontend/apps/blog exec vitest run
-      # 或修改 frontend/apps/blog/package.json 把 test 改成 "vitest run"。
       - name: Test blog
-      #  run: pnpm --dir frontend/apps/blog test
-        run: pnpm --dir frontend/apps/blog exec vitest run
+        run: pnpm --dir frontend/apps/blog test
 
