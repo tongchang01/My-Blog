@@ -1,5 +1,12 @@
+# MyBlog V2 持续集成（CI）工作流。
+# 覆盖当前进入主线维护面的最小稳定检查：v2 后端 + admin 前台 + blog 前台。
+
 name: CI
 
+# 触发时机：
+# - 向 main 发起 PR：合并前必须通过。
+# - 向 main 推送：合并后再次校验。
+# - workflow_dispatch：允许在 GitHub 页面手动跑一次，用于排查。
 on:
   pull_request:
     branches: [main]
@@ -7,13 +14,20 @@ on:
     branches: [main]
   workflow_dispatch:
 
+# 最小权限：只读仓库内容。CI 不做发布、不写 issue、不写 PR 评论。
 permissions:
   contents: read
 
 jobs:
+  # ==========================================================================
+  # 后端主 job：v2 后端的 H2 + 单元测试，快速反馈用。
+  # 排除三个 MySql*Test（需要真 MySQL 容器），交给下面的 backend-mysql-test。
+  # ==========================================================================
   backend-test:
     name: Backend tests
     runs-on: ubuntu-latest
+    # 时区固定 Asia/Tokyo，保证与时间相关的断言（如登录审计、发布计划）
+    # 在 CI 和本地行为一致。JVM 用 -Duser.timezone，shell 用 TZ。
     env:
       MAVEN_OPTS: -Duser.timezone=Asia/Tokyo
       TZ: Asia/Tokyo
@@ -27,14 +41,23 @@ jobs:
         with:
           distribution: temurin
           java-version: "17"
+          # 缓存 Maven 依赖，加速后续 job；缓存 key 由 setup-java 内部按 pom.xml 生成。
           cache: maven
 
+      # -Dtest=!... 排除三个真实 MySQL 集成测试，避免主 job 依赖 Docker。
+      # 用双引号包住整个参数是为了防止 shell 把 ! 当历史扩展。
       - name: Run backend tests
         run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=!MySqlFlywayMigrationTest,!MySqlChangePasswordConcurrencyTest,!MySqlLoginFailureConcurrencyTest"
 
+  # ==========================================================================
+  # 后端 MySQL 集成 job：跑三个基于 Testcontainers MySQL 8.4 的专项测试。
+  # 覆盖真实 MySQL 方言、行锁、并发条件更新等只在真 MySQL 上暴露的问题。
+  # 见 docs/working/plans/2026-07-02-ci-mysql-integration-test-plan.md。
+  # ==========================================================================
   backend-mysql-test:
     name: Backend MySQL integration tests
     runs-on: ubuntu-latest
+    # 硬上限，防止 Testcontainers 挂死占用 Actions 额度。
     timeout-minutes: 15
     env:
       MAVEN_OPTS: -Duser.timezone=Asia/Tokyo
@@ -51,14 +74,56 @@ jobs:
           java-version: "17"
           cache: maven
 
+      # 提前拉镜像，把网络失败与测试失败分离：这一步挂了就一眼看出是镜像/网络问题。
+      # runner 自带 Docker，无需额外安装。
       - name: Pre-pull MySQL image
         run: docker pull mysql:8.4
 
       - name: Run MySQL integration tests
         run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=MySqlFlywayMigrationTest,MySqlChangePasswordConcurrencyTest,MySqlLoginFailureConcurrencyTest"
 
+  # ==========================================================================
+  # 后台 admin 前端 job：TypeScript 类型检查 + Vitest。
+  # admin 的 package.json 里 "test" 已配成 vitest run，CI 可直接用。
+  # ==========================================================================
   admin-frontend-test:
     name: Admin frontend tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # pnpm 版本固定 9.15.9，与仓库 packageManager 字段对齐，避免 lockfile 兼容问题。
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.9
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          # 按 admin 目录的 pnpm-lock.yaml 生成缓存 key，独立于 blog。
+          cache: pnpm
+          cache-dependency-path: frontend/apps/admin/pnpm-lock.yaml
+
+      # --frozen-lockfile：严格按 lockfile 装，禁止自动更新，防止无意间引入新版本。
+      - name: Install admin dependencies
+        run: pnpm --dir frontend/apps/admin install --frozen-lockfile
+
+      - name: Typecheck admin
+        run: pnpm --dir frontend/apps/admin typecheck
+
+      - name: Test admin
+        run: pnpm --dir frontend/apps/admin test
+
+  # ==========================================================================
+  # 前台 blog 前端 job：TypeScript 类型检查 + Vitest。
+  # 结构和 admin 对称。
+  # ==========================================================================
+  blog-frontend-test:
+    name: Blog frontend tests
     runs-on: ubuntu-latest
 
     steps:
@@ -75,13 +140,19 @@ jobs:
         with:
           node-version: "22"
           cache: pnpm
-          cache-dependency-path: frontend/apps/admin/pnpm-lock.yaml
+          cache-dependency-path: frontend/apps/blog/pnpm-lock.yaml
 
-      - name: Install admin dependencies
-        run: pnpm --dir frontend/apps/admin install --frozen-lockfile
+      - name: Install blog dependencies
+        run: pnpm --dir frontend/apps/blog install --frozen-lockfile
 
-      - name: Typecheck admin
-        run: pnpm --dir frontend/apps/admin typecheck
+      - name: Typecheck blog
+        run: pnpm --dir frontend/apps/blog typecheck
 
-      - name: Test admin
-        run: pnpm --dir frontend/apps/admin test
+      # 注意：blog 的 package.json 中 "test" 是裸 vitest，会进 watch 模式导致 CI 挂死。
+      # CI 里必须用 vitest run；改法：把这行换成
+      #   pnpm --dir frontend/apps/blog exec vitest run
+      # 或修改 frontend/apps/blog/package.json 把 test 改成 "vitest run"。
+      - name: Test blog
+      #  run: pnpm --dir frontend/apps/blog test
+        run: pnpm --dir frontend/apps/blog exec vitest run
+
