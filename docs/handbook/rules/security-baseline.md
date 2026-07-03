@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后端安全相关代码、配置和后台会话实现
-> 最后校准：2026-06-29
+> 最后校准：2026-07-03
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/`、`identity/application/token/`、`frontend/apps/admin/src/features/auth/`
 > 权威程度：规则
 
@@ -159,7 +159,7 @@ DEMO 规则：
 - DEMO 是后台只读演示账号。
 - DEMO 写操作必须由后端拒绝，不能只靠前端隐藏按钮。
 - DEMO 可读字段是否需要裁剪，由 application 层统一处理，不应散落在 Controller、Mapper、Repository。
-- DEMO 敏感字段裁剪边界仍需逐页校准，见 O-002。
+- DEMO 敏感字段裁剪边界已按 O-002 关闭：文章非公开正文、评论邮箱/IP/UA、附件内部存储字段由后端裁剪；统计 dashboard 不裁剪。
 
 ## 9. 公开白名单
 

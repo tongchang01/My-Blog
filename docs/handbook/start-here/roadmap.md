@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后续开发
-> 最后校准：2026-06-29
+> 最后校准：2026-07-03
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：路线图
 
@@ -53,7 +53,7 @@
 
 - 前台 blog 已完成首批公开接口联调：站点配置、文章列表、文章详情。
 - 后台 admin 已完成基础闭环和主要业务页，包括认证会话、文章、分类标签、评论、友链、附件、站点配置、作者资料和统计仪表盘。
-- 后台完成度已沉淀到 `../frontend/admin/integration-status.md`；剩余 DEMO 字段边界和统计 ID 契约分别见 O-002、O-012。
+- 后台完成度已沉淀到 `../frontend/admin/integration-status.md`；DEMO 字段边界和统计 ID 契约已分别在 O-002、O-012 关闭。
 
 ## 近期路线
 
@@ -101,11 +101,11 @@
 
 目标：在后台主要业务页已完成的基础上，裁决剩余权限和契约边界。
 
-- [ ] 校准 ADMIN/DEMO 页面和字段边界。
-- [ ] 裁决 `topArticles[].articleId` 是否改为 JSON string。
-- [ ] 若需要代码修改，同步补后端 Controller/OpenAPI 测试和前端 contract。
+- [x] 校准 ADMIN/DEMO 页面和字段边界。
+- [x] 裁决 `topArticles[].articleId` 是否改为 JSON string。
+- [x] 若需要代码修改，同步补后端 Controller/OpenAPI 测试和前端 contract。
 
-关联 open issues：O-002、O-012。
+关联 open issues：O-002、O-012，均已关闭。
 
 ### R5：上线准备
 

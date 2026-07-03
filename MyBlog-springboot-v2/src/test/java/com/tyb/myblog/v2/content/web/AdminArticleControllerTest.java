@@ -248,6 +248,22 @@ class AdminArticleControllerTest {
     }
 
     @Test
+    void returnsDemoNonPublishedDetailWithoutBodyOrPasswordFields()
+            throws Exception {
+        when(queryService.adminDetail(principal, 100L))
+                .thenReturn(detailWithoutBody());
+
+        mockMvc.perform(get("/api/admin/articles/100"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.id")
+                        .value(Long.toString(UNSAFE_BROWSER_ID)))
+                .andExpect(jsonPath("$.data.status").value("DRAFT"))
+                .andExpect(jsonPath("$.data.body").doesNotExist())
+                .andExpect(jsonPath("$.data.password").doesNotExist())
+                .andExpect(jsonPath("$.data.accessPassword").doesNotExist());
+    }
+
+    @Test
     void deletesRestoresAndReadsRecycleBin() throws Exception {
         doNothing().when(deleteService).delete(principal, 100L);
         when(deletedQueryService.page(principal, 1, 20))
@@ -352,6 +368,33 @@ class AdminArticleControllerTest {
                 ArticleStatus.PUBLISHED,
                 HomepageSlot.PINNED,
                 LocalDateTime.of(2026, 6, 15, 10, 0),
+                UNSAFE_BROWSER_ID,
+                "https://cdn.example.com/c.png",
+                2,
+                List.of(UNSAFE_BROWSER_ID),
+                LocalDateTime.of(2026, 6, 15, 9, 0),
+                UNSAFE_BROWSER_ID,
+                LocalDateTime.of(2026, 6, 15, 11, 0),
+                UNSAFE_BROWSER_ID);
+    }
+
+    private AdminArticleDetailResult detailWithoutBody() {
+        return new AdminArticleDetailResult(
+                UNSAFE_BROWSER_ID,
+                "标题",
+                null,
+                "Title",
+                "摘要",
+                null,
+                null,
+                null,
+                UNSAFE_BROWSER_ID,
+                "分类",
+                UNSAFE_BROWSER_ID,
+                "article",
+                ArticleStatus.DRAFT,
+                HomepageSlot.PINNED,
+                null,
                 UNSAFE_BROWSER_ID,
                 "https://cdn.example.com/c.png",
                 2,
