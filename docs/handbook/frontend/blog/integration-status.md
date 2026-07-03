@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 前台读者端
-> 最后校准：2026-07-01
+> 最后校准：2026-07-02
 > 对应代码：`frontend/apps/blog/`
 > 权威程度：前台完成度记录
 
@@ -16,12 +16,14 @@
 - 首页已改接 `GET /api/public/articles/home` 聚合接口，使用 `pinnedArticle`、`featuredArticles`、`articles` 渲染首屏。
 - 首页不再用普通文章分页的 `records[0]` / `records.slice(...)` 推断置顶或推荐语义。
 - 公开文章详情、canonical slug、PASSWORD 锁定态、404、网络错误、retry。
+- 分类和标签列表已接入 `GET /api/public/categories`、`GET /api/public/tags`，数量使用公开 `articleCount` 映射。
+- 分类和标签公开页已使用 slug 路由 `/:lang/categories/:slug`、`/:lang/tags/:slug`，并通过公开文章列表 `categorySlug/tagSlug` 查询。
 - 首页已停止请求旧 Hexo/Aurora mock 数据。
 - Markdown 正文通过 `markdown-it` 渲染，禁用原始 HTML。
 
 ## 待补齐
 
-- 分类、标签、归档、友链、关于、搜索仍需替换旧 JSON 数据源或旧页面实现。
+- 归档、友链、关于、搜索仍需替换旧 JSON 数据源或旧页面实现。
 - 评论、留言和访问统计前台接入。
 - PASSWORD 文章完整解锁流程。
 - Spotify Embed。
@@ -32,4 +34,6 @@
 - O-001 PASSWORD 文章完整解锁流程。
 - O-003 前台读者主链路补齐。
 - O-004 前台评论、留言和统计接入。
-- O-010/O-011 公开接口 ID 类型校准。
+- O-016 公开归档时间线接口缺失。
+- O-017 搜索实现方式与前后端能力不一致。
+- O-018 关于页仍依赖旧 page JSON。

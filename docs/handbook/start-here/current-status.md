@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 开发
-> 最后校准：2026-06-29
+> 最后校准：2026-07-02
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：当前进度权威源
 
@@ -18,7 +18,7 @@
 |------|----------|------|
 | V1 | 只读历史参考 | 不再作为新功能开发目标 |
 | V2 后端 | 第一版主体完成 | 六大模块已完成，后续以联调修正、上线准备和增量能力为主 |
-| V2 前台 blog | 首批联调完成，主链路未完整 | 站点配置、文章列表、文章详情已接入；分类、标签、归档、友链、关于、搜索等仍待补齐 |
+| V2 前台 blog | 首批联调完成，主链路未完整 | 站点配置、首页槽位、文章列表、文章详情已接入；分类、标签、归档、友链、关于、搜索等仍待补齐 |
 | V2 后台 admin | 主要业务页已校准 | 登录、会话、文章、分类标签、评论、友链、附件、站点配置、作者资料、统计仪表盘已有实现记录，仍需裁决 DEMO 字段边界和统计 ID 契约 |
 | 文档体系 | 主要迁移完成，仍在收口 | `project-handbook/` 已降级为跳转入口，`superpowers/` 和后台过程材料已归档；剩余为入口状态、前台 blog、产品/运维细节校准 |
 
@@ -51,15 +51,17 @@
 - 三语入口和语言保存。
 - `/:lang` 首页和 `/:lang/posts/:id/:slug?` ID 主导文章路由。
 - `GET /api/public/site-config` 接入，失败时使用 typed defaults 降级。
+- `GET /api/public/articles/home` 首页聚合接口接入，后台文章编辑可维护 `homepageSlot`。
 - 公开文章列表、分页、loading、empty、error、retry。
 - 公开文章详情、canonical slug、PASSWORD 锁定态、404、网络错误、retry。
-- 前台契约目标是文章、分类、标签 ID 按 string 使用；当前后端公开 content/comment/stats 部分响应仍返回 number，已登记到 `open-issues.md` 的 O-010、O-011、O-012。
+- 分类和标签公开列表、文章数量展示、slug 路由筛选。
+- 公开 content/comment/stats 的前端可见 Snowflake ID 已在 HTTP JSON 边界输出为 string；后端内部仍使用数值 ID。
 - 正文通过 `markdown-it` 渲染，禁用原始 HTML，并补充外链安全属性。
 - 首页已停止请求旧 Hexo/Aurora 的 `site.json`、`posts/1.json`、`features.json`、旧搜索索引和旧友链页面数据。
 
 仍待补齐：
 
-- 分类、标签、归档、友链、关于、搜索。
+- 归档、友链、关于、搜索。
 - 评论、留言、访问统计前台接入。
 - PASSWORD 文章完整解锁流程。
 - Spotify Embed。
@@ -97,6 +99,7 @@
 已有历史记录显示：
 
 - 后端多轮 `mvn clean test` 通过，跳过项主要为 Docker 不可用时的 Testcontainers 条件测试。
+- CI 已补 `backend-mysql-test`，在 GitHub Actions 上真实运行 `MySql*Test`。
 - 前台首批联调完成 Vitest、lint、typecheck、build。
 - 后台基础闭环和多项业务页完成前端测试、typecheck、build，并有部分本地 MySQL 浏览器联调记录。
 

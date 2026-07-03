@@ -18,7 +18,8 @@ public interface TagWebMapping {
         return new PublicTagVO(
                 Long.toString(source.id()),
                 source.name(),
-                source.slug());
+                source.slug(),
+                source.articleCount());
     }
 
     default AdminTagVO toAdminVO(TagResult source) {

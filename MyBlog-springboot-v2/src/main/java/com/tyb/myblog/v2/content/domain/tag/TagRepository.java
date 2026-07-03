@@ -11,6 +11,9 @@ public interface TagRepository {
 
     List<Tag> findAllActive();
 
+    List<PublicTagWithArticleCount> findPublicWithArticleCount(
+            LocalDateTime now);
+
     Optional<Tag> findActiveById(long id);
 
     Optional<Tag> findActiveByIdForUpdate(long id);
@@ -32,4 +35,9 @@ public interface TagRepository {
             long id,
             LocalDateTime deletedAt,
             long deletedBy);
+
+    record PublicTagWithArticleCount(
+            Tag tag,
+            long articleCount) {
+    }
 }

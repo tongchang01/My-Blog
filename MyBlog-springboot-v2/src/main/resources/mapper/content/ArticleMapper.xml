@@ -194,12 +194,32 @@
         <if test="query.categoryId != null">
           AND a.category_id = #{query.categoryId}
         </if>
+        <if test="query.categorySlug != null and query.categorySlug != ''">
+          AND EXISTS (
+              SELECT 1
+              FROM t_category filter_category
+              WHERE filter_category.id = a.category_id
+                AND filter_category.slug = #{query.categorySlug}
+                AND filter_category.deleted = 0
+          )
+        </if>
         <if test="query.tagId != null">
           AND EXISTS (
               SELECT 1
               FROM t_article_tag filter_at
               WHERE filter_at.article_id = a.id
                 AND filter_at.tag_id = #{query.tagId}
+          )
+        </if>
+        <if test="query.tagSlug != null and query.tagSlug != ''">
+          AND EXISTS (
+              SELECT 1
+              FROM t_article_tag filter_slug_at
+              INNER JOIN t_tag filter_tag
+                  ON filter_tag.id = filter_slug_at.tag_id
+                 AND filter_tag.deleted = 0
+              WHERE filter_slug_at.article_id = a.id
+                AND filter_tag.slug = #{query.tagSlug}
           )
         </if>
         <if test="query.keyword != null and query.keyword != ''">

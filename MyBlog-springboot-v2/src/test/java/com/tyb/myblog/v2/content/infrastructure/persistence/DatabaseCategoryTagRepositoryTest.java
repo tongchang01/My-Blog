@@ -63,6 +63,42 @@ class DatabaseCategoryTagRepositoryTest {
     }
 
     @Test
+    void readsPublicTaxonomyWithVisibleArticleCountsOnly() {
+        LocalDateTime now = LocalDateTime.of(2026, 6, 16, 12, 0);
+        insertCategory(101L, "Backend", "backend", 10, false);
+        insertCategory(102L, "Empty", "empty", 20, false);
+        insertCategory(103L, "Deleted", "deleted", 30, true);
+        insertTag(201L, "Java", "java", false);
+        insertTag(202L, "Vue", "vue", true);
+        insertTag(203L, "Empty", "empty-tag", false);
+        insertArticle(301L, 101L, 2, "2026-06-15 10:00:00", false);
+        insertArticle(302L, 101L, 4, "2026-06-15 11:00:00", false);
+        insertArticle(303L, 101L, 1, "2026-06-15 12:00:00", false);
+        insertArticle(304L, 101L, 2, "2026-06-17 10:00:00", false);
+        insertArticle(305L, 101L, 2, "2026-06-15 13:00:00", true);
+        insertArticle(306L, 103L, 2, "2026-06-15 14:00:00", false);
+        linkTag(301L, 201L);
+        linkTag(302L, 201L);
+        linkTag(303L, 201L);
+        linkTag(304L, 201L);
+        linkTag(305L, 201L);
+        linkTag(306L, 202L);
+
+        assertThat(categoryRepository.findPublicWithArticleCount(now))
+                .singleElement()
+                .satisfies(item -> {
+                    assertThat(item.category().id()).isEqualTo(101L);
+                    assertThat(item.articleCount()).isEqualTo(2);
+                });
+        assertThat(tagRepository.findPublicWithArticleCount(now))
+                .singleElement()
+                .satisfies(item -> {
+                    assertThat(item.tag().id()).isEqualTo(201L);
+                    assertThat(item.articleCount()).isEqualTo(2);
+                });
+    }
+
+    @Test
     void findsSlugIncludingDeletedRows() {
         insertCategory(101L, "Deleted", "old-category", 0, true);
         insertTag(201L, "Deleted", "old-tag", true);
@@ -104,7 +140,7 @@ class DatabaseCategoryTagRepositoryTest {
     void insertsWithAssignedIdsAndExplicitAuditUsers() {
         Category category = categoryRepository.insert(
                 NewCategory.create(
-                        "后端",
+                        "Backend",
                         null,
                         "Backend",
                         "backend",
@@ -149,7 +185,7 @@ class DatabaseCategoryTagRepositoryTest {
 
         Category category = categoryRepository.findActiveById(101L)
                 .orElseThrow()
-                .replace("服务端", null, null, "server", 20);
+                .replace("Server", null, null, "server", 20);
         Tag tag = tagRepository.findActiveById(201L)
                 .orElseThrow()
                 .replace("Java 17", null, null, "java-17");
@@ -161,7 +197,7 @@ class DatabaseCategoryTagRepositoryTest {
         assertThat(categoryRepository.findActiveById(101L))
                 .get()
                 .satisfies(updated -> {
-                    assertThat(updated.name().zh()).isEqualTo("服务端");
+                    assertThat(updated.name().zh()).isEqualTo("Server");
                     assertThat(updated.name().ja()).isNull();
                     assertThat(updated.slug().value()).isEqualTo("server");
                     assertThat(updated.sortOrder()).isEqualTo(20);
@@ -182,10 +218,7 @@ class DatabaseCategoryTagRepositoryTest {
         insertCategory(101L, "Backend", "backend", 10, false);
         insertTag(201L, "Java", "java", false);
         insertArticle(301L, 101L, false);
-        jdbcTemplate.update("""
-                INSERT INTO t_article_tag (article_id, tag_id)
-                VALUES (?, ?)
-                """, 301L, 201L);
+        linkTag(301L, 201L);
 
         assertThat(categoryRepository
                 .hasActiveArticleReference(101L)).isTrue();
@@ -282,15 +315,30 @@ class DatabaseCategoryTagRepositoryTest {
             long id,
             long categoryId,
             boolean deleted) {
+        insertArticle(
+                id,
+                categoryId,
+                2,
+                "2026-06-15 10:00:00",
+                deleted);
+    }
+
+    private void insertArticle(
+            long id,
+            long categoryId,
+            int status,
+            String publishAt,
+            boolean deleted) {
         jdbcTemplate.update("""
                 INSERT INTO t_article (
                     id, title_zh, category_id, author_id,
                     slug, status, comment_count,
-                    created_at, created_by, updated_at, updated_by,
+                    publish_at, created_at, created_by, updated_at, updated_by,
                     deleted, deleted_at, deleted_by
                 ) VALUES (
-                    ?, '文章', ?, 1001,
-                    ?, 2, 0,
+                    ?, 'Article', ?, 1001,
+                    ?, ?, 0,
+                    ?,
                     '2026-06-15 10:00:00', 1001,
                     '2026-06-15 10:00:00', 1001,
                     ?, ?, ?
@@ -299,8 +347,17 @@ class DatabaseCategoryTagRepositoryTest {
                 id,
                 categoryId,
                 "article-" + id,
+                status,
+                publishAt,
                 deleted ? 1 : 0,
                 deleted ? "2026-06-15 11:00:00" : null,
                 deleted ? 1001L : null);
+    }
+
+    private void linkTag(long articleId, long tagId) {
+        jdbcTemplate.update("""
+                INSERT INTO t_article_tag (article_id, tag_id)
+                VALUES (?, ?)
+                """, articleId, tagId);
     }
 }

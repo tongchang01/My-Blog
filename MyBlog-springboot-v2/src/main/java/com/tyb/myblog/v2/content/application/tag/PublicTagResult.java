@@ -6,5 +6,6 @@ package com.tyb.myblog.v2.content.application.tag;
 public record PublicTagResult(
         long id,
         String name,
-        String slug) {
+        String slug,
+        long articleCount) {
 }

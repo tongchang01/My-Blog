@@ -4,7 +4,10 @@
   >
     <router-link
       :class="tagClasses"
-      :to="{ name: 'post-search', query: { tag: slug } }"
+      :to="{
+        name: 'tag-articles',
+        params: { lang: appStore.locale, slug }
+      }"
       :style="gradientBackground"
     >
       {{ name }}

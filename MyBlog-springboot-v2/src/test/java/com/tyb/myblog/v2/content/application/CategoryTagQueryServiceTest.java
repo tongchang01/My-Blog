@@ -17,7 +17,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +30,10 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryTagQueryServiceTest {
+
+    private static final Clock CLOCK = Clock.fixed(
+            Instant.parse("2026-06-16T12:00:00Z"),
+            ZoneOffset.UTC);
 
     @Mock
     private CategoryRepository categoryRepository;
@@ -42,27 +49,28 @@ class CategoryTagQueryServiceTest {
         ContentAuthorization authorization =
                 new ContentAuthorization();
         categoryService = new CategoryQueryService(
-                categoryRepository, authorization);
+                categoryRepository, authorization, CLOCK);
         tagService = new TagQueryService(
-                tagRepository, authorization);
+                tagRepository, authorization, CLOCK);
     }
 
     @Test
-    void returnsLocalizedPublicResultsWithChineseFallback() {
-        when(categoryRepository.findAllActive())
-                .thenReturn(List.of(category()));
-        when(tagRepository.findAllActive())
-                .thenReturn(List.of(tag()));
+    void returnsLocalizedPublicResultsWithArticleCounts() {
+        LocalDateTime now = LocalDateTime.of(2026, 6, 16, 12, 0);
+        when(categoryRepository.findPublicWithArticleCount(now))
+                .thenReturn(List.of(categoryWithArticleCount(3)));
+        when(tagRepository.findPublicWithArticleCount(now))
+                .thenReturn(List.of(tagWithArticleCount(2)));
 
         assertThat(categoryService.publicList("ja"))
                 .containsExactly(new PublicCategoryResult(
-                        101L, "后端", "backend"));
+                        101L, "Backend", "backend", 3));
         assertThat(categoryService.publicList("en"))
                 .containsExactly(new PublicCategoryResult(
-                        101L, "Backend", "backend"));
+                        101L, "Backend", "backend", 3));
         assertThat(tagService.publicList("ja"))
                 .containsExactly(new PublicTagResult(
-                        201L, "Java", "java"));
+                        201L, "Java", "java", 2));
     }
 
     @Test
@@ -87,7 +95,7 @@ class CategoryTagQueryServiceTest {
         assertThat(categoryService.adminList(principal("ADMIN")))
                 .singleElement()
                 .satisfies(result -> {
-                    assertThat(result.nameZh()).isEqualTo("后端");
+                    assertThat(result.nameZh()).isEqualTo("Backend");
                     assertThat(result.nameEn()).isEqualTo("Backend");
                     assertThat(result.sortOrder()).isEqualTo(10);
                 });
@@ -158,7 +166,7 @@ class CategoryTagQueryServiceTest {
     private Category category() {
         return Category.reconstitute(
                 101L,
-                "后端",
+                "Backend",
                 null,
                 "Backend",
                 "backend",
@@ -180,5 +188,19 @@ class CategoryTagQueryServiceTest {
                 1001L,
                 LocalDateTime.of(2026, 6, 15, 11, 0),
                 1001L);
+    }
+
+    private CategoryRepository.PublicCategoryWithArticleCount categoryWithArticleCount(
+            long articleCount) {
+        return new CategoryRepository.PublicCategoryWithArticleCount(
+                category(),
+                articleCount);
+    }
+
+    private TagRepository.PublicTagWithArticleCount tagWithArticleCount(
+            long articleCount) {
+        return new TagRepository.PublicTagWithArticleCount(
+                tag(),
+                articleCount);
     }
 }

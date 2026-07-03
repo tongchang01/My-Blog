@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.content.infrastructure.persistence.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.tyb.myblog.v2.content.infrastructure.persistence.entity.TagEntity;
+import com.tyb.myblog.v2.content.infrastructure.persistence.projection.TagArticleCountRow;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -15,6 +16,9 @@ import java.util.List;
 public interface TagMapper extends BaseMapper<TagEntity> {
 
     List<TagEntity> selectAllActive();
+
+    List<TagArticleCountRow> selectPublicWithArticleCount(
+            @Param("now") LocalDateTime now);
 
     TagEntity selectActiveById(@Param("id") long id);
 

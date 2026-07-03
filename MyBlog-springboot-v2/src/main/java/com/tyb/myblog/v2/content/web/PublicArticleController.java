@@ -31,6 +31,8 @@ public class PublicArticleController {
             @RequestParam(defaultValue = "zh") String lang,
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) Long tagId,
+            @RequestParam(required = false) String categorySlug,
+            @RequestParam(required = false) String tagSlug,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String archiveMonth) {
         return ApiResponse.ok(mapping.toPublicPage(
@@ -40,6 +42,8 @@ public class PublicArticleController {
                         lang,
                         categoryId,
                         tagId,
+                        categorySlug,
+                        tagSlug,
                         keyword,
                         archiveMonth))));
     }

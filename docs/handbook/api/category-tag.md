@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 content 模块、前台 blog、后台 admin
-> 最后校准：2026-06-29
+> 最后校准：2026-07-02
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/*Category*`、`*Tag*`
 > 权威程度：API 契约
 
@@ -50,22 +50,22 @@ Query：
   "msg": "success",
   "data": [
     {
-      "id": 123,
+      "id": "123",
       "name": "后端",
-      "slug": "backend"
+      "slug": "backend",
+      "articleCount": 8
     }
   ]
 }
 ```
 
-当前代码中的 `PublicCategoryVO.id` 是 number。它与“前端可见 Snowflake ID 统一 string”的规则存在不一致，已登记到 O-010；修正前本文档按当前代码事实记录。
-
 规则：
 
-- 只返回 active 分类。
+- 只返回 active 分类，且关联公开可见文章数量大于 0 的记录。
 - `lang=ja/en` 字段为空时 fallback 到中文。
-- 公开响应只包含 `id/name/slug`。
-- 不返回三语原始字段、排序、文章数或审计字段。
+- 公开响应只包含 `id/name/slug/articleCount`，其中 `id` 为 string。
+- `articleCount` 只统计未删除、`PUBLISHED`/`PASSWORD`、`publish_at <= now` 的公开可见文章。
+- 不返回三语原始字段、排序或审计字段。
 - 分类按 `sortOrder ASC, id ASC` 排序。
 
 ## 3. 公开读取标签
@@ -84,22 +84,22 @@ GET /api/public/tags?lang=zh
   "msg": "success",
   "data": [
     {
-      "id": 123,
+      "id": "123",
       "name": "Java",
-      "slug": "java"
+      "slug": "java",
+      "articleCount": 8
     }
   ]
 }
 ```
 
-当前代码中的 `PublicTagVO.id` 是 number。它与“前端可见 Snowflake ID 统一 string”的规则存在不一致，已登记到 O-010。
-
 规则：
 
-- 只返回 active 标签。
+- 只返回 active 标签，且关联公开可见文章数量大于 0 的记录。
 - `lang=ja/en` 字段为空时 fallback 到中文。
-- 公开响应只包含 `id/name/slug`。
-- 不返回三语原始字段、文章数或审计字段。
+- 公开响应只包含 `id/name/slug/articleCount`，其中 `id` 为 string。
+- `articleCount` 只统计未删除、`PUBLISHED`/`PASSWORD`、`publish_at <= now` 的公开可见文章。
+- 不返回三语原始字段或审计字段。
 - 标签按名称和 ID 的服务端规则排序。
 
 ## 4. 后台读取分类

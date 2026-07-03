@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后续开发
-> 最后校准：2026-06-30
+> 最后校准：2026-07-02
 > 权威程度：未完成事项权威登记表
 
 ## 本文档回答什么问题
@@ -135,32 +135,31 @@
 
 ## O-013 文章置顶和推荐能力缺失
 
-- 状态：未完成 / 方案已定 / 实现待设计
+- 状态：已关闭
 - 优先级：P0
 - 影响范围：后端 content、后台 admin、前台 blog、API 契约、Schema 迁移
-- 当前判断：前台 Aurora/Hexo 旧文章模型包含 `pinned` 和 `feature`，首页首屏实际需要“1 篇置顶大卡片 + 最多 2 篇推荐小卡片 + 普通文章列表”。该能力不属于文章生命周期状态，应使用独立首页展示槽位表达，建议为 `NONE / PINNED / FEATURED`。
-- 风险：如果继续用公开文章列表第一条冒充置顶或推荐，站长无法显式控制首页首屏内容，普通最新文章也可能被误展示为推荐；如果把槽位并入文章状态，又会污染 `DRAFT/PUBLISHED/PASSWORD/SCHEDULED` 等发布生命周期。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-homepage-slot-implementation-plan.md` 拆分实现。后端约束 `PINNED` 最多 1 篇、`FEATURED` 最多 2 篇，且只有 `PUBLISHED` 文章可进入槽位；首页接口明确返回 `pinnedArticle`、`featuredArticles`、`articles`；前台卡片区域可以由普通文章自然补位，但置顶/推荐语义标识只在真实槽位存在时显示；后台文章新建/编辑页增加槽位选择和数量提示，超限保存时拒绝，不自动替换旧文章。
-- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-001、`docs/working/plans/2026-06-30-frontend-homepage-slot-implementation-plan.md`、前台 `Post.feature` / `Post.pinned`、当前 content 代码
+- 关闭原因：已实现独立首页展示槽位 `NONE / PINNED / FEATURED`。后端新增 `homepage_slot`、写入校验和 `GET /api/public/articles/home`；后台文章列表和编辑表单支持维护槽位；前台首页消费聚合接口，不再从普通分页切片推断置顶或推荐语义。
+- 验证：后端 Maven 测试、后台 Vitest/typecheck、前台 Vitest/typecheck/build 通过；GitHub Actions `backend-mysql-test` 已纳入主线 CI。
+- 来源：`docs/working/plans/2026-06-30-frontend-homepage-slot-implementation-plan.md`、`docs/handbook/api/article.md`、当前 content/admin/blog 代码
 
 ## O-014 公开 URL 标识策略与 slug 生命周期
 
-- 状态：未完成 / 后端与后台已落实 / 前台接入待实现
+- 状态：已关闭
 - 优先级：P0
 - 影响范围：前台 blog、后端 content、公开 API、SEO、分享链接、后台分类标签编辑
 - 当前判断：公开 URL 采用混合策略。文章继续沿用现有 ID 主导路径 `/:lang/posts/:id/:slug?`，slug 只增强可读性，不作为文章业务唯一标识；分类和标签公开页采用 slug 主导路径 `/:lang/categories/:slug`、`/:lang/tags/:slug`。后台 admin 内部管理接口继续使用 ID。分类和标签更新服务已拒绝修改已创建 slug，后台分类/标签表单已在编辑态禁用 slug 并提示其公开 URL 重要性。
 - 风险：如果把文章也改成 slug 主导，需要追加文章 slug 全局唯一、发布后锁定、旧 ID URL 兼容、空 slug/重复 slug 迁移和误填修正工具，当前收益不足；如果分类/标签 slug 允许随意修改，会导致导航入口、外链和搜索收录路径失效。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-url-slug-implementation-plan.md` 的混合策略继续前台接入。文章侧保留 BR-203，不强制改为 slug 主导；后续分类和标签公开列表、侧栏和筛选页面统一使用 slug URL。
+- 关闭原因：已落实混合策略。后端公开文章列表支持 `categorySlug/tagSlug` 筛选；前台分类和标签侧栏、标签页使用 `/:lang/categories/:slug`、`/:lang/tags/:slug` 路由进入公开文章列表；文章详情继续使用 ID 主导路由。
 - 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-002/G-011、`docs/working/plans/2026-06-30-frontend-url-slug-implementation-plan.md`、`ContentSlug`、当前 category/tag/content 代码
 
 ## O-015 公开分类和标签缺少文章数量
 
-- 状态：未完成 / 部分方案已定 / 细节待设计
+- 状态：已关闭
 - 优先级：P1
 - 影响范围：后端 content、公开 API、前台 blog、后台 admin
-- 当前判断：Aurora/Hexo 原始分类和标签 JSON 都包含 `count`，前台分类侧栏、标签侧栏和标签页都会展示该数量。V2 公开分类/标签接口当前只返回 `id/name/slug`，需要补公开读者端文章数量字段，建议命名为 `articleCount`。
+- 当前判断：Aurora/Hexo 原始分类和标签 JSON 都包含 `count`，前台分类侧栏、标签侧栏和标签页都会展示该数量。V2 公开分类/标签接口已返回 `id/name/slug/articleCount`。
 - 风险：如果不补字段，前台迁移后分类和标签数量展示会丢失；如果把数量落库到 `t_category` / `t_tag`，文章发布、下架、定时发布、删除恢复、改分类、改标签等动作都要维护计数，容易产生不一致。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-taxonomy-count-implementation-plan.md` 拆分实现。`articleCount` 不新增数据库存储字段，由公开查询聚合得出；统计口径与公开文章列表一致：文章未软删除，状态为 `PUBLISHED` 或 `PASSWORD`，且 `publish_at <= now`。公开读者端只返回 `articleCount > 0` 的分类和标签；后台 admin 分类/标签管理仍返回完整 active 列表。
+- 关闭原因：`articleCount` 不新增数据库存储字段，由公开查询聚合得出；统计口径与公开文章列表一致：文章未软删除，状态为 `PUBLISHED` 或 `PASSWORD`，且 `publish_at <= now`。公开读者端只返回 `articleCount > 0` 的分类和标签；前台 taxonomy mapper 已映射为现有组件使用的 `count`。
 - 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-003、`docs/working/plans/2026-06-30-frontend-taxonomy-count-implementation-plan.md`、前台 `Category.count` / `Tag.count`、当前 category/tag/content 代码
 
 ## O-016 公开归档时间线接口缺失

@@ -47,6 +47,7 @@ import { useTagStore } from '@/stores/tag'
 import { TagList, TagItem } from '@/components/Tag'
 import { useI18n } from 'vue-i18n'
 import SvgIcon from '@/components/SvgIcon/index.vue'
+import { useAppStore } from '@/stores/app'
 
 const props = defineProps({
   sidebarBox: {
@@ -57,11 +58,12 @@ const props = defineProps({
 })
 
 const tagStore = useTagStore()
+const appStore = useAppStore()
 const { t } = useI18n()
 const expand = ref<boolean>(false)
 
 const fetchData = async () => {
-  tagStore.fetchAllTags()
+  await tagStore.fetchAllTags(appStore.locale)
 }
 
 const expandBox = () => {

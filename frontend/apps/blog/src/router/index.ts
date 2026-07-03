@@ -25,6 +25,16 @@ const localizedRoutes: RouteRecordRaw[] = [
     path: '/:lang(zh|ja|en)/posts/:id(\\d+)/:slug?',
     name: 'article-detail',
     component: () => import('@/pages/post/[slug].vue')
+  },
+  {
+    path: '/:lang(zh|ja|en)/categories/:slug',
+    name: 'category-articles',
+    component: () => import('@/pages/post/search/index.vue')
+  },
+  {
+    path: '/:lang(zh|ja|en)/tags/:slug',
+    name: 'tag-articles',
+    component: () => import('@/pages/post/search/index.vue')
   }
 ]
 

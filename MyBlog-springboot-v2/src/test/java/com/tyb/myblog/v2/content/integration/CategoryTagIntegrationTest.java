@@ -95,6 +95,22 @@ class CategoryTagIntegrationTest {
                 .andExpect(status().isForbidden());
 
         mockMvc.perform(get("/api/public/categories")
+                        .queryParam("lang", "zh"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isEmpty());
+        mockMvc.perform(get("/api/public/tags")
+                        .queryParam("lang", "zh"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data").isEmpty());
+
+        insertArticle(3001L, categoryId);
+        insertArticle(3002L, secondCategoryId);
+        jdbcTemplate.update("""
+                INSERT INTO t_article_tag (article_id, tag_id)
+                VALUES (?, ?)
+                """, 3001L, tagId);
+
+        mockMvc.perform(get("/api/public/categories")
                         .queryParam("lang", "ja"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].name")
@@ -160,11 +176,6 @@ class CategoryTagIntegrationTest {
                 .andExpect(jsonPath("$.data[0].id")
                         .value(categoryId));
 
-        insertArticle(3001L, categoryId);
-        jdbcTemplate.update("""
-                INSERT INTO t_article_tag (article_id, tag_id)
-                VALUES (?, ?)
-                """, 3001L, tagId);
         mockMvc.perform(delete(
                                 "/api/admin/categories/{id}",
                                 categoryId)
@@ -288,11 +299,13 @@ class CategoryTagIntegrationTest {
                 INSERT INTO t_article (
                     id, title_zh, category_id, author_id,
                     slug, status, comment_count,
+                    publish_at,
                     created_at, created_by, updated_at, updated_by,
                     deleted
                 ) VALUES (
                     ?, '文章', ?, 1001,
                     ?, 2, 0,
+                    '2026-06-15 10:00:00',
                     CURRENT_TIMESTAMP, 1001,
                     CURRENT_TIMESTAMP, 1001,
                     0

@@ -34,6 +34,16 @@ public class MyBatisCategoryRepository
     }
 
     @Override
+    public List<PublicCategoryWithArticleCount> findPublicWithArticleCount(
+            LocalDateTime now) {
+        return mapper.selectPublicWithArticleCount(now).stream()
+                .map(row -> new PublicCategoryWithArticleCount(
+                        mapping.toDomain(row),
+                        row.getArticleCount()))
+                .toList();
+    }
+
+    @Override
     public Optional<Category> findActiveById(long id) {
         return Optional.ofNullable(mapper.selectActiveById(id))
                 .map(mapping::toDomain);

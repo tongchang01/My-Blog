@@ -8,5 +8,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 public record PublicCategoryVO(
         @Schema(format = "int64") String id,
         String name,
-        String slug) {
+        String slug,
+        long articleCount) {
 }

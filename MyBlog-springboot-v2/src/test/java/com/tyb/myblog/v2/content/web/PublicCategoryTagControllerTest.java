@@ -48,20 +48,22 @@ class PublicCategoryTagControllerTest {
     void returnsOnlyLocalizedPublicCategoryFields() throws Exception {
         PublicCategoryResult result =
                 new PublicCategoryResult(
-                        101L, "后端", "backend");
+                        101L, "Backend", "backend", 3);
         when(categoryService.publicList("zh"))
                 .thenReturn(List.of(result));
         when(categoryMapping.toPublicVO(result))
                 .thenReturn(new PublicCategoryVO(
-                        "101", "后端", "backend"));
+                        "101", "Backend", "backend", 3));
 
         mockMvc.perform(get("/api/public/categories")
                         .queryParam("lang", "zh"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].id").value("101"))
-                .andExpect(jsonPath("$.data[0].name").value("后端"))
+                .andExpect(jsonPath("$.data[0].name").value("Backend"))
                 .andExpect(jsonPath("$.data[0].slug")
                         .value("backend"))
+                .andExpect(jsonPath("$.data[0].articleCount")
+                        .value(3))
                 .andExpect(jsonPath("$.data[0].nameZh")
                         .doesNotExist())
                 .andExpect(jsonPath("$.data[0].sortOrder")
@@ -75,12 +77,12 @@ class PublicCategoryTagControllerTest {
     @Test
     void returnsOnlyLocalizedPublicTagFields() throws Exception {
         PublicTagResult result =
-                new PublicTagResult(201L, "Java", "java");
+                new PublicTagResult(201L, "Java", "java", 2);
         when(tagService.publicList("en"))
                 .thenReturn(List.of(result));
         when(tagMapping.toPublicVO(result))
                 .thenReturn(new PublicTagVO(
-                        "201", "Java", "java"));
+                        "201", "Java", "java", 2));
 
         mockMvc.perform(get("/api/public/tags")
                         .queryParam("lang", "en"))
@@ -88,6 +90,8 @@ class PublicCategoryTagControllerTest {
                 .andExpect(jsonPath("$.data[0].id").value("201"))
                 .andExpect(jsonPath("$.data[0].name").value("Java"))
                 .andExpect(jsonPath("$.data[0].slug").value("java"))
+                .andExpect(jsonPath("$.data[0].articleCount")
+                        .value(2))
                 .andExpect(jsonPath("$.data[0].nameEn")
                         .doesNotExist())
                 .andExpect(jsonPath("$.data[0].updatedAt")

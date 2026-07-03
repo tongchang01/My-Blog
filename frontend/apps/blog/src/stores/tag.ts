@@ -1,29 +1,28 @@
-import { fetchAllTags } from '@/api'
-import { Tags } from '@/models/Post.class'
+import { useTaxonomyStore } from '@/features/taxonomy/store'
+import type { SupportedLocale } from '@/shared/i18n/locale'
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 
 export const useTagStore = defineStore('tagStore', () => {
+  const taxonomyStore = useTaxonomyStore()
   const isLoaded = ref(false)
-  const tags = ref(new Tags().data)
+  const tags = computed(() => taxonomyStore.tags)
 
-  const fetchAllTagsData = async () => {
-    const { data } = await fetchAllTags()
-    return new Promise(resolve => {
-      tags.value = new Tags(data).data
-      resolve(tags.value)
-    })
+  const fetchAllTagsData = async (locale: SupportedLocale = 'zh') => {
+    isLoaded.value = false
+    await taxonomyStore.loadTags(locale)
+    isLoaded.value = true
+    return tags.value
   }
 
-  const fetchTagsByCount = async (count: number) => {
+  const fetchTagsByCount = async (
+    count: number,
+    locale: SupportedLocale = 'zh'
+  ) => {
     isLoaded.value = false
-    const { data } = await fetchAllTags()
-    return new Promise(resolve => {
-      isLoaded.value = true
-      const maxLength = data.length > count ? count : data.length
-      tags.value = new Tags(data.splice(0, maxLength)).data
-      resolve(tags.value)
-    })
+    await taxonomyStore.loadTags(locale)
+    isLoaded.value = true
+    return tags.value.slice(0, count)
   }
 
   return {

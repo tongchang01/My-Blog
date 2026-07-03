@@ -204,6 +204,18 @@
   - backend job 显式设置 `MAVEN_OPTS=-Duser.timezone=Asia/Tokyo` 和 `TZ=Asia/Tokyo`。
 - **相关**：`../ops/ci-cd.md`、`../ops/ci-troubleshooting.md`
 
+### ⚠️ P-011 测试数据使用当前时间导致单跑绿、全量红
+
+- **时间**：2026-07-02
+- **现象**：公开分类/标签接入文章计数后，`CategoryTagIntegrationTest` 单跑通过，但 CI 同款后端全量命令失败，公开分类列表返回空数组。
+- **根因**：公开列表只统计 `publish_at <= now` 的公开文章。测试手写 SQL 造文章时一开始漏填 `publish_at`，后续又用数据库 `CURRENT_TIMESTAMP`，导致测试数据可见性依赖当前时间源和 Spring context 复用时机。
+- **后果**：单个集成测试新建 context 时可能通过，全量测试复用 context 时暴露时间边界问题。
+- **正确做法**：
+  - 公开文章测试数据必须显式填 `publish_at`。
+  - 不要用 `CURRENT_TIMESTAMP` 证明“已发布且可公开”；用固定过去时间更稳定。
+  - 若出现单跑绿、全量红，优先排查共享 context、时间源、数据库状态和手写测试数据是否满足业务可见条件。
+- **相关**：`../rules/testing-policy.md`、`../ops/ci-troubleshooting.md`
+
 ---
 
 ## 未解决但已识别（需后续跟进）
