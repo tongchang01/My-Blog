@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 content 模块、前台 blog、后台 admin
-> 最后校准：2026-07-02
+> 最后校准：2026-07-03
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/*Article*`
 > 权威程度：API 契约
 
@@ -28,7 +28,7 @@
 ## 2. 通用约定
 
 - 后台写接口仅 ADMIN 可用。
-- DEMO 可读后台文章，但敏感正文裁剪边界见 O-002。
+- DEMO 可读后台文章，但后台详情正文按文章状态裁剪。
 - 文章密码只在写入接口接收明文。
 - 查询响应不得返回密码明文或密码 hash。
 - 时间字段为 Asia/Tokyo 语义的本地时间字符串，不带 offset。
@@ -114,7 +114,11 @@ Authorization: Bearer <access-token>
 - `body`
 - `authorId`
 
-响应不包含密码明文或密码 hash。
+字段权限：
+
+- ADMIN 可读取所有文章状态的 `body`。
+- DEMO 只可读取 `PUBLISHED` 文章的 `body`；`DRAFT`、`PRIVATE`、`PASSWORD`、`SCHEDULED` 文章详情的 `body` 返回 `null`。
+- 响应不包含 `password`、`accessPassword` 或密码 hash。
 
 错误：
 

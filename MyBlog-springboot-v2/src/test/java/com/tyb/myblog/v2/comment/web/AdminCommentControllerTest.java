@@ -86,6 +86,27 @@ class AdminCommentControllerTest {
     }
 
     @Test
+    void returnsDemoCommentPageWithoutAuditFields() throws Exception {
+        when(queryService.page(eq(principal), any()))
+                .thenReturn(new AdminCommentPageResult(List.of(itemWithoutAuditFields()), 1, 1, 20));
+
+        mockMvc.perform(get("/api/admin/comments")
+                        .param("targetType", "ARTICLE")
+                        .param("auditStatus", "PENDING"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].authorNickname")
+                        .value("TYB"))
+                .andExpect(jsonPath("$.data.records[0].contentMd")
+                        .value("hello"))
+                .andExpect(jsonPath("$.data.records[0].authorEmail")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.records[0].authorIp")
+                        .doesNotExist())
+                .andExpect(jsonPath("$.data.records[0].authorUserAgent")
+                        .doesNotExist());
+    }
+
+    @Test
     void delegatesModerationCommands() throws Exception {
         mockMvc.perform(post("/api/admin/comments/10/approve"))
                 .andExpect(status().isOk());
@@ -135,6 +156,26 @@ class AdminCommentControllerTest {
                 "https://example.com",
                 "127.0.0.1",
                 "JUnit",
+                "hello",
+                "<p>hello</p>",
+                CommentAuditStatus.PENDING,
+                LocalDateTime.of(2026, 6, 17, 19, 50),
+                false);
+    }
+
+    private static AdminCommentPageResult.Item itemWithoutAuditFields() {
+        return new AdminCommentPageResult.Item(
+                9007199254740993L,
+                CommentTargetType.ARTICLE,
+                9007199254740995L,
+                null,
+                null,
+                null,
+                "TYB",
+                null,
+                "https://example.com",
+                null,
+                null,
                 "hello",
                 "<p>hello</p>",
                 CommentAuditStatus.PENDING,

@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 stats 模块、前台 blog、后台 admin
-> 最后校准：2026-06-29
+> 最后校准：2026-07-03
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/stats/web/`
 > 权威程度：API 契约
 
@@ -152,7 +152,7 @@ Query：
 
 `topArticles[].dailyUvSum` 是区间内各日 UV 的算术和，不是跨日独立访客数。
 
-`topArticles[].articleId` 当前是 JSON number。若后台前端需要统一 Snowflake ID string，需按 O-012 校准。
+`topArticles[].articleId` 在 HTTP JSON 边界输出为 string；统计聚合、查询和 `articleId=0` 的首页/非文章页汇总语义不变。
 
 错误：
 
@@ -173,4 +173,4 @@ Query：
 
 ## 5. DEMO 边界
 
-DEMO 当前可读取 dashboard。是否需要对统计细节做字段裁剪，统一由 O-002 跟踪。
+DEMO 可读取 dashboard，统计 dashboard 不做字段裁剪。DEMO 敏感字段裁剪边界已在 O-002 关闭。

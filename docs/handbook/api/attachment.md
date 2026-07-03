@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 system 模块、后台 admin 附件管理
-> 最后校准：2026-06-29
+> 最后校准：2026-07-03
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/web/AdminAttachmentController.java`
 > 权威程度：API 契约
 
@@ -45,7 +45,8 @@
 
 - `id` 为 string，避免 Snowflake ID 精度损失。
 - `createdBy` 为 string 或 `null`。
-- 不返回存储类型、Bucket、对象键、SHA-256、删除审计和更新审计字段。
+- ADMIN / DEMO 使用同一响应结构，只返回公开管理元数据。
+- 不返回 `storageType`、`bucket`、`objectKey`、`hashSha256`、本地磁盘路径、删除审计和更新审计字段。
 
 ## 3. 分页查询 active 附件
 

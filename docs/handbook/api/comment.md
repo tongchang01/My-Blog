@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 comment 模块、前台 blog、后台 admin
-> 最后校准：2026-06-29
+> 最后校准：2026-07-03
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/comment/web/`
 > 权威程度：API 契约
 
@@ -65,7 +65,7 @@ GET /api/public/articles/{articleId}/comments?page=1&size=20
 
 分页 `total` 只统计根评论；当前页根评论的 `replies` 完整返回，回复暂不单独分页。
 
-当前公开评论 ID、父评论 ID 和回复目标 ID 是 JSON number 或 `null`。这与前端可见 ID string 规则不一致，见 O-011。
+当前公开评论 ID、父评论 ID 和回复目标 ID 是 JSON string 或 `null`，避免 Snowflake ID 精度损失。
 
 错误：
 
@@ -208,7 +208,7 @@ Query：
 字段权限：
 
 - ADMIN 可读取 `authorEmail`、`authorIp`、`authorUserAgent`。
-- DEMO 敏感字段裁剪边界需校准，见 O-002；历史设计要求这些字段对 DEMO 返回 `null`。
+- DEMO 固定裁剪 `authorEmail`、`authorIp`、`authorUserAgent`，这些字段返回 `null`；评论内容、目标信息、审核状态和删除状态仍返回。
 
 后台评论 ID、目标 ID、父评论 ID 和回复目标 ID 均为 string 或 `null`。
 

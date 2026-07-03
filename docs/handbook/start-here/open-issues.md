@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后续开发
-> 最后校准：2026-07-02
+> 最后校准：2026-07-03
 > 权威程度：未完成事项权威登记表
 
 ## 本文档回答什么问题
@@ -31,13 +31,13 @@
 
 ## O-002 DEMO 敏感字段裁剪边界
 
-- 状态：未完成 / 方案已定 / 实现待设计
+- 状态：已关闭
 - 优先级：P1
 - 影响范围：后台 admin、后端 application 层、API 契约
-- 当前判断：DEMO 是后台演示账号，允许查看后台整体效果和只读数据，但不能看到不该公开的敏感内容，也不能执行任何写操作。DEMO 可查看 dashboard 统计、文章列表、分类、标签、友链、站点配置、作者资料、附件列表和评论管理视图；统计 dashboard 不裁剪。
-- 风险：如果只靠前端隐藏按钮或页面控制，DEMO 仍可能通过直接请求读取未公开正文、评论邮箱/IP/UA 或执行后台写操作；如果裁剪边界不清，演示账号会在安全和可展示性之间反复摇摆。
-- 下一步：按 `docs/working/plans/2026-06-30-demo-sensitive-field-trimming-plan.md` 拆分实现。DEMO 文章详情正文只允许查看 `PUBLISHED`，`DRAFT / PRIVATE / PASSWORD / SCHEDULED` 的 `body` 固定返回 `null`；后台评论列表对 DEMO 固定裁剪 `authorEmail`、`authorIp`、`authorUserAgent`；附件可看公开 URL、文件名、类型、大小等管理信息，但不得暴露本地磁盘路径、对象存储密钥、bucket 私密配置；所有后台写操作仍由后端返回 `403 + 10003`。裁剪必须在后端 application / VO mapping 层完成，前端只做只读体验优化。
-- 来源：`security-baseline.md`、`docs/handbook/product/use-cases.md`、后台业务页设计文档
+- 关闭原因：DEMO 是后台演示账号，允许查看后台整体效果和只读数据，但不能看到不该公开的敏感内容，也不能执行后台写操作。后端 application / VO mapping 层已落实裁剪边界：DEMO 文章详情只可读取 `PUBLISHED` 正文，`DRAFT / PRIVATE / PASSWORD / SCHEDULED` 的 `body` 返回 `null`；后台评论列表对 DEMO 固定裁剪 `authorEmail`、`authorIp`、`authorUserAgent`；附件响应只包含公开 URL、文件名、类型、大小等管理信息，不暴露本地磁盘路径、对象存储内部字段或 hash。统计 dashboard 不裁剪。
+- 验证：已补 `AdminArticleControllerTest`、`AdminCommentControllerTest` 的 Web 契约测试；已有 `AdminArticleQueryServiceTest`、`AdminCommentQueryServiceTest` 覆盖 application 层裁剪；`AdminAttachmentControllerTest` 覆盖附件内部字段不暴露；已通过定向测试。
+- 后续约束：前端只做只读体验优化，安全边界必须继续由后端返回裁剪字段和 `403 + 10003` 写操作拒绝。
+- 来源：`security-baseline.md`、`docs/handbook/product/use-cases.md`、后台业务页设计文档、`handbook/api/article.md`、`handbook/api/comment.md`、`handbook/api/attachment.md`
 
 ## O-003 前台读者主链路补齐
 
@@ -63,7 +63,7 @@
 - 优先级：P0
 - 影响范围：后台 admin、content、system attachment
 - 关闭原因：已对照 `E:\My-Blog\frontend\apps\admin/src/` 校准；文章列表、新建、编辑、Markdown 预览、本地草稿、回收站、附件管理、文章封面选择、站点图片选择均已有实现记录。剩余争议不再放在本条展开。
-- 后续跟踪：DEMO 字段裁剪见 O-002，统计 TOP 文章 ID 类型见 O-012。
+- 后续跟踪：统计 TOP 文章 ID 类型见 O-012。
 - 来源：后台 article/editor/attachment 设计与计划文档
 
 ## O-006 后台其他业务页完成度
@@ -72,7 +72,7 @@
 - 优先级：P1
 - 影响范围：后台 admin、category/tag、comment、friend-link、site-config、stats
 - 关闭原因：已建立并校准 `../frontend/admin/integration-status.md`；分类、标签、评论、友链、站点配置、作者资料、附件和统计仪表盘均已有当前状态。
-- 后续跟踪：DEMO 字段裁剪见 O-002，统计 TOP 文章 ID 类型见 O-012。
+- 后续跟踪：统计 TOP 文章 ID 类型见 O-012。
 - 来源：`frontend/apps/admin/docs/`
 
 ## O-007 上线前 SEO、发布和运维准备
