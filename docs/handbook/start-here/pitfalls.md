@@ -216,6 +216,19 @@
   - 若出现单跑绿、全量红，优先排查共享 context、时间源、数据库状态和手写测试数据是否满足业务可见条件。
 - **相关**：`../rules/testing-policy.md`、`../ops/ci-troubleshooting.md`
 
+### ⚠️ P-012 OpenAPI 嵌套 record 默认 schema 名冲突
+
+- **时间**：2026-07-04
+- **现象**：新增公开归档 VO 时，嵌套 record `Item` 在 springdoc 中生成了通用 schema 名 `Item`。仓库里已有其他同名嵌套类型后，OpenAPI 测试断言命中了错误 schema，表现为归档文章 `id` 被读成 `integer` 或缺少 `format: int64`。
+- **后果**：接口 JSON 实际返回可能正确，但 OpenAPI 契约不稳定；前端按文档生成类型或人工对照文档时，会误判 Snowflake ID 类型。
+- **禁止做法**：
+  - 不要给公开 VO 的嵌套 record 使用 `Item`、`Group` 这类裸 schema 名后就不写 OpenAPI 守护测试。
+  - 不要只看 Controller JSONPath 通过就认为契约完成。
+- **正确做法**：
+  - 公开 OpenAPI 可见的嵌套 VO 必须用 `@Schema(name = "...")` 给出稳定唯一名称。
+  - Snowflake ID 即使 Java 字段已经是 `String`，也应在 OpenAPI 高风险字段上显式标注 `@Schema(type = "string", format = "int64")`，并用 `XxxOpenApiTest` 固定。
+- **相关**：`../rules/testing-policy.md`、`../api/article.md`、`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/content/web/ArticleOpenApiTest.java`
+
 ---
 
 ## 未解决但已识别（需后续跟进）

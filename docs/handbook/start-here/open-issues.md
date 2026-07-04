@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后续开发
-> 最后校准：2026-07-03
+> 最后校准：2026-07-04
 > 权威程度：未完成事项权威登记表
 
 ## 本文档回答什么问题
@@ -44,8 +44,8 @@
 - 状态：未完成
 - 优先级：P0
 - 影响范围：前台 blog、公开 API
-- 当前判断：首页、公开文章列表、文章详情和站点配置已接入；分类、标签、归档、友链、关于、搜索仍待补齐。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-integration-batch-plan.md` 拆分推进。先完成契约地基、首页槽位、分类/标签/归档/搜索，再接关于页和页脚统计；友链已下调优先级，后续单独重开讨论。
+- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签和归档已接入；友链、关于、搜索仍待补齐。
+- 下一步：按 `docs/working/plans/2026-06-30-frontend-integration-batch-plan.md` 拆分推进。下一批优先补搜索和关于页；友链已下调优先级，后续单独重开讨论；页脚统计归入 O-020。
 - 来源：`../frontend/blog/integration-status.md`、`roadmap.md`
 
 ## O-004 前台评论、留言和统计接入
@@ -164,13 +164,12 @@
 
 ## O-016 公开归档时间线接口缺失
 
-- 状态：未完成 / 部分方案已定 / 细节待设计
+- 状态：已关闭
 - 优先级：P1
 - 影响范围：后端 content、公开 API、前台 blog
-- 当前判断：Aurora/Hexo 原始归档页是按发布时间倒序分页的文章时间线，不是普通文章列表，也不是月份索引页。当前 V2 后端只有 `/api/public/articles?archiveMonth=yyyy-MM`，可以筛选某个月文章，但不能直接支撑归档时间线页面。
-- 风险：如果前台自行拉全量文章再分组，会破坏分页和性能边界；如果把归档页降级为普通分页文章列表或月份索引，会改变原前台视觉和交互。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-archive-timeline-implementation-plan.md` 拆分实现。新增公开归档时间线接口，建议 `GET /api/public/archives?page=1&size=12&lang=zh`；分页单位按文章数计算，`total` 表示文章总数；后端返回按年月分组后的 records。归档文章项只返回 `title`、`slug`、`publishedAt`、`summary`，不返回正文、分类、标签、封面、评论数或阅读时间。公开口径与公开文章列表一致，`PUBLISHED/PASSWORD + publish_at <= now + 未软删`，置顶/推荐不影响归档。
-- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-004、`docs/working/plans/2026-06-30-frontend-archive-timeline-implementation-plan.md`、前台 `archives.vue` / `Archives` 模型、当前 public article 查询代码
+- 关闭原因：已新增 `GET /api/public/archives?page=1&size=12&lang=zh`。后端复用公开文章分页口径，按文章数分页后对当前页按年月分组；归档文章项只返回 `id/title/slug/publishedAt/summary`，不返回正文、分类、标签、封面、评论数、状态、锁定标记或密码字段。前台 `archives.vue` 已停止使用旧 `/archives/{page}.json` 和旧 `post-slug` 路由，改用 `useArticleStore().loadArchives(...)` 和 `article-detail` 的 `{ lang, id, slug }` 参数。
+- 验证：后端已通过 `PublicArticleQueryServiceTest`、`PublicArchiveControllerTest`、`BackendPropertiesTest`、`ArticleOpenApiTest` 定向验证；前台已通过 `pnpm --dir frontend/apps/blog typecheck` 和 `pnpm --dir frontend/apps/blog test`。
+- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-004、`docs/working/plans/2026-07-03-blog-archive-timeline-implementation-plan.md`、`handbook/api/article.md`、当前 content/blog 代码
 
 ## O-017 搜索实现方式与前后端能力不一致
 
