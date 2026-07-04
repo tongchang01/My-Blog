@@ -71,9 +71,12 @@ class RuntimeProfileConfigurationTest {
                 .isEqualTo("/api/public/site-config");
         assertThat(application.getProperty(
                 "myblog.security.public-endpoints[9].path"))
-                .isEqualTo("/api/public/articles/*/comments");
+                .isEqualTo("/api/public/archives");
         assertThat(application.getProperty(
                 "myblog.security.public-endpoints[10].path"))
+                .isEqualTo("/api/public/articles/*/comments");
+        assertThat(application.getProperty(
+                "myblog.security.public-endpoints[11].path"))
                 .isEqualTo("/api/public/guestbook/comments");
 
         assertThat(local.getProperty(
