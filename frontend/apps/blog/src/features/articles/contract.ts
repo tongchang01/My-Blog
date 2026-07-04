@@ -29,3 +29,18 @@ export interface PublicArticleHomeDto {
   featuredArticles: PublicArticleListItemDto[]
   articles: PublicArticleListItemDto[]
 }
+
+export interface PublicArchiveArticleDto {
+  id: string
+  title: string
+  slug: string
+  publishedAt: string
+  summary: string | null
+}
+
+export interface PublicArchiveGroupDto {
+  yearMonth: string
+  year: number
+  month: number
+  articles: PublicArchiveArticleDto[]
+}

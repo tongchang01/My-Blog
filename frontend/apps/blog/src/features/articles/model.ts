@@ -31,6 +31,29 @@ export interface ArticleHomeViewModel {
   articles: ArticleCardViewModel[]
 }
 
+export interface ArchiveArticleViewModel {
+  id: string
+  slug: string
+  title: string
+  summary: string
+  publishedAt: string
+}
+
+export interface ArchiveGroupViewModel {
+  yearMonth: string
+  year: number
+  month: number
+  articles: ArchiveArticleViewModel[]
+}
+
+export interface ArchivePageViewModel {
+  records: ArchiveGroupViewModel[]
+  total: number
+  page: number
+  size: number
+  pages: number
+}
+
 export interface ArticleDetailViewModel extends ArticleCardViewModel {
   bodyHtml: string
   updatedAt: string

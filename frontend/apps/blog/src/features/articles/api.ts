@@ -3,6 +3,7 @@ import { ApiError } from '@/shared/http/error'
 import type { PageResponse } from '@/shared/http/contract'
 import type { SupportedLocale } from '@/shared/i18n/locale'
 import type {
+  PublicArchiveGroupDto,
   PublicArticleDetailDto,
   PublicArticleHomeDto,
   PublicArticleListItemDto
@@ -18,6 +19,13 @@ export interface LoadPublicArticlesParams {
 }
 
 export interface LoadPublicHomeArticlesParams {
+  size: number
+  lang: SupportedLocale
+  signal?: AbortSignal
+}
+
+export interface LoadPublicArchivesParams {
+  page: number
   size: number
   lang: SupportedLocale
   signal?: AbortSignal
@@ -55,6 +63,24 @@ export const loadPublicHomeArticles = async ({
     signal
   })
   if (data === null) throw new ApiError('Article home response is empty')
+  return data
+}
+
+export const loadPublicArchives = async ({
+  page,
+  size,
+  lang,
+  signal
+}: LoadPublicArchivesParams): Promise<
+  PageResponse<PublicArchiveGroupDto>
+> => {
+  const data = await requestApi<PageResponse<PublicArchiveGroupDto>>({
+    method: 'GET',
+    url: '/public/archives',
+    params: { page, size, lang },
+    signal
+  })
+  if (data === null) throw new ApiError('Archive page response is empty')
   return data
 }
 

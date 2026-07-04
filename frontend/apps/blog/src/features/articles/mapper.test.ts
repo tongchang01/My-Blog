@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { mapArticleDetail, mapArticleHome, mapArticlePage } from './mapper'
+import {
+  mapArchivePage,
+  mapArticleDetail,
+  mapArticleHome,
+  mapArticlePage
+} from './mapper'
 
 describe('article mapper', () => {
   it('preserves string IDs and computes pagination', () => {
@@ -93,5 +98,40 @@ describe('article detail mapper', () => {
     expect(mapped.id).toBe('9007199254740993')
     expect(mapped.slug).toBe('canonical-slug')
     expect(mapped.bodyHtml).toContain('<h1>Body</h1>')
+  })
+})
+
+describe('archive mapper', () => {
+  it('preserves article IDs and computes pagination by article total', () => {
+    const mapped = mapArchivePage(
+      {
+        records: [
+          {
+            yearMonth: '2026-06',
+            year: 2026,
+            month: 6,
+            articles: [
+              {
+                id: '9007199254740993',
+                title: 'Article',
+                slug: 'article',
+                publishedAt: '2026-06-15T10:00:00',
+                summary: null
+              }
+            ]
+          }
+        ],
+        total: 13,
+        page: 1,
+        size: 12
+      },
+      'en'
+    )
+
+    expect(mapped.records[0].yearMonth).toBe('2026-06')
+    expect(mapped.records[0].articles[0].id).toBe('9007199254740993')
+    expect(mapped.records[0].articles[0].summary).toBe('')
+    expect(mapped.records[0].articles[0].publishedAt).toContain('10:00')
+    expect(mapped.pages).toBe(2)
   })
 })

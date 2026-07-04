@@ -4,6 +4,7 @@ import { normalizeApiError } from '@/shared/http/client'
 import type { ApiError } from '@/shared/http/error'
 import type { SupportedLocale } from '@/shared/i18n/locale'
 import type {
+  ArchivePageViewModel,
   ArticleDetailStatus,
   ArticleDetailViewModel,
   ArticleHomeViewModel,
@@ -12,12 +13,19 @@ import type {
 } from './model'
 import {
   loadPublicArticle,
+  loadPublicArchives,
   loadPublicHomeArticles,
   loadPublicArticles,
+  type LoadPublicArchivesParams,
   type LoadPublicHomeArticlesParams,
   type LoadPublicArticlesParams
 } from './api'
-import { mapArticleDetail, mapArticleHome, mapArticlePage } from './mapper'
+import {
+  mapArchivePage,
+  mapArticleDetail,
+  mapArticleHome,
+  mapArticlePage
+} from './mapper'
 
 const emptyPage = (): ArticlePageViewModel => ({
   records: [],
@@ -33,6 +41,14 @@ const emptyHome = (): ArticleHomeViewModel => ({
   articles: []
 })
 
+const emptyArchive = (): ArchivePageViewModel => ({
+  records: [],
+  total: 0,
+  page: 1,
+  size: 12,
+  pages: 0
+})
+
 export const useArticleStore = defineStore('public-articles', () => {
   const page = ref<ArticlePageViewModel>(emptyPage())
   const status = ref<ArticleListStatus>('idle')
@@ -40,15 +56,20 @@ export const useArticleStore = defineStore('public-articles', () => {
   const home = ref<ArticleHomeViewModel>(emptyHome())
   const homeStatus = ref<ArticleListStatus>('idle')
   const homeError = ref<ApiError | null>(null)
+  const archive = ref<ArchivePageViewModel>(emptyArchive())
+  const archiveStatus = ref<ArticleListStatus>('idle')
+  const archiveError = ref<ApiError | null>(null)
   const detail = ref<ArticleDetailViewModel | null>(null)
   const detailStatus = ref<ArticleDetailStatus>('idle')
   const detailError = ref<ApiError | null>(null)
   let activeRequest: AbortController | null = null
   let activeHomeRequest: AbortController | null = null
+  let activeArchiveRequest: AbortController | null = null
   let activeDetailRequest: AbortController | null = null
   let lastQuery: Omit<LoadPublicArticlesParams, 'signal'> | null = null
   let lastHomeQuery: Omit<LoadPublicHomeArticlesParams, 'signal'> | null =
     null
+  let lastArchiveQuery: Omit<LoadPublicArchivesParams, 'signal'> | null = null
   let lastDetailQuery: { id: string; lang: SupportedLocale } | null = null
 
   const load = async (
@@ -114,6 +135,36 @@ export const useArticleStore = defineStore('public-articles', () => {
     if (lastHomeQuery) await loadHome(lastHomeQuery)
   }
 
+  const loadArchives = async (
+    query: Omit<LoadPublicArchivesParams, 'signal'>
+  ): Promise<void> => {
+    activeArchiveRequest?.abort()
+    const request = new AbortController()
+    activeArchiveRequest = request
+    lastArchiveQuery = query
+    archiveStatus.value = 'loading'
+    archiveError.value = null
+
+    try {
+      archive.value = mapArchivePage(
+        await loadPublicArchives({ ...query, signal: request.signal }),
+        query.lang
+      )
+      archiveStatus.value =
+        archive.value.records.length === 0 ? 'empty' : 'ready'
+    } catch (cause) {
+      if (request.signal.aborted) return
+      archiveError.value = normalizeApiError(cause)
+      archiveStatus.value = 'error'
+    } finally {
+      if (activeArchiveRequest === request) activeArchiveRequest = null
+    }
+  }
+
+  const retryArchives = async (): Promise<void> => {
+    if (lastArchiveQuery) await loadArchives(lastArchiveQuery)
+  }
+
   const loadDetail = async (
     id: string,
     lang: SupportedLocale
@@ -162,6 +213,9 @@ export const useArticleStore = defineStore('public-articles', () => {
     home,
     homeStatus,
     homeError,
+    archive,
+    archiveStatus,
+    archiveError,
     detail,
     detailStatus,
     detailError,
@@ -169,6 +223,8 @@ export const useArticleStore = defineStore('public-articles', () => {
     retry,
     loadHome,
     retryHome,
+    loadArchives,
+    retryArchives,
     loadDetail,
     retryDetail
   }

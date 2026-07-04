@@ -3,11 +3,13 @@ import type { SupportedLocale } from '@/shared/i18n/locale'
 import { formatJst } from '@/shared/time/jst'
 import { renderMarkdown } from '@/shared/markdown/render'
 import type {
+  PublicArchiveGroupDto,
   PublicArticleDetailDto,
   PublicArticleHomeDto,
   PublicArticleListItemDto
 } from './contract'
 import type {
+  ArchivePageViewModel,
   ArticleCardViewModel,
   ArticleDetailViewModel,
   ArticleHomeViewModel,
@@ -55,6 +57,28 @@ export const mapArticleHome = (
     mapArticle(article, locale)
   ),
   articles: dto.articles.map(article => mapArticle(article, locale))
+})
+
+export const mapArchivePage = (
+  dto: PageResponse<PublicArchiveGroupDto>,
+  locale: SupportedLocale
+): ArchivePageViewModel => ({
+  records: dto.records.map(group => ({
+    yearMonth: group.yearMonth,
+    year: group.year,
+    month: group.month,
+    articles: group.articles.map(article => ({
+      id: article.id,
+      slug: article.slug,
+      title: article.title,
+      summary: article.summary ?? '',
+      publishedAt: formatJst(article.publishedAt, locale)
+    }))
+  })),
+  total: dto.total,
+  page: dto.page,
+  size: dto.size,
+  pages: dto.size > 0 ? Math.ceil(dto.total / dto.size) : 0
 })
 
 export const mapArticleDetail = (
