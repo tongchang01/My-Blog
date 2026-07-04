@@ -94,6 +94,8 @@ myblog:
         path: /api/public/articles
       - method: GET
         path: /api/public/articles/**
+      - method: GET
+        path: /api/public/archives
       - method: POST
         path: /api/public/articles/*/comments
       - method: GET

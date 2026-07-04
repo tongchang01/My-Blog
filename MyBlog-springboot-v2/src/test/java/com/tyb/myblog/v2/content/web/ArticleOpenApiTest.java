@@ -38,6 +38,7 @@ class ArticleOpenApiTest {
 
         assertMethods(root, "/paths/~1api~1public~1articles", "get");
         assertMethods(root, "/paths/~1api~1public~1articles~1{id}", "get");
+        assertMethods(root, "/paths/~1api~1public~1archives", "get");
         assertMethods(root, "/paths/~1api~1admin~1articles", "get", "post");
         assertMethods(root, "/paths/~1api~1admin~1articles~1{id}",
                 "get", "put", "delete");
@@ -80,6 +81,7 @@ class ArticleOpenApiTest {
         assertStringId(root, "PublicArticleDetailVO", "id");
         assertStringId(root, "PublicArticleDetailVO", "categoryId");
         assertStringId(root, "PublicArticleTagVO", "id");
+        assertStringId(root, "PublicArchiveArticleVO", "id");
         assertStringId(root, "AdminArticlePageItemVO", "id");
         assertStringId(root, "AdminArticlePageItemVO", "categoryId");
         assertStringId(root, "AdminArticlePageItemVO", "coverAttachmentId");

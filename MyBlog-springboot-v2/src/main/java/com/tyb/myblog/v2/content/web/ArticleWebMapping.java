@@ -4,6 +4,7 @@ import com.tyb.myblog.v2.common.web.PageResponse;
 import com.tyb.myblog.v2.content.application.article.AdminArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.AdminArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
+import com.tyb.myblog.v2.content.application.article.PublicArchivePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleHomeResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticlePageResult;
@@ -61,6 +62,17 @@ public class ArticleWebMapping {
         return new PageResponse<>(
                 result.records().stream()
                         .map(this::toPublicPageItem)
+                        .toList(),
+                result.total(),
+                result.page(),
+                result.size());
+    }
+
+    public PageResponse<PublicArchivePageVO> toPublicArchivePage(
+            PublicArchivePageResult result) {
+        return new PageResponse<>(
+                result.records().stream()
+                        .map(this::toPublicArchiveGroup)
                         .toList(),
                 result.total(),
                 result.page(),
@@ -151,6 +163,27 @@ public class ArticleWebMapping {
                 publicTags(item.tags()),
                 item.createdAt(),
                 item.locked());
+    }
+
+    private PublicArchivePageVO toPublicArchiveGroup(
+            PublicArchivePageResult.Group group) {
+        return new PublicArchivePageVO(
+                group.yearMonth(),
+                group.year(),
+                group.month(),
+                group.articles().stream()
+                        .map(this::toPublicArchiveItem)
+                        .toList());
+    }
+
+    private PublicArchivePageVO.Item toPublicArchiveItem(
+            PublicArchivePageResult.Item item) {
+        return new PublicArchivePageVO.Item(
+                id(item.id()),
+                item.title(),
+                item.slug(),
+                item.publishedAt(),
+                item.summary());
     }
 
     private String id(long value) {
