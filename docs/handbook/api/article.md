@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 content 模块、前台 blog、后台 admin
-> 最后校准：2026-07-03
+> 最后校准：2026-07-04
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/*Article*`
 > 权威程度：API 契约
 
@@ -16,6 +16,7 @@
 |--------|------|------|------|-------|
 | GET | `/api/public/articles` | 允许 | 允许 | 允许 |
 | GET | `/api/public/articles/home` | 允许 | 允许 | 允许 |
+| GET | `/api/public/archives` | 允许 | 允许 | 允许 |
 | GET | `/api/public/articles/{id}` | 允许 | 允许 | 允许 |
 | GET | `/api/admin/articles` | 401 | 允许 | 允许 |
 | GET | `/api/admin/articles/{id}` | 401 | 允许 | 允许 |
@@ -350,7 +351,57 @@ Query：
 
 公开首页只返回 `PUBLISHED` 文章。PASSWORD 文章继续只进入普通公开列表，不进入首页置顶或推荐槽位。
 
-## 12. 公开文章详情
+## 12. 公开归档时间线
+
+```http
+GET /api/public/archives?page=1&size=12&lang=zh
+```
+
+鉴权：匿名。
+
+Query：
+
+| 参数 | 类型 | 默认 | 说明 |
+|------|------|------|------|
+| `page` | number | 1 | 页码，从 1 开始 |
+| `size` | number | 12 | 每页文章数量，最大 100 |
+| `lang` | string | `zh` | 支持 `zh`、`ja`、`en`；缺失或非法时按服务端规则回退 `zh` |
+
+成功响应：HTTP 200，`data` 为 `PageResponse<PublicArchivePageVO>`。
+
+```json
+{
+  "code": "00000",
+  "msg": "success",
+  "data": {
+    "records": [
+      {
+        "yearMonth": "2026-06",
+        "year": 2026,
+        "month": 6,
+        "articles": [
+          {
+            "id": "9007199254740993",
+            "title": "中文标题",
+            "slug": "hello-world",
+            "publishedAt": "2026-06-16T12:00:00",
+            "summary": "中文摘要"
+          }
+        ]
+      }
+    ],
+    "total": 1,
+    "page": 1,
+    "size": 12
+  }
+}
+```
+
+归档分页单位是文章数，`total` 是公开可见文章总数，不是月份分组总数。服务端先按公开文章口径和 `publishAt DESC, id DESC` 分页，再对当前页文章按 `yearMonth` 分组。
+
+归档文章项只返回 `id/title/slug/publishedAt/summary`。不返回正文、分类、标签、封面、评论数、状态、锁定标记、密码字段或存储字段。文章 ID 继续按公开 HTTP 契约输出为 JSON string，供前台 `/:lang/posts/:id/:slug?` ID 主导路由使用。
+
+## 13. 公开文章详情
 
 ```http
 GET /api/public/articles/{id}?lang=zh
@@ -365,18 +416,18 @@ GET /api/public/articles/{id}?lang=zh
   "code": "00000",
   "msg": "success",
   "data": {
-    "id": 123,
+    "id": "123",
     "title": "中文标题",
     "summary": "中文摘要",
     "body": "Markdown 正文",
-    "categoryId": 10,
+    "categoryId": "10",
     "categoryName": "后端",
     "slug": "hello-world",
     "publishAt": "2026-06-16T12:00:00",
     "coverUrl": "https://static.example.com/cover.webp",
     "commentCount": 2,
     "tags": [
-      { "id": 20, "name": "Java", "slug": "java" }
+      { "id": "20", "name": "Java", "slug": "java" }
     ],
     "createdAt": "2026-06-16T10:00:00",
     "updatedAt": "2026-06-16T11:00:00",
@@ -391,7 +442,7 @@ GET /api/public/articles/{id}?lang=zh
 - `PASSWORD`：返回 `403 + 10003`，完整解锁流程见 O-001。
 - `DRAFT`、`PRIVATE`、`SCHEDULED`、不存在或已删除：返回 `404 + 90003`。
 
-## 13. 状态规则摘要
+## 14. 状态规则摘要
 
 | 状态 | 公开列表 | 公开详情 | 后台读 | 后台写 |
 |------|----------|----------|--------|--------|
@@ -401,7 +452,7 @@ GET /api/public/articles/{id}?lang=zh
 | `PASSWORD` | 可见，`locked=true` | 403 | 可读 | ADMIN |
 | `SCHEDULED` | 到期前不可见 | 到期前 404 | 可读 | ADMIN |
 
-## 14. 错误码
+## 15. 错误码
 
 | 场景 | HTTP | code |
 |------|------|------|

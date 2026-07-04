@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -49,6 +52,44 @@ public class PublicArticleQueryService {
                                 item.coverAttachmentId() == null
                                         ? null
                                         : coverUrls.get(item.coverAttachmentId())))
+                        .toList(),
+                page.total(),
+                page.page(),
+                page.size());
+    }
+
+    public PublicArchivePageResult archives(PublicArticleQuery query) {
+        validateQuery(query);
+        PublicArticlePage page = repository.findPublicPage(
+                query.toCriteria(LocalDateTime.now(clock)));
+        String lang = normalizeLang(query.lang());
+        Map<YearMonth, List<PublicArchivePageResult.Item>> groups =
+                new LinkedHashMap<>();
+        for (PublicArticlePageItem item : page.records()) {
+            YearMonth yearMonth = YearMonth.from(item.publishAt());
+            groups.computeIfAbsent(yearMonth, ignored -> new ArrayList<>())
+                    .add(new PublicArchivePageResult.Item(
+                            item.id(),
+                            localized(
+                                    lang,
+                                    item.titleZh(),
+                                    item.titleJa(),
+                                    item.titleEn()),
+                            item.slug(),
+                            item.publishAt(),
+                            localized(
+                                    lang,
+                                    item.summaryZh(),
+                                    item.summaryJa(),
+                                    item.summaryEn())));
+        }
+        return new PublicArchivePageResult(
+                groups.entrySet().stream()
+                        .map(entry -> new PublicArchivePageResult.Group(
+                                entry.getKey().toString(),
+                                entry.getKey().getYear(),
+                                entry.getKey().getMonthValue(),
+                                entry.getValue()))
                         .toList(),
                 page.total(),
                 page.page(),

@@ -2,6 +2,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   loadPublicArticle,
+  loadPublicArchives,
   loadPublicHomeArticles,
   loadPublicArticles
 } from './api'
@@ -11,10 +12,12 @@ import { ApiError } from '@/shared/http/error'
 vi.mock('./api', () => ({
   loadPublicArticles: vi.fn(),
   loadPublicHomeArticles: vi.fn(),
+  loadPublicArchives: vi.fn(),
   loadPublicArticle: vi.fn()
 }))
 const mockedLoad = vi.mocked(loadPublicArticles)
 const mockedLoadHome = vi.mocked(loadPublicHomeArticles)
+const mockedLoadArchives = vi.mocked(loadPublicArchives)
 const mockedDetail = vi.mocked(loadPublicArticle)
 
 const page = (
@@ -31,6 +34,7 @@ describe('article store', () => {
     setActivePinia(createPinia())
     mockedLoad.mockReset()
     mockedLoadHome.mockReset()
+    mockedLoadArchives.mockReset()
     mockedDetail.mockReset()
   })
 
@@ -139,6 +143,56 @@ describe('article store', () => {
 
     expect(store.homeStatus).toBe('empty')
     expect(mockedLoadHome).toHaveBeenCalledTimes(2)
+  })
+
+  it('loads archive timeline independently from article pages', async () => {
+    mockedLoadArchives.mockResolvedValueOnce({
+      records: [
+        {
+          yearMonth: '2026-06',
+          year: 2026,
+          month: 6,
+          articles: [
+            {
+              id: '9007199254740993',
+              title: 'Article',
+              slug: 'article',
+              publishedAt: '2026-06-15T10:00:00',
+              summary: null
+            }
+          ]
+        }
+      ],
+      total: 1,
+      page: 1,
+      size: 12
+    })
+    const store = useArticleStore()
+
+    await store.loadArchives({ page: 1, size: 12, lang: 'en' })
+
+    expect(store.archiveStatus).toBe('ready')
+    expect(store.archive.records[0].articles[0].id).toBe('9007199254740993')
+    expect(store.page.records).toEqual([])
+  })
+
+  it('retries the last archive query', async () => {
+    mockedLoadArchives
+      .mockRejectedValueOnce(new Error('offline'))
+      .mockResolvedValueOnce({
+        records: [],
+        total: 0,
+        page: 1,
+        size: 12
+      })
+    const store = useArticleStore()
+
+    await store.loadArchives({ page: 1, size: 12, lang: 'zh' })
+    expect(store.archiveStatus).toBe('error')
+    await store.retryArchives()
+
+    expect(store.archiveStatus).toBe('empty')
+    expect(mockedLoadArchives).toHaveBeenCalledTimes(2)
   })
 
   it.each([

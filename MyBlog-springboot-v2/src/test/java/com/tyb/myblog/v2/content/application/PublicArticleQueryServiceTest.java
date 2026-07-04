@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.content.application;
 
 import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
+import com.tyb.myblog.v2.content.application.article.PublicArchivePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleHomeResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQuery;
@@ -96,7 +97,7 @@ class PublicArticleQueryServiceTest {
         PublicArticlePageItem item = pageItem(
                 100L,
                 ArticleStatus.PUBLISHED,
-                null);
+                (Long) null);
         when(repository.findPublicPage(query.toCriteria(NOW)))
                 .thenReturn(new PublicArticlePage(
                         List.of(item),
@@ -113,6 +114,44 @@ class PublicArticleQueryServiceTest {
     }
 
     @Test
+    void returnsArchiveTimelineGroupedByCurrentPagePublishMonth() {
+        PublicArticleQuery query = new PublicArticleQuery(
+                1, 3, "en", null, null, null, null);
+        PublicArticlePageItem previousMonth =
+                pageItem(101L, ArticleStatus.PUBLISHED, NOW.minusMonths(1));
+        when(repository.findPublicPage(query.toCriteria(NOW)))
+                .thenReturn(new PublicArticlePage(
+                        List.of(
+                                pageItem(103L, ArticleStatus.PUBLISHED, NOW.minusDays(1)),
+                                pageItem(102L, ArticleStatus.PASSWORD, NOW.minusDays(2)),
+                                previousMonth),
+                        8,
+                        1,
+                        3));
+
+        PublicArchivePageResult result = service.archives(query);
+
+        assertThat(result.total()).isEqualTo(8);
+        assertThat(result.page()).isEqualTo(1);
+        assertThat(result.size()).isEqualTo(3);
+        assertThat(result.records()).hasSize(2);
+        assertThat(result.records().get(0).yearMonth()).isEqualTo("2026-06");
+        assertThat(result.records().get(0).articles())
+                .extracting("id")
+                .containsExactly(103L, 102L);
+        assertThat(result.records().get(1).yearMonth()).isEqualTo("2026-05");
+        assertThat(result.records().get(1).articles())
+                .singleElement()
+                .satisfies(article -> {
+                    assertThat(article.title()).isEqualTo("English Title");
+                    assertThat(article.summary()).isEqualTo(previousMonth.summaryZh());
+                    assertThat(article.slug()).isEqualTo("article-101");
+                    assertThat(article.publishedAt()).isEqualTo(NOW.minusMonths(1));
+                });
+        verify(attachmentService, never()).resolvePublicUrls(Set.of());
+    }
+
+    @Test
     void returnsHomepageArticlesWithPinnedFeaturedAndOrdinaryGroups() {
         PublicArticlePageItem pinned = pageItem(
                 100L,
@@ -121,7 +160,7 @@ class PublicArticleQueryServiceTest {
         PublicArticlePageItem featured = pageItem(
                 101L,
                 ArticleStatus.PUBLISHED,
-                null);
+                (Long) null);
         PublicArticlePageItem ordinary = pageItem(
                 102L,
                 ArticleStatus.PUBLISHED,
@@ -225,6 +264,21 @@ class PublicArticleQueryServiceTest {
             long id,
             ArticleStatus status,
             Long coverAttachmentId) {
+        return pageItem(id, status, coverAttachmentId, NOW.minusDays(1));
+    }
+
+    private PublicArticlePageItem pageItem(
+            long id,
+            ArticleStatus status,
+            LocalDateTime publishAt) {
+        return pageItem(id, status, 300L, publishAt);
+    }
+
+    private PublicArticlePageItem pageItem(
+            long id,
+            ArticleStatus status,
+            Long coverAttachmentId,
+            LocalDateTime publishAt) {
         return new PublicArticlePageItem(
                 id,
                 "中文标题",
@@ -239,7 +293,7 @@ class PublicArticleQueryServiceTest {
                 "Category",
                 "article-" + id,
                 status,
-                NOW.minusDays(1),
+                publishAt,
                 coverAttachmentId,
                 null,
                 2,

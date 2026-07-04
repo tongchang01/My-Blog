@@ -7,40 +7,59 @@
     <div
       class="bg-ob-deep-800 px-14 py-16 rounded-2xl shadow-xl block min-h-screen"
     >
-      <ul class="timeline timeline-centered">
+      <div v-if="articleStore.archiveStatus === 'loading'" class="state-text">
+        Loading...
+      </div>
+      <div v-else-if="articleStore.archiveStatus === 'error'" class="state-text">
+        Unable to load archives.
+        <button class="retry-button" type="button" @click="articleStore.retryArchives">
+          Retry
+        </button>
+      </div>
+      <div
+        v-else-if="articleStore.archiveStatus === 'empty'"
+        class="state-text"
+      >
+        No public archives yet.
+      </div>
+      <ul v-else class="timeline timeline-centered">
         <template
-          v-for="posts in archives"
-          :key="`${posts.month}-${posts.year}}`"
+          v-for="group in articleStore.archive.records"
+          :key="group.yearMonth"
         >
           <li class="timeline-item period">
             <div class="timeline-info"></div>
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <h2 class="timeline-title">
-                {{ t(posts.month) }} {{ posts.year }}
+                {{ group.yearMonth }}
               </h2>
             </div>
           </li>
           <li
             class="timeline-item"
-            v-for="post in posts.posts"
-            :key="post.slug"
+            v-for="article in group.articles"
+            :key="article.id"
           >
             <div class="timeline-info">
-              <span>
-                {{ t(post.date.month) }} {{ post.date.day }},
-                {{ post.date.year }}
-              </span>
+              <span>{{ article.publishedAt }}</span>
             </div>
             <div class="timeline-marker"></div>
             <div class="timeline-content">
               <router-link
-                :to="{ name: 'post-slug', params: { slug: post.slug } }"
+                :to="{
+                  name: 'article-detail',
+                  params: {
+                    lang: currentLocale,
+                    id: article.id,
+                    slug: article.slug
+                  }
+                }"
               >
-                <h3 class="timeline-title">{{ post.title }}</h3>
+                <h3 class="timeline-title">{{ article.title }}</h3>
               </router-link>
               <p>
-                {{ post.text }}
+                {{ article.summary }}
               </p>
             </div>
           </li>
@@ -48,7 +67,7 @@
       </ul>
       <Paginator
         :pageSize="12"
-        :pageTotal="pagination.pageTotal"
+        :pageTotal="articleStore.archive.total"
         :page="pagination.page"
         @pageChange="pageChangeHandler"
       />
@@ -57,31 +76,35 @@
 </template>
 
 <script setup lang="ts">
-import { Archives } from '@/models/Post.class'
-import { usePostStore } from '@/stores/post'
-import { onBeforeMount, onUnmounted, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import { computed, onBeforeMount, onUnmounted, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import Paginator from '@/components/Paginator.vue'
 import { useCommonStore } from '@/stores/common'
+import { useAppStore } from '@/stores/app'
+import { useArticleStore } from '@/features/articles/store'
+import { isSupportedLocale } from '@/shared/i18n/locale'
 import defaultCover from '@/assets/default-cover.jpg'
 import usePageTitle from '@/hooks/usePageTitle'
 
 const commonStore = useCommonStore()
-const postStore = usePostStore()
-const { t } = useI18n()
-const archives = ref(new Archives().data)
+const appStore = useAppStore()
+const articleStore = useArticleStore()
+const route = useRoute()
 const pagination = ref({
-  pageTotal: 0,
   page: 1
 })
 const { pageTitle, updateTitle } = usePageTitle()
+const currentLocale = computed(() =>
+  isSupportedLocale(route.params.lang) ? route.params.lang : appStore.locale
+)
 
 const fetchData = async () => {
-  const data = await postStore.fetchArchives(pagination.value.page)
-
-  pagination.value.pageTotal = data.total
-  archives.value = data.data
+  await articleStore.loadArchives({
+    page: pagination.value.page,
+    size: 12,
+    lang: currentLocale.value
+  })
   commonStore.setHeaderImage(defaultCover)
   updateTitle()
 }
@@ -96,6 +119,10 @@ const pageChangeHandler = (page: number) => {
 }
 
 onBeforeMount(fetchData)
+watch(currentLocale, () => {
+  pagination.value.page = 1
+  fetchData()
+})
 onUnmounted(() => {
   commonStore.resetHeaderImage()
 })
@@ -202,6 +229,14 @@ onUnmounted(() => {
     background: var(--main-gradient);
     left: 0;
   }
+}
+
+.state-text {
+  @apply text-ob-bright text-center py-12;
+}
+
+.retry-button {
+  @apply ml-3 px-4 py-2 rounded bg-ob-bright text-ob-deep-800;
 }
 
 /*----- TIMELINE PERIOD -----*/
