@@ -44,8 +44,8 @@
 - 状态：未完成
 - 优先级：P0
 - 影响范围：前台 blog、公开 API
-- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签、归档和关于页已接入；友链、搜索仍待补齐。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-integration-batch-plan.md` 拆分推进。下一批优先补搜索；友链已下调优先级，后续单独重开讨论；页脚统计归入 O-020。
+- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签、归档、关于页和搜索已接入；友链仍待补齐。
+- 下一步：友链已下调优先级，后续单独重开讨论；页脚统计归入 O-020。
 - 来源：`../frontend/blog/integration-status.md`、`roadmap.md`
 
 ## O-004 前台评论、留言和统计接入
@@ -173,13 +173,12 @@
 
 ## O-017 搜索实现方式与前后端能力不一致
 
-- 状态：未完成 / 部分方案已定 / 细节待设计
+- 状态：已关闭
 - 优先级：P1
 - 影响范围：后端 content、公开 API、前台 blog
-- 当前判断：Aurora/Hexo 原始搜索弹窗依赖 `/search.json` 本地索引，支持浏览器内即时搜索、正文片段高亮、最近搜索和键盘导航。V2 后端当前只有公开文章列表的 `keyword` 查询，范围为标题和摘要。第一版不做独立全文搜索系统，也不生成静态 search index。
-- 风险：如果直接要求还原本地全文索引，需要设计索引生成、正文脱敏、PASSWORD 文章正文暴露、缓存和体积边界；如果直接移除搜索弹窗，会损失明显的前台交互体验。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-search-keyword-implementation-plan.md` 拆分实现。前台搜索弹窗保留，数据源改为 `/api/public/articles?keyword=...`；搜索范围限定为标题和摘要，不搜索正文，不做服务端高亮片段；搜索结果展示标题和摘要，点击后跳转文章 slug 路由；最近搜索和键盘导航尽量保留。公开口径与公开文章列表一致，`PUBLISHED/PASSWORD + publish_at <= now + 未软删`。
-- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-005、`docs/working/plans/2026-06-30-frontend-search-keyword-implementation-plan.md`、前台 `SearchModal.vue` / `Search.class.ts`、当前 public article keyword 查询代码
+- 关闭原因：前台搜索弹窗已改用 `GET /api/public/articles?keyword=...`，结果使用公开文章列表口径，只展示标题和摘要；最近搜索、键盘上下选择和回车跳转保留；旧 `/search.json` 和正文高亮逻辑已下线。第一版不做全文搜索或 search index。
+- 验证：已通过 `mvn -f MyBlog-springboot-v2/pom.xml -Dtest=ArticleIntegrationTest test`、`pnpm --dir frontend/apps/blog typecheck` 和 `pnpm --dir frontend/apps/blog test`。
+- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-005、`docs/working/plans/2026-07-05-blog-search-keyword-implementation-plan.md`、前台 `SearchModal.vue` / `Search.class.ts`、当前 public article keyword 查询代码
 
 ## O-018 关于页仍依赖旧 page JSON
 
