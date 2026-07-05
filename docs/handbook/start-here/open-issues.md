@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后续开发
-> 最后校准：2026-07-04
+> 最后校准：2026-07-05
 > 权威程度：未完成事项权威登记表
 
 ## 本文档回答什么问题
@@ -44,8 +44,8 @@
 - 状态：未完成
 - 优先级：P0
 - 影响范围：前台 blog、公开 API
-- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签和归档已接入；友链、关于、搜索仍待补齐。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-integration-batch-plan.md` 拆分推进。下一批优先补搜索和关于页；友链已下调优先级，后续单独重开讨论；页脚统计归入 O-020。
+- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签、归档和关于页已接入；友链、搜索仍待补齐。
+- 下一步：按 `docs/working/plans/2026-06-30-frontend-integration-batch-plan.md` 拆分推进。下一批优先补搜索；友链已下调优先级，后续单独重开讨论；页脚统计归入 O-020。
 - 来源：`../frontend/blog/integration-status.md`、`roadmap.md`
 
 ## O-004 前台评论、留言和统计接入
@@ -183,13 +183,12 @@
 
 ## O-018 关于页仍依赖旧 page JSON
 
-- 状态：未完成 / 部分方案已定 / 细节待设计
+- 状态：已关闭
 - 优先级：P1
 - 影响范围：前台 blog、后端 system、后台 admin、Markdown 渲染
-- 当前判断：V2 后端公开站点配置已经返回 `aboutMd`，后台站点配置也已有三语 About Markdown 字段；当前问题主要是前台 About 页仍请求旧 `/pages/about/index.json`，没有接入现有 V2 配置。
-- 风险：继续依赖旧 page JSON 会让 About 页和后台站点配置脱节；如果前台直接把 `aboutMd` 原文当 HTML 插入页面，会违反 Markdown 渲染安全边界。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-about-page-implementation-plan.md` 拆分实现。About 页改为读取 `siteSettings.aboutMd`，复用现有 `renderMarkdown(aboutMd)` 渲染，保持禁用 raw HTML；现阶段尽量保留旧 About 页面视觉和组件，包括 `Profile`、`Toc`、`PostStats`；`aboutMd` 为空时显示空态或骨架，不伪造旧 page。后端和后台原则上不新增 schema 或入口。
-- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-006、`docs/working/plans/2026-06-30-frontend-about-page-implementation-plan.md`、前台 `about.vue` / `PageContent.vue`、`PublicSiteConfigVO.aboutMd`、`renderMarkdown`
+- 关闭原因：前台 About 页已读取 `siteSettings.aboutMd`，使用现有 `renderMarkdown` 渲染 Markdown，保留 raw HTML 禁用策略；为空时走现有骨架空态；后端和后台未新增 schema 或入口。
+- 验证：已通过 `pnpm --dir frontend/apps/blog typecheck` 和 `pnpm --dir frontend/apps/blog test`。
+- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-006、`docs/working/plans/2026-07-05-blog-about-page-implementation-plan.md`、前台 `about.vue` / `PageContent.vue`、`PublicSiteConfigVO.aboutMd`、`renderMarkdown`
 
 ## O-019 评论和留言迁移到 V2 自研 API
 

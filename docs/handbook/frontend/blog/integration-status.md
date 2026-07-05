@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 前台读者端
-> 最后校准：2026-07-04
+> 最后校准：2026-07-05
 > 对应代码：`frontend/apps/blog/`
 > 权威程度：前台完成度记录
 
@@ -19,12 +19,13 @@
 - 分类和标签列表已接入 `GET /api/public/categories`、`GET /api/public/tags`，数量使用公开 `articleCount` 映射。
 - 分类和标签公开页已使用 slug 路由 `/:lang/categories/:slug`、`/:lang/tags/:slug`，并通过公开文章列表 `categorySlug/tagSlug` 查询。
 - 归档页已接入 `GET /api/public/archives`，按后端返回的年月分组渲染时间线，文章链接使用 `/:lang/posts/:id/:slug?` ID 主导路由。
+- 关于页已接入公开站点配置 `aboutMd`，不再读取旧 `/pages/about/index.json`。
 - 首页已停止请求旧 Hexo/Aurora mock 数据。
 - Markdown 正文通过 `markdown-it` 渲染，禁用原始 HTML。
 
 ## 待补齐
 
-- 友链、关于、搜索仍需替换旧 JSON 数据源或旧页面实现。
+- 友链、搜索仍需替换旧 JSON 数据源或旧页面实现。
 - 评论、留言和访问统计前台接入。
 - PASSWORD 文章完整解锁流程。
 - Spotify Embed。
@@ -36,4 +37,3 @@
 - O-003 前台读者主链路补齐。
 - O-004 前台评论、留言和统计接入。
 - O-017 搜索实现方式与前后端能力不一致。
-- O-018 关于页仍依赖旧 page JSON。
