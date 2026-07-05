@@ -118,8 +118,11 @@ jobs:
       - name: Test admin
         run: pnpm --dir frontend/apps/admin test
 
+      - name: Build admin
+        run: pnpm --dir frontend/apps/admin build
+
   # ==========================================================================
-  # 前台 blog 前端 job：TypeScript 类型检查 + Vitest。
+  # 前台 blog 前端 job：TypeScript 类型检查 + Vitest + production build。
   # 结构和 admin 对称。
   # ==========================================================================
   blog-frontend-test:
@@ -151,3 +154,5 @@ jobs:
       - name: Test blog
         run: pnpm --dir frontend/apps/blog test
 
+      - name: Build blog
+        run: pnpm --dir frontend/apps/blog build
