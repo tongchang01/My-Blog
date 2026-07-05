@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -206,6 +207,27 @@ class ArticleIntegrationTest {
                 """, Integer.class, scheduledId)).isEqualTo(2);
     }
 
+    @Test
+    void publicKeywordSearchMatchesTitleAndSummaryButNotBody()
+            throws Exception {
+        insertCategory(10L);
+        insertTag(20L);
+        insertAttachment(300L);
+        insertPublishedArticle(100L, "Spring 标题", "普通摘要", "正文不重要");
+        insertPublishedArticle(101L, "普通标题", "摘要包含 Spring", "正文不重要");
+        insertPublishedArticle(102L, "普通标题", "普通摘要", "正文包含 Spring");
+
+        mockMvc.perform(get("/api/public/articles")
+                        .queryParam("lang", "zh")
+                        .queryParam("keyword", "Spring"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(2))
+                .andExpect(jsonPath("$.data.records[*].id")
+                        .value(containsInAnyOrder("100", "101")))
+                .andExpect(jsonPath("$.data.records[*].body")
+                        .doesNotExist());
+    }
+
     private JsonNode response(
             org.springframework.test.web.servlet.request
                     .MockHttpServletRequestBuilder request)
@@ -322,6 +344,29 @@ class ArticleIntegrationTest {
                 "articles/" + id + ".png",
                 "http://localhost/media/" + id + ".png",
                 "a".repeat(64));
+    }
+
+    private void insertPublishedArticle(
+            long id,
+            String titleZh,
+            String summaryZh,
+            String body) {
+        jdbcTemplate.update("""
+                INSERT INTO t_article (
+                    id, title_zh, title_ja, title_en,
+                    summary_zh, summary_ja, summary_en,
+                    body, category_id, author_id, slug, status, publish_at,
+                    cover_attachment_id, homepage_slot,
+                    created_at, created_by, updated_at, updated_by, deleted
+                ) VALUES (?, ?, null, null, ?, null, null, ?, 10, 1001, ?,
+                    2, CURRENT_TIMESTAMP, 300, 'NONE',
+                    CURRENT_TIMESTAMP, 1001, CURRENT_TIMESTAMP, 1001, 0)
+                """,
+                id,
+                titleZh,
+                summaryZh,
+                body,
+                "article-" + id);
     }
 
     private String hash(long articleId) {

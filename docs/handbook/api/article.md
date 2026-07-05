@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 content 模块、前台 blog、后台 admin
-> 最后校准：2026-07-04
+> 最后校准：2026-07-05
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/*Article*`
 > 权威程度：API 契约
 
@@ -277,7 +277,7 @@ Query：
 | `tagId` | number | 无 | 标签 ID |
 | `categorySlug` | string | 无 | 分类 slug；前台公开 URL 优先使用该参数 |
 | `tagSlug` | string | 无 | 标签 slug；前台公开 URL 优先使用该参数 |
-| `keyword` | string | 无 | 当前语言标题/摘要关键字 |
+| `keyword` | string | 无 | 当前语言标题/摘要关键字；第一版不搜索正文 |
 | `archiveMonth` | string | 无 | 格式 `yyyy-MM` |
 
 成功响应：HTTP 200，`data` 为 `PageResponse<PublicArticlePageItemVO>`。
@@ -313,6 +313,8 @@ Query：
 ```
 
 公开列表只返回 `PUBLISHED` 和 `PASSWORD` 状态文章，不返回正文和密码信息。PASSWORD 文章通过 `locked=true` 表示。公开筛选同时保留 `categoryId/tagId` 兼容参数和 `categorySlug/tagSlug` URL 语义参数；前台分类/标签页面优先使用 slug。
+
+`keyword` 第一版只匹配三语标题和三语摘要，不搜索正文，不返回高亮片段。搜索结果仍使用公开文章列表响应，不返回正文和密码信息。
 
 ## 11. 公开首页文章
 
