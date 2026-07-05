@@ -218,6 +218,14 @@ onMounted(initialize);
           <el-form-item :label="transformI18n('settings.siteConfig.spotifyPlaylistId')">
             <el-input v-model="form.spotifyPlaylistId" :disabled="readonly" />
           </el-form-item>
+          <el-form-item :label="transformI18n('settings.siteConfig.startedDate')">
+            <el-date-picker
+              v-model="form.startedDate"
+              type="date"
+              value-format="YYYY-MM-DD"
+              :disabled="readonly"
+            />
+          </el-form-item>
         </el-form>
       </el-card>
 

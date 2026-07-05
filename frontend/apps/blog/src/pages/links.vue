@@ -21,7 +21,6 @@
             :current-path="currentPath"
             :plugin-configs="pluginConfigs"
             :comments="enabledComment"
-            ref="postStatsRef"
           />
         </div>
       </div>
@@ -94,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, Ref, ref } from 'vue'
+import { computed, nextTick, onMounted, ref } from 'vue'
 import PostStats from '@/components/Post/PostStats.vue'
 import LinkBox from '@/components/Link/LinkBox.vue'
 import { Link, Page } from '@/models/Article.class'
@@ -109,15 +108,9 @@ import usePageTitle from '@/hooks/usePageTitle'
 import useJumpToEle from '@/hooks/useJumpToEle'
 import useCommentPlugin from '@/hooks/useCommentPlugin'
 
-interface PostStatsExpose extends Ref<InstanceType<typeof PostStats>> {
-  getCommentCount(): void
-  getPostView(): void
-}
-
 const articleStore = useArticleStore()
 const appStore = useAppStore()
 const pageData = ref(new Page<Link[] | Record<string, Link[]>>())
-const postStatsRef = ref<PostStatsExpose>()
 const route = useRoute()
 const { pageTitle, updateTitle } = usePageTitle()
 const { jumpToEle } = useJumpToEle()
@@ -127,8 +120,6 @@ const fetchArticle = async () => {
   pageData.value = await articleStore.fetchArticle('links')
   updateTitle(appStore.locale)
   await nextTick()
-  postStatsRef.value?.getCommentCount()
-  postStatsRef.value?.getPostView()
 }
 
 const jumpToContent = () => {

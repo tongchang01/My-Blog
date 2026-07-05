@@ -385,6 +385,7 @@ settings:
     faviconUrl: Favicon URL
     icpNo: ICP 番号
     spotifyPlaylistId: Spotify プレイリスト ID
+    startedDate: サイト開始日
   profile:
     account: アカウント概要
     form: 作者プロフィール

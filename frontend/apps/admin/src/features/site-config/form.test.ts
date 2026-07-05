@@ -21,6 +21,7 @@ const config: SiteConfig = {
   faviconUrl: "https://example.com/favicon.ico",
   icpNo: null,
   spotifyPlaylistId: "playlist-id",
+  startedDate: "2024-01-02",
   updatedAt: "2026-06-25T10:00:00",
   updatedBy: "1001"
 };
@@ -40,13 +41,15 @@ describe("site config form", () => {
       logoUrl: "",
       faviconUrl: "",
       icpNo: "",
-      spotifyPlaylistId: ""
+      spotifyPlaylistId: "",
+      startedDate: ""
     });
     expect(siteConfigToForm(config)).toMatchObject({
       siteTitleZh: "中文标题",
       logoUrl: "",
       faviconUrl: "https://example.com/favicon.ico",
-      icpNo: ""
+      icpNo: "",
+      startedDate: "2024-01-02"
     });
   });
 
@@ -79,7 +82,8 @@ describe("site config form", () => {
       logoUrl: null,
       faviconUrl: "https://example.com/favicon.ico",
       icpNo: "ICP",
-      spotifyPlaylistId: "playlist-id"
+      spotifyPlaylistId: "playlist-id",
+      startedDate: "2024-01-02"
     });
   });
 });

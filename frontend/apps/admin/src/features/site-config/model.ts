@@ -12,6 +12,7 @@ export interface SiteConfigPayload {
   faviconUrl: string | null;
   icpNo: string | null;
   spotifyPlaylistId: string | null;
+  startedDate: string | null;
 }
 
 export interface SiteConfig extends SiteConfigPayload {

@@ -3,6 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import routes from '~pages'
 import Cookies from 'js-cookie'
 import { resolveInitialLocale } from '@/shared/i18n/locale'
+import { installPageViewTracking } from './pageViewTracking'
 
 const initialLocale = () =>
   resolveInitialLocale(
@@ -57,5 +58,7 @@ const router = createRouter({
     })
   }
 })
+
+installPageViewTracking(router)
 
 export default router
