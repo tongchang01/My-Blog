@@ -114,10 +114,9 @@
                         </svg>
                       </div>
                       <div class="search-hit-content-wrapper">
-                        <span
-                          class="search-hit-title"
-                          v-html="result.content"
-                        ></span>
+                        <span class="search-hit-title">
+                          {{ result.content }}
+                        </span>
                         <span class="search-hit-path">{{ result.title }}</span>
                       </div>
                       <div class="search-hit-action">
@@ -172,10 +171,9 @@
                         </svg>
                       </div>
                       <div class="search-hit-content-wrapper">
-                        <span
-                          class="search-hit-title"
-                          v-html="result.content"
-                        ></span>
+                        <span class="search-hit-title">
+                          {{ result.content }}
+                        </span>
                         <span class="search-hit-path">{{ result.title }}</span>
                       </div>
                       <div class="search-hit-action">
@@ -308,14 +306,14 @@
 </template>
 
 <script setup lang="ts">
+import type { ArticleCardViewModel } from '@/features/articles/model'
 import { SearchResultType } from '@/models/Search.class'
+import { useAppStore } from '@/stores/app'
 import { useSearchStore } from '@/stores/search'
 import {
   computed,
-  onBeforeMount,
   onMounted,
   onUnmounted,
-  onUpdated,
   ref,
   watch
 } from 'vue'
@@ -331,17 +329,24 @@ declare const _: any
 
 const searchStore = useSearchStore()
 const searchInput = ref<HTMLInputElement>()
-const searchIndexStatus = ref(false)
 const searchResults = ref<SearchResultType[]>([])
+const appStore = useAppStore()
 const router = useRouter()
 const openModal = ref(false)
 const openSearchContainer = ref(false)
 const keyword = ref('')
-const recentResults = ref<any>(null)
+const recentResults = ref<SearchResultType[]>([])
 const menuActiveIndex = ref(0)
 const menuMaxIndex = ref(0)
 const isEmpty = ref(false)
 const { t } = useI18n()
+
+const toSearchResult = (article: ArticleCardViewModel): SearchResultType => ({
+  id: article.id,
+  title: article.title,
+  content: article.summary || article.title,
+  slug: article.slug
+})
 
 /**
  * Handlers
@@ -351,11 +356,18 @@ const handleStatusChange = (status: boolean) => {
 }
 
 const handleLinkClick = (result: SearchResultType) => {
+  handleStatusChange(false)
+  if (!result.id) return
   searchStore.addRecentSearch(result)
   reloadRecentResult()
-  handleStatusChange(false)
-  if (result.slug !== '')
-    router.push({ name: 'post-slug', params: { slug: result.slug } })
+  router.push({
+    name: 'article-detail',
+    params: {
+      lang: appStore.locale,
+      id: result.id,
+      slug: result.slug
+    }
+  })
 }
 
 const handleResetInput = () => {
@@ -424,17 +436,15 @@ const handleEnterDown = () => {
  * for user to finish typing. Prevent uncessary searches
  * between typing of a keyword.
  */
-const searchKeyword = _.debounce((event: Event) => {
+const searchKeyword = _.debounce(async (event: Event) => {
   const target = event.target as HTMLInputElement | null
-  const keyword = target?.value ?? ''
-  if (keyword !== '') {
-    searchResults.value = searchStore.searchIndexes.search(keyword)
-    if (searchResults.value.length > 0) {
-      resetIndex(searchResults.value.length)
-      isEmpty.value = false
-    } else {
-      isEmpty.value = true
-    }
+  const query = target?.value.trim() ?? ''
+  if (query !== '') {
+    await searchStore.searchArticles(query, appStore.locale)
+    if (query !== keyword.value.trim()) return
+    searchResults.value = searchStore.searchResults.map(toSearchResult)
+    isEmpty.value = searchResults.value.length === 0
+    resetIndex(searchResults.value.length)
   } else {
     isEmpty.value = false
     searchResults.value = []
@@ -453,36 +463,12 @@ const resetIndex = (max: number) => {
   menuMaxIndex.value = max - 1
 }
 
-/**
- * Initialize search modual default data.
- */
-const initSearch = async () => {
-  searchIndexStatus.value = false
-  isEmpty.value = false
-  await searchStore.fetchSearchIndex().then(() => {
-    searchIndexStatus.value = true
-  })
-}
-
-onBeforeMount(initSearch)
-
 onMounted(() =>
   /** Delay focus for animation to finish. */
   setTimeout(() => {
     if (searchInput.value) searchInput.value.focus()
   }, 200)
 )
-
-onUpdated(() => {
-  /** Reset default values. */
-  keyword.value = ''
-  searchResults.value = []
-
-  /** Delay focus for animation to finish. */
-  setTimeout(() => {
-    if (searchInput.value) searchInput.value.focus()
-  }, 200)
-})
 
 onUnmounted(() => {
   document.body.classList.remove('modal--active')
@@ -495,7 +481,15 @@ watch(
      * This watch is used to delay the animation
      * of the search box container.
      */
-    if (status === true) reloadRecentResult()
+    if (status === true) {
+      keyword.value = ''
+      searchResults.value = []
+      isEmpty.value = false
+      reloadRecentResult()
+      setTimeout(() => {
+        if (searchInput.value) searchInput.value.focus()
+      }, 200)
+    }
 
     if (status === false) {
       setTimeout(() => {

@@ -9,7 +9,6 @@ import {
 } from '@/models/Post.class'
 import { Page } from '@/models/Article.class'
 import { Statistic } from '@/models/Statistic.class'
-import { SearchIndexes } from '@/models/Search.class'
 import { paginator } from '@/utils'
 
 // GET /api/posts/:pageNum.json (default 1.json)
@@ -73,11 +72,6 @@ export async function fetchImplicitPageBySource(
 // GET /api/statistic.json
 export async function fetchStatistic(): Promise<AxiosResponse<any>> {
   return request.get<Statistic>('/statistic.json')
-}
-
-// GET /api/search.json
-export async function fetchSearchIndexes(): Promise<AxiosResponse<any>> {
-  return request.get<SearchIndexes[]>('/search.json')
 }
 
 // GET /api/authors/author-slug.json

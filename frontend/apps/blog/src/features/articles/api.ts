@@ -15,6 +15,7 @@ export interface LoadPublicArticlesParams {
   lang: SupportedLocale
   categorySlug?: string
   tagSlug?: string
+  keyword?: string
   signal?: AbortSignal
 }
 
@@ -37,6 +38,7 @@ export const loadPublicArticles = async ({
   lang,
   categorySlug,
   tagSlug,
+  keyword,
   signal
 }: LoadPublicArticlesParams): Promise<
   PageResponse<PublicArticleListItemDto>
@@ -44,7 +46,7 @@ export const loadPublicArticles = async ({
   const data = await requestApi<PageResponse<PublicArticleListItemDto>>({
     method: 'GET',
     url: '/public/articles',
-    params: { page, size, lang, categorySlug, tagSlug },
+    params: { page, size, lang, categorySlug, tagSlug, keyword },
     signal
   })
   if (data === null) throw new ApiError('Article page response is empty')

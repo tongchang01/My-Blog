@@ -20,12 +20,13 @@
 - 分类和标签公开页已使用 slug 路由 `/:lang/categories/:slug`、`/:lang/tags/:slug`，并通过公开文章列表 `categorySlug/tagSlug` 查询。
 - 归档页已接入 `GET /api/public/archives`，按后端返回的年月分组渲染时间线，文章链接使用 `/:lang/posts/:id/:slug?` ID 主导路由。
 - 关于页已接入公开站点配置 `aboutMd`，不再读取旧 `/pages/about/index.json`。
+- 搜索弹窗已接入公开文章 `keyword` 查询，不再读取旧 `/search.json`；第一版只展示标题和摘要，不搜索正文，不做高亮片段。
 - 首页已停止请求旧 Hexo/Aurora mock 数据。
 - Markdown 正文通过 `markdown-it` 渲染，禁用原始 HTML。
 
 ## 待补齐
 
-- 友链、搜索仍需替换旧 JSON 数据源或旧页面实现。
+- 友链仍需替换旧 JSON 数据源或旧页面实现。
 - 评论、留言和访问统计前台接入。
 - PASSWORD 文章完整解锁流程。
 - Spotify Embed。
@@ -36,4 +37,3 @@
 - O-001 PASSWORD 文章完整解锁流程。
 - O-003 前台读者主链路补齐。
 - O-004 前台评论、留言和统计接入。
-- O-017 搜索实现方式与前后端能力不一致。
