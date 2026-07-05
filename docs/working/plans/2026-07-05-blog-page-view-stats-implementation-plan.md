@@ -1,6 +1,6 @@
 # 前台访问统计闭环实施计划
 
-> 状态：执行中
+> 状态：已完成
 > 适用范围：O-020 访问统计前台打点和展示口径
 > 最后校准：2026-07-05
 
@@ -64,3 +64,11 @@
 - `pnpm --dir frontend/apps/blog typecheck`
 - `pnpm --dir frontend/apps/blog test`
 - 阶段收尾再按风险运行前后端 build。
+
+## 验收结果
+
+- 后端新增公开站点统计摘要接口 `GET /api/public/stats/site-summary`，公开站点配置和后台站点配置补齐 `startedDate`。
+- 前台路由导航后写入 V2 page-view：文章详情使用真实文章 ID，其他公开页面使用 `articleId=0`。
+- 页脚改用 V2 `site-summary` 展示访问量和今日访客，并继续按 `startedDate` 计算建站天数。
+- `PostStats` 已移除 Waline / Twikoo / Valine / LeanCloud 浏览量和评论数 DOM，仅保留阅读时长与字数。
+- 已通过后端定向 Maven 测试、admin/blog 相关 Vitest 和 typecheck。
