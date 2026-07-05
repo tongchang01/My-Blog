@@ -2,6 +2,8 @@ package com.tyb.myblog.v2.system.web;
 
 import com.tyb.myblog.v2.system.application.siteconfig.PublicSiteConfigResult;
 
+import java.time.LocalDate;
+
 /**
  * 前台当前语言站点配置响应。
  */
@@ -12,7 +14,8 @@ public record PublicSiteConfigVO(
         String logoUrl,
         String faviconUrl,
         String icpNo,
-        String spotifyPlaylistId
+        String spotifyPlaylistId,
+        LocalDate startedDate
 ) {
 
     /**
@@ -27,6 +30,7 @@ public record PublicSiteConfigVO(
                 result.logoUrl(),
                 result.faviconUrl(),
                 result.icpNo(),
-                result.spotifyPlaylistId());
+                result.spotifyPlaylistId(),
+                result.startedDate());
     }
 }

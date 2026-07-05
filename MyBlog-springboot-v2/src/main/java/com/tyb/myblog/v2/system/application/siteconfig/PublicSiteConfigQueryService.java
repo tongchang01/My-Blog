@@ -41,7 +41,8 @@ public class PublicSiteConfigQueryService {
                 config.logoUrl(),
                 config.faviconUrl(),
                 config.icpNo(),
-                config.spotifyPlaylistId());
+                config.spotifyPlaylistId(),
+                config.startedDate());
     }
 
     private ApiException missingConfig() {

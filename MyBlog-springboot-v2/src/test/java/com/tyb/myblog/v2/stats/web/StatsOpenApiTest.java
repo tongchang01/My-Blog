@@ -31,6 +31,8 @@ class StatsOpenApiTest {
         assertMethods(root,
                 "/paths/~1api~1public~1stats~1page-views", "post");
         assertMethods(root,
+                "/paths/~1api~1public~1stats~1site-summary", "get");
+        assertMethods(root,
                 "/paths/~1api~1admin~1stats~1dashboard", "get");
     }
 
@@ -46,6 +48,10 @@ class StatsOpenApiTest {
                         "/components/schemas/TopArticle/properties")
                 .fieldNames()).toIterable()
                 .contains("articleId", "title", "pv", "dailyUvSum");
+        assertThat(root.at(
+                        "/components/schemas/SiteStatsSummaryVO/properties")
+                .fieldNames()).toIterable()
+                .containsExactlyInAnyOrder("todayUv", "totalPv");
         assertStringId(root, "TopArticle", "articleId");
         assertThat(root.toString()).doesNotContain(
                 "PageViewEntity",

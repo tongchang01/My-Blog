@@ -58,6 +58,7 @@ public class MyBatisSiteConfigRepository implements SiteConfigRepository {
                 entity.getFaviconUrl(),
                 entity.getIcpNo(),
                 entity.getSpotifyPlaylistId(),
+                entity.getStartedDate(),
                 entity.getUpdatedAt(),
                 entity.getUpdatedBy());
     }
@@ -78,6 +79,7 @@ public class MyBatisSiteConfigRepository implements SiteConfigRepository {
         entity.setFaviconUrl(config.faviconUrl());
         entity.setIcpNo(config.icpNo());
         entity.setSpotifyPlaylistId(config.spotifyPlaylistId());
+        entity.setStartedDate(config.startedDate());
         return entity;
     }
 }

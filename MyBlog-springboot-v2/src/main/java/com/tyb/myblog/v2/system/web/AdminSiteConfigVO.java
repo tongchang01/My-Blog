@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.system.web;
 
 import com.tyb.myblog.v2.system.application.siteconfig.AdminSiteConfigResult;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -21,6 +22,7 @@ public record AdminSiteConfigVO(
         String faviconUrl,
         String icpNo,
         String spotifyPlaylistId,
+        LocalDate startedDate,
         LocalDateTime updatedAt,
         Long updatedBy
 ) {
@@ -43,6 +45,7 @@ public record AdminSiteConfigVO(
                 result.faviconUrl(),
                 result.icpNo(),
                 result.spotifyPlaylistId(),
+                result.startedDate(),
                 result.updatedAt(),
                 result.updatedBy());
     }

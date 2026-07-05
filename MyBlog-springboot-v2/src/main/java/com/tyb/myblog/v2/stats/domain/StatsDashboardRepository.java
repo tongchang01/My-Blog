@@ -12,4 +12,8 @@ public interface StatsDashboardRepository {
             LocalDate from, LocalDate to, int limit);
 
     List<LanguageTraffic> findLanguages(LocalDate from, LocalDate to);
+
+    long sumUv(LocalDate date);
+
+    long sumPv();
 }

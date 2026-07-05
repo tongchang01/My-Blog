@@ -126,6 +126,14 @@ class SecurityConfigTest {
     }
 
     @Test
+    void permitsConfiguredPublicStatsSummaryWithoutAccessToken()
+            throws Exception {
+        mockMvc.perform(get("/api/public/stats/site-summary"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("00000"));
+    }
+
+    @Test
     void doesNotPermitRefreshGet() throws Exception {
         mockMvc.perform(get("/api/auth/refresh"))
                 .andExpect(status().isUnauthorized())
@@ -561,7 +569,8 @@ class SecurityConfigTest {
                   "logoUrl":"https://example.com/logo.png",
                   "faviconUrl":null,
                   "icpNo":null,
-                  "spotifyPlaylistId":"playlist_123"
+                  "spotifyPlaylistId":"playlist_123",
+                  "startedDate":null
                 }
                 """;
     }

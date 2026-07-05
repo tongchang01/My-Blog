@@ -117,6 +117,11 @@ class StatsIntegrationTest {
         mockMvc.perform(get("/api/admin/stats/dashboard"))
                 .andExpect(status().isUnauthorized());
 
+        mockMvc.perform(get("/api/public/stats/site-summary"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.todayUv").value(3))
+                .andExpect(jsonPath("$.data.totalPv").value(4));
+
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM t_page_view "
                         + "WHERE visitor_hash LIKE '%203.0.113.1%'",

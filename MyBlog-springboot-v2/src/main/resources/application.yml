@@ -104,6 +104,8 @@ myblog:
         path: /api/public/guestbook/comments
       - method: POST
         path: /api/public/stats/page-views
+      - method: GET
+        path: /api/public/stats/site-summary
   content:
     article-publish:
       enabled: true

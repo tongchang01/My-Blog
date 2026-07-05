@@ -2,6 +2,8 @@ package com.tyb.myblog.v2.system.web;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDate;
+
 /**
  * 站点配置全量更新的 OpenAPI 文档模型。
  */
@@ -43,6 +45,9 @@ public record UpdateSiteConfigOpenApiRequest(
         String icpNo,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED,
                 types = {"string", "null"})
-        String spotifyPlaylistId
+        String spotifyPlaylistId,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED,
+                types = {"string", "null"})
+        LocalDate startedDate
 ) {
 }
