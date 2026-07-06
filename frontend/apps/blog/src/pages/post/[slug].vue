@@ -38,6 +38,9 @@
         </header>
 
         <div class="post-html" v-html="article.bodyHtml" />
+        <div id="comments">
+          <Comment :article-id="article.id" :enabled="!article.locked" />
+        </div>
       </div>
     </article>
 
@@ -62,6 +65,7 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { useArticleStore } from '@/features/articles/store'
 import { isSupportedLocale } from '@/shared/i18n/locale'
+import Comment from '@/components/Comment.vue'
 import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
 import { useMetaStore } from '@/stores/meta'

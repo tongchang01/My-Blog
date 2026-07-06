@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后续开发
-> 最后校准：2026-07-05
+> 最后校准：2026-07-06
 > 权威程度：未完成事项权威登记表
 
 ## 本文档回答什么问题
@@ -53,8 +53,8 @@
 - 状态：未完成
 - 优先级：P1
 - 影响范围：前台 blog、comment、stats
-- 当前判断：后端评论、留言板和统计基础能力已经完成，但前台接入仍未形成完整读者交互闭环。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-integration-batch-plan.md` 的 Batch 3 / Batch 4 / Batch 5 推进。统计先接 V2 打点和页脚站点摘要；评论第一批接文章评论，第二批接留言板；PASSWORD 文章评论依赖完整解锁链路；最近评论侧栏已裁决移除。
+- 当前判断：前台访问统计已完成；文章详情页评论已接入 V2 自研公开评论 API；留言板评论仍未接入；PASSWORD 文章评论依赖 O-001 完整解锁链路。
+- 下一步：评论专题第二批接留言板评论；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接；最近评论侧栏已裁决移除，不规划 V2 公开最近评论接口。
 - 来源：`roadmap.md`、`../frontend/blog/integration-status.md`
 
 ## O-005 后台内容生产闭环
@@ -191,13 +191,14 @@
 
 ## O-019 评论和留言迁移到 V2 自研 API
 
-- 状态：未完成 / 独立专题 / 部分方案已定
+- 状态：未完成 / 文章评论已接入 / 留言板待接入
 - 优先级：P1
 - 影响范围：后端 comment、后端 content、前台 blog、后台 admin、API 契约
-- 当前判断：V2 后端已有文章评论、留言板评论、后台审核、隐藏、删除、恢复和文章 `commentCount` 闭环；前台当前仍绑定 Gitalk / Valine / Twikoo / Waline。评论接入范围较大，涉及 PASSWORD 解锁、公开评论 ID string、最近评论、评论数和第三方插件下线，应作为独立专题推进。
-- 风险：继续走第三方插件会让后端自研评论和审核能力无法形成闭环；如果在旧插件适配层上继续叠逻辑，会同时背负第三方插件状态和 V2 自研评论状态，后续难以维护。
-- 下一步：后续单独做评论专题设计。方向为前台重写 V2 评论组件，不继续依赖第三方评论插件；第一批优先接文章评论，留言板第二批，友链评论不做；最近评论侧栏直接移除，不保留第三方最新评论，也不规划 V2 公开最近评论接口；PASSWORD 文章评论在完整解锁流程完成前禁用；评论数优先使用文章接口 `commentCount`；公开评论 ID 先按 O-011 修正为 string 后再正式接入。
-- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-008、`docs/handbook/api/comment.md`、前台 `Comment.vue` / `PostStats.vue` / `RecentComment.vue`、当前 comment/content 代码
+- 当前判断：V2 后端已有文章评论、留言板评论、后台审核、隐藏、删除、恢复和文章 `commentCount` 闭环。前台文章详情页已使用 `Comment.vue` 接入 `GET /api/public/articles/{articleId}/comments` 和 `POST /api/public/articles/{articleId}/comments`，第三方评论插件不再参与文章评论主链路；公开评论 ID、父评论 ID、回复目标 ID 均按 JSON string/null 处理。
+- 风险：留言板仍未迁移，旧 page/link/RecentComment 仍引用 `useCommentPlugin()`，因此第三方评论工具代码本批未物理删除；如果后续直接删除旧工具，会影响旧页面和侧栏消费者。PASSWORD 文章评论在 O-001 完成前仍不可用。
+- 下一步：第二批迁移留言板评论；确认旧 page/link 评论展示是否保留、迁移或删除；最近评论侧栏按既有裁决移除，不规划 V2 公开最近评论接口；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接。
+- 验证：前台已通过 `pnpm --dir frontend/apps/blog test` 和 `pnpm --dir frontend/apps/blog typecheck`；最终验收需在本分支继续通过 blog build。
+- 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-008、`docs/working/plans/2026-07-06-blog-v2-comments-implementation-plan.md`、`docs/handbook/api/comment.md`、前台 `Comment.vue` / `frontend/apps/blog/src/features/comments/`、当前 comment/content 代码
 
 ## O-020 访问统计前台打点和展示口径
 
