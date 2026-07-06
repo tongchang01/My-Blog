@@ -201,10 +201,9 @@
 
 ## O-020 访问统计前台打点和展示口径
 
-- 状态：未完成 / 方案已定 / 实现待设计
+- 状态：已关闭
 - 优先级：P1
 - 影响范围：后端 stats、后端 content、后端 system、前台 blog、后台 admin、API 契约
-- 当前判断：V2 后端已经有公开访问打点、日 PV/UV 聚合和后台 dashboard，后台 dashboard 已展示 PV/UV、趋势、TOP 文章和语言分布；后台文章列表已展示文章 `commentCount`。前台原始 `PostStats` 核心展示是阅读时长和字数，但同时依赖 Waline / Twikoo / Valine / LeanCloud 展示文章浏览量和文章评论数；`FooterContainer` 依赖 Waline / Busuanzi 展示全站 PV/UV，并从 `themeConfig.site.started_date` 本地计算建站天数。`PostStats` 第一版不展示文章浏览量和文章评论数；页脚保留展示今日访客、访问量和建站天数，但数据源迁移到 V2 后端。
-- 风险：如果前台继续展示第三方统计值，同时又给 V2 后端打点，读者端数字和后台 dashboard 会不一致；如果为了恢复展示过早新增公开统计读取接口，需要先裁决公开范围、缓存、累计/今日/区间口径和近实时要求。
-- 下一步：按 `docs/working/plans/2026-06-30-frontend-page-view-stats-implementation-plan.md` 拆分实现。前台接 V2 page-view 打点：文章页传 `articleId + lang`，非文章页固定传 `articleId=0 + lang`，沿用现有 `0=首页/非文章页汇总` 约定；`PostStats` 只保留阅读时长和字数，第三方浏览量和第三方评论数展示注释或删除，并在代码注释中说明后期可通过 V2 `viewCount` / `commentCount` 恢复；`FooterContainer` 的 Waline / Busuanzi PV/UV 展示绑定注释或删除，改用公开站点统计摘要接口展示 `今日访客：todayUv` 和 `访问量：totalPv`。新增 `GET /api/public/stats/site-summary`，`todayUv` 为全站、全语言、所有公开页面今日日 UV 合计，`totalPv` 为全站、全语言、所有公开页面累计 PV；允许使用日聚合表并接受定时聚合延迟。站点配置表新增 `started_date DATE NULL`，后台站点配置维护 `startedDate`，公开站点配置返回 `startedDate`，前台本地计算建站天数；为空时不展示。
+- 关闭原因：已落实 V2 前台访问统计闭环。前台公开路由导航后调用 `POST /api/public/stats/page-views`，文章详情传真实 `articleId + lang`，非文章页沿用 `articleId=0 + lang`；后端新增 `GET /api/public/stats/site-summary`，页脚展示 `todayUv` 和 `totalPv`；站点配置新增 `startedDate`，后台可维护建站日期，公开站点配置返回该字段，前台本地计算建站天数；`PostStats` 已移除 Waline / Twikoo / Valine / LeanCloud 浏览量和评论数 DOM，仅保留阅读时长和字数。
+- 验证：已通过后端 stats/site-config/security 定向 Maven 测试、`pnpm --dir frontend/apps/admin test`、`pnpm --dir frontend/apps/admin typecheck`、`pnpm --dir frontend/apps/blog test`、`pnpm --dir frontend/apps/blog typecheck`。
 - 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-009、`docs/working/plans/2026-06-30-frontend-page-view-stats-implementation-plan.md`、`docs/handbook/api/stats.md`、前台 `PostStats.vue` / `FooterContainer.vue`、当前 stats/content/system 代码

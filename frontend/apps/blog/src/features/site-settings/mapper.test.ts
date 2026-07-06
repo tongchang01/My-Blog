@@ -12,7 +12,8 @@ describe('site settings mapper', () => {
       logoUrl: null,
       faviconUrl: '/api/favicon.png',
       icpNo: null,
-      spotifyPlaylistId: null
+      spotifyPlaylistId: null,
+      startedDate: '2024-01-02'
     })
 
     expect(mapped.siteTitle).toBe('Backend title')
@@ -28,5 +29,6 @@ describe('site settings mapper', () => {
       defaults.themeConfig.menu.menus
     )
     expect(mapped.themeConfig.site_meta.favicon).toBe('/api/favicon.png')
+    expect(mapped.themeConfig.site.started_date).toBe('2024-01-02')
   })
 })

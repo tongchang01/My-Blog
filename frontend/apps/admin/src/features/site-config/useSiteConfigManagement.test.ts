@@ -24,6 +24,7 @@ const config: SiteConfig = {
   faviconUrl: null,
   icpNo: null,
   spotifyPlaylistId: null,
+  startedDate: "2024-01-02",
   updatedAt: "2026-06-25T10:00:00",
   updatedBy: "1001"
 };
@@ -48,6 +49,7 @@ describe("site config management state", () => {
     expect(source.getSiteConfig).toHaveBeenCalledOnce();
     expect(state.current.value?.siteTitleZh).toBe("中文标题");
     expect(state.form.siteTitleJa).toBe("日本語タイトル");
+    expect(state.form.startedDate).toBe("2024-01-02");
     expect(state.loading.value).toBe(false);
     expect(state.error.value).toBeNull();
   });
@@ -61,7 +63,11 @@ describe("site config management state", () => {
     await expect(state.save()).resolves.toBe(true);
 
     expect(source.updateSiteConfig).toHaveBeenCalledWith(
-      expect.objectContaining({ siteTitleZh: "新标题", logoUrl: null })
+      expect.objectContaining({
+        siteTitleZh: "新标题",
+        logoUrl: null,
+        startedDate: "2024-01-02"
+      })
     );
     expect(state.current.value?.updatedBy).toBe("1001");
     expect(state.saveError.value).toBeNull();

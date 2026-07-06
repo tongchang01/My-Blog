@@ -21,7 +21,8 @@ describe('site settings store', () => {
       logoUrl: null,
       faviconUrl: null,
       icpNo: null,
-      spotifyPlaylistId: null
+      spotifyPlaylistId: null,
+      startedDate: null
     })
     const store = useSiteSettingsStore()
 
@@ -56,7 +57,8 @@ describe('site settings store', () => {
         logoUrl: null,
         faviconUrl: null,
         icpNo: null,
-        spotifyPlaylistId: null
+        spotifyPlaylistId: null,
+        startedDate: null
       })
     const store = useSiteSettingsStore()
 

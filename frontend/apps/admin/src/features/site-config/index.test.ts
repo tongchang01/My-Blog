@@ -14,6 +14,7 @@ const stubs = {
   "el-card": { template: "<div><slot name='header' /><slot /></div>" },
   "el-dialog": { template: "<div><slot /></div>" },
   "el-empty": true,
+  "el-date-picker": true,
   "el-form": true,
   "el-form-item": true,
   "el-image": true,
@@ -54,6 +55,7 @@ const siteConfig = {
   faviconUrl: null,
   icpNo: null,
   spotifyPlaylistId: null,
+  startedDate: "2024-01-02",
   updatedAt: "2026-06-25T10:00:00",
   updatedBy: "1001"
 };
@@ -153,6 +155,7 @@ describe("site config management page", () => {
       const payload = JSON.parse(config.data);
       expect(payload.logoUrl).toBe("http://localhost/media/logo.png");
       expect(payload.faviconUrl).toBe("http://localhost/media/favicon.png");
+      expect(payload.startedDate).toBe("2024-01-02");
       return [200, ok(siteConfig)];
     });
     const wrapper = mount(SiteConfigManagement, { global: { stubs } });

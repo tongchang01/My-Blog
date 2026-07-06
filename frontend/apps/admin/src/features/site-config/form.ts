@@ -21,7 +21,8 @@ const SITE_CONFIG_FIELDS: Array<keyof SiteConfigPayload> = [
   "logoUrl",
   "faviconUrl",
   "icpNo",
-  "spotifyPlaylistId"
+  "spotifyPlaylistId",
+  "startedDate"
 ];
 
 function optional(value: string): string | null {
@@ -70,6 +71,7 @@ export function siteConfigFormToPayload(
     logoUrl: optional(form.logoUrl),
     faviconUrl: optional(form.faviconUrl),
     icpNo: optional(form.icpNo),
-    spotifyPlaylistId: optional(form.spotifyPlaylistId)
+    spotifyPlaylistId: optional(form.spotifyPlaylistId),
+    startedDate: optional(form.startedDate)
   };
 }

@@ -7,6 +7,8 @@ import com.tyb.myblog.v2.common.infrastructure.persistence.entity.AuditOnlyBase;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 /**
  * 站点配置持久化实体，对应固定单行表 {@code t_site_config}。
  */
@@ -57,4 +59,7 @@ public class SiteConfigEntity extends AuditOnlyBase {
 
     /** Spotify 播放列表 ID。 */
     private String spotifyPlaylistId;
+
+    /** 建站日期，用于前台计算运行天数。 */
+    private LocalDate startedDate;
 }

@@ -60,7 +60,7 @@
           <ul class="flex flex-col flex-1 gap-1.5">
             <li
               class="flex flex-row max-w-[11rem]"
-              v-if="enabledPlugin === 'waline'"
+              v-if="siteStats"
             >
               <span>
                 <SvgIcon
@@ -71,30 +71,13 @@
                 {{ t('settings.page-views-value') }}
               </span>
               <span class="flex-1 text-right">
-                <span class="waline-pageview-count" data-path="/" />
+                {{ siteStats.totalPv }}
               </span>
             </li>
 
             <li
               class="flex flex-row max-w-[11rem]"
-              v-if="themeConfig.plugins.busuanzi.enable"
-            >
-              <span>
-                <SvgIcon
-                  icon-class="hot"
-                  class="mr-1 text-lg inline-block"
-                  stroke="currentColor"
-                />
-                {{ t('settings.page-views-value') }}
-              </span>
-              <span class="flex-1 text-right" id="busuanzi_container_site_pv">
-                <span id="busuanzi_value_site_pv"
-              /></span>
-            </li>
-
-            <li
-              class="flex flex-row max-w-[11rem]"
-              v-if="themeConfig.plugins.busuanzi.enable"
+              v-if="siteStats"
             >
               <span>
                 <SvgIcon
@@ -104,9 +87,9 @@
                 />
                 {{ t('settings.unique_visitor-value') }}
               </span>
-              <span id="busuanzi_container_site_uv" class="flex-1 text-right">
-                <span id="busuanzi_value_site_uv"
-              /></span>
+              <span class="flex-1 text-right">
+                {{ siteStats.todayUv }}
+              </span>
             </li>
 
             <li v-if="runningDays" class="flex flex-row max-w-[11rem]">
@@ -141,27 +124,28 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import beianImg from '@/assets/gongan-beian-40-40.png'
 import { getDaysTillNow } from '@/utils'
-import useCommentPlugin from '@/hooks/useCommentPlugin'
+import {
+  loadSiteStatsSummary,
+  type SiteStatsSummaryDto
+} from '@/features/stats/api'
 
 const appStore = useAppStore()
 const { t } = useI18n()
-const { enabledCommentPlugin, intiCommentPluginPageView } = useCommentPlugin()
+const siteStats = ref<SiteStatsSummaryDto | null>(null)
 
-watch(
-  () => appStore.configReady,
-  async (newValue, oldValue) => {
-    if (!oldValue && newValue) {
-      await nextTick()
-      intiCommentPluginPageView('/')
-    }
+onMounted(async () => {
+  try {
+    siteStats.value = await loadSiteStatsSummary()
+  } catch {
+    siteStats.value = null
   }
-)
+})
 
 const avatarClass = computed(() => {
   return {
@@ -178,7 +162,6 @@ const runningDays = computed(() => {
   if (appStore.themeConfig.site.started_date === '') return undefined
   return getDaysTillNow(`${appStore.themeConfig.site.started_date}`)
 })
-const enabledPlugin = computed(() => enabledCommentPlugin.value.plugin)
 </script>
 
 <style lang="scss" scoped></style>

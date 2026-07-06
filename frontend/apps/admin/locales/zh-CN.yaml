@@ -385,6 +385,7 @@ settings:
     faviconUrl: Favicon 地址
     icpNo: 备案号
     spotifyPlaylistId: Spotify 播放列表 ID
+    startedDate: 建站日期
   profile:
     account: 账号概览
     form: 作者资料

@@ -57,10 +57,10 @@ class SiteConfigIntegrationTest {
         jdbcTemplate.update("""
                 INSERT INTO t_site_config (
                     id, site_title_zh, site_title_ja,
-                    site_subtitle_zh, about_md_zh, deleted
+                    site_subtitle_zh, about_md_zh, started_date, deleted
                 ) VALUES (
                     1, '初始标题', '初期タイトル',
-                    '初始副标题', '# 初始关于我', 0
+                    '初始副标题', '# 初始关于我', '2023-12-31', 0
                 )
                 """);
         insertAccount(1001L, "admin", AccountType.ADMIN);
@@ -73,7 +73,8 @@ class SiteConfigIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.siteTitle").value("初期タイトル"))
                 .andExpect(jsonPath("$.data.siteSubtitle").value("初始副标题"))
-                .andExpect(jsonPath("$.data.aboutMd").value("# 初始关于我"));
+                .andExpect(jsonPath("$.data.aboutMd").value("# 初始关于我"))
+                .andExpect(jsonPath("$.data.startedDate").value("2023-12-31"));
 
         String demoToken = login("demo");
         mockMvc.perform(get("/api/admin/site-config")
@@ -98,6 +99,7 @@ class SiteConfigIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.siteTitleZh").value("新标题"))
                 .andExpect(jsonPath("$.data.siteTitleJa").isEmpty())
+                .andExpect(jsonPath("$.data.startedDate").value("2024-01-02"))
                 .andExpect(jsonPath("$.data.aboutMdZh")
                         .value("# 新的关于我\n\n正文"))
                 .andExpect(jsonPath("$.data.updatedBy").value(1001));
@@ -105,7 +107,8 @@ class SiteConfigIntegrationTest {
         mockMvc.perform(get("/api/public/site-config").param("lang", "zh"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.siteTitle").value("新标题"))
-                .andExpect(jsonPath("$.data.siteSubtitle").value("新副标题"));
+                .andExpect(jsonPath("$.data.siteSubtitle").value("新副标题"))
+                .andExpect(jsonPath("$.data.startedDate").value("2024-01-02"));
         mockMvc.perform(get("/api/public/site-config").param("lang", "ja"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.siteTitle").value("新标题"))
@@ -184,6 +187,7 @@ class SiteConfigIntegrationTest {
         request.put("faviconUrl", null);
         request.put("icpNo", null);
         request.put("spotifyPlaylistId", "playlist_123");
+        request.put("startedDate", "2024-01-02");
         return request;
     }
 

@@ -68,11 +68,11 @@ class MySqlFlywayMigrationTest {
                 .locations("classpath:db/migration")
                 .load();
 
-        assertThat(latestFlyway.migrate().migrationsExecuted).isEqualTo(2);
-        assertMigrationCount(3);
+        assertThat(latestFlyway.migrate().migrationsExecuted).isEqualTo(3);
+        assertMigrationCount(4);
         assertBackfilledProfile();
         assertThat(latestFlyway.migrate().migrationsExecuted).isZero();
-        assertMigrationCount(3);
+        assertMigrationCount(4);
         assertBackfilledProfile();
     }
 

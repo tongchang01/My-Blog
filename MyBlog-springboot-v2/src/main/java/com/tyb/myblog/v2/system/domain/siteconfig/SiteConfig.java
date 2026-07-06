@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.system.domain.siteconfig;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -23,6 +24,7 @@ public record SiteConfig(
         String faviconUrl,
         String icpNo,
         String spotifyPlaylistId,
+        LocalDate startedDate,
         LocalDateTime updatedAt,
         Long updatedBy
 ) {
@@ -52,6 +54,7 @@ public record SiteConfig(
             String faviconUrl,
             String icpNo,
             String spotifyPlaylistId,
+            LocalDate startedDate,
             LocalDateTime updatedAt,
             Long updatedBy) {
         if (id != FIXED_ID) {
@@ -72,6 +75,44 @@ public record SiteConfig(
                 url(faviconUrl, "站点 favicon URL"),
                 optional(icpNo, "ICP备案号", 64),
                 spotifyId(spotifyPlaylistId),
+                startedDate,
+                updatedAt,
+                updatedBy);
+    }
+
+    public static SiteConfig create(
+            long id,
+            String siteTitleZh,
+            String siteTitleJa,
+            String siteTitleEn,
+            String siteSubtitleZh,
+            String siteSubtitleJa,
+            String siteSubtitleEn,
+            String aboutMdZh,
+            String aboutMdJa,
+            String aboutMdEn,
+            String logoUrl,
+            String faviconUrl,
+            String icpNo,
+            String spotifyPlaylistId,
+            LocalDateTime updatedAt,
+            Long updatedBy) {
+        return create(
+                id,
+                siteTitleZh,
+                siteTitleJa,
+                siteTitleEn,
+                siteSubtitleZh,
+                siteSubtitleJa,
+                siteSubtitleEn,
+                aboutMdZh,
+                aboutMdJa,
+                aboutMdEn,
+                logoUrl,
+                faviconUrl,
+                icpNo,
+                spotifyPlaylistId,
+                null,
                 updatedAt,
                 updatedBy);
     }

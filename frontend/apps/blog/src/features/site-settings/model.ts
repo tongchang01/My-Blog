@@ -10,5 +10,6 @@ export interface SiteSettingsViewModel {
   faviconUrl: string | null
   icpNo: string | null
   spotifyPlaylistId: string | null
+  startedDate: string | null
   themeConfig: ThemeConfig
 }

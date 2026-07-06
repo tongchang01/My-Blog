@@ -7,6 +7,8 @@ import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.system.application.siteconfig.UpdateSiteConfigCommand;
 
+import java.time.LocalDate;
+
 /**
  * 站点配置全量更新请求，保留每个 JSON 字段的 presence 信息。
  */
@@ -25,6 +27,7 @@ public class UpdateSiteConfigRequest {
     private SubmittedField<String> faviconUrl = SubmittedField.absent();
     private SubmittedField<String> icpNo = SubmittedField.absent();
     private SubmittedField<String> spotifyPlaylistId = SubmittedField.absent();
+    private SubmittedField<LocalDate> startedDate = SubmittedField.absent();
 
     @JsonSetter("siteTitleZh")
     public void setSiteTitleZh(String value) {
@@ -91,6 +94,11 @@ public class UpdateSiteConfigRequest {
         spotifyPlaylistId = SubmittedField.of(value);
     }
 
+    @JsonSetter("startedDate")
+    public void setStartedDate(LocalDate value) {
+        startedDate = SubmittedField.of(value);
+    }
+
     /**
      * 拒绝未声明字段，避免客户端拼写错误被静默忽略。
      */
@@ -123,7 +131,8 @@ public class UpdateSiteConfigRequest {
                 logoUrl.value(),
                 faviconUrl.value(),
                 icpNo.value(),
-                spotifyPlaylistId.value());
+                spotifyPlaylistId.value(),
+                startedDate.value());
     }
 
     private boolean allPresent() {
@@ -139,6 +148,7 @@ public class UpdateSiteConfigRequest {
                 && logoUrl.present()
                 && faviconUrl.present()
                 && icpNo.present()
-                && spotifyPlaylistId.present();
+                && spotifyPlaylistId.present()
+                && startedDate.present();
     }
 }

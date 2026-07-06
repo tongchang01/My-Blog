@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 stats 模块、前台 blog、后台 admin
-> 最后校准：2026-07-03
+> 最后校准：2026-07-05
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/stats/web/`
 > 权威程度：API 契约
 
@@ -76,7 +76,37 @@ Content-Type: application/json
 - 明细只保存 hash、可选 referrer 和访问时间等必要字段。
 - API 不提供跨日期独立访客数。
 
-## 3. 后台访问统计总览
+## 3. 公开站点统计摘要
+
+```http
+GET /api/public/stats/site-summary
+```
+
+鉴权：匿名。
+
+成功响应：HTTP 200
+
+```json
+{
+  "code": "00000",
+  "msg": "success",
+  "data": {
+    "todayUv": 20,
+    "totalPv": 1000
+  }
+}
+```
+
+字段说明：
+
+| 字段 | 含义 |
+|------|------|
+| `todayUv` | JST 今天全站、全语言、所有公开页面的日 UV 合计 |
+| `totalPv` | 全站、全语言、所有公开页面累计 PV |
+
+当前接口直接读取 `t_page_view_daily` 聚合表，接受聚合任务延迟，不叠加尚未聚合的访问明细。
+
+## 4. 后台访问统计总览
 
 ```http
 GET /api/admin/stats/dashboard?from=2026-06-01&to=2026-06-30
@@ -162,7 +192,7 @@ Query：
 | 非 ADMIN/DEMO 访问 | 403 | `10003` |
 | 日期缺失一端、格式非法、区间非法或跨度过大 | 400 | `90001` |
 
-## 4. 聚合与清理
+## 5. 聚合与清理
 
 当前实现口径：
 
@@ -171,6 +201,6 @@ Query：
 - 维护任务清理 90 天前访问明细。
 - 聚合数据保留，用于后台趋势和 TOP 文章。
 
-## 5. DEMO 边界
+## 6. DEMO 边界
 
 DEMO 可读取 dashboard，统计 dashboard 不做字段裁剪。DEMO 敏感字段裁剪边界已在 O-002 关闭。

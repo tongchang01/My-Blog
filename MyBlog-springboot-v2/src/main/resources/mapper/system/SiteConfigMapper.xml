@@ -21,6 +21,7 @@
                favicon_url,
                icp_no,
                spotify_playlist_id,
+               started_date,
                created_at,
                created_by,
                updated_at,
@@ -50,6 +51,7 @@
                favicon_url,
                icp_no,
                spotify_playlist_id,
+               started_date,
                created_at,
                created_by,
                updated_at,
@@ -79,6 +81,7 @@
             favicon_url = #{config.faviconUrl},
             icp_no = #{config.icpNo},
             spotify_playlist_id = #{config.spotifyPlaylistId},
+            started_date = #{config.startedDate},
             updated_at = #{updatedAt},
             updated_by = #{updatedBy}
         WHERE id = 1

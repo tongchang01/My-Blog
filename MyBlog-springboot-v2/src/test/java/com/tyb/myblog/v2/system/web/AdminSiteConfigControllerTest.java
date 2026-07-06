@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -86,6 +87,7 @@ class AdminSiteConfigControllerTest {
                 .andExpect(jsonPath("$.data.faviconUrl").value("https://example.com/favicon.ico"))
                 .andExpect(jsonPath("$.data.icpNo").value("京ICP备12345678号"))
                 .andExpect(jsonPath("$.data.spotifyPlaylistId").value("playlist_123"))
+                .andExpect(jsonPath("$.data.startedDate").value("2024-01-02"))
                 .andExpect(jsonPath("$.data.updatedAt").value("2026-06-14T12:00:00"))
                 .andExpect(jsonPath("$.data.updatedBy").value(1001));
 
@@ -112,6 +114,8 @@ class AdminSiteConfigControllerTest {
                         "MyBlog".equals(command.siteTitleZh())
                                 && command.siteTitleJa() == null
                                 && " ".equals(command.siteSubtitleJa())
+                                && LocalDate.of(2024, 1, 2)
+                                .equals(command.startedDate())
                                 && command.faviconUrl() == null));
     }
 
@@ -155,7 +159,8 @@ class AdminSiteConfigControllerTest {
                   "logoUrl":"https://example.com/logo.png",
                   "faviconUrl":null,
                   "icpNo":null,
-                  "spotifyPlaylistId":"playlist_123"
+                  "spotifyPlaylistId":"playlist_123",
+                  "startedDate":"2024-01-02"
                 }
                 """;
     }
@@ -194,6 +199,7 @@ class AdminSiteConfigControllerTest {
                 "https://example.com/favicon.ico",
                 "京ICP备12345678号",
                 "playlist_123",
+                LocalDate.of(2024, 1, 2),
                 LocalDateTime.of(2026, 6, 14, 12, 0),
                 1001L);
     }

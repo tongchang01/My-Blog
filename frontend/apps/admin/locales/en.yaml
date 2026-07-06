@@ -385,6 +385,7 @@ settings:
     faviconUrl: Favicon URL
     icpNo: ICP number
     spotifyPlaylistId: Spotify playlist ID
+    startedDate: Site start date
   profile:
     account: Account overview
     form: Author profile

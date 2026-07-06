@@ -49,4 +49,14 @@ public class MyBatisStatsDashboardRepository
                         row.getPv()))
                 .toList();
     }
+
+    @Override
+    public long sumUv(LocalDate date) {
+        return mapper.sumUv(date);
+    }
+
+    @Override
+    public long sumPv() {
+        return mapper.sumPv();
+    }
 }

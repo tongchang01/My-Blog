@@ -69,4 +69,15 @@
         GROUP BY lang
         ORDER BY lang ASC
     </select>
+
+    <select id="sumUv" resultType="long">
+        SELECT COALESCE(SUM(uv), 0)
+        FROM t_page_view_daily
+        WHERE stat_date = #{date}
+    </select>
+
+    <select id="sumPv" resultType="long">
+        SELECT COALESCE(SUM(pv), 0)
+        FROM t_page_view_daily
+    </select>
 </mapper>

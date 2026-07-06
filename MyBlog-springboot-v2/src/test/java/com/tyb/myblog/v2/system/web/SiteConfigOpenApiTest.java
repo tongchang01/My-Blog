@@ -30,7 +30,8 @@ class SiteConfigOpenApiTest {
             "logoUrl",
             "faviconUrl",
             "icpNo",
-            "spotifyPlaylistId");
+            "spotifyPlaylistId",
+            "startedDate");
     private static final Set<String> BUSINESS_FIELDS = Set.of(
             "siteTitleZh",
             "siteTitleJa",
@@ -44,7 +45,8 @@ class SiteConfigOpenApiTest {
             "logoUrl",
             "faviconUrl",
             "icpNo",
-            "spotifyPlaylistId");
+            "spotifyPlaylistId",
+            "startedDate");
 
     @Autowired
     private MockMvc mockMvc;

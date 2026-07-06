@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 system 模块、前台 blog、后台 admin
-> 最后校准：2026-06-29
+> 最后校准：2026-07-05
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/web/*SiteConfig*`
 > 权威程度：API 契约
 
@@ -49,7 +49,8 @@ Query：
     "logoUrl": null,
     "faviconUrl": null,
     "icpNo": null,
-    "spotifyPlaylistId": null
+    "spotifyPlaylistId": null,
+    "startedDate": null
   }
 }
 ```
@@ -98,6 +99,7 @@ Authorization: Bearer <access-token>
     "faviconUrl": null,
     "icpNo": null,
     "spotifyPlaylistId": null,
+    "startedDate": null,
     "updatedAt": "2026-06-14T12:00:00",
     "updatedBy": 1001
   }
@@ -123,7 +125,7 @@ Content-Type: application/json
 
 鉴权：仅 ADMIN。
 
-请求体必须提交 13 个业务字段：
+请求体必须提交 14 个业务字段：
 
 ```json
 {
@@ -139,7 +141,8 @@ Content-Type: application/json
   "logoUrl": null,
   "faviconUrl": null,
   "icpNo": null,
-  "spotifyPlaylistId": null
+  "spotifyPlaylistId": null,
+  "startedDate": null
 }
 ```
 
@@ -154,6 +157,7 @@ Content-Type: application/json
 | `logoUrl` / `faviconUrl` | trim，可空，最长 255，只接受 HTTP/HTTPS 绝对 URL |
 | `icpNo` | trim，可空，最长 64 |
 | `spotifyPlaylistId` | trim，可空，最长 64，只接受字母、数字、下划线、连字符 |
+| `startedDate` | 可空，格式 `yyyy-MM-dd`，用于前台本地计算建站天数 |
 
 成功响应：HTTP 200，`data` 为更新后的完整后台站点配置。
 

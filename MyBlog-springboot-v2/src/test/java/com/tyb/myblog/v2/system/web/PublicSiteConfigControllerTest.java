@@ -34,10 +34,10 @@ class PublicSiteConfigControllerTest {
         jdbcTemplate.update("""
                 INSERT INTO t_site_config (
                     id, site_title_zh, site_title_ja,
-                    site_subtitle_zh, about_md_zh, deleted
+                    site_subtitle_zh, about_md_zh, started_date, deleted
                 ) VALUES (
                     1, '中文标题', '日本語タイトル',
-                    '中文副标题', '# 中文关于我', 0
+                    '中文副标题', '# 中文关于我', '2024-01-02', 0
                 )
                 """);
     }
@@ -54,6 +54,8 @@ class PublicSiteConfigControllerTest {
                         .value("中文副标题"))
                 .andExpect(jsonPath("$.data.aboutMd")
                         .value("# 中文关于我"))
+                .andExpect(jsonPath("$.data.startedDate")
+                        .value("2024-01-02"))
                 .andExpect(jsonPath("$.data.siteTitleZh").doesNotExist())
                 .andExpect(jsonPath("$.data.updatedAt").doesNotExist())
                 .andExpect(jsonPath("$.data.deleted").doesNotExist());

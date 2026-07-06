@@ -40,4 +40,8 @@ public interface PageViewAggregationMapper {
     List<LanguageTrafficRow> selectLanguages(
             @Param("from") LocalDate from,
             @Param("to") LocalDate to);
+
+    long sumUv(@Param("date") LocalDate date);
+
+    long sumPv();
 }

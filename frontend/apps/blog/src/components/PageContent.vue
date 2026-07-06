@@ -19,7 +19,6 @@
           :current-path="currentPath"
           :plugin-configs="pluginConfigs"
           :comments="enabledComment"
-          ref="postStatsRef"
         />
       </div>
     </div>
@@ -78,7 +77,6 @@ import {
   nextTick,
   onMounted,
   onUnmounted,
-  Ref,
   ref,
   toRefs,
   watch
@@ -91,11 +89,6 @@ import { useAppStore } from '@/stores/app'
 import useCommentPlugin from '@/hooks/useCommentPlugin'
 import useLightBox from '@/hooks/useLightBox'
 import ObSkeleton from '@/components/LoadingSkeleton/Skeleton.vue'
-
-interface PostStatsExpose extends Ref<InstanceType<typeof PostStats>> {
-  getCommentCount(): void
-  getPostView(): void
-}
 
 const props = defineProps({
   post: {
@@ -115,7 +108,6 @@ const commonStore = useCommonStore()
 const route = useRoute()
 const post = toRefs(props).post
 const title = toRefs(props).title
-const postStatsRef = ref<PostStatsExpose>()
 const { enabledCommentPlugin } = useCommentPlugin()
 const { initializeLightBox } = useLightBox()
 
@@ -132,8 +124,6 @@ watch(
     if (value) {
       await nextTick()
       initializeLightBox()
-      postStatsRef.value?.getCommentCount()
-      postStatsRef.value?.getPostView()
     }
   }
 )

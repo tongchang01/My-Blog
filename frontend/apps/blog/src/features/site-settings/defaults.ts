@@ -46,6 +46,7 @@ export const createDefaultSiteSettings = (): SiteSettingsViewModel => {
     faviconUrl: themeConfig.site_meta.favicon,
     icpNo: null,
     spotifyPlaylistId: null,
+    startedDate: null,
     themeConfig
   }
 }

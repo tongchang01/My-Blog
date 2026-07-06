@@ -29,7 +29,8 @@ describe("site config API", () => {
       logoUrl: null,
       faviconUrl: null,
       icpNo: null,
-      spotifyPlaylistId: null
+      spotifyPlaylistId: null,
+      startedDate: "2024-01-02"
     };
     mock.onGet("/api/admin/site-config").reply(200, ok(payload));
     mock.onPut("/api/admin/site-config").reply(config => {

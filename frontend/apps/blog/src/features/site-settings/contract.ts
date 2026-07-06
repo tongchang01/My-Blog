@@ -6,4 +6,5 @@ export interface PublicSiteConfigDto {
   faviconUrl: string | null
   icpNo: string | null
   spotifyPlaylistId: string | null
+  startedDate: string | null
 }
