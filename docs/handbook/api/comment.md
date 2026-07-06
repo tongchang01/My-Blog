@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 comment 模块、前台 blog、后台 admin
-> 最后校准：2026-07-03
+> 最后校准：2026-07-06
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/comment/web/`
 > 权威程度：API 契约
 
@@ -45,7 +45,7 @@ GET /api/public/articles/{articleId}/comments?page=1&size=20
   "data": {
     "records": [
       {
-        "id": 123,
+        "id": "123",
         "parentId": null,
         "replyToCommentId": null,
         "replyToNickname": null,
@@ -102,7 +102,7 @@ Content-Type: application/json
 | `email` | string | 是 | 邮箱，不在公开响应返回 |
 | `site` | string/null | 否 | 只允许 HTTP/HTTPS |
 | `contentMd` | string | 是 | Markdown 原文 |
-| `replyToCommentId` | number/null | 否 | 回复同一文章下已通过评论 |
+| `replyToCommentId` | string/null | 否 | 回复同一文章下已通过评论；公开 ID 按 string 传递，避免 Snowflake ID 精度损失 |
 
 成功响应：HTTP 200
 
@@ -111,7 +111,7 @@ Content-Type: application/json
   "code": "00000",
   "msg": "success",
   "data": {
-    "id": 123,
+    "id": "123",
     "auditStatus": "PASS"
   }
 }

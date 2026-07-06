@@ -1,6 +1,6 @@
 # 前台文章评论迁移 V2 实施计划
 
-> 状态：计划中
+> 状态：已完成
 > 适用范围：O-019 评论和留言迁移到 V2 自研 API 的第一批，前台 blog 文章评论
 > 最后校准：2026-07-06
 
@@ -227,6 +227,20 @@
 - `pnpm --dir frontend/apps/blog test`
 - `pnpm --dir frontend/apps/blog typecheck`
 - `pnpm --dir frontend/apps/blog build`
+
+## 实施结果
+
+- 已新增 comments API、mapper、Pinia store 和对应 Vitest 覆盖。
+- 已将 `Comment.vue` 从第三方插件初始化入口替换为 V2 自研文章评论组件，同时保留旧 page/link 调用的 props 类型兼容；没有 `articleId` 时不加载 V2 评论。
+- 已在文章详情页正文后挂载 V2 评论区。
+- 已修正评论 API 文档中公开评论 ID 示例和 `replyToCommentId` 类型，统一为 string/null。
+- 已更新 O-019 和前台 Blog 联调状态：文章评论已接入，留言板仍待接入。
+
+阶段验证：
+
+- `pnpm --dir frontend/apps/blog test`：通过。
+- `pnpm --dir frontend/apps/blog typecheck`：通过。
+- `git diff --check`：通过。
 
 如本批只改前台和文档，不需要跑后端 Maven；若同步修改后端契约测试或 API 文档校准到后端代码，则补跑相关 Maven 定向测试。
 
