@@ -6,652 +6,400 @@
       paddings="pb-2 pt-0"
       text-size="text-2xl md:text-3xl"
     />
-    <div id="gitalk-container"></div>
-    <div id="vcomments"></div>
-    <div id="tcomment"></div>
-    <div id="waline"></div>
+
+    <div v-if="!effectiveEnabled" class="comment-state">
+      当前文章暂不开放评论
+    </div>
+    <template v-else>
+      <form class="comment-form" @submit.prevent="handleSubmit">
+        <div
+          v-if="commentStore.replyTarget"
+          class="comment-reply-target"
+        >
+          <span>回复 {{ commentStore.replyTarget.authorNickname }}</span>
+          <button type="button" @click="commentStore.clearReplyTarget()">
+            取消
+          </button>
+        </div>
+
+        <textarea
+          v-model="form.contentMd"
+          class="comment-editor"
+          rows="5"
+          required
+          placeholder="写下你的评论"
+        />
+        <div class="comment-meta-inputs">
+          <input
+            v-model="form.nickname"
+            class="comment-input"
+            required
+            placeholder="昵称"
+          />
+          <input
+            v-model="form.email"
+            class="comment-input"
+            required
+            type="email"
+            placeholder="邮箱"
+          />
+          <input
+            v-model="form.site"
+            class="comment-input"
+            type="url"
+            placeholder="网站，可选"
+          />
+        </div>
+        <div class="comment-form-footer">
+          <p v-if="commentStore.notice" class="comment-notice">
+            {{ commentStore.notice }}
+          </p>
+          <p v-else-if="commentStore.error" class="comment-error">
+            {{ commentStore.error.message }}
+          </p>
+          <button class="comment-submit" :disabled="submitting">
+            {{ submitting ? '提交中...' : '提交评论' }}
+          </button>
+        </div>
+      </form>
+
+      <div v-if="commentStore.status === 'loading'" class="comment-state">
+        评论加载中...
+      </div>
+      <div v-else-if="commentStore.status === 'error'" class="comment-state">
+        <span>评论加载失败</span>
+        <button type="button" @click="commentStore.retry()">重试</button>
+      </div>
+      <div v-else-if="commentStore.status === 'empty'" class="comment-state">
+        暂无评论
+      </div>
+      <div v-else class="comment-list">
+        <article
+          v-for="comment in commentStore.comments"
+          :key="comment.id"
+          class="comment-card"
+        >
+          <div class="comment-card-main">
+            <div class="comment-avatar">
+              {{ avatarText(comment.authorNickname) }}
+            </div>
+            <div class="comment-body">
+              <div class="comment-head">
+                <a
+                  v-if="comment.authorSite"
+                  :href="comment.authorSite"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {{ comment.authorNickname }}
+                </a>
+                <span v-else>{{ comment.authorNickname }}</span>
+                <time>{{ comment.createdAt }}</time>
+              </div>
+              <div class="comment-content" v-html="comment.contentHtml"></div>
+              <button
+                class="comment-reply-button"
+                type="button"
+                @click="replyTo(comment.id, comment.authorNickname)"
+              >
+                回复
+              </button>
+            </div>
+          </div>
+
+          <div
+            v-if="flattenReplies(comment).length > 0"
+            class="comment-replies"
+          >
+            <article
+              v-for="reply in flattenReplies(comment)"
+              :key="reply.id"
+              class="comment-card comment-card-reply"
+            >
+              <div class="comment-avatar">
+                {{ avatarText(reply.authorNickname) }}
+              </div>
+              <div class="comment-body">
+                <div class="comment-head">
+                  <a
+                    v-if="reply.authorSite"
+                    :href="reply.authorSite"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {{ reply.authorNickname }}
+                  </a>
+                  <span v-else>{{ reply.authorNickname }}</span>
+                  <time>{{ reply.createdAt }}</time>
+                </div>
+                <p v-if="reply.replyToNickname" class="comment-reply-to">
+                  回复 {{ reply.replyToNickname }}
+                </p>
+                <div class="comment-content" v-html="reply.contentHtml"></div>
+                <button
+                  class="comment-reply-button"
+                  type="button"
+                  @click="replyTo(reply.id, reply.authorNickname)"
+                >
+                  回复
+                </button>
+              </div>
+            </article>
+          </div>
+        </article>
+      </div>
+
+      <div v-if="commentStore.page.pages > 1" class="comment-pagination">
+        <button
+          type="button"
+          :disabled="commentStore.page.page <= 1"
+          @click="loadPage(commentStore.page.page - 1)"
+        >
+          上一页
+        </button>
+        <span>{{ commentStore.page.page }} / {{ commentStore.page.pages }}</span>
+        <button
+          type="button"
+          :disabled="commentStore.page.page >= commentStore.page.pages"
+          @click="loadPage(commentStore.page.page + 1)"
+        >
+          下一页
+        </button>
+      </div>
+    </template>
   </div>
 </template>
 
 <script setup lang="ts">
-import { useAppStore } from '@/stores/app'
-import { computed, onMounted, toRefs, watch } from 'vue'
+import { computed, reactive, watch } from 'vue'
 import { MainTitle } from '@/components/Title'
-import { usePostStore } from '@/stores/post'
-import { twikooInit } from '@/utils/comments/twikoo-api'
-import { githubInit } from '@/utils/comments/github-api'
-import { valineInit } from '@/utils/comments/valine-api'
-import { walineInit } from '@/utils/comments/waline-api'
+import { useAppStore } from '@/stores/app'
+import { useCommentStore } from '@/features/comments/store'
+import type {
+  CommentFormState,
+  CommentViewModel
+} from '@/features/comments/model'
 
-const props = defineProps({
-  /** Used for create issue title by Gitalk */
-  title: {
-    type: String,
-    default: ''
-  },
-  /** Used for create issue body content by Gitalk */
-  body: {
-    type: String,
-    default: ''
-  },
-  /** Unique ID used by Gitalk and Valine */
-  uid: {
-    type: String,
-    default: ''
+const props = withDefaults(
+  defineProps<{
+    articleId?: string
+    enabled?: boolean
+    title?: string
+    body?: string
+    uid?: string
+  }>(),
+  {
+    articleId: '',
+    enabled: true
   }
+)
+
+const appStore = useAppStore()
+const commentStore = useCommentStore()
+const form = reactive<CommentFormState>({
+  nickname: '',
+  email: '',
+  site: '',
+  contentMd: ''
 })
 
-const postTitle = toRefs(props).title
-const postBody = toRefs(props).body
-const postUid = toRefs(props).uid
-const appStore = useAppStore()
-const postStore = usePostStore()
-let waline: any = undefined
+const submitting = computed(() => commentStore.status === 'submitting')
+const effectiveEnabled = computed(() => props.enabled && props.articleId !== '')
+const wrapperClasses = computed(() => ({
+  'bg-ob-deep-800 p-4 mt-8 lg:px-14 lg:py-10 rounded-2xl shadow-xl mb-8 lg:mb-0': true,
+  [`comment-${appStore.themeConfig.theme.profile_shape}`]: true
+}))
 
-const enabledComment = (
-  postTitleVal: string,
-  postBodyVal: string,
-  postUidVal: string
-) => {
-  /**
-   * Generate the data needed for Gitalk to generate the issue.
-   */
-  const title = !postTitleVal || postTitleVal === '' ? '' : postTitleVal
-  const body =
-    !postBodyVal || postBodyVal === ''
-      ? window.location.href
-      : `${window.location.href} \n ${postBodyVal}`
-
-  const uid =
-    appStore.themeConfig.plugins.gitalk.id === 'pathname'
-      ? window.location.pathname
-      : postUidVal
-
-  /**
-   * Caching the current post data, used
-   * when config changes on render updates.
-   */
-  postStore.setCache({
-    title: postTitleVal,
-    body: postBodyVal,
-    uid: postUidVal
+const loadPage = (page: number): void => {
+  void commentStore.load({
+    articleId: props.articleId,
+    page,
+    size: commentStore.page.size
   })
-
-  if (!appStore.configReady) return
-
-  if (appStore.themeConfig.plugins.gitalk.enable) {
-    const proxy =
-      appStore.themeConfig.plugins.gitalk.proxy === ''
-        ? 'https://cors-anywhere.azm.workers.dev/https://github.com/login/oauth/access_token'
-        : appStore.themeConfig.plugins.gitalk.proxy
-
-    const { clientID, clientSecret, repo, owner, admin, language } =
-      appStore.themeConfig.plugins.gitalk
-
-    githubInit({
-      clientID,
-      clientSecret,
-      repo,
-      owner,
-      admin,
-      language,
-      uid,
-      title,
-      body,
-      proxy
-    })
-  } else if (appStore.themeConfig.plugins.valine.enable) {
-    const {
-      app_id,
-      app_key,
-      avatar,
-      placeholder,
-      visitor,
-      lang,
-      meta,
-      requiredFields,
-      avatarForce
-    } = appStore.themeConfig.plugins.valine
-
-    valineInit({
-      appId: app_id,
-      appKey: app_key,
-      avatar,
-      placeholder,
-      visitor,
-      lang,
-      meta,
-      requiredFields,
-      avatarForce,
-      path: window.location.pathname // Make sure updating pathname
-    })
-  } else if (appStore.themeConfig.plugins.twikoo.enable) {
-    const { envId, region, lang } = appStore.themeConfig.plugins.twikoo
-    twikooInit({ envId, region, lang, path: window.location.pathname })
-  } else if (appStore.themeConfig.plugins.waline.enable) {
-    const {
-      serverURL,
-      login,
-      reaction,
-      meta,
-      requiredMeta,
-      commentSorting,
-      wordLimit,
-      imageUploader,
-      pageSize
-    } = appStore.themeConfig.plugins.waline
-
-    waline = walineInit({
-      serverURL,
-      lang: appStore.locale ?? 'en',
-      login,
-      reaction,
-      meta,
-      requiredMeta,
-      commentSorting,
-      wordLimit,
-      imageUploader,
-      pageSize
-    })
-  }
 }
 
-/** Wait for config is ready */
+const replyTo = (id: string, authorNickname: string): void => {
+  commentStore.setReplyTarget({ id, authorNickname })
+}
+
+const handleSubmit = async (): Promise<void> => {
+  if (!props.articleId) return
+  await commentStore.submit(props.articleId, form)
+  if (!commentStore.error) form.contentMd = ''
+}
+
+const avatarText = (nickname: string): string =>
+  nickname.trim().slice(0, 1).toUpperCase() || '?'
+
+const flattenReplies = (comment: CommentViewModel): CommentViewModel[] =>
+  comment.replies.flatMap(reply => [reply, ...flattenReplies(reply)])
+
 watch(
-  () => appStore.configReady,
-  (newValue, oldValue) => {
-    if (!oldValue && newValue) {
-      const cachePost = postStore.cachePost
-      enabledComment(cachePost.title, cachePost.body, cachePost.uid)
+  () => [props.articleId, props.enabled] as const,
+  ([articleId, enabled]) => {
+    if (enabled && articleId) {
+      void commentStore.load({ articleId, page: 1, size: commentStore.page.size })
     }
-  }
+  },
+  { immediate: true }
 )
-
-/** Updating comments base on current locale */
-watch(
-  () => appStore.locale,
-  (newLocale, oldLocale) => {
-    if (waline && newLocale !== undefined && newLocale !== oldLocale) {
-      waline.update({
-        lang: newLocale
-      })
-    }
-  }
-)
-
-onMounted(() => {
-  enabledComment(postTitle.value, postBody.value, postUid.value)
-})
-
-const wrapperClasses = computed(() => {
-  return {
-    'bg-ob-deep-800 p-4 mt-8 lg:px-14 lg:py-10 rounded-2xl shadow-xl mb-8 lg:mb-0': true,
-    [`comment-${appStore.themeConfig.theme.profile_shape}`]: true
-  }
-})
 </script>
 
 <style lang="scss">
-#vcomments {
-  .vwrap {
-    @apply rounded-xl bg-ob-deep-900;
-    border: none;
-    border-color: transparent;
-    .vheader {
-      @apply grid gap-2;
-      &.item2 {
-        @apply grid-cols-2;
-      }
-      &.item3 {
-        @apply grid-cols-3;
-      }
-      .vinput {
-        @apply bg-ob-deep-800 border-none w-full rounded-lg px-3;
-      }
-    }
+.comment-form {
+  @apply mb-6 rounded-xl bg-ob-deep-900 p-4;
+}
+
+.comment-editor {
+  @apply box-border w-full rounded-lg bg-ob-deep-800 p-3 text-ob-normal opacity-70 outline-none;
+  transition: var(--trans-ease);
+  resize: vertical;
+
+  &:focus {
+    @apply opacity-100;
   }
-  .vcards {
-    & > .vcard {
-      @apply px-4 pt-6 pb-2 bg-ob-deep-900 mb-6 rounded-lg;
-      transition: var(--trans-ease);
-      &:hover {
-        box-shadow: var(--accent-shadow);
-      }
-    }
-    .vcard {
-      .vimg {
-        border: 2px solid var(--text-accent);
-      }
-      .vh {
-        border: none;
-        .vmeta .vat {
-          color: var(--text-accent);
-          opacity: 0.6;
-          transition: var(--trans-ease);
-          &:hover {
-            opacity: 0.3;
-          }
-        }
-      }
-      .vquote {
-        border: none;
-      }
-      .vhead {
-        .vnick {
-          color: var(--text-accent);
-          font-weight: 700;
-        }
-      }
-    }
+}
+
+.comment-meta-inputs {
+  @apply mt-3 grid gap-2 md:grid-cols-3;
+}
+
+.comment-input {
+  @apply min-w-0 rounded-lg border-none bg-ob-deep-800 px-3 py-2 text-sm text-ob-normal opacity-70 outline-none;
+  transition: var(--trans-ease);
+
+  &:focus {
+    @apply opacity-100;
   }
-  .vbtn {
-    background: var(--main-gradient);
-    border: none;
-    color: #fff;
-    &:hover {
-      color: #fff;
-      opacity: 0.5;
-    }
+}
+
+.comment-form-footer {
+  @apply mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between;
+}
+
+.comment-submit,
+.comment-pagination button,
+.comment-state button {
+  @apply rounded-lg px-4 py-2 text-sm text-white;
+  background: var(--main-gradient);
+  transition: var(--trans-ease);
+
+  &:disabled {
+    @apply cursor-not-allowed opacity-50;
   }
-  .vcount .vnum {
+
+  &:not(:disabled):hover {
+    opacity: 0.65;
+  }
+}
+
+.comment-notice {
+  color: var(--text-sub-accent);
+}
+
+.comment-error {
+  @apply text-red-300;
+}
+
+.comment-reply-target {
+  @apply mb-3 flex items-center justify-between rounded-lg bg-ob-deep-800 px-3 py-2 text-sm;
+  color: var(--text-sub-accent);
+
+  button {
     color: var(--text-accent);
   }
-  .veditor,
-  .vinput {
-    color: var(--text-normal);
+}
+
+.comment-state {
+  @apply flex min-h-24 items-center justify-center gap-3 rounded-lg bg-ob-deep-900 p-4 text-sm text-ob-dim;
+}
+
+.comment-list {
+  @apply flex flex-col gap-3;
+}
+
+.comment-card {
+  @apply rounded-lg bg-ob-deep-900 p-4;
+  transition: var(--trans-ease);
+
+  &:hover {
+    box-shadow: var(--accent-shadow);
   }
-  .vicon {
-    transition: var(--trans-ease);
-    &:hover {
-      opacity: 0.5;
-    }
+}
+
+.comment-card-main,
+.comment-card-reply {
+  @apply flex gap-3;
+}
+
+.comment-replies {
+  @apply mt-3 flex flex-col gap-2 pl-8;
+}
+
+.comment-avatar {
+  @apply flex h-9 w-9 shrink-0 items-center justify-center bg-ob-deep-800 text-sm font-bold;
+  color: var(--text-accent);
+}
+
+.comment-circle .comment-avatar,
+.comment-circle-avatar .comment-avatar {
+  @apply rounded-full;
+}
+
+.comment-rounded .comment-avatar,
+.comment-rounded-avatar .comment-avatar {
+  @apply rounded-2xl;
+}
+
+.comment-diamond .comment-avatar,
+.comment-diamond-avatar .comment-avatar {
+  clip-path: polygon(50% 3%, 91% 25%, 91% 75%, 50% 97%, 9% 75%, 9% 25%);
+}
+
+.comment-body {
+  @apply min-w-0 flex-1;
+}
+
+.comment-head {
+  @apply flex flex-wrap items-center gap-x-3 gap-y-1 text-sm font-bold;
+
+  a,
+  span {
+    color: var(--text-sub-accent);
   }
+
+  time {
+    @apply text-xs font-normal text-ob-dim;
+  }
+}
+
+.comment-content {
+  @apply mt-2 text-sm leading-7 text-ob-normal;
+
   a {
     color: var(--text-sub-accent);
-    transition: var(--trans-ease);
-    &:hover {
-      opacity: 0.5;
-    }
   }
+
   blockquote {
     border-left: 0.25rem solid var(--bg-accent-55);
   }
-  p {
-    color: var(--text-normal);
+}
+
+.comment-reply-to {
+  @apply mt-2 text-xs text-ob-dim;
+}
+
+.comment-reply-button {
+  @apply mt-2 text-xs;
+  color: var(--text-accent);
+  transition: var(--trans-ease);
+
+  &:hover {
+    opacity: 0.6;
   }
 }
 
-#gitalk-container {
-  .gt-container {
-    .gt-meta {
-      border-bottom: 1px solid var(--background-primary);
-    }
-    .gt-header-textarea {
-      background-color: var(--background-primary);
-    }
-    .gt-btn {
-      border: none;
-      background: var(--main-gradient);
-      transition: var(--trans-ease);
-      &:hover {
-        opacity: 0.5;
-      }
-    }
-    .gt-btn-preview {
-      background: var(--background-secondary);
-      color: var(--text-bright);
-      opacity: 0.7;
-    }
-    .gt-header-controls-tip {
-      color: var(--text-bright);
-      opacity: 0.7;
-      transition: var(--trans-ease);
-      &:hover {
-        opacity: 0.5;
-      }
-    }
-    .gt-svg svg {
-      fill: var(--text-bright);
-    }
-    .gt-popup {
-      background: var(--background-secondary);
-      border: 1px solid var(--background-primary);
-      border-radius: 0.25rem;
-    }
-    .gt-copyright {
-      border-top: 1px solid var(--background-primary);
-    }
-    .gt-link {
-      border-bottom: 2px solid var(--text-accent);
-    }
-    a {
-      color: var(--text-accent);
-      transition: var(--trans-ease);
-      &.is--active {
-        color: var(--text-bright);
-        &:before {
-          background: var(--text-accent);
-        }
-      }
-      &:hover {
-        opacity: 0.5;
-      }
-    }
-    .gt-comment-admin .gt-comment-content {
-      background-color: var(--background-primary);
-      box-shadow: var(--accent-shadow);
-      &:hover {
-        box-shadow: var(--accent-shadow);
-      }
-      a {
-        color: var(--text-accent);
-      }
-      .gt-comment-body {
-        &.markdown-body {
-          blockquote {
-            border-left: 0.25em solid var(--bg-accent-55);
-          }
-          pre {
-            background-color: var(--background-secondary);
-          }
-        }
-      }
-    }
-    .gt-comment-content {
-      background-color: var(--background-primary);
-      border-radius: 5px;
-      &:hover {
-        box-shadow: var(--sub-accent-shadow);
-      }
-      a {
-        color: var(--text-sub-accent);
-      }
-    }
-    .gt-comment-body {
-      color: var(--text-normal) !important;
-      &.markdown-body {
-        blockquote {
-          border-left: 0.25em solid var(--bg-sub-accent-55);
-        }
-      }
-    }
-  }
-}
-
-#twikoo {
-  .tk-comments {
-    @apply pt-2;
-  }
-
-  .tk-input {
-    @apply bg-ob-deep-900;
-  }
-
-  .tk-meta-input input {
-    @apply bg-ob-deep-900;
-  }
-
-  .el-input__inner:focus,
-  .el-textarea__inner:focus {
-    border-color: var(--text-accent);
-  }
-
-  .el-button--primary {
-    background: var(--main-gradient);
-    border: none;
-    color: #fff;
-    &:hover {
-      color: #fff;
-      opacity: 0.5;
-    }
-  }
-
-  .tk-icon.__comments {
-    color: var(--text-accent);
-  }
-
-  .tk-action-icon {
-    color: var(--text-accent);
-  }
-
-  .tk-comment {
-    @apply px-4 pt-6 pb-6 bg-ob-deep-900 mb-2 rounded-lg;
-    transition: var(--trans-ease);
-    &:hover {
-      box-shadow: var(--accent-shadow);
-    }
-  }
-
-  .tk-avatar {
-    border: none;
-  }
-
-  .tk-nick {
-    color: var(--text-accent);
-    font-weight: 700;
-  }
-
-  .tk-comments-count {
-    > span:first-of-type {
-      color: var(--text-accent);
-    }
-  }
-}
-
-.comment-diamond-avatar #waline {
-  .wl-user img,
-  .wl-login-nick img {
-    clip-path: polygon(50% 3%, 91% 25%, 91% 75%, 50% 97%, 9% 75%, 9% 25%);
-  }
-}
-.comment-circle-avatar #waline {
-  .wl-user img,
-  .wl-login-nick img {
-    @apply rounded-full border-ob-deep-900;
-    border-width: 6px;
-  }
-}
-.comment-rounded-avatar #waline {
-  .wl-user img,
-  .wl-login-nick img {
-    @apply rounded-2xl border-ob-deep-900;
-    border-width: 6px;
-  }
-}
-
-#waline {
-  --waline-theme-color: var(--text-accent);
-  --waline-border: var(--background-secondary);
-  --waline-bgcolor: var(--background-primary);
-  --waline-bgcolor-light: var(--background-secondary);
-  --waline-badge-color: var(--text-accent);
-  --waline-disabled-bgcolor: var(--text-dim);
-  --waline-avatar-size: 2.25rem;
-  --waline-m-avatar-size: 1.25rem;
-  .wl-editor {
-    @apply p-2 box-border bg-ob-deep-800 mx-1 my-0 opacity-50;
-    transition: 0.3s opacity linear;
-    &:focus {
-      @apply opacity-100;
-    }
-  }
-
-  .wl-login-nick {
-    @apply text-lg lg:text-2xl;
-    color: var(--text-sub-accent);
-    img {
-      @apply h-6 w-6 lg:h-9 lg:w-9;
-    }
-  }
-
-  .wl-text-number {
-    @apply hidden lg:block;
-  }
-
-  .wl-avatar {
-    @apply h-6 w-6 lg:h-9 lg:w-9 mr-3;
-  }
-
-  .wl-header {
-    @apply flex gap-2 mb-2 ml-1 mr-2;
-    .wl-header-item {
-      @apply bg-ob-deep-800 rounded-md;
-      label {
-        @apply font-bold;
-      }
-      input {
-        @apply px-2 py-1 h-full w-full bg-ob-deep-800 opacity-50;
-        transition: 0.3s opacity ease-in-out;
-        &:focus {
-          @apply opacity-100;
-        }
-      }
-    }
-    border-bottom-width: 0;
-  }
-
-  .wl-input,
-  .wl-input.wl-nick {
-    @apply text-xs text-ob-dim;
-  }
-
-  .wl-nick {
-    @apply text-xl lg:text-2xl;
-    color: var(--text-sub-accent);
-  }
-
-  .wl-cards {
-    @apply flex flex-col gap-2 pb-4;
-
-    .wl-user {
-      @apply flex justify-center pr-2 lg:pr-4 bg-ob-deep-900 mt-1.5;
-      margin-inline-end: 0;
-      .verified-icon {
-        @apply left-4 top-6 lg:left-6 lg:top-8;
-      }
-      img {
-        @apply h-6 w-6 lg:h-9 lg:w-9;
-      }
-      svg {
-        position: absolute;
-        top: calc(2.25rem * 3 / 4);
-        inset-inline-start: calc(2.2rem * 3 / 4);
-      }
-    }
-  }
-
-  .wl-comment {
-    @apply flex flex-col bg-ob-deep-900 p-4 rounded-lg;
-  }
-
-  .wl-login-info {
-    @apply flex flex-row items-center max-w-none mt-0;
-    .wl-logout-btn {
-      top: 0;
-      inset-inline-end: -0.5rem;
-    }
-    a.wl-login-nick {
-      @apply flex w-full;
-    }
-  }
-
-  .wl-card-item {
-    @apply bg-ob-deep-900 p-2 lg:p-4 rounded-lg;
-    .wl-card-item {
-      @apply shadow-ob mb-2;
-    }
-  }
-
-  .wl-card {
-    @apply pt-1 lg:pt-2 pb-0 border-b-0;
-  }
-
-  .wl-num {
-    color: var(--text-accent);
-  }
-
-  .primary.wl-btn {
-    @apply px-4 text-white;
-    border: none;
-    background: var(--main-gradient);
-    transition: var(--trans-ease);
-    &:hover {
-      opacity: 0.5;
-    }
-  }
-
-  .wl-card {
-    .wl-quote {
-      border-inline-start: none;
-    }
-
-    .wl-delete,
-    .wl-like,
-    .wl-reply,
-    .wl-edit {
-      color: var(--text-dim);
-    }
-
-    .wl-edit,
-    .wl-delete,
-    .wl-like {
-      @apply hidden lg:inline-flex;
-    }
-
-    .wl-badge {
-      @apply text-[0.55rem] text-xs px-1 py-0.5 me-0 mr-2 box-border border-none bg-ob-accent-55 text-ob;
-      &:first-of-type {
-        @apply text-white;
-        background: var(--main-gradient);
-      }
-      &:nth-of-type(2) {
-        @apply hidden lg:inline-flex;
-      }
-    }
-  }
-
-  .wl-sort {
-    li:hover {
-      color: var(--text-accent);
-    }
-  }
-
-  .wl-head {
-    @apply flex items-center mb-2;
-    .wl-time {
-      @apply mr-auto;
-    }
-  }
-
-  .wl-meta {
-    @apply mb-2;
-    span {
-      @apply rounded-md py-0.5 px-1.5 me-1 text-[0.55rem] lg:text-xs;
-    }
-  }
-
-  .wl-header-item {
-    @apply items-center;
-  }
-
-  .wl-admin-actions {
-    @apply pt-4;
-    .wl-comment-status {
-    }
-    .wl-btn {
-      @apply py-1.5 px-2;
-      font-size: 0.65rem;
-    }
-    .wl-btn.wl-approved:disabled {
-      @apply bg-ob-deep-800 text-ob-normal;
-    }
-  }
-
-  .wl-comment-actions {
-    @apply flex gap-1.5;
-    > *:hover {
-      color: var(--text-accent);
-    }
-  }
+.comment-pagination {
+  @apply mt-4 flex items-center justify-center gap-3 text-sm text-ob-normal;
 }
 </style>
