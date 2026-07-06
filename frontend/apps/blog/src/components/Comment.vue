@@ -311,7 +311,8 @@ watch(
 }
 
 .comment-state {
-  @apply flex min-h-24 items-center justify-center gap-3 rounded-lg bg-ob-deep-900 p-4 text-sm text-ob-dim;
+  @apply flex items-center justify-center gap-3 rounded-lg bg-ob-deep-900 p-4 text-sm text-ob-dim;
+  min-height: 6rem;
 }
 
 .comment-list {

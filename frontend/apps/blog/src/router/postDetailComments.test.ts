@@ -4,7 +4,10 @@ import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
-const source = readFileSync(resolve(currentDir, '[slug].vue'), 'utf8')
+const source = readFileSync(
+  resolve(currentDir, '../pages/post/[slug].vue'),
+  'utf8'
+)
 
 describe('post detail page comments', () => {
   it('mounts the V2 comment component after article content', () => {
