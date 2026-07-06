@@ -77,8 +77,8 @@ class FlywayMigrationTest {
                 "select count(*) from t_user_info",
                 Integer.class);
 
-        assertThat(migrationCount).isEqualTo(3);
-        assertThat(latestVersion).isEqualTo("3");
+        assertThat(migrationCount).isEqualTo(4);
+        assertThat(latestVersion).isEqualTo("4");
         assertThat(userCount).isZero();
         assertThat(profileCount).isZero();
     }
