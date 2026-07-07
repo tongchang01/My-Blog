@@ -1,5 +1,3 @@
-import { Social } from './ThemeConfig.class'
-
 export interface PostRaw {
   [key: string]: unknown[] | string | Record<string, any>
 }
@@ -183,39 +181,6 @@ export class FeaturePosts {
       Object.assign(this, {
         features: raw.map((one: { [key: string]: [] }) => new Post(one))
       })
-    }
-  }
-}
-
-export class AuthorPosts {
-  name = ''
-  slug = ''
-  avatar = ''
-  link = ''
-  description = ''
-  socials = new Social()
-  categories = 0
-  tags = 0
-  word_count = '0'
-  post_list: Post[] = []
-
-  constructor(raw?: Record<string, any>) {
-    if (raw) {
-      for (const key of Object.keys(this)) {
-        if (Object.prototype.hasOwnProperty.call(raw, key)) {
-          if (key === 'socials') {
-            Object.assign(this, { [key]: new Social(raw[key]) })
-          } else if (key === 'post_list') {
-            Object.assign(this, {
-              post_list: raw[key].map(
-                (one: { [key: string]: [] }) => new Post(one)
-              )
-            })
-          } else {
-            Object.assign(this, { [key]: raw[key] })
-          }
-        }
-      }
     }
   }
 }

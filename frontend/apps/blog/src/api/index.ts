@@ -1,14 +1,12 @@
 import request from '@/utils/request'
 import { AxiosResponse } from 'axios'
 import {
-  AuthorPosts,
   Categories,
   PostList,
   SpecificPostListRaw,
   Tags
 } from '@/models/Post.class'
 import { Page } from '@/models/Article.class'
-import { Statistic } from '@/models/Statistic.class'
 import { paginator } from '@/utils'
 
 // GET /api/posts/:pageNum.json (default 1.json)
@@ -67,16 +65,4 @@ export async function fetchImplicitPageBySource(
   source: string
 ): Promise<AxiosResponse<any>> {
   return request.get<Page>(`/pages/${source}/index.json`)
-}
-
-// GET /api/statistic.json
-export async function fetchStatistic(): Promise<AxiosResponse<any>> {
-  return request.get<Statistic>('/statistic.json')
-}
-
-// GET /api/authors/author-slug.json
-export async function fetchAuthorPost(
-  slug: string
-): Promise<AxiosResponse<any>> {
-  return request.get<AuthorPosts>(`/authors/${slug}.json`)
 }

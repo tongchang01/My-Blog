@@ -3,8 +3,6 @@ import Cookies from 'js-cookie'
 import i18n from '@/locales/index'
 import { Locales } from '@/models/ThemeConfig.class'
 import { HexoConfig } from '@/models/HexoConfig.class'
-import { fetchStatistic } from '@/api'
-import { Statistic } from '@/models/Statistic.class'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
 import { computed, ref } from 'vue'
@@ -56,7 +54,6 @@ export const useAppStore = defineStore('app', () => {
   const configStatus = computed(() => siteSettingsStore.status)
   const hexoConfig = ref(new HexoConfig())
   const headerGradient = ref('')
-  const statistic = ref(new Statistic())
   const appLoading = ref(false)
   const NPTimeout = ref(-1)
   const loadingTimeout = ref(-1)
@@ -71,14 +68,6 @@ export const useAppStore = defineStore('app', () => {
   const fetchConfig = async () => {
     await siteSettingsStore.load(locale.value)
     initializeTheme(themeConfig.value.theme.dark_mode)
-  }
-
-  const fetchStat = async () => {
-    const { data } = await fetchStatistic()
-    return new Promise(resolve => {
-      statistic.value = new Statistic(data)
-      resolve(statistic.value)
-    })
   }
 
   const initializeTheme = (isDarkMode?: boolean | string) => {
@@ -146,7 +135,6 @@ export const useAppStore = defineStore('app', () => {
     configStatus,
     hexoConfig,
     headerGradient,
-    statistic,
     appLoading,
     NPTimeout,
     loadingTimeout,
@@ -155,7 +143,6 @@ export const useAppStore = defineStore('app', () => {
     getTheme,
     getAppLoading,
     fetchConfig,
-    fetchStat,
     initializeTheme,
     toggleTheme,
     changeLocale,
