@@ -57,6 +57,9 @@
 6. **第三方评论工具物理删除、RecentComment 侧栏重建**
    - 文章评论主链路已不依赖第三方插件。
    - 留言板、旧动态 page 和 RecentComment 仍可能引用旧插件代码；等留言板策略确定后再清理，避免误删旧消费者。
+   - 当前代码引用点已确认：`links.vue`、`page/[slug].vue`、`PageContent.vue`、`RecentComment.vue`、`useCommentPlugin.ts`、`utils/comments/*`、`ThemeConfig.plugins` 旧配置形状，以及 `PostStats.vue` 的插件 props。
+   - 清理顺序：先完成友链简版，让 `links.vue` 脱离旧 page/comment 插件；再确认通用 page 评论不进第一版；最后用一个纯前台删除提交移除 `RecentComment`、`useCommentPlugin`、`utils/comments/*`、旧插件配置字段和 `PostStats` 死 props。
+   - 不做 V2 最近评论公开接口。后续如果真需要最近评论，应基于 V2 自研评论重新设计，不保留 Gitalk / Valine / Twikoo / Waline / LeanCloud 适配层。
 
 ## SEO 裁决
 
@@ -71,4 +74,4 @@
 1. 先实现友链简版，关闭或下调 O-003。
 2. 进入部署硬项文档和实战校准。
 3. 手动部署跑通后，再决定是否设计 CD。
-4. 第一版发布后再排 O-001、O-019 第二批、SEO 增强和旧插件清理。
+4. 第一版发布后再排 O-001、O-019 第二批、SEO 增强；旧第三方评论物理清理排在友链简版之后，必须先让 `links.vue` 和通用 page 评论脱离旧插件。

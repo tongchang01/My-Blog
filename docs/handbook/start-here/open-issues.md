@@ -56,7 +56,8 @@
 - 影响范围：前台 blog、comment、stats
 - 当前判断：前台访问统计已完成；文章详情页评论已接入 V2 自研公开评论 API；留言板评论仍未接入；PASSWORD 文章评论依赖 O-001 完整解锁链路。
 - 第一版范围：文章评论和访问统计已覆盖当前阅读主流程；留言板评论不阻塞第一版发布。
-- 下一步：第一版发布后再做评论专题第二批，迁移留言板评论；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接；最近评论侧栏已裁决移除，不规划 V2 公开最近评论接口。
+- 第三方评论物理清理：当前旧插件引用点集中在 `links.vue`、`page/[slug].vue`、`PageContent.vue`、`RecentComment.vue`、`useCommentPlugin.ts`、`utils/comments/*`、`ThemeConfig.plugins` 旧配置形状和 `PostStats.vue` 插件 props。先完成友链简版并确认通用 page 评论不进第一版，再用一个纯前台删除提交移除这些旧代码；不新增 V2 最近评论公开接口。
+- 下一步：第一版发布后再做评论专题第二批，迁移留言板评论；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接；最近评论侧栏已裁决移除，不规划 V2 公开最近评论接口。旧第三方评论物理清理可以在友链简版完成后单独做，不必等留言板评论。
 - 来源：`roadmap.md`、`../frontend/blog/integration-status.md`、`docs/working/reviews/2026-07-07-first-release-scope-review.md`
 
 ## O-005 后台内容生产闭环
@@ -200,7 +201,8 @@
 - 影响范围：后端 comment、后端 content、前台 blog、后台 admin、API 契约
 - 当前判断：V2 后端已有文章评论、留言板评论、后台审核、隐藏、删除、恢复和文章 `commentCount` 闭环。前台文章详情页已使用 `Comment.vue` 接入 `GET /api/public/articles/{articleId}/comments` 和 `POST /api/public/articles/{articleId}/comments`，第三方评论插件不再参与文章评论主链路；公开评论 ID、父评论 ID、回复目标 ID 均按 JSON string/null 处理。
 - 风险：留言板仍未迁移，旧 page/link/RecentComment 仍引用 `useCommentPlugin()`，因此第三方评论工具代码本批未物理删除；如果后续直接删除旧工具，会影响旧页面和侧栏消费者。PASSWORD 文章评论在 O-001 完成前仍不可用。
-- 下一步：第二批迁移留言板评论；确认旧 page/link 评论展示是否保留、迁移或删除；最近评论侧栏按既有裁决移除，不规划 V2 公开最近评论接口；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接。
+- 第三方评论清理流程：先做 O-003 友链简版，移除 `links.vue` 对旧 page/comment 插件的依赖；再裁掉通用 `page/[slug].vue` 的旧第三方评论入口和 `PageContent.vue` 的插件 gating；随后删除 `RecentComment.vue` 及导出、`useCommentPlugin.ts`、`utils/comments/*`、`ThemeConfig.plugins` 中 Gitalk / Valine / Twikoo / Waline / recent_comments 字段、`PostStats.vue` 插件 props，并更新对应测试断言。该批不新增任何最近评论 API。
+- 下一步：第二批迁移留言板评论；确认旧 page 评论展示删除；最近评论侧栏按既有裁决移除，不规划 V2 公开最近评论接口；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接。
 - 验证：前台已通过 `pnpm --dir frontend/apps/blog test` 和 `pnpm --dir frontend/apps/blog typecheck`；最终验收需在本分支继续通过 blog build。
 - 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-008、`docs/working/plans/2026-07-06-blog-v2-comments-implementation-plan.md`、`docs/handbook/api/comment.md`、前台 `Comment.vue` / `frontend/apps/blog/src/features/comments/`、当前 comment/content 代码
 
