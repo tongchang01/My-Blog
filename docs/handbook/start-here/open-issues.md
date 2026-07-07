@@ -44,10 +44,10 @@
 - 状态：未完成
 - 优先级：P0
 - 影响范围：前台 blog、公开 API
-- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签、归档、关于页、搜索、访问统计和文章评论已接入。友链页仍使用旧 `articleStore.fetchArticle('links')` / `/pages/links/index.json` 页面数据，并挂旧第三方评论插件，是前台主流程中最后一个明显旧数据源页面。
-- 第一版范围：只做友链简版，接入 `GET /api/public/friend-links`，展示公开友链列表。旧 Aurora 友链页的头像墙、分组模式、随机访问、申请说明、友链评论、页面统计不进第一版。
-- 下一步：按友链简版拆分实现；完成后 O-003 可关闭，剩余旧友链增强能力以后作为扩展单独规划。
-- 来源：`../frontend/blog/integration-status.md`、`roadmap.md`、`docs/working/reviews/2026-07-07-first-release-scope-review.md`
+- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签、归档、关于页、搜索、访问统计和文章评论已接入。仍有多处旧数据源残留：作者卡片和移动菜单读取 `/authors/blog-author.json`，作者卡片还触发旧 `/statistic.json`；友链页和页脚友链读取 `/pages/links/index.json` / `avatarWall`；通用 `page/[slug].vue` 仍读取旧 page JSON 并挂旧第三方评论入口。
+- 第一版范围：作者卡片和移动菜单必须脱离旧作者 JSON；友链页接入 `GET /api/public/friend-links` 简版卡片；页脚友链要么接同一公开友链接口，要么第一版隐藏随机友链块。旧 Aurora 友链页的头像墙、分组模式、随机访问、申请说明、友链评论、页面统计不进第一版。
+- 下一步：按 `docs/working/reviews/2026-07-07-first-release-gap-and-deployment-assessment.md` 拆成前台旧数据源第一批；完成后再删除旧 `stores/article`、`stores/author`、`stores/post`、`api/index.ts` 中不再有消费者的旧 helper 和 `public/api` 活跃依赖。
+- 来源：`../frontend/blog/integration-status.md`、`roadmap.md`、`docs/working/reviews/2026-07-07-first-release-scope-review.md`、`docs/working/reviews/2026-07-07-first-release-gap-and-deployment-assessment.md`
 
 ## O-004 前台评论、留言和统计接入
 
@@ -83,12 +83,12 @@
 - 状态：未完成 / 清单已建立 / 实现待设计
 - 优先级：P1
 - 影响范围：前台 blog、ops、CI/CD
-- 当前判断：`docs/handbook/ops/release-checklist.md` 已存在并覆盖测试、生产环境变量、CORS、反向代理、客户端 IP、附件存储、备份恢复和上线冒烟。考虑当前是个人网站且不计划经营流量，完整 SEO / RSS / Sitemap / Open Graph / 结构化数据不作为第一版发布阻塞项。
-- 第一版范围：优先处理部署硬项，包括生产环境变量核对、CORS、反向代理路径、可信代理 / 客户端 IP、S3、数据库备份恢复、公开页和后台登录冒烟。生产暴露范围必须确认，避免后台、OpenAPI、Swagger UI 等被公开索引或暴露。
+- 当前判断：`docs/handbook/ops/release-checklist.md` 已存在并覆盖测试、生产环境变量、CORS、反向代理、客户端 IP、附件存储、备份恢复和上线冒烟。`docs/handbook/ops/deployment-direction.md` 已补服务器待确认项和第一版部署方向。当前仍缺服务器真实信息、环境变量权威清单、Nginx/systemd 草案、S3 实战校准和备份恢复演练。考虑当前是个人网站且不计划经营流量，完整 SEO / RSS / Sitemap / Open Graph / 结构化数据不作为第一版发布阻塞项。
+- 第一版范围：优先处理部署硬项，包括服务器现状记录、生产环境变量核对、CORS、反向代理路径、可信代理 / 客户端 IP、S3、数据库备份恢复、公开页和后台登录冒烟。生产暴露范围必须确认，避免后台、OpenAPI、Swagger UI 等被公开索引或暴露。
 - 后置范围：SEO meta、canonical、robots、sitemap、RSS / Atom、Open Graph、结构化数据和多语言索引策略。后续如果希望公开经营、提升搜索收录或分享效果，再单独规划。
 - 风险：如果上线前只验证接口可用，忽略备份、生产环境变量、反向代理、客户端 IP 和存储配置，容易出现可运行但不可恢复、限流 IP 错误、附件不可用或部署不可复现的问题。
-- 下一步：以 `docs/handbook/ops/release-checklist.md` 作为上线前权威清单，先补部署硬项文档和实战校准；CD 等手动部署跑通后再设计。
-- 来源：`roadmap.md`、`docs/handbook/ops/release-checklist.md`、`docs/working/reviews/2026-07-07-first-release-scope-review.md`
+- 下一步：以 `docs/handbook/ops/release-checklist.md` 和 `docs/handbook/ops/deployment-direction.md` 作为上线前权威清单，先补服务器现状、环境变量、Nginx/systemd、S3 和备份恢复；CD 等手动部署跑通后再设计。
+- 来源：`roadmap.md`、`docs/handbook/ops/release-checklist.md`、`docs/handbook/ops/deployment-direction.md`、`docs/working/reviews/2026-07-07-first-release-scope-review.md`、`docs/working/reviews/2026-07-07-first-release-gap-and-deployment-assessment.md`
 
 ## O-008 后台 token 存储方式升级
 

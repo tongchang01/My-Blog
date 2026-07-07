@@ -28,7 +28,7 @@
 
 ## 待补齐
 
-- 第一版发布前建议补：友链简版。当前 `links.vue` 仍读取旧 `/pages/links/index.json` 页面数据；后端已有 `GET /api/public/friend-links`，第一版只需要公开友链列表卡片，不复刻旧头像墙、分组、随机访问、申请说明、友链评论和页面统计。
+- 第一版发布前建议补：作者卡片、移动菜单、友链页和页脚友链。当前 `Profile.vue` / `MobileMenu.vue` 仍读取旧 `/authors/blog-author.json`，作者卡片还会触发旧 `/statistic.json`；`links.vue` 和 `FooterLink.vue` 仍读取旧 `/pages/links/index.json` / `avatarWall`。后端已有 `GET /api/public/friend-links`，第一版友链只需要公开友链列表卡片，不复刻旧头像墙、分组、随机访问、申请说明、友链评论和页面统计。
 - 第一版后置：留言板评论前台接入。
 - 第一版后置：PASSWORD 文章完整解锁流程。
 - 第一版后置：完整 SEO / RSS / Sitemap / Open Graph / 结构化数据。
