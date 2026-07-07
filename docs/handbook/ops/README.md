@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 本地开发、验证、发布准备
-> 最后校准：2026-06-29
+> 最后校准：2026-07-07
 > 权威程度：运维入口
 
 ## 本文档回答什么问题
@@ -18,4 +18,5 @@
 | `build-and-test.md` | 构建与测试命令 |
 | `ci-cd.md` | CI/CD 边界与扩展规则 |
 | `ci-troubleshooting.md` | CI 故障记录与排查方式 |
+| `deployment-direction.md` | 第一版部署方向和服务器待确认项 |
 | `release-checklist.md` | 发布前检查清单 |

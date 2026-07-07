@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：全项目、MyBlog V2 开发
-> 最后校准：2026-06-29
+> 最后校准：2026-07-07
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：项目总览
 
@@ -19,7 +19,7 @@ MyBlog 是一个个人博客系统。当前仓库同时保留 V1 历史代码和
 | `MyBlog-springboot/` | 后端 V1 | 只读历史参考，不再修改 |
 | `MyBlog-vue/` | 前端 V1 | 只读历史参考，不作为新功能开发目标 |
 | `MyBlog-springboot-v2/` | 后端 V2 | 当前后端主线，六大业务模块已完成第一版 |
-| `frontend/apps/blog/` | 前台 V2 | 当前前台主线，已完成首批公开接口联调 |
+| `frontend/apps/blog/` | 前台 V2 | 当前前台主线，主阅读流程已基本接入 V2 API，友链简版待补 |
 | `frontend/apps/admin/` | 后台 V2 | 当前后台主线，基础闭环和多项业务页已完成 |
 | `docs/` | 开发文档 | 正在从旧结构整理为 handbook / working / archive 三层 |
 
@@ -77,7 +77,7 @@ MyBlog 是一个个人博客系统。当前仓库同时保留 V1 历史代码和
 
 代码目录：`frontend/apps/blog/`
 
-当前定位：从旧 Aurora/Hexo 数据源逐步迁移到 MyBlog V2 后端。已接入站点配置、公开文章列表和公开文章详情；分类、标签、归档、友链、关于、搜索、评论、留言、统计和 PASSWORD 解锁仍在后续批次。
+当前定位：从旧 Aurora/Hexo 数据源逐步迁移到 MyBlog V2 后端。已接入站点配置、首页、公开文章列表、文章详情、分类、标签、归档、关于、搜索、访问统计和文章评论；第一版发布前仍需处理作者卡片、移动菜单、友链页和页脚友链的旧 JSON 数据源。留言板评论、PASSWORD 完整解锁、完整 SEO / RSS / Sitemap / Open Graph、Spotify 和后台筛选扩展放到第一版发布之后。
 
 ### 后台 admin
 
