@@ -45,7 +45,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass `
   -File .\scripts\dev\mysql\initialize.ps1 -Reset
 ```
 
-`-Reset` 会且只会删除并重建 `myblog_v2_dev`。当前本地数据库已明确作为测试库时可以使用该参数；执行前仍须确认其中没有需要保留的数据。脚本拒绝其他数据库名，随后隐藏启动 Spring Boot，让 Flyway 应用到版本 2，再导入 `seed.sql` 并执行验收查询。
+`-Reset` 会且只会删除并重建 `myblog_v2_dev`。当前本地数据库已明确作为测试库时可以使用该参数；执行前仍须确认其中没有需要保留的数据。脚本拒绝其他数据库名，随后隐藏启动 Spring Boot，让 Flyway 应用到版本 4，再导入 `seed.sql` 并执行验收查询。
 
 不带 `-Reset` 时，脚本不会执行 `DROP DATABASE`。如果目标表已有 active 用户或文章，它会直接拒绝导入，避免覆盖已有开发数据：
 
@@ -82,9 +82,21 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass `
   -File .\scripts\dev\mysql\verify.ps1
 ```
 
-验收检查：Flyway 版本为 2、当前会话时区为 `+09:00`、关键表数量满足种子基线，且已发布文章的冗余评论数与 PASS 评论一致。
+验收检查：Flyway 版本为 4、当前会话时区为 `+09:00`、关键表数量满足种子基线，且已发布文章的冗余评论数与 PASS 评论一致。
 
-## 六、启动后端与前端
+## 六、追加本地演示数据
+
+如果现有 `myblog_v2_dev` 已经完成初始化，但需要给前台、评论、友链和统计页面补充更完整的展示数据，可以执行：
+
+```powershell
+cd MyBlog-springboot-v2
+powershell.exe -NoProfile -ExecutionPolicy Bypass `
+  -File .\scripts\dev\mysql\apply-demo-extra.ps1
+```
+
+`apply-demo-extra.ps1` 只允许更新 `myblog_v2_dev`，不会重建数据库。它执行 `demo-extra.sql`，追加固定 ID 的本地演示文章、评论、友链、访问统计和站点展示文案；脚本可重复执行。该数据只用于本地联调，不得作为 V1 数据迁移或生产初始化来源。
+
+## 七、启动后端与前端
 
 后端：
 
@@ -111,7 +123,7 @@ corepack pnpm dev
 
 默认访问地址：后端 `http://localhost:8080`、博客前台 `http://localhost:5173`、管理后台 `http://localhost:5174`。实际端口以 Vite 输出为准。
 
-## 七、回归与故障处理
+## 八、回归与故障处理
 
 H2 自动化测试继续作为完整回归门禁：
 
