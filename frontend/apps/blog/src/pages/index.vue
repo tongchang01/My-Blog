@@ -9,40 +9,45 @@
     </Feature>
     <HorizontalArticle v-else-if="mainArticle" class="mb-8" :data="mainArticle" />
 
-    <div id="article-list" class="flex flex-col relative">
-      <ul
-        v-if="articleStore.homeStatus === 'loading'"
-        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
-      >
-        <li v-for="n in 6" :key="n"><ArticleCard :data="null" /></li>
-      </ul>
-
-      <div
-        v-else-if="articleStore.homeStatus === 'empty'"
-        class="py-24 text-center text-ob-dim"
-      >
-        {{ emptyMessage }}
-      </div>
-
-      <div
-        v-else-if="articleStore.homeStatus === 'error'"
-        class="py-24 text-center text-ob-dim"
-      >
-        <p>{{ errorMessage }}</p>
-        <button
-          class="mt-4 px-5 py-2 rounded-full text-ob-bright"
-          :style="retryStyle"
-          @click="retry"
+    <div class="main-grid">
+      <div id="article-list" class="flex flex-col relative">
+        <ul
+          v-if="articleStore.homeStatus === 'loading'"
+          class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
         >
-          {{ retryLabel }}
-        </button>
-      </div>
+          <li v-for="n in 6" :key="n"><ArticleCard :data="null" /></li>
+        </ul>
 
-      <ul v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <li v-for="article in listArticles" :key="article.id">
-          <ArticleCard :data="article" />
-        </li>
-      </ul>
+        <div
+          v-else-if="articleStore.homeStatus === 'empty'"
+          class="py-24 text-center text-ob-dim"
+        >
+          {{ emptyMessage }}
+        </div>
+
+        <div
+          v-else-if="articleStore.homeStatus === 'error'"
+          class="py-24 text-center text-ob-dim"
+        >
+          <p>{{ errorMessage }}</p>
+          <button
+            class="mt-4 px-5 py-2 rounded-full text-ob-bright"
+            :style="retryStyle"
+            @click="retry"
+          >
+            {{ retryLabel }}
+          </button>
+        </div>
+
+        <ul v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          <li v-for="article in listArticles" :key="article.id">
+            <ArticleCard :data="article" />
+          </li>
+        </ul>
+      </div>
+      <Sidebar>
+        <Profile author="blog-author" />
+      </Sidebar>
     </div>
   </div>
 </template>
@@ -52,6 +57,7 @@ import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { Feature, FeatureList } from '@/components/Feature'
 import { ArticleCard, HorizontalArticle } from '@/components/ArticleCard'
+import { Profile, Sidebar } from '@/components/Sidebar'
 import { useArticleStore } from '@/features/articles/store'
 import { isSupportedLocale } from '@/shared/i18n/locale'
 import { useAppStore } from '@/stores/app'
