@@ -14,14 +14,12 @@
   `yyyy-MM-dd'T'HH:mm:ss`，不携带 offset。
 - [ ] OpenAPI、Swagger UI、管理后台和公开前台的生产暴露范围符合部署策略。
 
-## 2. SEO 与公开索引
+## 2. 公开暴露范围
 
-- [ ] 公开页面输出正确的 `<title>`、description、canonical URL 和必要 Open Graph 元数据。
-- [ ] 文章详情 canonical 与当前公开 URL 策略一致。
-- [ ] `robots.txt` 可访问，并只允许抓取应公开收录的页面。
-- [ ] `sitemap.xml` 可访问，只包含允许公开收录的页面。
-- [ ] RSS / Atom 可访问，只包含允许公开展示的文章。
-- [ ] PASSWORD 文章可以输出入口页元数据，但不得在 meta、RSS 或 Sitemap 扩展字段中暴露正文。
+- [ ] 后台、OpenAPI、Swagger UI、Knife4j 和管理接口的生产暴露范围符合部署策略。
+- [ ] 公开前台只暴露允许匿名访问的页面和静态资源。
+- [ ] PASSWORD 文章按当前实现只展示锁定入口，不通过公开接口、页面源码、日志或扩展元数据泄露正文。
+- [ ] 完整 SEO、canonical、robots、sitemap、RSS / Atom、Open Graph 和结构化数据不作为第一版发布阻塞项；如后续启用，必须只包含允许公开收录的页面和文章。
 
 ## 3. 同源反向代理
 

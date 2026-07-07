@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 前台读者端
-> 最后校准：2026-07-06
+> 最后校准：2026-07-07
 > 对应代码：`frontend/apps/blog/`
 > 权威程度：前台完成度记录
 
@@ -28,11 +28,13 @@
 
 ## 待补齐
 
-- 友链仍需替换旧 JSON 数据源或旧页面实现。
-- 留言板评论前台接入。
-- PASSWORD 文章完整解锁流程。
-- Spotify Embed。
-- Markdown chunk 分包和 Sass 旧 API/`@import` 清理。
+- 第一版发布前建议补：友链简版。当前 `links.vue` 仍读取旧 `/pages/links/index.json` 页面数据；后端已有 `GET /api/public/friend-links`，第一版只需要公开友链列表卡片，不复刻旧头像墙、分组、随机访问、申请说明、友链评论和页面统计。
+- 第一版后置：留言板评论前台接入。
+- 第一版后置：PASSWORD 文章完整解锁流程。
+- 第一版后置：完整 SEO / RSS / Sitemap / Open Graph / 结构化数据。
+- 第一版后置：Spotify Embed。
+- 第一版后置：Markdown chunk 分包和 Sass 旧 API/`@import` 清理。
+- 第一版后置：第三方评论工具物理删除和 RecentComment 侧栏重建。文章评论主链路已不依赖第三方插件，但留言板、旧动态 page 和 RecentComment 仍可能引用旧插件代码，需等留言板策略确定后再清理。
 
 ## 对应 open issues
 
