@@ -147,22 +147,15 @@ import { useI18n } from 'vue-i18n'
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
 import { useRouter } from 'vue-router'
 import { useNavigatorStore } from '@/stores/navigator'
-import { useAuthorStore } from '@/stores/author'
-import { AuthorPosts } from '@/models/Post.class'
 import Social from '@/components/Social.vue'
+import { useAuthorProfileStore } from '@/features/author-profile/store'
 
 const appStore = useAppStore()
-const authorStore = useAuthorStore()
+const authorProfileStore = useAuthorProfileStore()
 const router = useRouter()
 const navigatorStore = useNavigatorStore()
 const { t } = useI18n()
 const blurScreen = ref()
-
-const authorData = ref(new AuthorPosts())
-
-const fetchAuthor = async () => {
-  authorData.value = await authorStore.fetchAuthorData('blog-author')
-}
 
 const pushPage = (path: string): void => {
   if (!path) return
@@ -211,9 +204,26 @@ watch(
   }
 )
 
+watch(
+  () => appStore.locale,
+  locale => {
+    void authorProfileStore.load(locale)
+  }
+)
+
 onMounted(() => {
-  fetchAuthor()
+  void authorProfileStore.load(appStore.locale)
 })
+
+const authorData = computed(() => ({
+  avatar: authorProfileStore.profile.avatar,
+  name: authorProfileStore.profile.name,
+  description: authorProfileStore.profile.description,
+  socials: authorProfileStore.profile.socials,
+  post_list: { length: authorProfileStore.profile.articleCount },
+  categories: authorProfileStore.profile.categoryCount,
+  tags: authorProfileStore.profile.tagCount
+}))
 
 const avatarClass = computed(() => {
   return {

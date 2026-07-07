@@ -73,14 +73,13 @@
 </template>
 
 <script setup lang="ts">
-import { AuthorPosts } from '@/models/Post.class'
 import { useAppStore } from '@/stores/app'
-import { useAuthorStore } from '@/stores/author'
-import { computed, onMounted, ref, toRefs, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Social from '@/components/Social.vue'
+import { useAuthorProfileStore } from '@/features/author-profile/store'
 
-const props = defineProps({
+defineProps({
   author: {
     type: String,
     default: () => {
@@ -90,34 +89,30 @@ const props = defineProps({
 })
 
 const appStore = useAppStore()
-const authorStore = useAuthorStore()
+const authorProfileStore = useAuthorProfileStore()
 const { t } = useI18n()
 
-const author = toRefs(props).author
-const authorData = ref(new AuthorPosts())
-
-const fetchData = async () => {
-  await appStore.fetchStat()
-  await fetchAuthor()
-}
-
-const fetchAuthor = async () => {
-  if (author.value === '') return
-  await authorStore.fetchAuthorData(author.value).then(data => {
-    authorData.value = data
-  })
-}
-
 watch(
-  () => props.author,
-  (newAuthor, oldAuthor) => {
-    if (newAuthor && newAuthor !== oldAuthor) {
-      fetchAuthor()
-    }
+  () => appStore.locale,
+  locale => {
+    void authorProfileStore.load(locale)
   }
 )
 
-onMounted(fetchData)
+onMounted(() => {
+  void authorProfileStore.load(appStore.locale)
+})
+
+const authorData = computed(() => ({
+  avatar: authorProfileStore.profile.avatar,
+  name: authorProfileStore.profile.name,
+  description: authorProfileStore.profile.description,
+  socials: authorProfileStore.profile.socials,
+  word_count: authorProfileStore.profile.wordCount,
+  post_list: { length: authorProfileStore.profile.articleCount },
+  categories: authorProfileStore.profile.categoryCount,
+  tags: authorProfileStore.profile.tagCount
+}))
 
 const avatarClass = computed(() => {
   return {
