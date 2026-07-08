@@ -12,11 +12,9 @@ interface ThemeRaw {
     custom_socials: GeneralOptions
     site_meta: GeneralOptions
     plugins: GeneralOptions
-    footer_links: FooterLink[]
     version: string
   }
 }
-
 interface SwitchConfig {
   [key: string]: boolean
 }
@@ -44,8 +42,6 @@ export class ThemeConfig {
   site_meta: SiteMeta = new SiteMeta()
   /** Plugin configs */
   plugins: Plugins = new Plugins()
-  /** Footer Links configs */
-  footerLinks: FooterLinks = new FooterLinks()
   /** Theme version */
   version = ''
 
@@ -64,7 +60,6 @@ export class ThemeConfig {
       this.socials = new Social(rawConfig.socials)
       this.plugins = new Plugins(rawConfig)
       this.site_meta = new SiteMeta(rawConfig.site_meta)
-      this.footerLinks = new FooterLinks(rawConfig.footer_links)
       this.version = rawConfig.version
     }
   }
@@ -622,30 +617,6 @@ export class Plugins implements PluginsData {
           Object.assign(this, { [key]: raw[key] })
         }
       }
-    }
-  }
-}
-
-export interface FooterLink {
-  title: string
-  links: {
-    title: string
-    url: string
-  }[]
-  mode?: 'links'
-}
-
-export class FooterLinks {
-  data: FooterLink[] = []
-
-  /**
-   * Model class for Site meta settings
-   *
-   * @param raw - Config data generated from Hexo
-   */
-  constructor(raw?: FooterLink[]) {
-    if (raw) {
-      Object.assign(this.data, raw)
     }
   }
 }

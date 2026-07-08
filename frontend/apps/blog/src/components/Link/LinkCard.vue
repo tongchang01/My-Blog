@@ -38,8 +38,7 @@ const props = defineProps({
   nick: String,
   description: String,
   type: String,
-  vip: Boolean,
-  categoryMode: Boolean
+  vip: Boolean
 })
 
 const appStore = useAppStore()
@@ -55,8 +54,7 @@ const gradientBackground = computed(() => {
 const articleClasses = computed(() => {
   return {
     'article-container': true,
-    highlighted: !!props.vip,
-    'category-mode': !!props.categoryMode
+    highlighted: !!props.vip
   }
 })
 </script>
@@ -64,11 +62,6 @@ const articleClasses = computed(() => {
 <style lang="scss">
 #link-card {
   @apply relative;
-
-  &.highlighted.category-mode .article .article-content p {
-    @apply h-8 sm:h-10 lg:h-10;
-    -webkit-line-clamp: 2;
-  }
 
   &.article-container {
     height: auto;

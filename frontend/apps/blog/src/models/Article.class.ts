@@ -48,9 +48,7 @@ export class Article extends Post implements Detail {
   }
 }
 
-export class Page<
-  DataType = Link[] | Record<string, Link[]>
-> implements Detail {
+export class Page implements Detail {
   title = ''
   uid = ''
   date = {
@@ -67,10 +65,6 @@ export class Page<
   count_time = { symbolsTime: undefined, symbolsCount: undefined }
   toc = ''
   text = ''
-  categoryMode = false
-  avatarWall: Array<Link[]> = []
-  data: DataType | undefined = undefined
-
   constructor(raw?: { [key: string]: string }) {
     if (raw) {
       for (const key of Object.keys(this)) {
