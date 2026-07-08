@@ -6,7 +6,6 @@ import {
   SpecificPostListRaw,
   Tags
 } from '@/models/Post.class'
-import { Page } from '@/models/Article.class'
 import { paginator } from '@/utils'
 
 // GET /api/posts/:pageNum.json (default 1.json)
@@ -57,12 +56,4 @@ export async function fetchAllTags(): Promise<AxiosResponse<any>> {
 // GET /api/categories.json
 export async function fetchAllCategories(): Promise<AxiosResponse<any>> {
   return request.get<Categories>(`/categories.json`)
-}
-
-// GET /api/pages/about/index.json
-// source : e.g. about/index
-export async function fetchImplicitPageBySource(
-  source: string
-): Promise<AxiosResponse<any>> {
-  return request.get<Page>(`/pages/${source}/index.json`)
 }

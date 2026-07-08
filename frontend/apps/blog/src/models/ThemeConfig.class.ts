@@ -460,65 +460,7 @@ export class SiteMeta {
   }
 }
 
-type MetaAttributes = 'nick' | 'mail' | 'link'
-
 export interface PluginsData {
-  gitalk: {
-    enable: boolean
-    autoExpand: boolean
-    clientID: string
-    clientSecret: string
-    repo: string
-    owner: string
-    admin: Array<string>
-    id: string
-    language: string
-    distractionFreeMode: boolean
-    recentComment: boolean
-    proxy: string
-  }
-
-  valine: {
-    enable: boolean
-    app_id: string
-    app_key: string
-    avatar: string
-    placeholder: string
-    visitor: boolean
-    lang: string
-    meta: MetaAttributes[]
-    admin: string
-    recentComment: boolean
-  }
-
-  twikoo: {
-    enable: boolean
-    envId: string
-    recentComment: boolean
-    region?: string
-    lang: string
-  }
-
-  waline: {
-    enable: boolean
-    recentComment: boolean
-    serverURL: string
-    reaction: boolean
-    login: string
-    meta: string[] | never[]
-    requiredMeta: string[] | never[]
-    imageUploader?: boolean
-    wordLimit: number | number[]
-    pageSize: number
-    commentSorting: string
-  }
-
-  recent_comments: boolean
-
-  busuanzi: {
-    enable: boolean
-  }
-
   copy_protection: {
     enable: boolean
     author: {
@@ -537,58 +479,6 @@ export interface PluginsData {
 }
 
 export class Plugins implements PluginsData {
-  gitalk = {
-    enable: false,
-    autoExpand: true,
-    clientID: '',
-    clientSecret: '',
-    repo: 'blog-comments',
-    owner: 'TriDiamond',
-    admin: ['TriDiamond'],
-    id: 'location.pathname',
-    language: 'en',
-    distractionFreeMode: false,
-    recentComment: false,
-    proxy: ''
-  }
-  valine = {
-    enable: false,
-    app_id: '',
-    app_key: '',
-    avatar: 'mp',
-    placeholder: 'Leave your thoughts behind~',
-    visitor: true,
-    lang: '',
-    meta: [],
-    requiredFields: [],
-    avatarForce: false,
-    admin: '',
-    recentComment: false
-  }
-  twikoo = {
-    enable: false,
-    envId: '',
-    region: undefined,
-    recentComment: false,
-    lang: ''
-  }
-  waline = {
-    enable: false,
-    recentComment: false,
-    serverURL: '',
-    reaction: false,
-    login: 'disable',
-    meta: [],
-    requiredMeta: [],
-    imageUploader: false,
-    wordLimit: 0,
-    pageSize: 10,
-    commentSorting: 'latest'
-  }
-  recent_comments = false
-  busuanzi = {
-    enable: true
-  }
   copy_protection = {
     enable: true,
     author: {

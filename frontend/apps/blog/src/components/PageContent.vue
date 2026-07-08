@@ -15,10 +15,6 @@
         <PostStats
           :post-word-count="post.count_time.symbolsCount"
           :post-time-count="post.count_time.symbolsTime"
-          :post-title="post.title"
-          :current-path="currentPath"
-          :plugin-configs="pluginConfigs"
-          :comments="enabledComment"
         />
       </div>
     </div>
@@ -64,7 +60,7 @@
       <div class="col-span-1">
         <Sidebar>
           <Profile author="blog-author" />
-          <Toc :toc="post.toc" :comments="enabledComment" />
+          <Toc :toc="post.toc" :comments="false" />
         </Sidebar>
       </div>
     </div>
@@ -77,16 +73,12 @@ import {
   nextTick,
   onMounted,
   onUnmounted,
-  ref,
   toRefs,
   watch
 } from 'vue'
 import { Profile, Sidebar, Toc } from '@/components/Sidebar'
 import { useCommonStore } from '@/stores/common'
-import { useRoute } from 'vue-router'
 import PostStats from './Post/PostStats.vue'
-import { useAppStore } from '@/stores/app'
-import useCommentPlugin from '@/hooks/useCommentPlugin'
 import useLightBox from '@/hooks/useLightBox'
 import ObSkeleton from '@/components/LoadingSkeleton/Skeleton.vue'
 
@@ -103,12 +95,9 @@ const props = defineProps({
   }
 })
 
-const appStore = useAppStore()
 const commonStore = useCommonStore()
-const route = useRoute()
 const post = toRefs(props).post
 const title = toRefs(props).title
-const { enabledCommentPlugin } = useCommentPlugin()
 const { initializeLightBox } = useLightBox()
 
 watch(
@@ -136,15 +125,10 @@ onUnmounted(() => {
   commonStore.resetHeaderImage()
 })
 
-const enabledComment = computed(
-  () => post.value.comments && enabledCommentPlugin.value.plugin !== ''
-)
 const pageTitle = computed(() => {
   if (title.value !== '') return title.value
   return post.value.title
 })
-const currentPath = computed(() => route.path)
-const pluginConfigs = computed(() => appStore.themeConfig.plugins)
 </script>
 
 <style lang="scss" scoped>

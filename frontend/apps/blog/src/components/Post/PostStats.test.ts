@@ -8,11 +8,9 @@ const source = readFileSync(
 )
 
 describe('PostStats', () => {
-  it('does not render third-party page view or comment counters', () => {
-    expect(source).not.toContain('waline-pageview-count')
-    expect(source).not.toContain('waline-comment-count')
-    expect(source).not.toContain('twikoo_visitors')
-    expect(source).not.toContain('leancloud_visitors')
-    expect(source).not.toContain('useCommentPlugin')
+  it('only receives reading time and word count props', () => {
+    expect(source).toContain('postWordCount')
+    expect(source).toContain('postTimeCount')
+    expect(source).not.toContain('currentPath')
   })
 })
