@@ -44,9 +44,9 @@
 - 状态：未完成
 - 优先级：P0
 - 影响范围：前台 blog、公开 API
-- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签、归档、关于页、搜索、访问统计和文章评论已接入。仍有多处旧数据源残留：作者卡片和移动菜单读取 `/authors/blog-author.json`，作者卡片还触发旧 `/statistic.json`；友链页和页脚友链读取 `/pages/links/index.json` / `avatarWall`；通用 `page/[slug].vue` 仍读取旧 page JSON 并挂旧第三方评论入口。
-- 第一版范围：作者卡片和移动菜单必须脱离旧作者 JSON；友链页接入 `GET /api/public/friend-links` 简版卡片；页脚友链要么接同一公开友链接口，要么第一版隐藏随机友链块。旧 Aurora 友链页的头像墙、分组模式、随机访问、申请说明、友链评论、页面统计不进第一版。
-- 下一步：按 `docs/working/reviews/2026-07-07-first-release-gap-and-deployment-assessment.md` 拆成前台旧数据源第一批；完成后再删除旧 `stores/article`、`stores/author`、`stores/post`、`api/index.ts` 中不再有消费者的旧 helper 和 `public/api` 活跃依赖。
+- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签、归档、关于页、搜索、访问统计、文章评论、作者卡片、移动菜单和友链页已接入 V2 数据源。`/authors/blog-author.json`、`/statistic.json`、`/pages/links/index.json`、`avatarWall`、通用 `page/[slug].vue` 和旧第三方评论入口已从前台主源码清理。
+- 第一版范围：旧 Aurora 友链页的头像墙、分组模式、随机访问、申请说明、友链评论、页面统计不进第一版；页脚随机友链组件已因无挂载且依赖旧数据源而删除。
+- 下一步：继续清理其它仍有消费者的旧 JSON 兼容 store，例如 `stores/post`、`stores/tag`、`api/index.ts` 中仍被旧分类/标签兼容路径使用的 helper；该清理需单独确认当前页面消费者。
 - 来源：`../frontend/blog/integration-status.md`、`roadmap.md`、`docs/working/reviews/2026-07-07-first-release-scope-review.md`、`docs/working/reviews/2026-07-07-first-release-gap-and-deployment-assessment.md`
 
 ## O-004 前台评论、留言和统计接入
@@ -56,8 +56,8 @@
 - 影响范围：前台 blog、comment、stats
 - 当前判断：前台访问统计已完成；文章详情页评论已接入 V2 自研公开评论 API；留言板评论仍未接入；PASSWORD 文章评论依赖 O-001 完整解锁链路。
 - 第一版范围：文章评论和访问统计已覆盖当前阅读主流程；留言板评论不阻塞第一版发布。
-- 第三方评论物理清理：当前旧插件引用点集中在 `links.vue`、`page/[slug].vue`、`PageContent.vue`、`RecentComment.vue`、`useCommentPlugin.ts`、`utils/comments/*`、`ThemeConfig.plugins` 旧配置形状和 `PostStats.vue` 插件 props。先完成友链简版并确认通用 page 评论不进第一版，再用一个纯前台删除提交移除这些旧代码；不新增 V2 最近评论公开接口。
-- 下一步：第一版发布后再做评论专题第二批，迁移留言板评论；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接；最近评论侧栏已裁决移除，不规划 V2 公开最近评论接口。旧第三方评论物理清理可以在友链简版完成后单独做，不必等留言板评论。
+- 第三方评论物理清理：已删除 `RecentComment.vue`、`useCommentPlugin.ts`、`utils/comments/*`、`ThemeConfig.plugins` 旧评论配置字段和 `PostStats.vue` 插件 props；通用 `page/[slug].vue` 已删除；不新增 V2 最近评论公开接口。
+- 下一步：第一版发布后再做评论专题第二批，迁移留言板评论；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接；最近评论侧栏已裁决移除，不规划 V2 公开最近评论接口。
 - 来源：`roadmap.md`、`../frontend/blog/integration-status.md`、`docs/working/reviews/2026-07-07-first-release-scope-review.md`
 
 ## O-005 后台内容生产闭环
@@ -200,9 +200,9 @@
 - 优先级：P1
 - 影响范围：后端 comment、后端 content、前台 blog、后台 admin、API 契约
 - 当前判断：V2 后端已有文章评论、留言板评论、后台审核、隐藏、删除、恢复和文章 `commentCount` 闭环。前台文章详情页已使用 `Comment.vue` 接入 `GET /api/public/articles/{articleId}/comments` 和 `POST /api/public/articles/{articleId}/comments`，第三方评论插件不再参与文章评论主链路；公开评论 ID、父评论 ID、回复目标 ID 均按 JSON string/null 处理。
-- 风险：留言板仍未迁移，旧 page/link/RecentComment 仍引用 `useCommentPlugin()`，因此第三方评论工具代码本批未物理删除；如果后续直接删除旧工具，会影响旧页面和侧栏消费者。PASSWORD 文章评论在 O-001 完成前仍不可用。
-- 第三方评论清理流程：先做 O-003 友链简版，移除 `links.vue` 对旧 page/comment 插件的依赖；再裁掉通用 `page/[slug].vue` 的旧第三方评论入口和 `PageContent.vue` 的插件 gating；随后删除 `RecentComment.vue` 及导出、`useCommentPlugin.ts`、`utils/comments/*`、`ThemeConfig.plugins` 中 Gitalk / Valine / Twikoo / Waline / recent_comments 字段、`PostStats.vue` 插件 props，并更新对应测试断言。该批不新增任何最近评论 API。
-- 下一步：第二批迁移留言板评论；确认旧 page 评论展示删除；最近评论侧栏按既有裁决移除，不规划 V2 公开最近评论接口；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接。
+- 风险：留言板仍未迁移；PASSWORD 文章评论在 O-001 完成前仍不可用。旧第三方评论工具、旧 page 评论展示和最近评论侧栏已清理，不再作为后续留言板迁移前置风险。
+- 第三方评论清理结果：已裁掉通用 `page/[slug].vue` 的旧第三方评论入口和 `PageContent.vue` 的插件 gating；已删除 `RecentComment.vue` 及导出、`useCommentPlugin.ts`、`utils/comments/*`、`ThemeConfig.plugins` 中 Gitalk / Valine / Twikoo / Waline / recent_comments 字段、`PostStats.vue` 插件 props；不新增任何最近评论 API。
+- 下一步：第二批迁移留言板评论；最近评论侧栏按既有裁决移除，不规划 V2 公开最近评论接口；PASSWORD 文章评论等 O-001 Article Access Token 完成后再接。
 - 验证：前台已通过 `pnpm --dir frontend/apps/blog test` 和 `pnpm --dir frontend/apps/blog typecheck`；最终验收需在本分支继续通过 blog build。
 - 来源：`docs/working/reviews/2026-06-30-frontend-backend-gap-review.md` G-008、`docs/working/plans/2026-07-06-blog-v2-comments-implementation-plan.md`、`docs/handbook/api/comment.md`、前台 `Comment.vue` / `frontend/apps/blog/src/features/comments/`、当前 comment/content 代码
 

@@ -62,9 +62,7 @@
 </template>
 
 <script setup lang="ts">
-import { PropType } from 'vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
-import { PluginsData, ThemeConfig } from '@/models/ThemeConfig.class'
 
 defineProps({
   postWordCount: {
@@ -72,20 +70,6 @@ defineProps({
   },
   postTimeCount: {
     type: String || undefined
-  },
-  postTitle: {
-    type: String
-  },
-  pluginConfigs: {
-    type: Object as PropType<PluginsData>,
-    default: () => new ThemeConfig().plugins,
-    required: true
-  },
-  currentPath: {
-    type: String,
-    default: '/',
-    required: true
-  },
-  comments: Boolean
+  }
 })
 </script>
