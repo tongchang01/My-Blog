@@ -52,6 +52,20 @@
       </div>
 
       <span
+        class="icon-control flex items-center text-invert"
+        data-dia="search"
+        @click="handleSearchOpen"
+      >
+        <SvgIcon
+          icon-class="search"
+          fill="currentColor"
+          stroke="none"
+          width="1.2rem"
+          height="1.2rem"
+        />
+      </span>
+
+      <span
         no-hover-effect
         class="ob-drop-shadow hidden lg:flex"
         data-dia="light-switch"
@@ -116,6 +130,10 @@ const handleClick = async (name: string): Promise<void> => {
 
 const handleOpenMenu = () => {
   navigatorStore.toggleMobileMenu()
+}
+
+const handleSearchOpen = () => {
+  appStore.handleSearchOpen()
 }
 
 const handleBackToTop = () => {

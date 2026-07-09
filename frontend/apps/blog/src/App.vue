@@ -25,6 +25,7 @@
   <template v-if="isMobile">
     <MobileMenu />
   </template>
+  <SearchModal />
   <teleport to="head">
     <title>{{ title }}</title>
   </teleport>
@@ -44,6 +45,7 @@
 import {
   StyleValue,
   computed,
+  defineAsyncComponent,
   onBeforeMount,
   onMounted,
   onUnmounted,
@@ -59,6 +61,10 @@ import FooterContainer from '@/components/Footer/FooterContainer.vue'
 import MobileMenu from '@/components/MobileMenu.vue'
 import defaultCover from '@/assets/default-cover.jpg'
 import VueEasyLightbox from 'vue-easy-lightbox'
+
+const SearchModal = defineAsyncComponent(
+  () => import('@/components/SearchModal.vue')
+)
 
 const appStore = useAppStore()
 const lightBoxStore = useLightBoxStore()

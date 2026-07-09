@@ -352,7 +352,7 @@ const toSearchResult = (article: ArticleCardViewModel): SearchResultType => ({
  * Handlers
  */
 const handleStatusChange = (status: boolean) => {
-  searchStore.setOpenModal(status)
+  appStore.changeOpenModal(status)
 }
 
 const handleLinkClick = (result: SearchResultType) => {
@@ -475,8 +475,10 @@ onUnmounted(() => {
 })
 
 watch(
-  () => searchStore.openModal,
+  () => appStore.openSearchModal,
   status => {
+    searchStore.setOpenModal(status)
+
     /**
      * This watch is used to delay the animation
      * of the search box container.
