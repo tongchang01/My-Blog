@@ -80,7 +80,7 @@ describe('article detail mapper', () => {
         id: '9007199254740993',
         title: 'Article',
         summary: 'Summary',
-        body: '# Body',
+        body: '# Body\n\n## Section\n\nContent',
         categoryId: null,
         categoryName: null,
         slug: 'canonical-slug',
@@ -97,7 +97,11 @@ describe('article detail mapper', () => {
 
     expect(mapped.id).toBe('9007199254740993')
     expect(mapped.slug).toBe('canonical-slug')
-    expect(mapped.bodyHtml).toContain('<h1>Body</h1>')
+    expect(mapped.bodyHtml).toContain('<h1 id="body">Body</h1>')
+    expect(mapped.toc).toContain('href="#body"')
+    expect(mapped.toc).toContain('href="#section"')
+    expect(mapped.wordCount).toBeGreaterThan(0)
+    expect(mapped.readingTime).toBe('1 min')
   })
 })
 

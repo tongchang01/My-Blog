@@ -56,6 +56,9 @@ export interface ArchivePageViewModel {
 
 export interface ArticleDetailViewModel extends ArticleCardViewModel {
   bodyHtml: string
+  toc: string
+  wordCount: number
+  readingTime: string
   updatedAt: string
 }
 

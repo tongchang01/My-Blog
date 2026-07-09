@@ -1,7 +1,7 @@
 import type { PageResponse } from '@/shared/http/contract'
 import type { SupportedLocale } from '@/shared/i18n/locale'
 import { formatJst } from '@/shared/time/jst'
-import { renderMarkdown } from '@/shared/markdown/render'
+import { renderArticleMarkdown } from '@/shared/markdown/render'
 import type {
   PublicArchiveGroupDto,
   PublicArticleDetailDto,
@@ -84,8 +84,14 @@ export const mapArchivePage = (
 export const mapArticleDetail = (
   dto: PublicArticleDetailDto,
   locale: SupportedLocale
-): ArticleDetailViewModel => ({
-  ...mapArticle(dto, locale),
-  bodyHtml: renderMarkdown(dto.body),
-  updatedAt: formatJst(dto.updatedAt, locale)
-})
+): ArticleDetailViewModel => {
+  const article = renderArticleMarkdown(dto.body, locale)
+  return {
+    ...mapArticle(dto, locale),
+    bodyHtml: article.html,
+    toc: article.toc,
+    wordCount: article.wordCount,
+    readingTime: article.readingTime,
+    updatedAt: formatJst(dto.updatedAt, locale)
+  }
+}

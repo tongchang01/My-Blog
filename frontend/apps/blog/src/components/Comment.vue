@@ -214,7 +214,8 @@ const loadPage = (page: number): void => {
   void commentStore.load({
     articleId: props.articleId,
     page,
-    size: commentStore.page.size
+    size: commentStore.page.size,
+    locale: appStore.locale
   })
 }
 
@@ -238,7 +239,12 @@ watch(
   () => [props.articleId, props.enabled] as const,
   ([articleId, enabled]) => {
     if (enabled && articleId) {
-      void commentStore.load({ articleId, page: 1, size: commentStore.page.size })
+      void commentStore.load({
+        articleId,
+        page: 1,
+        size: commentStore.page.size,
+        locale: appStore.locale
+      })
     }
   },
   { immediate: true }
