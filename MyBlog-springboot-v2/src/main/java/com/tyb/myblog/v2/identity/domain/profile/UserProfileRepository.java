@@ -1,5 +1,6 @@
 package com.tyb.myblog.v2.identity.domain.profile;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /**
@@ -14,6 +15,8 @@ public interface UserProfileRepository {
      * @return 未删除的用户资料，不存在时返回空
      */
     Optional<UserProfile> findActiveByUserId(long userId);
+
+    Optional<UserProfile> findPrimaryPublicAuthor(LocalDateTime now);
 
     /**
      * 按用户 ID 加锁查询未删除资料。

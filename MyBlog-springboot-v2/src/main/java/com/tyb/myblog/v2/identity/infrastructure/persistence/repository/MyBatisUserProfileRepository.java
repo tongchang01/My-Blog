@@ -30,6 +30,12 @@ public class MyBatisUserProfileRepository implements UserProfileRepository {
     }
 
     @Override
+    public Optional<UserProfile> findPrimaryPublicAuthor(LocalDateTime now) {
+        return Optional.ofNullable(mapper.selectPrimaryPublicAuthor(now))
+                .map(this::toDomain);
+    }
+
+    @Override
     public Optional<UserProfile> findActiveByUserIdForUpdate(long userId) {
         return Optional.ofNullable(mapper.selectActiveByUserIdForUpdate(userId))
                 .map(this::toDomain);

@@ -34,6 +34,7 @@ class BackendPropertiesTest {
                         tuple("POST", "/api/auth/login"),
                         tuple("POST", "/api/auth/refresh"),
                         tuple("GET", "/api/public/site-config"),
+                        tuple("GET", "/api/public/author-profile"),
                         tuple("GET", "/api/public/friend-links"),
                         tuple("GET", "/api/public/categories"),
                         tuple("GET", "/api/public/tags"),

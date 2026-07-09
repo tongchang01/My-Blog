@@ -2,15 +2,18 @@ import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { loadPublicArticles } from '@/features/articles/api'
 import { loadPublicCategories, loadPublicTags } from '@/features/taxonomy/api'
+import { loadPublicAuthorProfile } from './api'
 import { useSiteSettingsStore } from '@/features/site-settings/store'
 import { useAuthorProfileStore } from './store'
 
 vi.mock('@/features/articles/api', () => ({ loadPublicArticles: vi.fn() }))
+vi.mock('./api', () => ({ loadPublicAuthorProfile: vi.fn() }))
 vi.mock('@/features/taxonomy/api', () => ({
   loadPublicCategories: vi.fn(),
   loadPublicTags: vi.fn()
 }))
 
+const mockedAuthor = vi.mocked(loadPublicAuthorProfile)
 const mockedArticles = vi.mocked(loadPublicArticles)
 const mockedCategories = vi.mocked(loadPublicCategories)
 const mockedTags = vi.mocked(loadPublicTags)
@@ -18,12 +21,29 @@ const mockedTags = vi.mocked(loadPublicTags)
 describe('author profile store', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    mockedAuthor.mockReset()
     mockedArticles.mockReset()
     mockedCategories.mockReset()
     mockedTags.mockReset()
   })
 
-  it('builds the profile from V2 site settings and public counters', async () => {
+  it('builds the profile from public author profile and counters', async () => {
+    mockedAuthor.mockResolvedValue({
+      nickname: '三钻',
+      avatarUrl: 'https://example.com/author.png',
+      bioZh: '中文作者简介',
+      bioJa: '日本語プロフィール',
+      bioEn: 'English author bio',
+      location: 'Tokyo',
+      website: 'https://example.com',
+      emailPublic: 'public@example.com',
+      githubUrl: 'https://github.com/tyb',
+      twitterUrl: 'https://x.com/tyb',
+      linkedinUrl: 'https://linkedin.com/in/tyb',
+      zhihuUrl: 'https://zhihu.com/people/tyb',
+      qiitaUrl: 'https://qiita.com/tyb',
+      juejinUrl: 'https://juejin.cn/user/tyb'
+    })
     mockedArticles.mockResolvedValue({
       records: [],
       total: 8,
@@ -46,15 +66,20 @@ describe('author profile store', () => {
     await store.load('zh')
 
     expect(store.status).toBe('ready')
-    expect(store.profile.name).toBe('TYB')
-    expect(store.profile.avatar).toBe('https://example.com/me.png')
-    expect(store.profile.description).toBe('Code and life')
+    expect(store.profile.name).toBe('三钻')
+    expect(store.profile.avatar).toBe('https://example.com/author.png')
+    expect(store.profile.description).toBe('中文作者简介')
+    expect(store.profile.socials.github).toBe('https://github.com/tyb')
+    expect(store.profile.socials.twitter).toBe('https://x.com/tyb')
+    expect(store.profile.socials.zhihu).toBe('https://zhihu.com/people/tyb')
+    expect(store.profile.socials.juejin).toBe('https://juejin.cn/user/tyb')
     expect(store.profile.articleCount).toBe(8)
     expect(store.profile.categoryCount).toBe(1)
     expect(store.profile.tagCount).toBe(2)
   })
 
-  it('keeps site settings when counters fail', async () => {
+  it('keeps site settings when author profile and counters fail', async () => {
+    mockedAuthor.mockRejectedValue(new Error('offline'))
     mockedArticles.mockRejectedValue(new Error('offline'))
     mockedCategories.mockResolvedValue([])
     mockedTags.mockRejectedValue(new Error('offline'))

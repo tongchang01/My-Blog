@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 前台读者端
-> 最后校准：2026-07-07
+> 最后校准：2026-07-09
 > 对应代码：`frontend/apps/blog/`
 > 权威程度：前台完成度记录
 
@@ -23,12 +23,14 @@
 - 搜索弹窗已接入公开文章 `keyword` 查询，不再读取旧 `/search.json`；第一版只展示标题和摘要，不搜索正文，不做高亮片段。
 - 访问统计已接入 V2：公开路由导航后写入 page-view，页脚展示 V2 站点统计摘要并按 `startedDate` 计算建站天数，`PostStats` 仅保留阅读时长和字数。
 - 文章详情页评论已接入 V2 自研公开评论 API，支持评论列表、回复、分页、提交成功/待审核提示和错误重试；文章评论主链路不再初始化 Gitalk / Valine / Twikoo / Waline。
+- 作者卡片和移动菜单已接入 V2 作者资料、公开文章数、分类数和标签数；作者社交链接读取 `GET /api/public/author-profile`，当前只映射 GitHub、Twitter、知乎、掘金。
 - 首页已停止请求旧 Hexo/Aurora mock 数据。
 - Markdown 正文通过 `markdown-it` 渲染，禁用原始 HTML。
 
 ## 待补齐
 
-- 第一版发布前建议补：作者卡片、移动菜单、友链页和页脚友链。当前 `Profile.vue` / `MobileMenu.vue` 仍读取旧 `/authors/blog-author.json`，作者卡片还会触发旧 `/statistic.json`；`links.vue` 和 `FooterLink.vue` 仍读取旧 `/pages/links/index.json` / `avatarWall`。后端已有 `GET /api/public/friend-links`，第一版友链只需要公开友链列表卡片，不复刻旧头像墙、分组、随机访问、申请说明、友链评论和页面统计。
+- 第一版发布前建议补：友链页和页脚友链。当前 `links.vue` 和 `FooterLink.vue` 仍读取旧 `/pages/links/index.json` / `avatarWall`。后端已有 `GET /api/public/friend-links`，第一版友链只需要公开友链列表卡片，不复刻旧头像墙、分组、随机访问、申请说明、友链评论和页面统计。
+- 第一版后置：作者卡片总字数、LinkedIn/Qiita/个人主页/公开邮箱展示，详见 `post-launch-backlog.md`。
 - 第一版后置：留言板评论前台接入。
 - 第一版后置：PASSWORD 文章完整解锁流程。
 - 第一版后置：完整 SEO / RSS / Sitemap / Open Graph / 结构化数据。
