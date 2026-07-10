@@ -1,48 +1,31 @@
-# V2 开发手册
+# MyBlog V2 开发手册
 
 > 状态：当前有效
-> 适用范围：MyBlog V2 开发
-> 最后校准：2026-06-29
-> 权威程度：权威手册入口
+> 适用范围：MyBlog V2
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
+> 权威程度：开发手册入口
 
-## 本文档回答什么问题
+## 目录职责
 
-本文档是 MyBlog V2 的当前开发手册入口。后续所有仍然有效的架构、规则、接口、前后台规格和运维说明，都应收口到本目录。
+| 目录 | 唯一职责 |
+| --- | --- |
+| [`start-here/`](start-here/project-overview.md) | 项目概览、当前状态、路线图、遗留事项、术语和踩坑 |
+| [`architecture/`](architecture/README.md) | 当前系统结构和关键数据流 |
+| [`adr/`](adr/README.md) | 仍影响当前实现的架构决策及理由 |
+| [`rules/`](rules/README.md) | 开发、测试、安全和文档维护约束 |
+| [`api/`](api/README.md) | 前后端联调所需的 HTTP 契约 |
+| [`product/`](product/README.md) | 稳定业务范围、规则和数据语义 |
+| [`frontend/`](frontend/README.md) | blog 与 admin 的当前实现边界 |
+| [`ops/`](ops/README.md) | 本地运行、环境变量、测试、CI、部署和发布 |
+| [`workflows/`](workflows/README.md) | 可重复执行且仍会使用的开发流程 |
 
-## 目录结构
+## 使用原则
 
-```text
-handbook/
-├── start-here/       项目概览、当前状态、路线图、未完成项、术语和踩坑
-├── architecture/     当前架构现状
-├── rules/            编码、测试、安全、文档等强约束
-├── adr/              架构决策记录
-├── api/              前后端接口契约
-├── product/          业务规格
-├── frontend/         前台和后台规格
-├── ops/              本地开发、环境变量、构建测试、发布部署
-└── workflows/        可重复执行的开发 SOP
-```
+1. `current-status.md` 只记录已实现能力、当前发布阻塞项和最近验证状态。
+2. `open-issues.md` 只保留尚未解决的事项，关闭项从正文删除并由 Git 追溯。
+3. `roadmap.md` 只记录未来顺序，不复制已完成历史。
+4. API、架构、产品和前端文档分别维护各自事实，不复制整段内容。
+5. 代码、配置、迁移或测试发生变化时，同一提交必须更新受影响的权威文档。
 
-## 当前状态
-
-本目录是当前开发手册入口。旧 `docs/project-handbook/` 已降级为跳转入口，历史原文已归档到 `docs/archive/project-handbook/`。维护原则：
-
-1. 只把当前仍有效的结论迁入 `handbook/`。
-2. 与代码不一致的内容必须先校准再迁入。
-3. 阶段计划和历史 review 不直接作为权威文档，只提炼结论。
-4. 未完成和争议事项统一进入 `start-here/open-issues.md`。
-5. `docs/project-handbook/` 只保留跳转入口，不再新增长期权威内容。
-
-## 阅读顺序
-
-1. `start-here/current-status.md`：当前 V2 进度。
-2. `start-here/open-issues.md`：未完成和有争议的事项。
-3. `start-here/glossary.md`：统一术语。
-4. `start-here/pitfalls.md`：红线和历史踩坑。
-5. `rules/documentation.md`：文档维护规则。
-5. 按任务读取对应的 architecture、api、frontend、ops 或 workflows 文档。
-
-## 冲突处理
-
-如其他目录内容与 `docs/handbook/` 冲突，以 `docs/handbook/` 为准。发现冲突时，先登记到 `start-here/open-issues.md` 或 `docs/working/reviews/`，再在对应批次校准。
+详细规则见 [`rules/documentation.md`](rules/documentation.md)。

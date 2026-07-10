@@ -1,41 +1,20 @@
 # 开发规则
 
 > 状态：当前有效
-> 适用范围：MyBlog V2 开发
-> 最后校准：2026-06-29
+> 适用范围：MyBlog V2
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：规则入口
 
-## 本文档回答什么问题
+| 文档 | 约束范围 |
+| --- | --- |
+| [`documentation.md`](documentation.md) | 文档目录、权威源、生命周期、格式和更新触发器 |
+| [`package-layout.md`](package-layout.md) | Java 模块、分层、依赖方向和 ArchUnit 边界 |
+| [`api-response.md`](api-response.md) | HTTP 响应、分页、ID、错误码和状态码 |
+| [`comment-style.md`](comment-style.md) | 代码注释与 Javadoc |
+| [`error-handling.md`](error-handling.md) | 异常分类、抛出位置和全局转换 |
+| [`security-baseline.md`](security-baseline.md) | 认证、授权、密码、CORS、限流和敏感信息 |
+| [`sql-placement.md`](sql-placement.md) | MyBatis-Plus、Wrapper、XML 和迁移脚本的职责 |
+| [`testing-policy.md`](testing-policy.md) | 单元、Web、集成、架构和数据库测试 |
 
-本目录记录 MyBlog V2 写代码和维护文档时必须遵守的规则。规则文档只写“怎么做”，设计理由放在 `../adr/`，未完成或争议事项放在 `../start-here/open-issues.md`。
-
-## 规则清单
-
-| 文档 | 主题 | 当前状态 |
-|------|------|----------|
-| `documentation.md` | 文档命名、状态、迁移、归档和权威源规则 | 已建立 |
-| `package-layout.md` | Java 包结构、分层依赖、跨模块调用和 ArchUnit 守护 | 已迁移校准 |
-| `api-response.md` | API 响应结构、错误码、分页和 HTTP 语义 | 已迁移校准 |
-| `comment-style.md` | 代码注释和 Javadoc 风格 | 已迁移校准 |
-| `error-handling.md` | 异常分类、抛出方式、全局响应 | 已迁移校准 |
-| `security-baseline.md` | JWT、密码、白名单、CORS、密钥和限流 | 已迁移校准 |
-| `sql-placement.md` | SQL 写在 BaseMapper、Wrapper 还是 XML 的规则 | 已迁移校准 |
-| `testing-policy.md` | 单测、集成测试、架构测试和验证范围 | 已迁移校准 |
-
-## 使用规则
-
-- 开始改代码前，先读与任务相关的规则文档。
-- 新增规则时，优先补充已有主题文件；只有主题不同才新增文件。
-- 规则变化如果影响架构决策，必须同步更新或新增 ADR。
-- 规则变化如果来自历史踩坑，必须同步更新 `../start-here/pitfalls.md`。
-- 不能确认是否仍有效的旧规则，先标记为“待校准”，不要直接当作当前依据。
-
-## 与其它目录的关系
-
-| 目录 | 关系 |
-|------|------|
-| `../architecture/` | 描述当前架构事实 |
-| `../adr/` | 解释为什么这样定 |
-| `../api/` | 记录具体接口契约 |
-| `../ops/` | 记录启动、测试、发布和环境变量 |
-| `../start-here/open-issues.md` | 登记未完成和有争议事项 |
+规则描述“必须怎样做”，架构事实放入 `../architecture/`，决策理由放入 `../adr/`，未决事项放入 `../start-here/open-issues.md`。
