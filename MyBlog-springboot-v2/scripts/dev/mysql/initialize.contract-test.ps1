@@ -118,7 +118,7 @@ exit 0
     } else {
         $fakeMysqlExecutable = Join-Path $temporaryDirectory "mysql"
         Set-Content -Path $fakeMysqlExecutable -Value (
-            "#!/usr/bin/env pwsh`n& '" + $fakeMysqlScript + "' @args") -Encoding utf8NoBOM
+            "#!" + $powerShellExecutable + "`n& '" + $fakeMysqlScript + "' @args") -Encoding utf8NoBOM
         & chmod +x $fakeMysqlExecutable
     }
 

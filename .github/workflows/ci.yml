@@ -82,7 +82,22 @@ jobs:
       - name: Run MySQL integration tests
         run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=MySqlFlywayMigrationTest,MySqlChangePasswordConcurrencyTest,MySqlLoginFailureConcurrencyTest"
 
-  # ==========================================================================
+  # ===========================================================================
+  # Linux PowerShell 合约 job：验证本地 MySQL 初始化脚本能在 Ubuntu 的 pwsh 下运行。
+  # 不启动真实 MySQL；数据库安全边界由 initialize.contract-test.ps1 的替身验证。
+  # ===========================================================================
+  mysql-initialization-contract:
+    name: Linux PowerShell initialization contract
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run initialization contract
+        shell: pwsh
+        run: pwsh -NoProfile -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract-test.ps1
+
   # 后台 admin 前端 job：TypeScript 类型检查 + Vitest。
   # admin 的 package.json 里 "test" 已配成 vitest run，CI 可直接用。
   # ==========================================================================
