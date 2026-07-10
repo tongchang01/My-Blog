@@ -2,8 +2,8 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 content 模块、前台 blog、后台 admin
-> 最后校准：2026-07-05
-> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/*Article*`
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/`
 > 权威程度：API 契约
 
 ## 本文档回答什么问题
@@ -79,6 +79,7 @@ Query：
         "categoryNameZh": "后端",
         "slug": "hello-world",
         "status": "PUBLISHED",
+        "homepageSlot": "NONE",
         "publishAt": "2026-06-16T12:00:00",
         "coverAttachmentId": "100",
         "coverUrl": "https://static.example.com/cover.webp",
@@ -114,6 +115,8 @@ Authorization: Bearer <access-token>
 
 - `body`
 - `authorId`
+
+列表与详情都包含 `homepageSlot`，取值为 `NONE`、`PINNED` 或 `FEATURED`。
 
 字段权限：
 
@@ -179,6 +182,7 @@ Content-Type: application/json
   "tagIds": [20],
   "slug": "hello-world",
   "status": "PUBLISHED",
+  "homepageSlot": "NONE",
   "password": null,
   "publishAt": "2026-06-16T12:00:00",
   "coverAttachmentId": 100
@@ -195,7 +199,7 @@ Content-Type: application/json
 | `body` | 必填，Markdown 原文 |
 | `categoryId` | number 或 `null`，由状态规则决定是否必需 |
 | `tagIds` | 数组，最多 20 个，ID 必须为正数且不得重复 |
-| `slug` | string 或 `null`，由应用层规范化和唯一性校验 |
+| `slug` | string 或 `null`，由应用层规范化；文章 slug 不要求唯一 |
 | `status` | `DRAFT`、`PUBLISHED`、`PRIVATE`、`PASSWORD`、`SCHEDULED` |
 | `password` | string 或 `null`；PASSWORD 状态新建时必须非空 |
 | `publishAt` | ISO 本地时间或 `null` |
@@ -277,7 +281,7 @@ Query：
 | `tagId` | number | 无 | 标签 ID |
 | `categorySlug` | string | 无 | 分类 slug；前台公开 URL 优先使用该参数 |
 | `tagSlug` | string | 无 | 标签 slug；前台公开 URL 优先使用该参数 |
-| `keyword` | string | 无 | 当前语言标题/摘要关键字；第一版不搜索正文 |
+| `keyword` | string | 无 | 当前语言标题/摘要关键字，不搜索正文 |
 | `archiveMonth` | string | 无 | 格式 `yyyy-MM` |
 
 成功响应：HTTP 200，`data` 为 `PageResponse<PublicArticlePageItemVO>`。
@@ -312,9 +316,9 @@ Query：
 }
 ```
 
-公开列表只返回 `PUBLISHED` 和 `PASSWORD` 状态文章，不返回正文和密码信息。PASSWORD 文章通过 `locked=true` 表示。公开筛选同时保留 `categoryId/tagId` 兼容参数和 `categorySlug/tagSlug` URL 语义参数；前台分类/标签页面优先使用 slug。
+公开列表只返回 `PUBLISHED` 和 `PASSWORD` 状态文章，不返回正文和密码信息。PASSWORD 文章通过 `locked=true` 表示。筛选支持 `categoryId/tagId` 和 `categorySlug/tagSlug`；博客端分类和标签路由使用 slug。
 
-`keyword` 第一版只匹配三语标题和三语摘要，不搜索正文，不返回高亮片段。搜索结果仍使用公开文章列表响应，不返回正文和密码信息。
+`keyword` 只匹配三语标题和三语摘要，不搜索正文，不返回高亮片段。搜索结果仍使用公开文章列表响应，不返回正文和密码信息。
 
 ## 11. 公开首页文章
 
@@ -441,7 +445,7 @@ GET /api/public/articles/{id}?lang=zh
 当前行为：
 
 - `PUBLISHED`：返回正文。
-- `PASSWORD`：返回 `403 + 10003`，完整解锁流程见 O-001。
+- `PASSWORD`：当前固定返回 `403 + 10003`，没有解锁接口。
 - `DRAFT`、`PRIVATE`、`SCHEDULED`、不存在或已删除：返回 `404 + 90003`。
 
 ## 14. 状态规则摘要
@@ -458,9 +462,9 @@ GET /api/public/articles/{id}?lang=zh
 
 | 场景 | HTTP | code |
 |------|------|------|
-| 参数、字段、状态、时间、slug、标签请求非法 | 400 | `90001` |
+| 参数、字段、状态、时间、slug 格式、标签请求非法 | 400 | `90001` |
 | access token 缺失或失效 | 401 | `10002` |
 | DEMO 执行写操作、PASSWORD 公开详情未解锁 | 403 | `10003` |
 | 文章不存在、不可见或已删除 | 404 | `90003` |
-| slug 冲突、引用失效、恢复冲突 | 409 | `90004` |
+| 首页槽位超限、引用失效、恢复冲突 | 409 | `90004` |
 | 持久化或内部异常 | 500 | `99999` |

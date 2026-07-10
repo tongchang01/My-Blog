@@ -1,31 +1,18 @@
-# 业务规格
+# 产品与业务规格
 
 > 状态：当前有效
-> 适用范围：MyBlog V2 产品与业务规则
-> 最后校准：2026-06-29
-> 权威程度：业务规格参考
+> 适用范围：MyBlog V2 产品能力与业务不变量
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/src/main/java/`、`frontend/apps/`
+> 权威程度：业务规格导航
 
-## 与代码层文档的区别
-
-| 类型 | 关注 | 例 |
-|------|------|----|
-| `rules/` / `architecture/` / `adr/` | **怎么实现** | "Controller 返回 ApiResponse" |
-| `product/` | **要实现什么** | "用户可以给文章点赞" |
-
-`product/` 不写技术，只写业务。技术实现见 architecture、rules 和 adr。
-
-## 当前文件
+本目录描述当前产品已经支持什么，以及业务状态和约束。接口字段见 `../api/`，实现边界见 `../architecture/`，开发约束见 `../rules/`。
 
 | 文件 | 内容 |
-|------|------|
-| `feature-inventory.md` | V1 全部功能清单和 V2 去留决策 |
-| `use-cases.md` | GUEST、DEMO、ADMIN、系统任务能做什么 |
-| `business-rules.md` | 评论审核、文章可见性、权限模型等关键业务规则 |
-| `data-model.md` | 业务实体与关系 |
-| `er-diagram.md` | ER / 领域关系图 |
+| --- | --- |
+| [功能清单](feature-inventory.md) | 当前后端、博客端和管理端覆盖范围 |
+| [业务规则](business-rules.md) | 权限、文章、评论、配置和统计不变量 |
+| [领域模型](data-model.md) | 聚合、值对象和模块归属 |
+| [关系图](er-diagram.md) | 模块与数据表的逻辑关系 |
 
-## 维护规则
-
-- 业务规格只记录当前仍有效的产品结论；历史讨论原文保留在 `../../archive/project-handbook/product/`。
-- 涉及实现方式时，只链接 architecture、rules、api 或 adr，不在本目录重复展开。
-- 未完成或争议事项登记到 `../start-here/open-issues.md`，不在业务规格里并行维护待办。
+未完成事项只登记到 `../start-here/open-issues.md`，不在产品规格中复制待办列表。已经失效的产品讨论由 Git 历史保留。

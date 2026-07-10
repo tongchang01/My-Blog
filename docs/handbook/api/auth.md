@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端认证接口、后台 admin 会话接入
-> 最后校准：2026-07-09
+> 最后校准：2026-07-10
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/web/`
 > 权威程度：API 契约
 
@@ -16,7 +16,7 @@
 - access token 使用 `Authorization: Bearer <token>`。
 - refresh token 只通过 JSON 请求体传输，不使用 Cookie。
 - token 原文不得写入日志、URL 或第三方统计。
-- 后台当前会话存储在前端 localStorage，安全升级争议见 O-008。
+- 后台当前会话存储在前端专用 localStorage session 中，风险与约束见 `../rules/security-baseline.md`。
 - ADMIN 和 DEMO 均可登录后台；GUEST 不允许登录后台。
 
 ## 2. 后台登录
@@ -362,11 +362,3 @@ Content-Type: application/json
 - 凭据验证成功后清除当前限流 key。
 
 refresh、logout、me、公开作者资料、profile、password 当前不单独增加接口级限流。
-
-## 11. 尚未开放
-
-- Cookie 模式 token。
-- 单设备会话管理。
-- 管理员强制下线其它账号。
-
-相关未完成或争议事项见 O-008。

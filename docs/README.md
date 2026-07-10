@@ -2,47 +2,37 @@
 
 > 状态：当前有效
 > 适用范围：全项目文档
-> 最后校准：2026-06-29
-> 权威程度：入口索引
+> 最后校准：2026-07-10
+> 对应代码：`README.md`、`AGENTS.md`
+> 权威程度：文档总入口
 
-## 本文档回答什么问题
+## 目录
 
-本文档说明 MyBlog 仓库里的文档应该从哪里开始读、哪些目录是当前有效依据、哪些目录只保留历史追溯价值。
+| 目录 | 内容 | 使用方式 |
+| --- | --- | --- |
+| [`handbook/`](handbook/README.md) | 当前架构、规则、API、产品、前端和运维说明 | 开发与部署的权威文档 |
+| [`governance/`](governance/README.md) | 分支、提交和仓库协作规则 | 仓库治理的权威文档 |
+| [`showcase/`](showcase/README.md) | 中文、英文、日文项目展示 | 对外介绍，不作为开发依据 |
 
-## 当前主线
+Git 历史承担计划、评审、迁移过程和废弃说明的追溯。`docs/` 不保留归档副本、已完成计划或旧入口。
 
-MyBlog 当前主线是 V2 开发：
+## 阅读路径
 
-- V1：历史版本，只作业务参考，不再修改。
-- V2 后端：主体模块已完成，后续以联调、修正和上线准备为主。
-- V2 前台：刚进入读者端页面和公开接口接入阶段。
-- V2 后台：登录、内容管理、评论、友链、附件、站点配置、作者资料和统计仪表盘已有实现记录，仍需裁决 DEMO 字段边界和统计 ID 契约。
+- 了解项目：[`handbook/start-here/project-overview.md`](handbook/start-here/project-overview.md)
+- 查看当前进度：[`handbook/start-here/current-status.md`](handbook/start-here/current-status.md)
+- 查看遗留事项：[`handbook/start-here/open-issues.md`](handbook/start-here/open-issues.md)
+- 查看项目踩坑：[`handbook/start-here/pitfalls.md`](handbook/start-here/pitfalls.md)
+- 开始开发：[`handbook/rules/README.md`](handbook/rules/README.md) 与对应模块文档
+- 本地运行：[`handbook/ops/local-development.md`](handbook/ops/local-development.md)
+- 准备上线：[`handbook/ops/release-checklist.md`](handbook/ops/release-checklist.md)
 
-## 文档目录分工
+## 事实优先级
 
-| 目录 | 用途 | 是否作为当前开发依据 |
-|------|------|----------------------|
-| `docs/handbook/` | 当前有效开发手册，后续权威源 | 是 |
-| `docs/working/` | 临时计划、盘点、review、调研 | 否，完成后需提炼或归档 |
-| `docs/archive/` | 历史资料和旧迁移过程 | 否 |
-| `docs/governance/` | 分支策略、仓库治理、发布协作规则 | 视主题而定 |
-| `docs/showcase/` | 项目展示文档，可多语言 | 否 |
-| `docs/project-handbook/` | 旧手册跳转入口 | 否 |
-| `docs/archive/superpowers/` | 旧阶段计划、设计和 review | 否 |
+发生冲突时按以下顺序处理：
 
-## 推荐阅读顺序
+1. 当前代码、数据库迁移、配置和可执行测试。
+2. `handbook/` 中已标记“当前有效”的权威说明。
+3. 已采纳且仍适用的 ADR。
+4. `governance/` 中的仓库协作规则。
 
-1. 当前入口：`docs/handbook/README.md`
-2. 当前进度：`docs/handbook/start-here/current-status.md`
-3. 未完成和争议项：`docs/handbook/start-here/open-issues.md`
-4. 术语表：`docs/handbook/start-here/glossary.md`
-5. 文档维护规则：`docs/handbook/rules/documentation.md`
-
-## 整理说明
-
-当前文档已完成主要结构整理：
-
-- 新增权威文档放入 `docs/handbook/`。
-- 旧 `docs/project-handbook/` 中的有效内容已迁入 `docs/handbook/`，原文归档到 `docs/archive/project-handbook/`。
-- 旧 `docs/superpowers/` 中的过程材料已归档到 `docs/archive/superpowers/`。
-- 未完成和有争议的事项统一登记到 `open-issues.md`。
+发现不一致时必须同步修正文档或登记到 `handbook/start-here/open-issues.md`，不能继续复制冲突内容。

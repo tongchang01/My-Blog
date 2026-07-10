@@ -1,45 +1,28 @@
-# ADR-0012: 用 ArchUnit 守护架构规则
+# ADR-0012：使用 ArchUnit 守护架构边界
 
-- 状态：accepted
-- 日期：2026-04
-- 决策者：项目负责人
+> 状态：当前有效
+> 适用范围：V2 后端架构测试
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`
+> 权威程度：ADR
 
 ## 背景
 
-模块化单体的最大风险是规则被悄悄破坏：今天加一行 import，明天就出现循环依赖、Controller 直连 Mapper、跨模块直接访问对方 infrastructure。仅靠 code review 不可靠。
+模块化单体的依赖边界容易被普通 import 逐步破坏，仅依赖人工审查无法持续保证一致性。
 
-## 决定
+## 决策
 
-引入 [ArchUnit](https://www.archunit.org/) 作为测试期架构守护：
-- 规则集中在 `src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`
-- 跑 `mvn test` 时自动验证
-- 任何违反即构建失败
+使用 ArchUnit 在测试阶段验证以下边界：
 
-## 当前规则集
+- domain 不依赖 application、web、infrastructure 和框架 API，也不直接读取系统时间；
+- web 与 application 不直接依赖 infrastructure，application 不绑定 Servlet；
+- common 不反向依赖业务模块，业务模块不依赖 common.security 实现；
+- 跨业务模块只允许依赖对方 application 能力；
+- 五个业务模块不存在循环依赖；
+- 禁止恢复旧的顶层 infrastructure 包。
 
-1. `..domain..` 不依赖 `..web..` / `..infrastructure..`
-2. `..web..` 不访问 `..infrastructure.persistence.mapper..`
-3. `..application..` 不直接访问 MyBatis-Plus Mapper
-4. `..common..` 不依赖业务模块
-5. 业务模块不互相访问对方 `infrastructure.persistence`
+测试还包含故意违规的 fixture，用于证明关键规则确实能够失败。
 
-## 理由
+## 结果
 
-- 在 CI 阶段挡住违规，比 review 可靠
-- 规则即文档，新人看 `ArchitectureRulesTest` 即可了解架构边界
-- 重构时若需要打破规则，必须先改规则并写 ADR
-
-## 后果
-
-正面：架构规则可执行、自动验证
-负面：
-- 新增模块时需同步更新规则，遗漏会导致新模块无守护
-- 跑测试时间略增（可忽略）
-
-后续需关注：
-- 新增模块同步更新 ArchUnit 规则
-- 规则集成长，必要时拆分多个 test 文件
-
-## 相关
-
-- 相关 rules：`rules/package-layout.md`、`rules/testing-policy.md`
+架构边界成为构建的一部分。新增模块或调整依赖方向时，必须同步更新架构说明、ADR 和测试规则。

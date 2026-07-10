@@ -1,6 +1,6 @@
 # AI 协作规则
 
-> 本文件是 Codex 等 AI 编码助手在仓库根目录下的工作约束。当前文档入口见 `docs/README.md`，开发手册见 `docs/handbook/`。
+> 本文件是 AI 编码助手在仓库根目录下的工作约束。当前文档入口见 `docs/README.md`，开发手册见 `docs/handbook/`。
 
 ## 任务与提交拆分
 

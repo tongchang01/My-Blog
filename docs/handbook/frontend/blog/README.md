@@ -1,30 +1,29 @@
-# 前台 Blog
+# 博客端
 
 > 状态：当前有效
-> 适用范围：V2 前台读者端
-> 最后校准：2026-07-07
+> 适用范围：V2 公开读者端
+> 最后校准：2026-07-10
 > 对应代码：`frontend/apps/blog/`
-> 权威程度：前台规格入口
+> 权威程度：前端实现摘要
 
-## 本文档回答什么问题
+博客端基于 Vue 3、Pinia、Vue Router、vue-i18n、Axios、markdown-it、Vite 和 Vitest。界面源自 Aurora，但数据源、路由和业务交互已经迁移到 V2 API。
 
-本文档记录前台读者端的范围和当前主线。具体完成度见 `integration-status.md`，接口契约见 `../../api/`。
+## 当前能力
 
-## 范围
+- `/:lang` 三语首页，包含 PINNED、FEATURED 和普通文章区域。
+- `/:lang/posts/:id/:slug?` 文章详情；ID 是查询依据，加载后规范化 slug。
+- 分类、标签、归档、标题摘要搜索、关于页和友链页。
+- 后端 Markdown 正文渲染、目录、阅读时长和字数。
+- 文章评论列表、两层回复、分页、提交状态和错误重试。
+- 作者资料、站点配置、建站日期、公开统计和路由访问打点。
+- loading、empty、404、locked、error 与 retry 状态。
 
-前台 blog 面向匿名读者，覆盖首页、文章列表、文章详情、分类、标签、归档、友链、关于、搜索、评论、留言和访问统计等读者链路。
+## 当前边界
 
-## 当前方向
+- PASSWORD 文章只显示锁定元数据，详情与评论没有解锁流程。
+- 留言板后端接口已存在，博客端没有留言板页面。
+- SEO、RSS/Atom、sitemap、Open Graph 和结构化数据尚未形成完整发布能力。
+- 作者卡总字数、部分社交入口和文章上一篇/下一篇导航尚未补齐，见[开放问题](../../start-here/open-issues.md)的 ISSUE-008。
+- Gitalk、Valine、Twikoo、Waline 和旧静态 JSON 已从当前文章主链路清理；后续留言板继续使用 V2 自研评论接口。
 
-- 本轮校准以 `E:\My-Blog\frontend\apps\blog/src/` 的前端集成分支源码为准。
-- 技术栈以当前 `frontend/apps/blog/` 为准。
-- 路由使用语言前缀 `/:lang`，支持 `zh`、`ja`、`en`。
-- 公开文章 URL 以文章 ID 为定位键，slug 只增强可读性。
-- UI 文案由前端 i18n 管理，业务内容来自后端公开 API。
-- 文章正文 Markdown 渲染禁用原始 HTML，外链补安全属性。
-- 当前站点配置、首页文章聚合接口、普通文章列表、文章详情、分类、标签、归档、关于、搜索、访问统计和文章评论已完成 V2 API 接入。
-- 第一版发布前优先补作者卡片、移动菜单、友链页和页脚友链的 V2 数据源；留言板评论、PASSWORD 完整解锁、完整 SEO / RSS / Sitemap / Open Graph、Spotify 和后台筛选扩展后置。
-
-## 后续边界
-
-未完成页面和争议事项统一登记到 `../../start-here/open-issues.md`，不在本文档重复维护。
+本地 API base 为 `/api`，Vite 代理目标默认 `http://localhost:8080`。运行与验证命令见 `../../ops/local-development.md`。

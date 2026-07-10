@@ -1,21 +1,14 @@
-# 前端规格
+# 前端实现说明
 
 > 状态：当前有效
-> 适用范围：V2 前台 blog、V2 后台 admin
-> 最后校准：2026-06-29
+> 适用范围：V2 博客端与管理端
+> 最后校准：2026-07-10
 > 对应代码：`frontend/apps/blog/`、`frontend/apps/admin/`
-> 权威程度：前端入口
+> 权威程度：前端导航
 
-## 本文档回答什么问题
+| 应用 | 当前说明 | 本地端口 | 路由模式 |
+| --- | --- | --- | --- |
+| blog | [读者端](blog/README.md) | 5173 | history，公开路径带 `zh / ja / en` |
+| admin | [管理端](admin/README.md) | 8848 | hash |
 
-本目录收口前台读者端和后台管理端的当前能力、联调状态和后续边界。接口字段以 `../api/` 为准，未完成事项以 `../start-here/open-issues.md` 为准。
-
-## 文档清单
-
-| 文档 | 用途 |
-|------|------|
-| `blog/README.md` | 前台 blog 范围和当前方向 |
-| `blog/integration-status.md` | 前台已接入页面与未完成读者链路 |
-| `blog/post-launch-backlog.md` | 前台第一版后置补充项 |
-| `admin/README.md` | 后台 admin 技术基线和范围 |
-| `admin/integration-status.md` | 后台业务页完成度与剩余跟踪项 |
+接口字段以 `../api/` 为准，跨端功能状态以 `../product/feature-inventory.md` 为准，未完成事项只登记到 `../start-here/open-issues.md`。

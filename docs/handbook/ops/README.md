@@ -1,22 +1,19 @@
-# 运维与本地开发
+# 运行、验证与发布
 
 > 状态：当前有效
-> 适用范围：MyBlog V2 本地开发、验证、发布准备
-> 最后校准：2026-07-07
-> 权威程度：运维入口
-
-## 本文档回答什么问题
-
-本目录收口本地启动、构建测试、发布检查和环境配置说明。重复性开发操作放在 `../workflows/`。
-
-## 文档清单
+> 适用范围：MyBlog V2 本地开发、CI 和部署准备
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`、`.github/workflows/ci.yml`
+> 权威程度：运维导航
 
 | 文档 | 用途 |
-|------|------|
-| `local-development.md` | 本机三端启动指南 |
-| `local-mysql-development.md` | 本地 MySQL 调试步骤 |
-| `build-and-test.md` | 构建与测试命令 |
-| `ci-cd.md` | CI/CD 边界与扩展规则 |
-| `ci-troubleshooting.md` | CI 故障记录与排查方式 |
-| `deployment-direction.md` | 第一版部署方向和服务器待确认项 |
-| `release-checklist.md` | 发布前检查清单 |
+| --- | --- |
+| [本地启动](local-development.md) | 后端、博客端和管理端启动顺序 |
+| [本地 MySQL](local-mysql-development.md) | 安全初始化、种子和验收脚本 |
+| [环境变量](environment.md) | local/prod 配置来源与必填项 |
+| [构建与测试](build-and-test.md) | 本地和阶段验证命令 |
+| [持续集成](ci-cd.md) | 当前 CI job 与 CD 边界 |
+| [部署方向](deployment-direction.md) | 尚未绑定服务器的推荐运行形态 |
+| [发布检查](release-checklist.md) | 真实环境上线与回滚门槛 |
+
+CI、测试和本地开发中可复用的故障经验统一记录在 [`../start-here/pitfalls.md`](../start-here/pitfalls.md)，完整过程由 Git 历史追溯。

@@ -1,159 +1,51 @@
-# 请求处理链路
+# 请求处理流程
 
-> 本文档回答："一个请求从前端到 DB 是怎么走的？谁负责什么？"
-> 适用范围：V2 所有受保护接口。
+> 状态：当前有效
+> 适用范围：MyBlog V2 后端 HTTP 请求
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`
+> 权威程度：架构权威说明
 
-## 1. 整体链路
+## 通用流程
 
-```
-[前端]
-   │
-   ▼  HTTP + JSON
-[Spring DispatcherServlet]
-   │
-   ▼
-[Filter 链]
-   ├─ CorsFilter
-   ├─ JwtAuthenticationFilter   ← 解析 Bearer，注入 SecurityContext
-   └─ FilterSecurityInterceptor ← 鉴权
-   │
-   ▼
-[Controller (web 层)]
-   ├─ 入参绑定（@Valid 校验）
-   ├─ 调用 ApplicationService
-   └─ 返回 ApiResponse<T>
-   │
-   ▼
-[ApplicationService (application 层)]
-   ├─ 用例编排（事务边界）
-   ├─ 调 Domain 服务做业务规则
-   └─ 调 Repository 接口（domain.repository）持久化
-   │
-   ▼
-[Domain (domain 层)]
-   ├─ Entity / 值对象
-   ├─ Domain Service
-   └─ Repository 接口
-   │
-   ▼
-[Repository 实现 (infrastructure.persistence)]
-   ├─ 调 MyBatis-Plus Mapper
-   └─ Entity ↔ PO 映射
-   │
-   ▼
-[MySQL / H2]
+```text
+HTTP request
+  -> CORS / Spring Security / JwtAuthenticationFilter
+  -> Controller + Bean Validation
+  -> Web request 到 application command/query 的映射
+  -> Application service
+  -> Domain rule / Repository port / 其他模块 application 能力
+  -> Infrastructure adapter / Mapper / external service
+  -> Application result
+  -> Web VO
+  -> ApiResponse<T>
 ```
 
-## 2. 异常处理链路
+Web 层只负责协议边界，不直接访问 Entity、Mapper 或其他模块内部类型。Application 层负责用例、事务和跨模块协作。Domain 层只表达业务规则。Infrastructure 层处理持久化和外部服务。
 
-任意层抛 `ApiException` →
-```
-   ▼
-[GlobalExceptionHandler]  (@RestControllerAdvice)
-   ├─ ApiException        → ApiErrorCode 对应 HTTP 状态 + 中文消息
-   ├─ 校验异常             → VALIDATION_ERROR（400）
-   ├─ Spring Security 异常 → 401/403
-   └─ 其它未捕获           → INTERNAL_ERROR（500），不暴露堆栈
-   │
-   ▼
-ApiResponse {code, msg, data:null}
-```
+## 公开请求
 
-详见 `../rules/error-handling.md`。
+`application.yml` 的 `myblog.security.public-endpoints` 使用 HTTP method 与 path 共同声明匿名入口。公开接口仍经过参数校验、限流、内容清洗和统一异常处理。
 
-## 3. 一个完整例子：发评论
+公开读取主要位于 `/api/public/**`；登录和 refresh 位于 `/api/auth/**`。新增公开入口时必须同步配置白名单、API 契约和安全测试。
 
-`POST /api/comments`，Body：`{ articleId, content, parentId? }`
+## 后台请求
 
-### Filter 阶段
-- `JwtAuthenticationFilter`：解析 Bearer token，注入 `Authentication`
-- `FilterSecurityInterceptor`：白名单匹配 `POST /api/comments` 需登录
+`JwtAuthenticationFilter` 解析 Bearer access token，`AccessTokenVerifier` 校验签名、issuer、有效期、token 类型、账号状态和 `token_version`，成功后写入 `SecurityContext`。
 
-### web 层：`CommentController`
-```java
-@PostMapping
-public ApiResponse<CommentResponse> create(@Valid @RequestBody CommentCreateRequest req) {
-    CommentCreateCommand cmd = CommentRequestMapper.toCommand(req, currentUserId());
-    CommentCreateResult result = commentApplicationService.create(cmd);
-    return ApiResponse.ok(CommentResponseMapper.toResponse(result));
-}
-```
+- 后台读取通常允许 `ADMIN` 和 `DEMO`。
+- 后台写入只允许 `ADMIN`。
+- application 层继续执行敏感字段裁剪和关键权限复核，不能只依赖前端隐藏按钮。
 
-### application 层：`CommentApplicationService.create()`
-```java
-@Transactional
-public CommentCreateResult create(CommentCreateCommand cmd) {
-    // 1. 校验文章存在且允许评论（跨模块通过 content.application）
-    contentQueryService.assertArticleCommentable(cmd.articleId());
+## 事务
 
-    // 2. 构建领域对象
-    Comment comment = Comment.draft(cmd);
+- 写用例的事务边界位于 application service 或专用 transaction service。
+- BCrypt、文件读取等高成本操作不应无必要地占用数据库事务。
+- refresh 轮换、改密撤销、评论状态与计数等一致性场景必须在同一事务完成。
+- 并发敏感场景使用行锁、条件更新或版本条件，并由 H2/MySQL 测试验证。
 
-    // 3. 应用领域规则
-    commentReviewPolicy.applyOnCreate(comment);
+## 错误响应
 
-    // 4. 持久化（走 Repository 接口）
-    Comment saved = commentRepository.save(comment);
+可预期业务失败抛出 `ApiException`，参数和框架异常由 `GlobalExceptionHandler` 转换，认证授权失败由 `SecurityProblemSupport` 转换。所有失败保持 `ApiResponse` 结构，未预期异常返回 `99999` 且不暴露内部细节。
 
-    return CommentCreateResult.of(saved);
-}
-```
-
-### domain 层
-- `Comment` Entity：业务字段、状态机方法
-- `CommentReviewPolicy`：审核策略
-- `CommentRepository`：接口
-
-### infrastructure 层：`CommentRepositoryImpl`
-```java
-public Comment save(Comment comment) {
-    CommentPO po = CommentPersistenceMapper.toPo(comment);
-    if (po.getId() == null) commentMapper.insert(po);
-    else commentMapper.updateById(po);
-    return CommentPersistenceMapper.toDomain(po);
-}
-```
-
-→ MyBatis-Plus → SQL → MySQL
-
-## 4. 各层职责速查
-
-| 层 | 职责 | 禁止 |
-|----|------|------|
-| web | HTTP 入口、参数校验、调 application、组装 ApiResponse | 直接调 Mapper / Repository 实现 |
-| application | 用例编排、事务边界、跨模块协调 | 包含业务规则（应在 domain）|
-| domain | 业务规则、领域模型、仓储接口 | 依赖 web / infrastructure |
-| infrastructure | 仓储实现、Mapper、外部适配 | 反向依赖业务模块 |
-
-## 5. 事务边界
-
-- 事务在 `application` 层用 `@Transactional` 标注
-- 不在 `Controller` 加事务
-- 不在 `Repository` 实现内加事务（除非有独立子事务需求并写注释）
-
-## 6. 跨模块调用
-
-业务模块 A 调业务模块 B：**只**能通过 B 的 `application` 层公开接口。
-
-🔴 不能：
-- 调 B 的 `infrastructure.persistence.*`
-- 直接 import B 的 `domain.*` 内部实体（如需共享只读视图，B 的 application 层提供 DTO）
-
-## 7. 测试切片对应
-
-| 层 | 典型测试 |
-|----|----------|
-| web | `@WebMvcTest` + MockMvc |
-| application | 单元 + Mock Repository，或 `@SpringBootTest` 集成 |
-| domain | 纯 JUnit，无 Spring |
-| infrastructure | `@SpringBootTest` + H2 |
-
-详见 `../rules/testing-policy.md`。
-
-## 8. API 错误消息边界
-
-- 后端返回稳定的 5 位 `code`，前端以 `code` 作为错误类型判断依据
-- `ApiErrorCode` 统一维护 HTTP 状态与中文兜底消息
-- 前端面向用户的中、日、英提示由 `vue-i18n` 根据 `code` 生成，不直接依赖后端 `msg`
-- 后端不维护通用 API 错误多语言资源，避免同一文案在前后端重复维护
-- 文章、分类、标签等业务内容语言仍由 `/{lang}/` 接口路径和数据库三语字段决定
+具体契约见 `../rules/api-response.md` 和 `../rules/error-handling.md`。

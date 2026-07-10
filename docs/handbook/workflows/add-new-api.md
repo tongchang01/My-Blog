@@ -1,91 +1,19 @@
-# 新增 API 接口（SOP）
+# 新增 REST API
 
-> 目标：在已有模块中新增一个 REST 接口，符合 V2 规范。
+> 状态：当前有效
+> 适用范围：V2 现有业务模块
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`
+> 权威程度：标准流程
 
-## 1. 前置思考
+1. 确认所属模块、公开或后台路径、角色、数据裁剪和是否需要新错误码。
+2. 在 web 定义 Request 与 VO，加入 Bean Validation 和必要的中文 OpenAPI 描述。
+3. 在 application 定义独立 Command/Query/Result，不复用 Web DTO。
+4. 在 application service 编排权限、领域规则、事务和端口调用；可预期失败抛 `ApiException`。
+5. Controller 只做 HTTP 映射和类型转换，返回 `ApiResponse<T>`。
+6. 匿名接口在 `myblog.security.public-endpoints` 增加精确 method + path；后台读写同步更新 `SecurityConfig` 与角色测试。
+7. 更新 `../api/` 中对应主题的契约，不为单个小接口新建重复文档。
+8. 编写 application 与 Controller 测试，覆盖成功、校验、业务失败、认证和授权。
+9. 先运行相关测试，再按风险运行 `mvn test`。
 
-- 接口归属哪个模块？
-- 前台 `/api/` 还是后台 `/api/admin/`？
-- 鉴权要求？写入白名单还是需登录？需要 ADMIN 角色？
-- 是否需要新的 Command/Query？
-
-## 2. 步骤
-
-### 步骤 1：定义 Request / Response
-
-- `web/request/{Resource}{Action}Request.java`
-- `web/response/{Resource}Response.java`
-- 字段必填用 `@NotNull` / `@NotBlank`，长度 `@Size`
-- 每个字段写 Javadoc（中文，业务语义）+ `@Schema(description=...)`
-
-### 步骤 2：定义 application 层的 Command/Query/Result
-
-- 与 web 层 DTO 分离
-- 不带 Web 注解
-- 不直接复用 Request 类
-
-### 步骤 3：写 ApplicationService 方法
-
-```java
-@Transactional
-public XxxResult doSomething(XxxCommand cmd) {
-    // 校验
-    // 取领域对象
-    // 调用领域方法或服务
-    // 持久化
-    return XxxResult.of(...);
-}
-```
-
-业务异常抛 `ApiException(ApiErrorCode.XXX)`，不自己 `try-catch` 返错。
-
-### 步骤 4：Controller 暴露接口
-
-```java
-@RestController
-@RequestMapping("/api/comments")
-public class CommentController {
-
-    @PostMapping
-    public ApiResponse<CommentResponse> create(@Valid @RequestBody CommentCreateRequest req) {
-        CommentCreateCommand cmd = mapper.toCommand(req);
-        CommentCreateResult result = service.create(cmd);
-        return ApiResponse.ok(mapper.toResponse(result));
-    }
-}
-```
-
-- URL kebab-case
-- 字段 camelCase
-- 方法上 `@Operation(summary=...)`
-
-### 步骤 5：处理鉴权
-
-- 需登录但任意角色 → 不在白名单
-- 匿名可访问 → 在 `myblog.security.public-endpoints` 加 `method + path`
-- 需 ADMIN → 在 Security 配置中标识或加注解
-
-### 步骤 6：错误码
-
-- 复用已有 `ApiErrorCode`，命名 `{MODULE}_{SUBJECT}_{REASON}`
-- 新增错误码必须确定 HTTP 状态码（参考 `../rules/error-handling.md` §4）
-
-### 步骤 7：写测试
-
-- `XxxControllerTest`：成功 + 校验失败 + 权限失败 + 业务错误
-- ApplicationService 集成测试（如涉及复杂规则）
-
-### 步骤 8：跑 `mvn test`
-
-## 3. Checklist
-
-- [ ] Request `@Valid` + 字段校验
-- [ ] Response 字段 Javadoc + `@Schema`
-- [ ] Command/Result 与 Request/Response 分离
-- [ ] ApplicationService 标 `@Transactional`（如有写）
-- [ ] 业务异常抛 `ApiException`
-- [ ] URL 前缀正确（前台 / 后台）
-- [ ] 鉴权配置正确
-- [ ] 错误码新增已加注释
-- [ ] 测试覆盖成功+失败+鉴权
-- [ ] Swagger 注解齐全
+路径、响应和异常规则分别见 `../rules/package-layout.md`、`../rules/api-response.md`、`../rules/error-handling.md`。

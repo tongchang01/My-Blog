@@ -1,90 +1,55 @@
-# ADR — 架构决策记录
+# 架构决策记录
 
-> 本目录回答："为什么是这样定的？"
-> 性质：永久保留。一个决策一份文件，被取代时不删除，而是标记 superseded。
+> 状态：当前有效
+> 适用范围：V2 关键架构决策
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
+> 权威程度：导航与维护规则
 
-## 什么是 ADR
+ADR 记录仍影响当前实现的关键取舍。实现细节以代码、配置、迁移和测试为准；操作方法进入 handbook，已经完全失效的 ADR 删除并由 Git 历史保留。
 
-ADR（Architecture Decision Record）是一种轻量级文档，记录一项重要决策的：
-- **背景**：当时面临什么问题、有哪些选项
-- **决定**：选了哪个
-- **理由**：为什么这么选
-- **后果**：带来的好处与代价
-- **状态**：accepted / superseded / deprecated
+## 当前决策
 
-## 文件命名
+| 编号 | 决策 |
+| --- | --- |
+| 0001 | [采用模块化单体](0001-modular-monolith.md) |
+| 0002 | [基础包使用 com.tyb.myblog.v2](0002-package-base-com-tyb-myblog-v2.md) |
+| 0003 | [业务模块采用四层架构](0003-four-layer-architecture.md) |
+| 0004 | [五个业务模块与 common 基础设施](0004-six-business-modules.md) |
+| 0005 | [MyBatis-Plus 作为主要持久化框架](0005-mybatis-plus-as-primary-orm.md) |
+| 0006 | [使用 Spring Boot 3.5 与 Java 17](0006-upgrade-to-spring-boot-3.md) |
+| 0007 | [使用 Spring Security JOSE 与数据库会话撤销](0007-jwt-via-spring-security-jose.md) |
+| 0009 | [springdoc 生成 OpenAPI，Knife4j 提供本地 UI](0009-springdoc-replaces-knife4j.md) |
+| 0010 | [按复杂度分配 MyBatis SQL](0010-sql-placement-strategy.md) |
+| 0011 | [代码注释统一使用中文](0011-chinese-only-comments.md) |
+| 0012 | [使用 ArchUnit 守护架构边界](0012-archunit-guards.md) |
+| 0013 | [V2 不兼容 V1 数据结构和接口](0013-no-v1-compatibility.md) |
+| 0014 | [V2 数据库结构设计原则](0014-schema-redesign-principles.md) |
+| 0015 | [统一审计列与软删除](0015-audit-columns-and-soft-delete.md) |
+| 0016 | [文章 URL 由 ID 定位并附带可读 slug](0016-url-strategy-id-led.md) |
+| 0017 | [不使用数据库外键约束](0017-no-db-foreign-key.md) |
+| 0018 | [运行时统一使用 Asia/Tokyo](0018-timezone-asia-tokyo.md) |
 
-`NNNN-短主题.md`，NNNN 是 4 位递增编号，不空号、不复用。
+0008 对应的 Hutool 引入决策已随依赖移除而删除，编号不再复用。
 
-例：
-- `0001-use-mybatis-plus.md`
-- `0002-package-base-com-tyb-myblog-v2.md`
-- `0003-no-default-jwt-secret.md`
+## 新建格式
 
-## 模板
+文件名使用 `NNNN-short-topic.md`。正文至少包含：
 
 ```markdown
-# ADR-NNNN: 短主题
+# ADR-NNNN：决策标题
 
-- 状态：accepted | superseded by ADR-XXXX | deprecated
-- 日期：YYYY-MM-DD
-- 决策者：xxx
+> 状态：提议中 / 当前有效 / 已取代
+> 适用范围：受影响的模块
+> 最后校准：YYYY-MM-DD
+> 对应代码：`path/`
+> 权威程度：ADR
 
 ## 背景
 
-当时遇到的问题，涉及的约束。
+## 决策
 
-## 备选方案
-
-- 方案 A：……
-- 方案 B：……
-- 方案 C：……
-
-## 决定
-
-选 X。
-
-## 理由
-
-为什么选 X，关键权衡。
-
-## 后果
-
-正面：……
-负面：……
-后续需关注：……
-
-## 相关
-
-- 受影响的 rules：……
-- 取代的 ADR：……
+## 结果
 ```
 
-## 与其它目录的关系
-
-- `rules/` 写"怎么做"，本目录写"为什么这么做"
-- `arch/` 描述的结构由本目录的 ADR 决定
-- 决策被取代时，原 ADR 状态改为 `superseded by ADR-XXXX`，文件保留
-
-## 已有 ADR
-
-| ADR | 主题 | 状态 |
-|---|---|---|
-| 0001 | 模块化单体 | accepted |
-| 0002 | 包名 `com.tyb.myblog.v2` | accepted |
-| 0003 | 四层架构 | accepted |
-| 0004 | 6 个业务模块 | accepted |
-| 0005 | MyBatis-Plus 作为主 ORM | accepted |
-| 0006 | 升级到 Spring Boot 3 | accepted |
-| 0007 | JWT 改用 spring-security-oauth2-jose | accepted（2026-06 补充 R6 C1 双 token 机制） |
-| 0008 | Hutool 按需引入 | accepted |
-| 0009 | OpenAPI 基于 springdoc + UI 使用 Knife4j 4.x | accepted（2026-06 修订，原"用 springdoc 替换 knife4j"修订为两者共存） |
-| 0010 | SQL 放置策略 | accepted |
-| 0011 | 中文注释 | accepted |
-| 0012 | ArchUnit 守护规则 | accepted |
-| 0013 | 不兼容 V1 数据结构 | accepted |
-| 0014 | schema 重设计原则 | accepted（**部分被 0015 / 0018 超越**：主键 `BIGINT AUTO_INCREMENT`→`BIGINT NOT NULL` + MyBatis-Plus `ASSIGN_ID`（日志型表例外），时间类型 TIMESTAMP→DATETIME，审计列 2→8 列，软删 `deleted_at TIMESTAMP NULL` 单列→`deleted/deleted_at/deleted_by` 三件套；表命名 / 索引 / 字符集 / COMMENT / 关联表原则仍有效） |
-| 0015 | 审计列规范与软删三件套 | accepted（supersede 0014 §3-§5） |
-| 0016 | URL 策略——id 主导 + slug | accepted |
-| 0017 | 不使用 DB FOREIGN KEY | accepted |
-| 0018 | 时区统一 Asia/Tokyo（五层） | accepted |
+创建和维护流程见 `../workflows/write-adr.md`。
