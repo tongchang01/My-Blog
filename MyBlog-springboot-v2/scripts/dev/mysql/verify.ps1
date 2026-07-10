@@ -1,5 +1,10 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+
+# Requires PowerShell 7+ on Windows or Linux. Windows PowerShell 5.1 is unsupported.
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    throw "PowerShell 7+ is required. Run this script with pwsh."
+}
 
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 $verifySeedFile = Join-Path $scriptDirectory "verify-seed.sql"
