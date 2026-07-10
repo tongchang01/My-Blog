@@ -34,7 +34,7 @@
 import { computed, onBeforeMount, onUnmounted } from 'vue'
 import Breadcrumbs from '@/components/Breadcrumbs.vue'
 import { useI18n } from 'vue-i18n'
-import { useTagStore } from '@/stores/tag'
+import { useTaxonomyStore } from '@/features/taxonomy/store'
 import { TagList, TagItem } from '@/components/Tag'
 import { useCommonStore } from '@/stores/common'
 import SvgIcon from '@/components/SvgIcon/index.vue'
@@ -45,16 +45,16 @@ import { useAppStore } from '@/stores/app'
 const commonStore = useCommonStore()
 const appStore = useAppStore()
 const { t } = useI18n()
-const tagStore = useTagStore()
+const taxonomyStore = useTaxonomyStore()
 const { pageTitle, updateTitle } = usePageTitle()
 
 const tags = computed(() => {
-  if (tagStore.isLoaded && tagStore.tags.length === 0) return null
-  return tagStore.tags
+  if (taxonomyStore.tagStatus === 'empty') return null
+  return taxonomyStore.tags
 })
 
 const fetchData = async () => {
-  await tagStore.fetchAllTags(appStore.locale)
+  await taxonomyStore.loadTags(appStore.locale)
   updateTitle()
   commonStore.setHeaderImage(defaultCover)
 }

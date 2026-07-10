@@ -6,7 +6,7 @@
 > 对应代码：`frontend/apps/blog/`
 > 权威程度：前台完成度记录
 
-## 已完成首批
+## 已完成
 
 - 本轮校准以 `E:\My-Blog\frontend\apps\blog/src/` 的前端集成分支源码为准。
 - 三语入口和语言保存。
@@ -27,7 +27,7 @@
 - 首页已停止请求旧 Hexo/Aurora mock 数据。
 - Markdown 正文通过 `markdown-it` 渲染，禁用原始 HTML。
 
-## 待补齐
+## 后置
 
 - 第一版发布前建议补：友链页和页脚友链。当前 `links.vue` 和 `FooterLink.vue` 仍读取旧 `/pages/links/index.json` / `avatarWall`。后端已有 `GET /api/public/friend-links`，第一版友链只需要公开友链列表卡片，不复刻旧头像墙、分组、随机访问、申请说明、友链评论和页面统计。
 - 第一版后置：作者卡片总字数、LinkedIn/Qiita/个人主页/公开邮箱展示，详见 `post-launch-backlog.md`。
@@ -41,6 +41,4 @@
 ## 对应 open issues
 
 - O-001 PASSWORD 文章完整解锁流程。
-- O-003 前台读者主链路补齐。
 - O-004 前台评论、留言和统计接入。
-- O-019 评论和留言迁移到 V2 自研 API。

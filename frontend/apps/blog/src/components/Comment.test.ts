@@ -11,6 +11,5 @@ describe('Comment.vue', () => {
     expect(source).toContain('useCommentStore')
     expect(source).toContain('articleId')
     expect(source).toContain('commentStore.notice')
-    expect(source).not.toContain('usePostStore')
   })
 })

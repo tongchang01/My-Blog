@@ -32,7 +32,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { SubTitle } from '@/components/Title'
-import { useCategoryStore } from '@/stores/category'
+import { useTaxonomyStore } from '@/features/taxonomy/store'
 import { useAppStore } from '@/stores/app'
 import { useRouter } from 'vue-router'
 
@@ -48,12 +48,12 @@ const props = defineProps({
 })
 
 const appStore = useAppStore()
-const categoryStore = useCategoryStore()
+const taxonomyStore = useTaxonomyStore()
 const loading = ref(true)
 const router = useRouter()
 
 const fetchData = async () => {
-  await categoryStore.fetchCategories(appStore.locale)
+  await taxonomyStore.loadCategories(appStore.locale)
   loading.value = false
 }
 
@@ -69,7 +69,7 @@ onMounted(fetchData)
 const sidebarBoxClasses = computed(() => ({
   'sidebar-box': props.sidebarBox
 }))
-const categories = computed(() => categoryStore.categories)
+const categories = computed(() => taxonomyStore.categories)
 const gradientBackground = (active: boolean) => {
   return active
     ? {

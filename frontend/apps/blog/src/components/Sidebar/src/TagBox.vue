@@ -43,7 +43,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { SubTitle } from '@/components/Title'
-import { useTagStore } from '@/stores/tag'
+import { useTaxonomyStore } from '@/features/taxonomy/store'
 import { TagList, TagItem } from '@/components/Tag'
 import { useI18n } from 'vue-i18n'
 import SvgIcon from '@/components/SvgIcon/index.vue'
@@ -57,13 +57,13 @@ const props = defineProps({
   activeTag: String
 })
 
-const tagStore = useTagStore()
+const taxonomyStore = useTaxonomyStore()
 const appStore = useAppStore()
 const { t } = useI18n()
 const expand = ref<boolean>(false)
 
 const fetchData = async () => {
-  await tagStore.fetchAllTags(appStore.locale)
+  await taxonomyStore.loadTags(appStore.locale)
 }
 
 const expandBox = () => {
@@ -73,8 +73,8 @@ const expandBox = () => {
 onMounted(fetchData)
 
 const tags = computed(() => {
-  if (tagStore.isLoaded && tagStore.tags.length === 0) return null
-  return tagStore.tags
+  if (taxonomyStore.tagStatus === 'empty') return null
+  return taxonomyStore.tags
 })
 const tagBoxClasses = computed(() => ({
   'overflow-hidden text-ellipsis relative': true,

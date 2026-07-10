@@ -41,12 +41,12 @@
 
 ## O-003 前台读者主链路补齐
 
-- 状态：未完成
+- 状态：已关闭
 - 优先级：P0
 - 影响范围：前台 blog、公开 API
-- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签、归档、关于页、搜索、访问统计、文章评论、作者卡片、移动菜单和友链页已接入 V2 数据源。`/authors/blog-author.json`、`/statistic.json`、`/pages/links/index.json`、`avatarWall`、通用 `page/[slug].vue` 和旧第三方评论入口已从前台主源码清理。
+- 当前判断：首页、公开文章列表、文章详情、站点配置、分类、标签、归档、关于页、搜索、访问统计、文章评论、作者卡片、移动菜单和友链页已接入 V2 数据源。`/authors/blog-author.json`、`/statistic.json`、`/pages/links/index.json`、`avatarWall`、通用 `page/[slug].vue`、旧第三方评论入口、旧分类/标签包装 store 和旧 `api/index.ts` 已从前台主源码清理。
 - 第一版范围：旧 Aurora 友链页的头像墙、分组模式、随机访问、申请说明、友链评论、页面统计不进第一版；页脚随机友链组件已因无挂载且依赖旧数据源而删除。
-- 下一步：继续清理其它仍有消费者的旧 JSON 兼容 store，例如 `stores/post`、`stores/tag`、`api/index.ts` 中仍被旧分类/标签兼容路径使用的 helper；该清理需单独确认当前页面消费者。
+- 关闭原因：第一版前台读者主链路已脱离已确认的旧 Aurora/Hexo 活跃数据源；后续若发现新的旧 mock 消费者，按具体页面单独登记。
 - 来源：`../frontend/blog/integration-status.md`、`roadmap.md`、`docs/working/reviews/2026-07-07-first-release-scope-review.md`、`docs/working/reviews/2026-07-07-first-release-gap-and-deployment-assessment.md`
 
 ## O-004 前台评论、留言和统计接入
