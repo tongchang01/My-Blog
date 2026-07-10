@@ -52,7 +52,7 @@ jobs:
   # ==========================================================================
   # 后端 MySQL 集成 job：跑三个基于 Testcontainers MySQL 8.4 的专项测试。
   # 覆盖真实 MySQL 方言、行锁、并发条件更新等只在真 MySQL 上暴露的问题。
-  # 见 docs/working/plans/2026-07-02-ci-mysql-integration-test-plan.md。
+  # 当前边界见 docs/handbook/ops/ci-cd.md。
   # ==========================================================================
   backend-mysql-test:
     name: Backend MySQL integration tests
