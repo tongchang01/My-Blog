@@ -3,7 +3,7 @@
 > 状态：当前有效
 > 适用范围：MyBlog V2 后端 HTTP 请求
 > 最后校准：2026-07-10
-> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/*/web/`
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`
 > 权威程度：架构权威说明
 
 ## 通用流程

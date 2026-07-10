@@ -3,7 +3,7 @@
 > 状态：当前有效
 > 适用范围：V2 Flyway、领域模型和持久化实现
 > 最后校准：2026-07-10
-> 对应代码：`MyBlog-springboot-v2/src/main/resources/db/migration/`、`src/main/java/`
+> 对应代码：`MyBlog-springboot-v2/src/main/resources/db/migration/`、`MyBlog-springboot-v2/src/main/java/`
 > 权威程度：标准流程
 
 1. 确认表归属模块、业务生命周期、引用关系、主键方式和是否属于审计列例外。

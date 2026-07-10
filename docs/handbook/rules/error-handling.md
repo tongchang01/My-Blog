@@ -3,7 +3,7 @@
 > 状态：当前有效
 > 适用范围：V2 Web、安全和应用层
 > 最后校准：2026-07-10
-> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/error/`、`common/security/SecurityProblemSupport.java`
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/error/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/SecurityProblemSupport.java`
 > 权威程度：规则
 
 ## 处理边界

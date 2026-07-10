@@ -3,7 +3,7 @@
 > 状态：当前有效
 > 适用范围：V2 后端、数据库连接和博客时间展示
 > 最后校准：2026-07-10
-> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/config/`、`MyBlog-springboot-v2/src/main/resources/application*.yml`、`frontend/apps/blog/src/shared/time/`
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/config/`、`MyBlog-springboot-v2/src/main/resources/application.yml`、`MyBlog-springboot-v2/src/main/resources/application-local.yml`、`MyBlog-springboot-v2/src/main/resources/application-prod.yml`、`frontend/apps/blog/src/shared/time/`
 > 权威程度：ADR
 
 ## 背景

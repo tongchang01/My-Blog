@@ -3,7 +3,7 @@
 > 状态：当前有效
 > 适用范围：五个 V2 业务模块
 > 最后校准：2026-07-10
-> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/{identity,content,comment,system,stats}/`
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`、`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`
 > 权威程度：ADR
 
 ## 背景

@@ -3,7 +3,7 @@
 > 状态：当前有效
 > 适用范围：MyBlog V2 MySQL Schema
 > 最后校准：2026-07-10
-> 对应代码：`MyBlog-springboot-v2/src/main/resources/db/migration/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/*/infrastructure/persistence/entity/`
+> 对应代码：`MyBlog-springboot-v2/src/main/resources/db/migration/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`
 > 权威程度：Schema 权威说明
 
 ## 权威来源

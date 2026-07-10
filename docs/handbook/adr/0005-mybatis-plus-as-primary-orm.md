@@ -3,7 +3,7 @@
 > 状态：当前有效
 > 适用范围：V2 后端持久化
 > 最后校准：2026-07-10
-> 对应代码：`MyBlog-springboot-v2/pom.xml`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/*/infrastructure/persistence/`
+> 对应代码：`MyBlog-springboot-v2/pom.xml`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`、`MyBlog-springboot-v2/src/main/resources/mapper/`
 > 权威程度：ADR
 
 ## 背景
