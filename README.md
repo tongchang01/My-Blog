@@ -1,365 +1,117 @@
 # MyBlog V2
 
-**简体中文** | [English](./README.en.md) | [日本語](./README.ja.md)
+**简体中文** | [English](README.en.md) | [日本語](README.ja.md)
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F)
 ![Vue](https://img.shields.io/badge/Vue-3-42b883)
-![Node](https://img.shields.io/badge/Node-20%2B-339933)
 
+MyBlog V2 是一个模块化单体个人博客系统，由 Spring Boot API、公开博客和管理后台三个可独立构建的应用组成。V2 是当前开发主线；仓库中的 V1 目录只作历史参考。
 
+## 当前能力
 
-一个模块化单体的个人博客系统。后端使用 Spring Boot 3 + Java 17 承载业务，前端拆成博客前台与管理后台两个独立的 Vue 3 应用。V2 是当前主线，V1（Spring Boot 2 + Vue 3 前台 / Vue 2 后台）仅作为归档保留在仓库中。
+- 三语博客：首页、文章详情、分类、标签、归档、搜索、关于、友链和文章评论。
+- 首页编排：1 篇置顶、最多 2 篇精选和普通文章列表。
+- 管理后台：文章、分类标签、评论、友链、附件、站点配置、作者资料和统计仪表盘。
+- 身份与权限：ADMIN/DEMO、JWT access token、数据库 refresh token、轮换、退出和改密撤销。
+- 内容与数据：Markdown、评论 HTML 清洗、Flyway V1–V4、14 张表、软删除和审计字段。
+- 运维基础：local/test/prod profile、LOCAL/S3 存储、health endpoint 和 GitHub Actions CI。
 
-<sub>
-  <a href="#概览">概览</a> ·
-  <a href="#起源">起源</a> ·
-  <a href="#架构">架构</a> ·
-  <a href="#技术选型">技术选型</a> ·
-  <a href="#目录结构">目录结构</a> ·
-  <a href="#本地运行">本地运行</a> ·
-  <a href="#数据库">数据库</a> ·
-  <a href="#测试与验证">测试与验证</a> ·
-  <a href="#与-v1-的关系">与 V1 的关系</a> ·
-  <a href="#license">License</a>
-</sub>
-
-## 概览
-
-
-
-- **形态**：单一 Spring Boot 后端 + 两个独立部署的前端 SPA。
-- **架构风格**：模块化单体（Modular Monolith），业务按限界上下文切分成五个模块，模块之间的依赖方向由 ArchUnit 测试强制约束。
-- **契约边界**：模块内部按 `web / application / domain / infrastructure` 四层组织；对外通过 REST + JWT 提供接口，公开端点在配置中显式声明。
-- **持久化**：MySQL + MyBatis-Plus，schema 演进由 Flyway 管理。
-- **可运行性优先**：无 Redis / RabbitMQ / Quartz 等外部中间件依赖，本机只需 JDK 17、Node 20+、MySQL 即可完整跑通。
-
-
-
-## 起源
-
-
-
-V2 三端各自的出发点不同，取舍也不同：
-
-
-
-- **后端**：灵感来自 [`aurora-springboot`](https://github.com/linhaojun857/Aurora)——一个功能齐备但依赖较重的博客后端（Spring Boot 2 + Spring Security + Redis + RabbitMQ + Elasticsearch + Quartz + AWS S3）。V2 保留了其业务域的划分思路（内容 / 评论 / 用户权限 / 站点系统 / 统计），但代码**从零开发**，剥离所有可选中间件，改用 JWT 自签 + Caffeine 本机缓存 + Flyway 迁移 + 本地/S3 可插拔存储，目标是"单机可跑、模块边界能被测试锁死"。
-- **博客前台**：源自 [`auroral-ui/hexo-theme-aurora`](https://github.com/auroral-ui/hexo-theme-aurora)——一个 Vue 3 编写、原本嵌入 Hexo 的博客主题。原工程构建链与 Hexo 静态生成器强绑定，同时携带 gitalk / valine / twikoo / waline 等多套评论插件的 CDN 引入，配置面很宽。V2 将其**从 Hexo 中剥离为独立 SPA**：移除 Hexo 集成层与冗余评论插件、清理 `templates/*` 与 `server.proxy` 相关的 Hexo dev-server 依赖、升级 Vite / TypeScript / 依赖包版本，并将数据源从 `hexo-generator-json` 静态 JSON 切换到自研后端 REST API。
-- **管理后台**：以 [`pure-admin-thin`](https://github.com/pure-admin/pure-admin-thin) 为脚手架快照引入，在此基础上裁剪模板、按业务补齐视图与 API 客户端。
-
-
+当前尚未实现 PASSWORD 文章解锁和博客端留言板。实际生产服务器、代理、备份与回滚拓扑仍需确认，详见[当前状态](docs/handbook/start-here/current-status.md)和[开放问题](docs/handbook/start-here/open-issues.md)。
 
 ## 架构
 
-
-
-### 全景
-
-
-
-```mermaid
-flowchart TB
-  Blog["博客前台 · frontend/apps/blog"]
-  Admin["管理后台 · frontend/apps/admin"]
-
-
-
-  subgraph BE ["后端 · Spring Boot 3 · com.tyb.myblog.v2"]
-    direction TB
-    API(["REST + Bearer JWT"])
-    Identity[identity]
-    Content[content]
-    Comment[comment]
-    Stats[stats]
-    System[system]
-    Common[["common · 认证 / 存储 / 邮件"]]
-    API --> Identity
-    API --> Content
-    API --> Comment
-    API --> Stats
-    API --> System
-    Identity --> Common
-    Content --> Common
-    Comment --> Common
-    Stats --> Common
-    System --> Common
-  end
-
-
-
-  DB[("MySQL 8")]
-
-
-
-  Blog --> API
-  Admin --> API
-  Common --> DB
-```
-
-
-
-### 后端模块划分
-
-
-
-后端根包 `com.tyb.myblog.v2`，共五个业务模块 + 一个公共模块：
-
-
-
-| 模块         | 职责                         |
-| ---------- | -------------------------- |
-| `identity` | 用户、角色、权限、认证、JWT 签发         |
-| `content`  | 文章、分类、标签，含定时发布             |
-| `comment`  | 文章评论与留言板，含关键词审核            |
-| `stats`    | 页面访问统计与聚合任务                |
-| `system`   | 站点配置、友链、上传媒体等运营能力          |
-| `common`   | 跨模块基础设施：认证、错误、存储、安全、Web、邮件 |
-
-
-
-每个业务模块内部固定分层：
-
-
-
-```
-<module>/
-├─ web            # Controller / DTO / 请求响应契约
-├─ application    # 用例编排、事务边界、跨聚合协调
-├─ domain         # 领域模型与领域服务
-└─ infrastructure # MyBatis-Plus 映射、外部适配器
-```
-
-
-
-`ArchitectureRulesTest` 用 ArchUnit 强制以下约束：模块间不得越权互相依赖、`domain` 层不允许出现 Spring/MyBatis 等框架符号、`common.auth` 的 token 端口不能被业务模块或 Spring Security 直接引用。任何架构漂移都会在 `mvn test` 阶段失败。
-
-
-
-### 请求路径
-
-
-
 ```mermaid
 flowchart LR
-  SPA["浏览器 SPA"] -->|REST + Bearer JWT| Web["web · Controller"]
-  Web --> App["application · 用例服务"]
-  App --> Dom["domain · 聚合"]
-  App --> Infra["infrastructure · MyBatis-Plus"]
-  Infra --> DB[("MySQL")]
+  Blog["Blog · Vue 3"] --> API["Spring Boot REST API"]
+  Admin["Admin · Vue 3"] --> API
+  API --> Identity["identity"]
+  API --> Content["content"]
+  API --> Comment["comment"]
+  API --> System["system"]
+  API --> Stats["stats"]
+  Identity --> Common["common"]
+  Content --> Common
+  Comment --> Common
+  System --> Common
+  Stats --> Common
+  Common --> DB[("MySQL 8")]
 ```
 
+后端基础包为 `com.tyb.myblog.v2`。五个业务模块内部采用 web/application/domain/infrastructure 四层，跨模块只通过 application 能力协作，ArchUnit 在测试中守护依赖方向。
 
+## 技术栈
 
-`application` 层承担 `@Transactional` 边界与跨聚合协调。公开端点（不需要认证）在 `application.yml` 的 `myblog.security.public-endpoints` 中集中声明，其余接口默认要求 JWT。
+| 范围 | 技术 |
+| --- | --- |
+| 后端 | Java 17、Spring Boot 3.5、Spring Security、MyBatis-Plus、Flyway |
+| 数据与内容 | MySQL 8、CommonMark、OWASP HTML Sanitizer、Caffeine |
+| 存储与邮件 | 本地文件 / AWS S3、Resend 可选 |
+| 博客端 | Vue 3、Pinia、Vue Router、vue-i18n、markdown-it、Vite、Vitest |
+| 管理端 | Vue 3、Pinia、Element Plus、ECharts、Vite、Vitest |
+| 测试 | JUnit 5、Spring Boot Test、ArchUnit、H2、Testcontainers |
 
+V2 运行时不依赖 Redis、RabbitMQ、Elasticsearch 或 Quartz。Caffeine 限流按当前单实例前提设计。
 
+## 目录
 
-### 前端拆分
-
-
-
-- `frontend/apps/blog`：面向访客的博客前台。技术栈 Vue 3 + Vite + TypeScript + Pinia + Vue Router 4 + vue-i18n + markdown-it，源码按 `pages / features / api / stores / models` 分层。源自 Hexo 主题 `hexo-theme-aurora`，已剥离 Hexo 运行时（详见"起源"节）。
-- `frontend/apps/admin`：面向站长的管理后台。基于 `pure-admin-thin` 模板脚手架，使用 Vue 3 + Vite + TypeScript + Element Plus + Tailwind CSS + Pinia，Vitest 作为单元测试。
-
-
-
-两个前端各自独立构建与部署，通过 REST 与同一个后端交互。
-
-
-
-## 技术选型
-
-
-
-| 层      | 选型                                | 说明                                     |
-| ------ | --------------------------------- | -------------------------------------- |
-| 运行时    | Java 17 / Node 20+                | 由 Maven Enforcer 与 `engines` 字段约束      |
-| 后端框架   | Spring Boot 3.5                   | Servlet + Spring Security + Validation |
-| 持久化    | MyBatis-Plus 3.5 + MySQL 8        | 手写 SQL 与轻量 ORM 组合                      |
-| 迁移     | Flyway                            | `db/migration/V*__*.sql`，启动时自动执行       |
-| 认证     | 自研 JWT（access + refresh）          | 参数集中在 `myblog.security.jwt`            |
-| 限流     | Caffeine 本机缓存                     | 登录失败与页面访问统计的速率控制                       |
-| 邮件     | Resend HTTP API                   | 默认关闭，按需开启                              |
-| 存储     | LOCAL / AWS S3 可插拔                | 通过 `myblog.storage.type` 切换            |
-| 内容处理   | Commonmark + OWASP HTML Sanitizer | Markdown 渲染与 XSS 净化                    |
-| 映射     | MapStruct + Lombok                | DTO / 领域 / 持久化对象转换                     |
-| 架构测试   | ArchUnit                          | 模块边界与依赖方向                              |
-| API 文档 | Springdoc / Knife4j               | 默认关闭，本地按需启用                            |
-| 部署     | AWS EC2 单实例                       | 后端计划容器化，当前 JAR 直跑；前端 dist 由 nginx 静态托管 |
-
-
-
-## 目录结构
-
-
-
+```text
+MyBlog-springboot-v2/   V2 后端
+frontend/apps/blog/     V2 公开博客
+frontend/apps/admin/    V2 管理后台
+docs/                   当前文档、治理和展示资料
+MyBlog-springboot/      V1 后端参考
+MyBlog-vue/             V1 前端参考
 ```
-My-Blog
-├─ MyBlog-springboot-v2/           # V2 后端（当前主线）
-│  ├─ src/main/java/com/tyb/myblog/v2/
-│  ├─ src/main/resources/
-│  │  ├─ application.yml           # 基线配置
-│  │  ├─ application-local.yml     # 本机 profile
-│  │  ├─ db/migration/             # Flyway SQL
-│  │  └─ mapper/                   # MyBatis XML
-│  ├─ scripts/                     # 本地辅助脚本
-│  └─ .env.example                 # 必要环境变量样例
-├─ frontend/
-│  └─ apps/
-│     ├─ blog/                     # V2 博客前台
-│     └─ admin/                    # V2 管理后台
-├─ MyBlog-springboot/              # V1 后端（归档，仅供参考）
-└─ MyBlog-vue/                     # V1 前端（归档，仅供参考）
-```
-
-
 
 ## 本地运行
 
-
-
-### 前置
-
-
-
-- JDK 17
-- Maven 3.9+
-- Node 20.19+ 或 22.12+，通过 `corepack` 启用 pnpm 9
-- MySQL 8，本机建库 `myblog_v2_dev`（Flyway 会负责建表与迁移）
-
-
-
-### 环境变量
-
-
-
-后端读取以下变量（详见 `MyBlog-springboot-v2/.env.example`）：
-
-
-
-<details>
-<summary>展开变量清单</summary>
-
-
-
-```
-MYBLOG_DATASOURCE_USERNAME=root
-MYBLOG_DATASOURCE_PASSWORD=<本机 MySQL 密码>
-MYBLOG_JWT_SECRET=<至少 32 字符的随机串>
-MYBLOG_STATS_HASH_SECRET=<至少 32 字符的随机串>
-```
-
-
-
-</details>
-
-
-
-真实密钥通过本机环境变量或 IDE 运行配置注入，仓库中不保存生产值。
-
-
-
-> [!IMPORTANT]
-> 生产环境的 `MYBLOG_JWT_SECRET` 与 `MYBLOG_STATS_HASH_SECRET` 必须替换为高熵随机串。示例值仅供本机开发使用，泄露即等同于伪造任意用户会话。
-
-
-
-### 启动三端
-
-
+要求 JDK 17、Maven 3.9.x、MySQL 8、Node 20.19+ 或兼容的 Node 22+、pnpm 9，以及 `Asia/Tokyo` JVM 时区。
 
 ```powershell
-# 后端（默认 profile：local）
+# 后端
 cd MyBlog-springboot-v2
-mvn spring-boot:run
+mvn spring-boot:run -Dspring-boot.run.profiles=local
 
-
-
-# 博客前台
+# 博客端，默认 http://localhost:5173
 cd frontend/apps/blog
 corepack pnpm install --frozen-lockfile
 corepack pnpm dev
 
-
-
-# 管理后台
+# 管理端，默认 http://localhost:8848
 cd frontend/apps/admin
 corepack pnpm install --frozen-lockfile
 corepack pnpm dev
 ```
 
+后端需要数据库、JWT 和统计密钥环境变量。完整步骤见[本地启动](docs/handbook/ops/local-development.md)和[环境变量](docs/handbook/ops/environment.md)。本地 MySQL 辅助脚本当前存在 PowerShell 版本兼容问题，使用前先阅读[本地 MySQL 手册](docs/handbook/ops/local-mysql-development.md)。
 
+## 验证
 
-默认监听地址：
+```powershell
+cd MyBlog-springboot-v2
+mvn clean test
 
+cd frontend/apps/blog
+corepack pnpm test
+corepack pnpm typecheck
+corepack pnpm build
 
+cd frontend/apps/admin
+corepack pnpm test
+corepack pnpm typecheck
+corepack pnpm build
+```
 
-![API](https://img.shields.io/badge/API-localhost%3A8080-6DB33F)
-![Health](https://img.shields.io/badge/Health-%2Factuator%2Fhealth-6DB33F)
-![Blog](https://img.shields.io/badge/Blog-localhost%3A5173-42b883)
-![Admin](https://img.shields.io/badge/Admin-localhost%3A5174-409EFF)
+## 文档
 
-
-
-## 数据库
-
-
-
-- 迁移脚本位于 `MyBlog-springboot-v2/src/main/resources/db/migration/`，命名遵循 Flyway 规范（`V<version>__<description>.sql`）。
-- 后端启动时自动执行未应用的迁移，无需手动导入 SQL。
-- 时区固定为 `Asia/Tokyo`，MySQL 连接串与 Jackson 序列化均对齐这一时区。
-
-
-
-> [!WARNING]
-> 时区是强约束。部署主机、MySQL server 时区与应用配置任何一处偏离 `Asia/Tokyo`，都会让文章发布时间、评论时间戳与统计聚合出现难以察觉的偏移。
-
-
-
-## 测试与验证
-
-
-
-| 命令                                                      | 覆盖范围                      |
-| ------------------------------------------------------- | ------------------------- |
-| `mvn test`                                              | 后端单元测试 + ArchUnit 架构约束    |
-| `mvn verify`                                            | 完整构建 + 打包                 |
-| `corepack pnpm --dir frontend/apps/blog run build`      | 博客前台产物构建                  |
-| `corepack pnpm --dir frontend/apps/admin test`          | 管理后台单元测试（Vitest）          |
-| `corepack pnpm --dir frontend/apps/admin run typecheck` | TypeScript + Vue TSC 类型检查 |
-| `corepack pnpm --dir frontend/apps/admin run build`     | 管理后台产物构建                  |
-
-
-
-任何触碰模块划分或跨模块依赖的改动，都应以 `mvn test` 的 ArchUnit 结果作为门禁。
-
-
-
-## 与 V1 的关系
-
-
-
-> [!NOTE]
-> V1 目录（`MyBlog-springboot` + `MyBlog-vue`）仅作对照与数据迁移参考，不再接受新特性；完整历史见 `archive/v1-master-2026-06-26` 分支。
-
-
-
-- V1 本身是对 [`aurora-springboot`](https://github.com/linhaojun857/Aurora) / [`aurora-blog`](https://github.com/auroral-ui/hexo-theme-aurora) 一系列上游工程的改造版本，运行时依赖 Spring Security / Redis / RabbitMQ / Elasticsearch / Quartz / AWS S3，属于"功能齐但重"的形态。
-- V2 不复用 V1 的运行时依赖，也不复用其数据库 schema；两套 schema 相互独立，需要迁移数据时以 SQL 脚本方式一次性完成，而非在运行期共存。
-
-
+- [文档入口](docs/README.md)
+- [开发手册](docs/handbook/README.md)
+- [API 契约](docs/handbook/api/README.md)
+- [业务规格](docs/handbook/product/README.md)
+- [运行与发布](docs/handbook/ops/README.md)
 
 ## License
 
-
-
-本仓库以 [MIT](./LICENSE) 授权。
-
-
-
-- `frontend/apps/blog` 派生自 [`auroral-ui/hexo-theme-aurora`](https://github.com/auroral-ui/hexo-theme-aurora)（MIT），保留其原始 [`LICENSE`](./frontend/apps/blog/LICENSE) 与版权声明。
-- `frontend/apps/admin` 基于 [`pure-admin/pure-admin-thin`](https://github.com/pure-admin/pure-admin-thin)（MIT）脚手架，保留其原始 [`LICENSE`](./frontend/apps/admin/LICENSE) 与版权声明。
-- 后端仅在业务域划分上参考 [`linhaojun857/Aurora`](https://github.com/linhaojun857/Aurora)（Apache-2.0），代码由本仓库从零编写。
- 
+仓库使用 [MIT License](LICENSE)。博客端源自 [Hexo Theme Aurora](https://github.com/auroral-ui/hexo-theme-aurora)，管理端基于 [pure-admin-thin](https://github.com/pure-admin/pure-admin-thin)；各应用保留对应上游许可证和来源记录。
