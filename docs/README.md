@@ -21,6 +21,7 @@ Git 历史承担计划、评审、迁移过程和废弃说明的追溯。`docs/`
 - 了解项目：[`handbook/start-here/project-overview.md`](handbook/start-here/project-overview.md)
 - 查看当前进度：[`handbook/start-here/current-status.md`](handbook/start-here/current-status.md)
 - 查看遗留事项：[`handbook/start-here/open-issues.md`](handbook/start-here/open-issues.md)
+- 查看项目踩坑：[`handbook/start-here/pitfalls.md`](handbook/start-here/pitfalls.md)
 - 开始开发：[`handbook/rules/README.md`](handbook/rules/README.md) 与对应模块文档
 - 本地运行：[`handbook/ops/local-development.md`](handbook/ops/local-development.md)
 - 准备上线：[`handbook/ops/release-checklist.md`](handbook/ops/release-checklist.md)

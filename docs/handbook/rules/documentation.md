@@ -41,6 +41,7 @@ docs/
 | 当前进度与验证状态 | `start-here/current-status.md` |
 | 未来实施顺序 | `start-here/roadmap.md` |
 | 未解决事项 | `start-here/open-issues.md` |
+| 可复用工程经验 | `start-here/pitfalls.md` |
 | 术语 | `start-here/glossary.md` |
 | 架构事实 | `architecture/` |
 | 架构决策理由 | `adr/` |

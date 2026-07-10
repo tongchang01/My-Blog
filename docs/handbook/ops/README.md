@@ -16,4 +16,4 @@
 | [部署方向](deployment-direction.md) | 尚未绑定服务器的推荐运行形态 |
 | [发布检查](release-checklist.md) | 真实环境上线与回滚门槛 |
 
-一次性 CI 故障记录由 Git 历史保留，不作为长期运维文档。
+CI、测试和本地开发中可复用的故障经验统一记录在 [`../start-here/pitfalls.md`](../start-here/pitfalls.md)，完整过程由 Git 历史追溯。
