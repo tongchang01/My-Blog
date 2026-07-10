@@ -8,7 +8,7 @@
 
 | 术语 | 定义 |
 | --- | --- |
-| V1 | `MyBlog-springboot/` 与 `MyBlog-vue/` 旧版本，只作参考 |
+| V1 | 已从主线移除的旧版本，源码由只读分支 `archive/v1-master-2026-06-26` 保存 |
 | V2 | 当前主线：V2 后端、blog 和 admin |
 | blog / 博客端 | `frontend/apps/blog/` 公开读者端 |
 | admin / 管理端 | `frontend/apps/admin/` 后台应用 |
