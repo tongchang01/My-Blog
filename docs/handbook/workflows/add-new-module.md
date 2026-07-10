@@ -1,90 +1,19 @@
-# 新增业务模块（SOP）
+# 新增后端业务模块
 
-> 目标：从零搭出符合 V2 架构规范的新业务模块。
-> 适用：新增如 `system`、`media` 等业务模块。
+> 状态：当前有效
+> 适用范围：V2 顶层业务模块
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`
+> 权威程度：标准流程
 
-## 1. 前置条件
+新增顶层模块属于架构变更，开始实现前必须确认现有五个模块无法合理承载该职责，并记录 ADR。
 
-- 模块边界清晰，与现有模块无重叠
-- 已确认模块名（小写，单数）
-- 阅读：`../architecture/module-map.md`、`../rules/package-layout.md`
+1. 定义模块职责、拥有的数据、公开 application 能力和允许的跨模块依赖。
+2. 建立 `web / application / domain / infrastructure` 四层包。
+3. 先定义领域模型、规则和端口，再实现 infrastructure 适配、application 用例和 web 接口。
+4. 把模块名加入 `ArchitectureRulesTest`，补跨模块限制、循环依赖和故意违规 fixture。
+5. 更新 `../architecture/module-map.md`、`../architecture/request-flow.md`、产品规格和 ADR 导航。
+6. 编写各层局部测试并运行 `ArchitectureRulesTest`。
+7. 阶段结束运行后端全量测试。
 
-## 2. 步骤
-
-### 步骤 1：建包结构
-
-```
-com.tyb.myblog.v2.{module}
-├── web
-│   ├── {Module}Controller.java
-│   ├── request/
-│   ├── response/
-│   └── mapper/   ← Web 层 DTO ↔ Command/Result 映射
-├── application
-│   ├── {Module}ApplicationService.java
-│   ├── command/
-│   ├── query/
-│   └── result/
-├── domain
-│   ├── model/   ← Entity、值对象
-│   ├── service/ ← Domain Service
-│   └── repository/  ← Repository 接口
-└── infrastructure
-    └── persistence
-        ├── {Module}RepositoryImpl.java
-        ├── mapper/   ← MyBatis-Plus Mapper
-        └── po/       ← 持久化对象（若与 domain 分离）
-```
-
-### 步骤 2：写 Domain（先建模）
-
-- 定义 Entity、值对象
-- 定义 Repository 接口
-- Domain Service 承载跨实体业务规则
-
-### 步骤 3：写 infrastructure
-
-- Mapper（按需 BaseMapper + XML）
-- Repository 实现
-- PO ↔ Entity 映射类
-
-### 步骤 4：写 application
-
-- ApplicationService 承载用例
-- Command/Query/Result 与 web 层 DTO 分离
-- 在用例方法标 `@Transactional`
-
-### 步骤 5：写 web
-
-- Controller、Request/Response
-- `@Valid` 校验
-- 返回 `ApiResponse<T>`
-
-### 步骤 6：更新 ArchUnit 规则
-
-🔴 必做。在 `ArchitectureRulesTest` 中加入新模块的守护规则：
-- 跨模块禁止访问本模块 `infrastructure.persistence`
-- 本模块 `domain` 不依赖 web/infrastructure
-
-漏更新 = 新模块无守护。
-
-### 步骤 7：写测试
-
-按 `../rules/testing-policy.md` §2 必测场景列表对照。
-
-### 步骤 8：更新文档
-
-- `../architecture/module-map.md` — 补新模块行
-- `../status.md` — 加新模块进度
-- 若涉及关键决策（如选用非常规组件），写 ADR
-
-### 步骤 9：跑 `mvn test`
-
-确认 ArchUnit + 单元 + 集成测试全过。
-
-## 3. 常见错误
-
-- ❌ 漏更新 ArchUnit 规则
-- ❌ Controller 直接 import 其它模块的 Mapper
-- ❌ Entity 暴露在跨模块边界（应改用 application 层 DTO）
-- ❌ 在 web/infrastructure 写业务规则
+禁止通过 common 承载新模块的专属业务对象，也禁止以直接访问其他模块 Mapper 的方式完成集成。
