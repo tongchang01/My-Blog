@@ -1,10 +1,15 @@
-param(
+﻿param(
     [switch]$Reset,
     [switch]$SkipSeed
 )
 
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
+
+# Requires PowerShell 7+ on Windows or Linux. Windows PowerShell 5.1 is unsupported.
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    throw "PowerShell 7+ is required. Run this script with pwsh."
+}
 
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 $projectDirectory = (Resolve-Path (Join-Path $scriptDirectory "../../..")).Path
@@ -113,13 +118,14 @@ function Stop-ProcessTree {
         return
     }
 
-    & taskkill.exe /PID $Process.Id /T /F 2>&1 | Out-Null
+    $Process.Kill($true)
 }
 
 $originalMysqlPassword = [Environment]::GetEnvironmentVariable("MYSQL_PWD", "Process")
 $backendProcess = $null
-$standardOutputLog = Join-Path $env:TEMP "myblog-v2-local-mysql.out.log"
-$standardErrorLog = Join-Path $env:TEMP "myblog-v2-local-mysql.err.log"
+$standardOutputLog = Join-Path ([System.IO.Path]::GetTempPath()) "myblog-v2-local-mysql.out.log"
+$standardErrorLog = Join-Path ([System.IO.Path]::GetTempPath()) "myblog-v2-local-mysql.err.log"
+$mavenExecutable = if ($IsWindows) { "mvn.cmd" } else { "mvn" }
 
 try {
     [Environment]::SetEnvironmentVariable("MYSQL_PWD", $password, "Process")
@@ -139,16 +145,21 @@ try {
 
     Remove-Item $standardOutputLog, $standardErrorLog `
         -Force -ErrorAction SilentlyContinue
-    $backendProcess = Start-Process -FilePath "mvn.cmd" `
-        -ArgumentList @(
+    $startProcessParameters = @{
+        FilePath = $mavenExecutable
+        ArgumentList = @(
             "spring-boot:run",
             "-Dspring-boot.run.profiles=local"
-        ) `
-        -WorkingDirectory $projectDirectory `
-        -WindowStyle Hidden `
-        -RedirectStandardOutput $standardOutputLog `
-        -RedirectStandardError $standardErrorLog `
-        -PassThru
+        )
+        WorkingDirectory = $projectDirectory
+        RedirectStandardOutput = $standardOutputLog
+        RedirectStandardError = $standardErrorLog
+        PassThru = $true
+    }
+    if ($IsWindows) {
+        $startProcessParameters.WindowStyle = "Hidden"
+    }
+    $backendProcess = Start-Process @startProcessParameters
 
     $deadline = [DateTime]::UtcNow.AddSeconds(120)
     $healthy = $false
@@ -200,7 +211,7 @@ try {
     $seedPath = $seedFile.Replace('\', '/')
     Invoke-MySqlQuery -Sql "source $seedPath" | Out-Null
 
-    & (Join-Path $PSHOME "powershell.exe") -NoProfile `
+    & (Get-Process -Id $PID).Path -NoProfile `
         -ExecutionPolicy Bypass -File $verifyScript
     if ($LASTEXITCODE -ne 0) {
         throw "Seed verification failed"

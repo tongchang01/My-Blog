@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 开发、测试、CI 与仓库维护
-> 最后校准：2026-07-10
+> 最后校准：2026-07-11
 > 对应代码：`.github/workflows/ci.yml`、`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：可复用工程经验
 
@@ -30,12 +30,12 @@
 - 处理：公开响应中的嵌套类型使用 `@Schema(name = "...")` 指定唯一名称；Snowflake ID 在 HTTP 边界保持 JSON string，并由 OpenAPI 测试固定。
 - 相关：`../rules/testing-policy.md`、`../api/article.md`。
 
-## P-004：PowerShell 版本和编码不能混用隐式默认值
+## P-004：PowerShell 版本、编码和平台命令必须显式约束
 
-- 现象：Windows PowerShell 5.1 在部分代码页下不能稳定解析 UTF-8 无 BOM 脚本；PowerShell 7 运行时，脚本又通过 `$PSHOME\powershell.exe` 启动错误的子进程。
-- 影响：本地 MySQL 初始化和合约验证不能可靠复现。
-- 处理：明确支持的 PowerShell 版本，统一子进程入口和 UTF-8 读写，再恢复自动初始化为推荐路径。
-- 状态：尚未解决，见 `open-issues.md` 的 ISSUE-001。
+- 现象：Windows PowerShell 5.1 在部分代码页下不能稳定解析 UTF-8 无 BOM 脚本；PowerShell 7 中硬编码 `powershell.exe`、`mvn.cmd`、`taskkill.exe` 或 `%TEMP%` 会破坏 Linux 运行。
+- 影响：本地 MySQL 初始化和合约验证无法可靠跨平台复现。
+- 处理：仅支持 PowerShell 7+；脚本使用 UTF-8 BOM、当前 `pwsh`、跨平台临时目录和 .NET 进程终止；Windows 专用启动选项必须置于 `$IsWindows` 分支。
+- 状态：Windows 与 Ubuntu CI 合约已通过；显式 `-Reset` 覆盖仍见 `open-issues.md` 的 ISSUE-001。
 
 ## P-005：旧基线分支不能直接并回主线
 

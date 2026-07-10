@@ -1,8 +1,13 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
+
+# Requires PowerShell 7+ on Windows or Linux. Windows PowerShell 5.1 is unsupported.
+if ($PSVersionTable.PSVersion.Major -lt 7) {
+    throw "PowerShell 7+ is required. Run this script with pwsh."
+}
 
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 $initializeScript = Join-Path $scriptDirectory "initialize.ps1"
-$powerShellExecutable = Join-Path $PSHOME "powershell.exe"
+$powerShellExecutable = (Get-Process -Id $PID).Path
 $temporaryDirectory = Join-Path ([System.IO.Path]::GetTempPath()) (
     "myblog-mysql-contract-" + [guid]::NewGuid().ToString("N"))
 $fakeMysqlLog = Join-Path $temporaryDirectory "mysql.log"
@@ -60,13 +65,18 @@ function Invoke-Initialize {
             "-File",
             ('"' + $initializeScript + '"')
         ) + $Arguments
-        $process = Start-Process -FilePath $powerShellExecutable `
-            -ArgumentList $argumentList `
-            -WindowStyle Hidden `
-            -RedirectStandardOutput $outputFile `
-            -RedirectStandardError $errorFile `
-            -Wait `
-            -PassThru
+        $startProcessParameters = @{
+            FilePath = $powerShellExecutable
+            ArgumentList = $argumentList
+            RedirectStandardOutput = $outputFile
+            RedirectStandardError = $errorFile
+            Wait = $true
+            PassThru = $true
+        }
+        if ($IsWindows) {
+            $startProcessParameters.WindowStyle = "Hidden"
+        }
+        $process = Start-Process @startProcessParameters
         $output = (
             (Get-Content -Raw $outputFile -ErrorAction SilentlyContinue) +
             (Get-Content -Raw $errorFile -ErrorAction SilentlyContinue))
@@ -99,8 +109,32 @@ if ($joined.Contains("active_count")) {
 }
 exit 0
 '@
-    Set-Content -Path (Join-Path $temporaryDirectory "mysql.ps1") `
-        -Value $fakeMysql -Encoding UTF8
+    $fakeMysqlScript = Join-Path $temporaryDirectory "mysql.ps1"
+    Set-Content -Path $fakeMysqlScript -Value $fakeMysql -Encoding utf8BOM
+    if ($IsWindows) {
+        Set-Content -Path (Join-Path $temporaryDirectory "mysql.cmd") `
+            -Value ('@"' + $powerShellExecutable + '" -NoProfile -File "' + $fakeMysqlScript + '" %*') `
+            -Encoding ascii
+    } else {
+        $fakeMysqlExecutable = Join-Path $temporaryDirectory "mysql"
+        Set-Content -Path $fakeMysqlExecutable -Value (
+            "#!" + $powerShellExecutable + "`n& '" + $fakeMysqlScript + "' @args") -Encoding utf8NoBOM
+        & chmod +x $fakeMysqlExecutable
+    }
+
+    $initializeSource = Get-Content -Raw -Encoding UTF8 $initializeScript
+    Assert-True ($initializeSource -match '\$PSVersionTable\.PSVersion\.Major -lt 7') `
+        "初始化脚本必须拒绝 PowerShell 7 以下版本"
+    Assert-True ($initializeSource -match 'if \(\$IsWindows\)') `
+        "初始化脚本必须按平台处理启动参数"
+    Assert-True ($initializeSource -notmatch 'taskkill\.exe') `
+        "初始化脚本不得调用 Windows 专有的 taskkill.exe"
+    Assert-True ($initializeSource -notmatch '-FilePath "mvn\.cmd"') `
+        "初始化脚本不得无条件调用 mvn.cmd"
+    Assert-True ($initializeSource -notmatch '\$env:TEMP') `
+        "初始化脚本必须使用跨平台临时目录"
+    Assert-True ($initializeSource -notmatch 'powershell\.exe') `
+        "初始化脚本不得硬编码 Windows PowerShell"
 
     $missingCredentials = Invoke-Initialize -Environment @{
         PATH = $temporaryDirectory

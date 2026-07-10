@@ -6,11 +6,11 @@
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：路线图
 
-## 1. 恢复本地可重复初始化
+## 1. 补齐本地初始化的 reset 合约覆盖
 
-- 修复 ISSUE-001 PowerShell 版本与编码兼容。
-- 让无数据、非空数据、错误数据库名和显式 reset 的合约测试稳定运行。
-- 恢复脚本后再把自动初始化流程写回本地 MySQL 手册。
+- 以 PowerShell 7+ 作为唯一脚本运行时；Windows 与 Ubuntu CI 合约验证已通过。
+- 扩充合约测试以覆盖显式 `-Reset`，并在 CI 中固定该场景。
+- reset 合约通过后关闭 ISSUE-001。
 
 ## 2. 完成可回滚生产发布
 

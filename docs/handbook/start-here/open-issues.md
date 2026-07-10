@@ -2,18 +2,18 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 尚未解决的产品与工程事项
-> 最后校准：2026-07-10
+> 最后校准：2026-07-11
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：未解决事项权威源
 
 本文件只保留仍需行动或满足触发条件后需要重开的事项。已关闭问题由 Git 历史追溯。
 
-## ISSUE-001：本地 MySQL PowerShell 脚本不兼容
+## ISSUE-001：本地 MySQL 显式 reset 缺少合约覆盖
 
 - 优先级：P0，发布准备前修复。
-- 现状：Windows PowerShell 5.1 在部分系统代码页下无法解析 UTF-8 无 BOM 脚本；PowerShell 7 下合约脚本与初始化脚本又硬编码 `$PSHOME\powershell.exe`。
-- 影响：`initialize.ps1`、`verify.ps1` 和合约测试不能作为可靠的跨版本初始化入口。
-- 完成条件：明确支持的 PowerShell 版本，统一子进程入口与 UTF-8 编码，并让 `initialize.contract-test.ps1` 在目标运行时通过。
+- 现状：脚本已固定为 Windows/Linux PowerShell 7+，Windows 与 Ubuntu GitHub Actions 合约测试通过；测试尚未断言 `-Reset` 会执行重建且不会误伤其他数据库。
+- 影响：`-Reset` 是破坏性入口，缺少回归保护时不能视为完整的可重复初始化流程。
+- 完成条件：扩充 `initialize.contract-test.ps1` 以覆盖显式 `-Reset` 的重建命令与唯一允许数据库边界，并在 Ubuntu `pwsh` CI 中通过。
 
 ## ISSUE-002：生产部署拓扑和恢复证据缺失
 
