@@ -2,8 +2,8 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 content 模块、前台 blog、后台 admin
-> 最后校准：2026-07-02
-> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/*Category*`、`*Tag*`
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/`
 > 权威程度：API 契约
 
 ## 本文档回答什么问题

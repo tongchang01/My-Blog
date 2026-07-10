@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 system 模块、后台 admin 附件管理
-> 最后校准：2026-07-03
+> 最后校准：2026-07-10
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/web/AdminAttachmentController.java`
 > 权威程度：API 契约
 

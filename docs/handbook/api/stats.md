@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 stats 模块、前台 blog、后台 admin
-> 最后校准：2026-07-05
+> 最后校准：2026-07-10
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/stats/web/`
 > 权威程度：API 契约
 
@@ -203,4 +203,4 @@ Query：
 
 ## 6. DEMO 边界
 
-DEMO 可读取 dashboard，统计 dashboard 不做字段裁剪。DEMO 敏感字段裁剪边界已在 O-002 关闭。
+DEMO 可读取 dashboard，统计 dashboard 不做字段裁剪。
