@@ -10,7 +10,7 @@
 
 | 目录 | 唯一职责 |
 | --- | --- |
-| [`start-here/`](start-here/project-overview.md) | 项目概览、当前状态、路线图、遗留事项、术语和踩坑 |
+| [`start-here/`](start-here/project-overview.md) | 项目概览、当前状态、路线图、开放问题和术语 |
 | [`architecture/`](architecture/README.md) | 当前系统结构和关键数据流 |
 | [`adr/`](adr/README.md) | 仍影响当前实现的架构决策及理由 |
 | [`rules/`](rules/README.md) | 开发、测试、安全和文档维护约束 |

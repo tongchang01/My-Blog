@@ -1,125 +1,37 @@
 # 项目概览
 
 > 状态：当前有效
-> 适用范围：全项目、MyBlog V2 开发
-> 最后校准：2026-07-07
+> 适用范围：MyBlog V2 全项目
+> 最后校准：2026-07-10
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：项目总览
 
-## 本文档回答什么问题
+MyBlog 是包含公开博客、管理后台和 Spring Boot API 的个人博客系统。当前开发主线是 V2；`MyBlog-springboot/` 与 `MyBlog-vue/` 只保留旧版本参考，不参与 V2 构建。
 
-本文档说明 MyBlog 是什么、V1 与 V2 的边界、当前主要代码目录、V2 技术栈和本地开发入口。
+| 目录 | 角色 |
+| --- | --- |
+| `MyBlog-springboot-v2/` | Java 17、Spring Boot 3.5、MyBatis-Plus、Flyway 后端 |
+| `frontend/apps/blog/` | Vue 3 公开读者端 |
+| `frontend/apps/admin/` | Vue 3 管理端 |
+| `docs/` | 当前文档、治理规则和展示材料 |
 
-## 项目简介
+## 后端
 
-MyBlog 是一个个人博客系统。当前仓库同时保留 V1 历史代码和 V2 重构代码；后续开发主线只关注 V2。
+基础包为 `com.tyb.myblog.v2`。identity、content、comment、system、stats 五个业务模块采用 web/application/domain/infrastructure 四层；common 提供响应、异常、安全、时间、存储、邮件和持久化配置。
 
-| 目录 | 角色 | 当前状态 |
-|------|------|----------|
-| `MyBlog-springboot/` | 后端 V1 | 只读历史参考，不再修改 |
-| `MyBlog-vue/` | 前端 V1 | 只读历史参考，不作为新功能开发目标 |
-| `MyBlog-springboot-v2/` | 后端 V2 | 当前后端主线，六大业务模块已完成第一版 |
-| `frontend/apps/blog/` | 前台 V2 | 当前前台主线，主阅读流程已基本接入 V2 API，友链简版待补 |
-| `frontend/apps/admin/` | 后台 V2 | 当前后台主线，基础闭环和多项业务页已完成 |
-| `docs/` | 开发文档 | 正在从旧结构整理为 handbook / working / archive 三层 |
+数据库为 MySQL 8，当前 Flyway V1–V4 建立 14 张表。运行时统一 `Asia/Tokyo`。认证使用 Spring Security、JWT access token、数据库 refresh token、token version 与 BCrypt。
 
-## V2 技术栈
+## 前端
 
-### 后端
+博客端提供三语首页、文章、分类、标签、归档、搜索、关于、友链、评论、作者资料和访问统计。管理端提供会话、仪表盘、文章、首页槽位、分类标签、评论、友链、附件、站点配置和资料管理。
 
-| 项 | 选型 |
-|----|------|
-| 语言 | Java 17 |
-| 框架 | Spring Boot 3.x |
-| 持久层 | MyBatis-Plus + MyBatis XML + Flyway |
-| 数据库 | MySQL 8，统一 Asia/Tokyo 时区 |
-| 认证 | Spring Security + JWT access token + DB refresh token |
-| 密码 | BCrypt |
-| API 文档 | Knife4j 4.x / springdoc-openapi，本地和测试环境启用 |
-| 邮件 | Resend HTTP API，默认关闭 |
-| 限流 | Caffeine 进程内限流，面向 V2 单实例部署 |
-| 测试 | JUnit、Spring Boot Test、ArchUnit、Testcontainers 条件测试 |
-| 构建 | Maven |
+详细能力与缺口见 `../product/feature-inventory.md`，接口见 `../api/`。
 
-### 前端
+## 开发入口
 
-| 应用 | 技术栈 | 说明 |
-|------|--------|------|
-| 前台 blog | Vue 3、TypeScript、Vite、Pinia、vue-i18n、Vitest | 保留 Aurora 视觉基础，逐步改为 V2 API 数据源 |
-| 后台 admin | Vue 3、TypeScript、Vite、Pure Admin Thin、Element Plus、Pinia、vue-i18n、Vitest | 静态路由，ADMIN/DEMO 权限，真实 V2 API 联调 |
-
-## V2 后端模块
-
-基础包：`com.tyb.myblog.v2`
-
-| 模块 | 职责 | 主要表 | 错误码段 |
-|------|------|--------|----------|
-| `identity` | 用户、登录、JWT、refresh token、当前用户资料 | `t_user_auth`、`t_user_info`、`t_refresh_token` | 10xxx |
-| `content` | 文章、分类、标签 | `t_article`、`t_category`、`t_tag`、`t_article_tag` | 20xxx |
-| `comment` | 评论、留言板、审核、回复通知 | `t_comment` | 30xxx |
-| `system` | 站点配置、附件、友链 | `t_site_config`、`t_attachment`、`t_friend_link` | 40xxx |
-| `stats` | 访问打点、日聚合、后台统计 | `t_page_view`、`t_page_view_daily` | 50xxx |
-| `common-infra` | 响应、异常、安全、配置、时间、存储、邮件、架构守护 | 无独立业务表 | 90xxx / 99999 |
-
-每个业务模块内部遵循四层结构：
-
-```text
-<module>/
-├── web/             Controller、请求/响应模型
-├── application/     应用服务、命令、查询、事务编排
-├── domain/          领域模型和领域规则
-└── infrastructure/  持久化、外部服务和框架适配
-```
-
-## V2 前端应用
-
-### 前台 blog
-
-代码目录：`frontend/apps/blog/`
-
-当前定位：从旧 Aurora/Hexo 数据源逐步迁移到 MyBlog V2 后端。已接入站点配置、首页、公开文章列表、文章详情、分类、标签、归档、关于、搜索、访问统计和文章评论；第一版发布前仍需处理作者卡片、移动菜单、友链页和页脚友链的旧 JSON 数据源。留言板评论、PASSWORD 完整解锁、完整 SEO / RSS / Sitemap / Open Graph、Spotify 和后台筛选扩展放到第一版发布之后。
-
-### 后台 admin
-
-代码目录：`frontend/apps/admin/`
-
-当前定位：V2 管理后台。已具备登录、会话刷新、静态路由、ADMIN/DEMO 权限、文章管理、分类标签、评论、友链、附件、站点配置、作者资料和统计仪表盘等页面的基础实现；仍需继续校准文档和补齐后续体验边界。
-
-## 本地开发入口
-
-后端：
-
-```powershell
-cd MyBlog-springboot-v2
-mvn clean test
-mvn spring-boot:run -Dspring-boot.run.profiles=local
-```
-
-前台：
-
-```powershell
-cd frontend/apps/blog
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
-```
-
-后台：
-
-```powershell
-cd frontend/apps/admin
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
-```
-
-完整环境变量、local/prod/test 差异和发布检查后续统一维护在 `docs/handbook/ops/`。
-
-## 文档入口
-
-| 主题 | 位置 |
-|------|------|
-| 文档总入口 | `docs/README.md` |
-| V2 开发手册 | `docs/handbook/README.md` |
-| 当前状态 | `docs/handbook/start-here/current-status.md` |
-| 未完成和争议项 | `docs/handbook/start-here/open-issues.md` |
-| 术语表 | `docs/handbook/start-here/glossary.md` |
-| 文档维护规则 | `docs/handbook/rules/documentation.md` |
+- 本地启动：`../ops/local-development.md`
+- 环境变量：`../ops/environment.md`
+- 构建测试：`../ops/build-and-test.md`
+- 当前状态：`current-status.md`
+- 路线图：`roadmap.md`
+- 开放问题：`open-issues.md`

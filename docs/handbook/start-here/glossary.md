@@ -1,59 +1,26 @@
 # 术语表
 
 > 状态：当前有效
-> 适用范围：MyBlog V2 文档与开发沟通
-> 最后校准：2026-06-29
-> 权威程度：术语权威源
-
-## 本文档回答什么问题
-
-本文档统一 MyBlog V2 开发文档中的术语，避免同一概念在不同文档中使用不同叫法。
-
-## 版本与端
+> 适用范围：MyBlog V2 文档与代码
+> 最后校准：2026-07-10
+> 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
+> 权威程度：术语表
 
 | 术语 | 定义 |
-|------|------|
-| V1 | 旧版博客系统，包括 `MyBlog-springboot/` 与旧 `MyBlog-vue/`，当前只作历史和业务参考 |
-| V2 | 当前重构主线，包括 `MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/` |
-| 前台 | 博客访客端，也称 blog、访客端、读者端，代码位于 `frontend/apps/blog/` |
-| 后台 | 博客管理端，也称 admin、管理端，代码位于 `frontend/apps/admin/` |
-| 后端 V2 | Spring Boot 3 后端，代码位于 `MyBlog-springboot-v2/` |
-
-## 角色
-
-| 术语 | 定义 |
-|------|------|
-| ADMIN | 管理员账号，可以访问后台读写功能 |
-| DEMO | 后台演示账号，只读，不允许写操作；敏感字段需要裁剪 |
-| GUEST | 游客或匿名访问者，只能访问公开接口 |
-
-## 模块
-
-| 术语 | 定义 |
-|------|------|
-| identity | 用户、登录、JWT、refresh token、当前用户信息模块 |
-| content | 文章、分类、标签模块 |
-| comment | 文章评论、留言板、审核模块 |
-| system | 站点配置、附件、友链模块 |
-| stats | 访问统计模块 |
-| common-infra | 后端公共基础设施层，实际 Java 包为 `com.tyb.myblog.v2.common` |
-
-## 认证与安全
-
-| 术语 | 定义 |
-|------|------|
-| access token | 登录访问令牌，JWT，短期有效，用于访问受保护接口 |
-| refresh token | 刷新令牌，随机字符串，数据库只保存 hash，用于换取新的 access token |
-| token_version | 用户表中的 token 版本号，用于让旧 access token 失效 |
-| PASSWORD 文章 | 需要访问密码才能查看正文的文章状态，不等于后台登录密码 |
-| Article Access Token | PASSWORD 文章解锁后的文章访问令牌，和后台登录 access token 互不通用 |
-
-## 文档治理
-
-| 术语 | 定义 |
-|------|------|
-| 权威源 | 当前开发必须以其为准的文档 |
-| 过程材料 | 计划、阶段 review、调研等临时文档，完成后应提炼或归档 |
-| 历史归档 | 保留追溯价值但不再作为当前实现依据的文档 |
-| 待校准 | 文档可能仍有价值，但尚未对照当前代码确认 |
-| open issue | 未完成、存在争议或需要后续裁决的事项 |
+| --- | --- |
+| V1 | `MyBlog-springboot/` 与 `MyBlog-vue/` 旧版本，只作参考 |
+| V2 | 当前主线：V2 后端、blog 和 admin |
+| blog / 博客端 | `frontend/apps/blog/` 公开读者端 |
+| admin / 管理端 | `frontend/apps/admin/` 后台应用 |
+| ADMIN | 可执行后台读写的管理员账号 |
+| DEMO | 可读取裁剪后后台数据、不能写入的演示账号 |
+| GUEST | 匿名公开访问语义，不是可登录账号体系 |
+| access token | 短期 JWT 登录令牌，`typ=access` |
+| refresh token | 用于轮换登录会话的随机字符串，数据库只保存哈希 |
+| token version | 账号会话版本，变化后旧 access token 失效 |
+| PASSWORD 文章 | 列表可见但当前不能公开解锁正文的文章状态 |
+| homepage slot | 首页展示位置：NONE、PINNED、FEATURED |
+| common | `com.tyb.myblog.v2.common` 通用基础设施，不是第六个业务模块 |
+| 逻辑引用 | 由应用校验、数据库不建立 FOREIGN KEY 的表间关系 |
+| 权威源 | 对当前事实或规则负责的唯一主要文档或代码位置 |
+| 开放问题 | 尚未完成或达到触发条件后需要重开的事项 |
