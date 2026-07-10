@@ -4,7 +4,7 @@
 
 ## 任务与提交拆分
 
-- 新建任务分支时按 `docs/governance/branch-policy.md` 使用普通分支命名，例如 `feature/<scope>-<short-name>`、`fix/<scope>-<short-name>`、`docs/<scope>-<short-name>`。
+- 新建任务分支时不使用 `codex/` 前缀，按 `docs/governance/branch-policy.md` 使用普通分支命名，例如 `feature/<scope>-<short-name>`、`fix/<scope>-<short-name>`、`docs/<scope>-<short-name>`。
 - 项目开发文档、计划文档、review 文档和提交说明默认使用中文；除非用户明确要求英文，不得用英文撰写正文。
 - 开始实现前，必须把任务拆成可以独立实现、独立验证、独立回滚的小任务。
 - 每个 Git 提交只完成一个明确目的，不得把清理、基础设施、业务模块重建、文档整理等不同阶段混在同一次提交。
