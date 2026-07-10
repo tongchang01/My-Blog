@@ -158,6 +158,35 @@ exit 0
     if (Test-Path $fakeMysqlLog) {
         Remove-Item $fakeMysqlLog -Force
     }
+    $wrongDatabaseReset = Invoke-Initialize -Environment @{
+        MYBLOG_DATASOURCE_URL = "jdbc:mysql://localhost:3306/not_myblog"
+        MYBLOG_DATASOURCE_USERNAME = "contract-user"
+        MYBLOG_DATASOURCE_PASSWORD = "contract-password"
+        PATH = $temporaryDirectory
+    } -Arguments @("-Reset")
+    Assert-True ($wrongDatabaseReset.ExitCode -ne 0) `
+        "错误数据库名传 Reset 时必须退出非 0"
+    Assert-True (-not (Test-Path $fakeMysqlLog)) `
+        "错误数据库名传 Reset 时不得执行 DROP DATABASE"
+
+    $resetDatabase = Invoke-Initialize -Environment @{
+        MYBLOG_DATASOURCE_URL = "jdbc:mysql://localhost:3306/myblog_v2_dev"
+        MYBLOG_DATASOURCE_USERNAME = "contract-user"
+        MYBLOG_DATASOURCE_PASSWORD = "contract-password"
+        FAKE_MYSQL_LOG = $fakeMysqlLog
+        PATH = $temporaryDirectory
+    } -Arguments @("-Reset")
+    Assert-True ($resetDatabase.ExitCode -ne 0) `
+        "缺少 Maven 时 reset 初始化必须以非 0 退出"
+    $resetCommands = Get-Content -Raw $fakeMysqlLog
+    Assert-True ($resetCommands -match 'DROP DATABASE IF EXISTS `myblog_v2_dev`') `
+        "Reset 必须只删除允许的数据库"
+    Assert-True ($resetCommands -match 'CREATE DATABASE `myblog_v2_dev`') `
+        "Reset 必须重建允许的数据库"
+
+    if (Test-Path $fakeMysqlLog) {
+        Remove-Item $fakeMysqlLog -Force
+    }
     $nonEmptyDatabase = Invoke-Initialize -Environment @{
         MYBLOG_DATASOURCE_URL = "jdbc:mysql://localhost:3306/myblog_v2_dev"
         MYBLOG_DATASOURCE_USERNAME = "contract-user"
