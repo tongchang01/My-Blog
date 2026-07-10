@@ -1,28 +1,27 @@
-# 后台 Admin
+# 管理端
 
 > 状态：当前有效
-> 适用范围：V2 后台管理端
-> 最后校准：2026-06-29
+> 适用范围：V2 后台管理应用
+> 最后校准：2026-07-10
 > 对应代码：`frontend/apps/admin/`
-> 权威程度：后台规格入口
+> 权威程度：前端实现摘要
 
-## 本文档回答什么问题
+管理端基于 Vue 3、Pinia、Vue Router、Element Plus、ECharts、Vite 和 Vitest，界面框架源自 vue-pure-admin thin i18n。上游来源记录保存在应用目录的 `UPSTREAM.md`。
 
-本文档记录后台管理端的技术基线、范围和当前文档收口方式。业务页完成度见 `integration-status.md`，接口契约见 `../../api/`。
+## 当前页面
 
-## 技术基线
+- 登录、会话恢复、刷新、退出和 403/404/500 页面。
+- PV/UV 趋势、语言分布和热门文章仪表盘。
+- 文章列表、新建、完整编辑、首页槽位、软删除、回收站和恢复。
+- 分类、标签、评论、友链和附件管理。
+- 站点配置、当前用户资料和密码修改。
 
-- Vue 3、TypeScript、Vite。
-- Element Plus、Pinia、Vue Router、vue-i18n。
-- Axios、Vitest、Vue Test Utils、happy-dom。
-- 中文、日文、英文三语界面。
+## 权限与数据
 
-## 当前范围
+- 菜单由前端静态路由定义，后端不提供动态菜单。
+- ADMIN 可以读写；DEMO 只读，写按钮禁用且后端再次授权。
+- DEMO 的非公开文章正文、评论邮箱/IP/User-Agent 和附件内部存储字段由后端裁剪。
+- access token 与 refresh token 当前保存在 `myblog-admin-session` localStorage 记录中；刷新失败或结构非法时清理会话。
+- Axios base URL 由 `VITE_API_BASE_URL` 控制；本地留空并通过 `/api` 代理到后端。
 
-后台 admin 覆盖登录、会话刷新、静态路由、ADMIN/DEMO 权限体验、仪表盘、文章、分类标签、评论、友链、附件、站点配置和作者资料。
-
-## 文档收口
-
-`frontend/apps/admin/docs/` 中的日期计划、设计和验收材料属于过程材料，已归档到 `../../../archive/frontend-admin/`。后续只把当前事实提炼到本目录；原文不继续作为长期权威源。
-
-本轮校准以 `E:\My-Blog\frontend\apps\admin/src/` 的前端集成分支源码为准；当前后端 worktree 中只有 admin 工程外壳、依赖和构建产物，没有可用于校准的 `src/`。
+本地默认端口为 8848，路由使用 hash 模式。运行与验证命令见 `../../ops/local-development.md`。
