@@ -19,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
@@ -200,6 +201,11 @@ class CurrentUserProfileUpdateConcurrencyTest {
         @Override
         public Optional<UserProfile> findActiveByUserId(long userId) {
             return delegate.findActiveByUserId(userId);
+        }
+
+        @Override
+        public Optional<UserProfile> findPrimaryPublicAuthor(LocalDateTime now) {
+            return delegate.findPrimaryPublicAuthor(now);
         }
 
         @Override

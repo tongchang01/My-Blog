@@ -34,6 +34,63 @@
           AND deleted = 0
     </select>
 
+    <select id="selectPrimaryPublicAuthor"
+            resultType="com.tyb.myblog.v2.identity.infrastructure.persistence.entity.UserProfileEntity">
+        SELECT ui.user_id,
+               ui.nickname,
+               ui.avatar_url,
+               ui.bio_zh,
+               ui.bio_ja,
+               ui.bio_en,
+               ui.location,
+               ui.website,
+               ui.email_public,
+               ui.github_url,
+               ui.twitter_url,
+               ui.linkedin_url,
+               ui.zhihu_url,
+               ui.qiita_url,
+               ui.juejin_url,
+               ui.created_at,
+               ui.created_by,
+               ui.updated_at,
+               ui.updated_by,
+               ui.deleted,
+               ui.deleted_at,
+               ui.deleted_by
+        FROM t_user_info ui
+        JOIN t_article a
+          ON a.author_id = ui.user_id
+         AND a.deleted = 0
+         AND a.status = 2
+         AND a.publish_at <![CDATA[<=]]> #{now}
+        WHERE ui.deleted = 0
+        GROUP BY ui.user_id,
+                 ui.nickname,
+                 ui.avatar_url,
+                 ui.bio_zh,
+                 ui.bio_ja,
+                 ui.bio_en,
+                 ui.location,
+                 ui.website,
+                 ui.email_public,
+                 ui.github_url,
+                 ui.twitter_url,
+                 ui.linkedin_url,
+                 ui.zhihu_url,
+                 ui.qiita_url,
+                 ui.juejin_url,
+                 ui.created_at,
+                 ui.created_by,
+                 ui.updated_at,
+                 ui.updated_by,
+                 ui.deleted,
+                 ui.deleted_at,
+                 ui.deleted_by
+        ORDER BY COUNT(a.id) DESC, MAX(a.publish_at) DESC, ui.user_id ASC
+        LIMIT 1
+    </select>
+
     <!-- 更新前加行锁，保证同一用户资料的读取、合并和写入保持一致。 -->
     <select id="selectActiveByUserIdForUpdate"
             resultType="com.tyb.myblog.v2.identity.infrastructure.persistence.entity.UserProfileEntity">

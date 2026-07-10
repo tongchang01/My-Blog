@@ -50,11 +50,22 @@ describe('comment store', () => {
       .mockResolvedValueOnce(page([]))
     const store = useCommentStore()
 
-    await store.load({ articleId: '9007199254740993', page: 1, size: 20 })
+    await store.load({
+      articleId: '9007199254740993',
+      page: 1,
+      size: 20,
+      locale: 'en'
+    })
     expect(store.status).toBe('ready')
     expect(store.comments[0].id).toBe('9007199254740993')
+    expect(store.comments[0].createdAt).toBe('07/06/2026, 10:00')
 
-    await store.load({ articleId: '9007199254740993', page: 2, size: 20 })
+    await store.load({
+      articleId: '9007199254740993',
+      page: 2,
+      size: 20,
+      locale: 'en'
+    })
     expect(store.status).toBe('empty')
   })
 
@@ -68,8 +79,8 @@ describe('comment store', () => {
       .mockResolvedValueOnce(page([]))
     const store = useCommentStore()
 
-    void store.load({ articleId: '1', page: 1, size: 20 })
-    await store.load({ articleId: '1', page: 2, size: 20 })
+    void store.load({ articleId: '1', page: 1, size: 20, locale: 'en' })
+    await store.load({ articleId: '1', page: 2, size: 20, locale: 'en' })
 
     expect(firstSignal?.aborted).toBe(true)
     expect(store.status).toBe('empty')

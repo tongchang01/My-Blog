@@ -38,6 +38,7 @@ class DatabaseUserProfileRepositoryTest {
     @BeforeEach
     void cleanDatabase() {
         SecurityContextHolder.clearContext();
+        jdbcTemplate.update("DELETE FROM t_article");
         jdbcTemplate.update("DELETE FROM t_user_info");
         jdbcTemplate.update("DELETE FROM t_refresh_token");
         jdbcTemplate.update("DELETE FROM t_user_auth");
@@ -79,6 +80,28 @@ class DatabaseUserProfileRepositoryTest {
         insertProfile(1002L, 1);
 
         assertThat(repository.findActiveByUserId(1002L)).isEmpty();
+    }
+
+    @Test
+    void shouldReadPrimaryPublicAuthorFromPublishedArticles() {
+        insertAccount(1007L, "minor-author");
+        insertProfile(1007L, 0);
+        insertAccount(1008L, "primary-author");
+        insertProfile(1008L, 0);
+        insertArticle(2001L, 1007L, 2, LocalDateTime.of(2026, 7, 1, 10, 0), 0);
+        insertArticle(2002L, 1008L, 2, LocalDateTime.of(2026, 7, 2, 10, 0), 0);
+        insertArticle(2003L, 1008L, 2, LocalDateTime.of(2026, 7, 3, 10, 0), 0);
+        insertArticle(2004L, 1008L, 5, LocalDateTime.of(2026, 7, 20, 10, 0), 0);
+        insertArticle(2005L, 1008L, 2, LocalDateTime.of(2026, 7, 4, 10, 0), 1);
+
+        Optional<UserProfile> result =
+                repository.findPrimaryPublicAuthor(LocalDateTime.of(2026, 7, 10, 0, 0));
+
+        assertThat(result).isPresent();
+        assertThat(result.get().userId()).isEqualTo(1008L);
+        assertThat(result.get().githubUrl()).isEqualTo("https://github.com/tyb");
+        assertThat(result.get().zhihuUrl()).isEqualTo("https://zhihu.com/people/tyb");
+        assertThat(result.get().juejinUrl()).isEqualTo("https://juejin.cn/user/tyb");
     }
 
     @Test
@@ -250,6 +273,28 @@ class DatabaseUserProfileRepositoryTest {
                         )
                         """,
                 userId,
+                deleted);
+    }
+
+    private void insertArticle(
+            long id,
+            long authorId,
+            int status,
+            LocalDateTime publishAt,
+            int deleted) {
+        jdbcTemplate.update(
+                """
+                        INSERT INTO t_article (
+                            id, title_zh, body, author_id, slug, status,
+                            publish_at, deleted
+                        ) VALUES (?, ?, 'body', ?, ?, ?, ?, ?)
+                        """,
+                id,
+                "Article " + id,
+                authorId,
+                "article-" + id,
+                status,
+                publishAt,
                 deleted);
     }
 

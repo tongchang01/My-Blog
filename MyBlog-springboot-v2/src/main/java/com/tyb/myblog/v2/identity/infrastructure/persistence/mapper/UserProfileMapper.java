@@ -21,6 +21,8 @@ public interface UserProfileMapper extends BaseMapper<UserProfileEntity> {
      */
     UserProfileEntity selectActiveByUserId(@Param("userId") long userId);
 
+    UserProfileEntity selectPrimaryPublicAuthor(@Param("now") LocalDateTime now);
+
     /**
      * 按用户 ID 加锁查询未删除资料。
      *

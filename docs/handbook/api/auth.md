@@ -2,13 +2,13 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端认证接口、后台 admin 会话接入
-> 最后校准：2026-06-29
+> 最后校准：2026-07-09
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/web/`
 > 权威程度：API 契约
 
 ## 本文档回答什么问题
 
-本文档记录后台登录、refresh token 轮换、全端退出、当前用户查询、当前用户资料更新和修改密码接口的前后端契约。
+本文档记录后台登录、refresh token 轮换、全端退出、当前用户查询、公开作者资料、当前用户资料更新和修改密码接口的前后端契约。
 
 ## 1. 通用约定
 
@@ -186,7 +186,56 @@ Authorization: Bearer <access-token>
 | access token 缺失、无效或已失效 | 401 | `10002` |
 | 当前账号或资料数据异常 | 500 | `99999` |
 
-## 6. 更新当前用户资料
+## 6. 查询公开作者资料
+
+```http
+GET /api/public/author-profile
+```
+
+鉴权：匿名。白名单按 `GET + /api/public/author-profile` 精确匹配。
+
+请求参数：无。
+
+成功响应：HTTP 200
+
+```json
+{
+  "code": "00000",
+  "msg": "success",
+  "data": {
+    "nickname": "TYB",
+    "avatarUrl": null,
+    "bioZh": "中文简介",
+    "bioJa": null,
+    "bioEn": null,
+    "location": "Tokyo",
+    "website": "https://example.com",
+    "emailPublic": null,
+    "githubUrl": "https://github.com/tyb",
+    "twitterUrl": null,
+    "linkedinUrl": null,
+    "zhihuUrl": null,
+    "qiitaUrl": null,
+    "juejinUrl": null
+  }
+}
+```
+
+公开响应不返回 `userId`、账号名、账号类型、密码摘要、token 版本、登录安全字段、审计列或删除列。
+
+主作者选择规则：
+
+- 后端从已有公开文章中选择作者，不接受客户端传入用户 ID。
+- 只统计 `status = PUBLISHED`、未删除、且 `publishAt <= 当前时间` 的文章。
+- 优先选择公开文章数最多的作者；文章数相同则选择最近发布时间更晚者；仍相同则按用户 ID 升序。
+
+错误：
+
+| 场景 | HTTP | code |
+|------|------|------|
+| 当前没有可见公开作者资料 | 404 | `90003` |
+
+## 7. 更新当前用户资料
 
 ```http
 PATCH /api/auth/me/profile
@@ -238,7 +287,7 @@ Content-Type: application/json
 | 空 PATCH、字段非法、未知字段或 JSON 非法 | 400 | `90001` |
 | 账号资料缺失或持久化异常 | 500 | `99999` |
 
-## 7. 修改当前用户密码
+## 8. 修改当前用户密码
 
 ```http
 PUT /api/auth/me/password
@@ -291,7 +340,7 @@ Content-Type: application/json
 | DEMO 尝试修改密码 | 403 | `10003` |
 | 账号并发删除、更新行数异常或持久化失败 | 500 | `99999` |
 
-## 8. 权限矩阵
+## 9. 权限矩阵
 
 | 操作 | 匿名 | ADMIN | DEMO |
 |------|------|-------|------|
@@ -299,10 +348,11 @@ Content-Type: application/json
 | refresh | 允许 | 允许 | 允许 |
 | logout | 禁止 | 允许 | 允许 |
 | 查询当前用户 | 禁止 | 允许 | 允许 |
+| 查询公开作者资料 | 允许 | 允许 | 允许 |
 | 更新当前用户资料 | 禁止 | 允许 | 禁止 |
 | 修改当前用户密码 | 禁止 | 允许 | 禁止 |
 
-## 9. 限流边界
+## 10. 限流边界
 
 登录限流：
 
@@ -311,9 +361,9 @@ Content-Type: application/json
 - 第 6 次命中冷却返回 `429 + 90002`。
 - 凭据验证成功后清除当前限流 key。
 
-refresh、logout、me、profile、password 当前不单独增加接口级限流。
+refresh、logout、me、公开作者资料、profile、password 当前不单独增加接口级限流。
 
-## 10. 尚未开放
+## 11. 尚未开放
 
 - Cookie 模式 token。
 - 单设备会话管理。

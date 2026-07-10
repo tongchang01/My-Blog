@@ -62,10 +62,10 @@ class ApplicationConfigurationTest {
     @Test
     void configuresCategoryAndTagPublicEndpoints() {
         assertThat(environment.getProperty(
-                "myblog.security.public-endpoints[5].path"))
+                "myblog.security.public-endpoints[6].path"))
                 .isEqualTo("/api/public/categories");
         assertThat(environment.getProperty(
-                "myblog.security.public-endpoints[6].path"))
+                "myblog.security.public-endpoints[7].path"))
                 .isEqualTo("/api/public/tags");
     }
 }

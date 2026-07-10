@@ -231,6 +231,7 @@ describe('article store', () => {
 
     expect(slug).toBe('canonical-slug')
     expect(store.detailStatus).toBe('ready')
-    expect(store.detail?.bodyHtml).toContain('<h1>Body</h1>')
+    expect(store.detail?.bodyHtml).toContain('<h1 id="body">Body</h1>')
+    expect(store.detail?.toc).toContain('href="#body"')
   })
 })

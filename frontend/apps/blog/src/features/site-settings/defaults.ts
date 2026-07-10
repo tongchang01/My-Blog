@@ -1,5 +1,4 @@
 import {
-  Social,
   Theme,
   ThemeConfig,
   ThemeMenu
@@ -36,7 +35,6 @@ export const createDefaultSiteSettings = (): SiteSettingsViewModel => {
   themeConfig.site.language = 'zh'
   themeConfig.site.multi_language = true
   themeConfig.site_meta.favicon = '/favicon.ico'
-  themeConfig.socials = new Social({ github: 'https://github.com/' })
 
   return {
     siteTitle: 'MyBlog',
