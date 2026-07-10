@@ -35,7 +35,7 @@
 - 现象：Windows PowerShell 5.1 在部分代码页下不能稳定解析 UTF-8 无 BOM 脚本；PowerShell 7 中硬编码 `powershell.exe`、`mvn.cmd`、`taskkill.exe` 或 `%TEMP%` 会破坏 Linux 运行。
 - 影响：本地 MySQL 初始化和合约验证无法可靠跨平台复现。
 - 处理：仅支持 PowerShell 7+；脚本使用 UTF-8 BOM、当前 `pwsh`、跨平台临时目录和 .NET 进程终止；Windows 专用启动选项必须置于 `$IsWindows` 分支。
-- 状态：Windows 与 Ubuntu CI 合约已通过；显式 `-Reset` 覆盖仍见 `open-issues.md` 的 ISSUE-001。
+- 状态：Windows 与 Ubuntu CI 合约已通过，包含显式 `-Reset` 的数据库边界覆盖。
 
 ## P-005：旧基线分支不能直接并回主线
 
