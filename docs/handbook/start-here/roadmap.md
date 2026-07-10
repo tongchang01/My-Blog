@@ -6,11 +6,11 @@
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：路线图
 
-## 1. 完成本地可重复初始化的跨平台验证
+## 1. 补齐本地初始化的 reset 合约覆盖
 
-- 以 PowerShell 7+ 作为唯一脚本运行时；Windows 合约验证已通过。
-- 扩充合约测试以覆盖显式 reset，再在 Linux PowerShell 7 环境运行无数据、非空数据、错误数据库名和 reset 场景。
-- Linux 合约通过后关闭 ISSUE-001，并将跨平台自动初始化标记为已验证入口。
+- 以 PowerShell 7+ 作为唯一脚本运行时；Windows 与 Ubuntu CI 合约验证已通过。
+- 扩充合约测试以覆盖显式 `-Reset`，并在 CI 中固定该场景。
+- reset 合约通过后关闭 ISSUE-001。
 
 ## 2. 完成可回滚生产发布
 
