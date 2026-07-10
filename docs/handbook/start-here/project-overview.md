@@ -6,7 +6,7 @@
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：项目总览
 
-MyBlog 是包含公开博客、管理后台和 Spring Boot API 的个人博客系统。当前开发主线是 V2；`MyBlog-springboot/` 与 `MyBlog-vue/` 只保留旧版本参考，不参与 V2 构建。
+MyBlog 是包含公开博客、管理后台和 Spring Boot API 的个人博客系统。当前开发主线是 V2；V1 源码已从主线移除，由只读分支 `archive/v1-master-2026-06-26` 保存。
 
 | 目录 | 角色 |
 | --- | --- |

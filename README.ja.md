@@ -2,7 +2,7 @@
 
 [简体中文](README.md) | [English](README.en.md) | **日本語**
 
-MyBlog V2 は、Spring Boot API、公開ブログ、独立ビルド可能な管理画面で構成されるモジュラーモノリス型の個人ブログシステムです。現在の開発対象は V2 であり、V1 ディレクトリは履歴参照としてのみ残しています。
+MyBlog V2 は、Spring Boot API、公開ブログ、独立ビルド可能な管理画面で構成されるモジュラーモノリス型の個人ブログシステムです。現在の開発対象は V2 です。V1 ソースは main ブランチから削除され、読み取り専用の `archive/v1-master-2026-06-26` ブランチに保存されています。
 
 ## 現在の機能
 
@@ -37,9 +37,9 @@ MyBlog-springboot-v2/   V2 バックエンド
 frontend/apps/blog/     V2 公開ブログ
 frontend/apps/admin/    V2 管理画面
 docs/                   現行ドキュメントとガバナンス
-MyBlog-springboot/      V1 バックエンド参照
-MyBlog-vue/             V1 フロントエンド参照
 ```
+
+V1 の実装を確認する必要がある場合は、読み取り専用の `archive/v1-master-2026-06-26` ブランチを使用してください。現在の main に V1 ディレクトリを戻さないでください。
 
 ## ローカル起動
 
