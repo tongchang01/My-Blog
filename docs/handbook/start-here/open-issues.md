@@ -2,18 +2,18 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 尚未解决的产品与工程事项
-> 最后校准：2026-07-10
+> 最后校准：2026-07-11
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：未解决事项权威源
 
 本文件只保留仍需行动或满足触发条件后需要重开的事项。已关闭问题由 Git 历史追溯。
 
-## ISSUE-001：本地 MySQL PowerShell 脚本不兼容
+## ISSUE-001：本地 MySQL Linux 验证证据缺失
 
 - 优先级：P0，发布准备前修复。
-- 现状：Windows PowerShell 5.1 在部分系统代码页下无法解析 UTF-8 无 BOM 脚本；PowerShell 7 下合约脚本与初始化脚本又硬编码 `$PSHOME\powershell.exe`。
-- 影响：`initialize.ps1`、`verify.ps1` 和合约测试不能作为可靠的跨版本初始化入口。
-- 完成条件：明确支持的 PowerShell 版本，统一子进程入口与 UTF-8 编码，并让 `initialize.contract-test.ps1` 在目标运行时通过。
+- 现状：脚本已固定为 Windows/Linux PowerShell 7+，Windows 合约测试通过；当前主机没有可用 Linux PowerShell 运行环境。
+- 影响：Linux 路径没有实测证据，不能作为已验证发布环境或关闭跨平台支持声明。
+- 完成条件：扩充 `initialize.contract-test.ps1` 以覆盖显式 reset；再在 Linux 的 PowerShell 7+ 中运行它，覆盖无数据、非空数据、错误数据库名和 reset 场景，并保留通过输出。
 
 ## ISSUE-002：生产部署拓扑和恢复证据缺失
 
