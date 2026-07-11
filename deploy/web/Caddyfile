@@ -1,0 +1,27 @@
+{$BLOG_HOST}, {$WWW_HOST} {
+    root * /srv/blog
+    encode gzip
+
+    handle /api/* {
+        reverse_proxy api:8080
+    }
+
+    handle {
+        try_files {path} /index.html
+        file_server
+    }
+}
+
+{$ADMIN_HOST} {
+    root * /srv/admin
+    encode gzip
+
+    handle /api/* {
+        reverse_proxy api:8080
+    }
+
+    handle {
+        try_files {path} /index.html
+        file_server
+    }
+}
