@@ -11,7 +11,7 @@
 ## ISSUE-002：生产部署实现和恢复证据缺失
 
 - 优先级：P0，发布阻塞。
-- 现状：生产供应商边界、当前 EC2 原地重建方向、Compose 目标拓扑和脱敏运行手册已经确认；首个管理员一次性初始化、管理端修改初始密码入口、Docker 镜像、Caddy/Compose、GHCR 发布、真实备份恢复、S3/IMDSv2 和手动发布证据尚未完成。
+- 现状：生产供应商边界、当前 EC2 原地重建方向、Compose 目标拓扑、脱敏运行手册、管理员初始化、管理端改密入口、Docker 镜像、Caddy/Compose 和 GHCR 发布已完成；真实服务器预检、备份恢复、S3/IMDSv2、网络核对、手动发布和生产冒烟证据尚未完成。
 - 完成条件：按 `../ops/production-runbook.md` 完成发布产物、回滚点、原地部署、S3、可信代理、生产冒烟和回滚演练，并通过 `../ops/release-checklist.md`。
 
 ## ISSUE-003：PASSWORD 文章无法解锁

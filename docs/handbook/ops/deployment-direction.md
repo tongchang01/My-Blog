@@ -1,6 +1,6 @@
 # 生产部署方向
 
-> 状态：当前有效，尚未实施
+> 状态：当前有效；生产镜像已发布，首次上线尚未实施
 > 适用范围：MyBlog V2 生产部署设计
 > 最后校准：2026-07-11
 > 对应代码：`MyBlog-springboot-v2/src/main/resources/application-prod.yml`、`frontend/apps/`、`.github/workflows/`
@@ -55,11 +55,10 @@
 
 清理 V1 前必须完成：
 
-- 首个管理员一次性初始化能力。
-- 后端和 web 镜像构建。
-- 生产 Docker Compose 与 Caddy 配置。
-- GHCR 镜像发布工作流。
+- 服务器只读预检与私有生产台账逐项核对。
 - 全新 MySQL 8、Flyway、S3 IAM Role 和 IMDSv2 实机验证。
 - EC2 快照、V1 MySQL 保险备份与恢复入口确认。
+- 生产环境文件、域名、证书、网络和维护窗口确认。
+- Compose 配置校验、镜像匿名拉取、首次部署和生产冒烟。
 
 具体执行顺序见 [`production-runbook.md`](production-runbook.md)，发布验收门槛见 [`release-checklist.md`](release-checklist.md)。
