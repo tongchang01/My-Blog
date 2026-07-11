@@ -13,6 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("test")
 @SpringBootTest(properties = {
+        "spring.datasource.url=jdbc:h2:mem:bootstrap_admin_test;MODE=MySQL;DB_CLOSE_DELAY=-1",
         "myblog.bootstrap-admin.enabled=true",
         "myblog.bootstrap-admin.username=admin",
         "myblog.bootstrap-admin.password=12345678"
