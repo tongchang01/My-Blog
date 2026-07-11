@@ -41,6 +41,20 @@
 | `MYBLOG_BOOTSTRAP_ADMIN_PASSWORD` | `12345678` | 一次性命令必填 | 首个管理员密码，8-128 字符；不得写入 Git 或日志 |
 | `MYBLOG_BOOTSTRAP_ADMIN_EXIT_AFTER_RUN` | `false` | 一次性命令设为 `true` | 初始化完成后退出非 Web 进程 |
 
+## Compose 与镜像变量
+
+这些变量由 `/etc/myblog-v2/runtime.env` 提供给根目录 `compose.yaml`；示例模板只包含占位值：
+
+| 变量 | 用途 |
+| --- | --- |
+| `GHCR_OWNER` | GHCR 命名空间 |
+| `IMAGE_TAG` | 两个镜像共同使用的完整 Git 提交 SHA |
+| `BLOG_HOST`、`WWW_HOST`、`ADMIN_HOST` | Caddy 的三个域名 |
+| `BLOG_ORIGIN`、`ADMIN_ORIGIN` | API CORS 的明确来源 |
+| `MYSQL_DATABASE`、`MYSQL_USER`、`MYSQL_PASSWORD`、`MYSQL_ROOT_PASSWORD` | V2 MySQL 初始化与连接 |
+
+镜像名固定为 `ghcr.io/${GHCR_OWNER}/myblog-api:${IMAGE_TAG}` 和 `ghcr.io/${GHCR_OWNER}/myblog-web:${IMAGE_TAG}`。不要使用 `latest` 作为生产唯一标签；发布工作流只推送提交 SHA 标签。
+
 ### 首个管理员初始化变量
 
 `MYBLOG_BOOTSTRAP_ADMIN_*` 只用于一次性非 Web 初始化命令。生产常驻 `api` 服务必须保持 `MYBLOG_BOOTSTRAP_ADMIN_ENABLED=false`，不得把管理员密码放进常驻环境文件、镜像、日志或仓库。初始化命令成功后立即删除临时 root-only 环境文件；再次执行时已有 ADMIN 会被跳过，不会覆盖密码。

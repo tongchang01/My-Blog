@@ -1,0 +1,9 @@
+.git
+.github
+.idea
+.worktrees
+**/node_modules
+**/dist
+**/target
+*.log
+docs
