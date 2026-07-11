@@ -13,7 +13,17 @@ describe('categories page', () => {
 
     const source = readFileSync(page, 'utf8')
     expect(source).toContain('loadCategories')
-    expect(source).toContain('v-for="category in categories"')
-    expect(source).toContain("name: 'category-articles'")
+    expect(source).toContain(
+      "import { TagList, TagItem } from '@/components/Tag'"
+    )
+    expect(source).toContain('<TagList>')
+    expect(source).toContain('route-name="category-articles"')
+    expect(source).not.toContain('justify-center gap-3')
+
+    const tagItem = readFileSync(
+      resolve(currentDir, '../components/Tag/TagItem.vue'),
+      'utf8'
+    )
+    expect(tagItem).toContain('routeName')
   })
 })

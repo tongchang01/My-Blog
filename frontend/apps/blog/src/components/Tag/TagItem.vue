@@ -5,7 +5,7 @@
     <router-link
       :class="tagClasses"
       :to="{
-        name: 'tag-articles',
+        name: routeName,
         params: { lang: appStore.locale, slug }
       }"
       :style="gradientBackground"
@@ -25,6 +25,10 @@ import { PropType, computed, toRefs } from 'vue'
 const props = defineProps({
   name: String,
   slug: String,
+  routeName: {
+    type: String,
+    default: 'tag-articles'
+  },
   count: {
     type: Number,
     default: 0

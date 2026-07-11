@@ -5,31 +5,28 @@
       <h1 class="post-title text-white uppercase">{{ pageTitle }}</h1>
     </div>
     <div class="bg-ob-deep-800 px-14 py-16 rounded-2xl shadow-xl block">
-      <ul class="flex flex-row flex-wrap justify-center gap-3">
+      <TagList>
         <template v-if="categories && categories.length > 0">
-          <li v-for="category in categories" :key="category.slug">
-            <router-link
-              class="category-item"
-              :to="{
-                name: 'category-articles',
-                params: { lang: appStore.locale, slug: category.slug }
-              }"
-            >
-              {{ category.name }}
-              <sub>{{ category.count }}</sub>
-            </router-link>
-          </li>
+          <TagItem
+            v-for="category in categories"
+            :key="category.slug"
+            :name="category.name"
+            :slug="category.slug"
+            :count="category.count"
+            route-name="category-articles"
+            size="large"
+          />
         </template>
         <template v-else-if="categories">
           <ob-skeleton tag="li" :count="10" height="20px" width="3rem" />
         </template>
         <template v-else>
-          <li class="flex flex-row justify-center items-center">
+          <div class="flex flex-row justify-center items-center">
             <SvgIcon class="stroke-ob-bright mr-2" icon-class="warning" />
             {{ t('settings.empty-category') }}
-          </li>
+          </div>
         </template>
-      </ul>
+      </TagList>
     </div>
   </div>
 </template>
@@ -43,6 +40,7 @@ import defaultCover from '@/assets/default-cover.jpg'
 import { useCommonStore } from '@/stores/common'
 import { useAppStore } from '@/stores/app'
 import { useTaxonomyStore } from '@/features/taxonomy/store'
+import { TagList, TagItem } from '@/components/Tag'
 import usePageTitle from '@/hooks/usePageTitle'
 
 const commonStore = useCommonStore()
@@ -67,13 +65,3 @@ onUnmounted(() => {
   commonStore.resetHeaderImage()
 })
 </script>
-
-<style lang="scss" scoped>
-.category-item {
-  @apply flex py-2 px-4 rounded-md bg-ob-deep-900 text-ob-bright text-base hover:opacity-100;
-
-  sub {
-    @apply block ml-2 rounded-full text-xs text-ob;
-  }
-}
-</style>
