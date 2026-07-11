@@ -47,14 +47,14 @@
 
           <p
             v-if="authorData.location"
-            class="flex w-full self-center items-center justify-center gap-1 text-xs text-ob-dim"
+            class="flex w-full flex-1 self-center items-center justify-center gap-2 text-base font-bold text-black"
           >
             <SvgIcon
               icon-class="location"
               fill="none"
               stroke="currentColor"
-              width="1rem"
-              height="1rem"
+              width="1.25rem"
+              height="1.25rem"
             />
             {{ authorData.location }}
           </p>

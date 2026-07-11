@@ -17,5 +17,8 @@ describe('Profile.vue', () => {
     expect(source).toContain('authorData.location')
     expect(source).toContain('icon-class="location"')
     expect(source).toContain('w-full')
+    expect(source).toContain('flex-1')
+    expect(source).toContain('text-black')
+    expect(source).toContain('font-bold')
   })
 })
