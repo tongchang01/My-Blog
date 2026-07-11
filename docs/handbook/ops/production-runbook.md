@@ -46,6 +46,7 @@
 - [ ] 后端、真实 MySQL 专项、blog/admin 测试和生产构建全部通过。
 - [ ] 两个公共 GHCR 镜像已使用同一提交 SHA 发布。
 - [ ] 在未登录 GHCR 的服务器上能够匿名拉取两个镜像。
+- [ ] `.github/workflows/images.yml` 已在目标提交上成功运行，两个镜像的 SHA 标签完全一致。
 - [ ] `compose.yaml` 已通过 `docker compose config --quiet`。
 - [ ] 待发布提交 SHA、两个镜像完整名称和上一可用 SHA 已写入私有台账。
 
@@ -88,6 +89,8 @@ sudo stat -c '%a %U:%G %n' /etc/myblog-v2/runtime.env
 ```
 
 预期权限为 `600 root:root`。不要用 `echo` 把密钥追加到文件，也不要提交该文件。
+
+根目录 `compose.yaml` 使用 `GHCR_OWNER` 和 `IMAGE_TAG` 选择镜像。`IMAGE_TAG` 必须填写私有台账记录的完整提交 SHA；不要填写 `latest` 或短 SHA。镜像发布由 `.github/workflows/images.yml` 完成，PR 不推送镜像。
 
 首次创建管理员时，另外创建临时文件 `/etc/myblog-v2/bootstrap.env`，只写入本次命令需要的四个 `MYBLOG_BOOTSTRAP_ADMIN_*` 变量。不要在聊天、工单、终端输出或 Git 中记录文件内容：
 
@@ -274,7 +277,7 @@ sudo docker compose --env-file /etc/myblog-v2/runtime.env config --images
 sudo docker compose --env-file /etc/myblog-v2/runtime.env pull
 ```
 
-核对输出中的两个应用镜像都带目标提交 SHA。若出现 `latest`、标签不一致、认证失败或变量缺失，停止部署。
+核对输出中的两个应用镜像都带目标提交 SHA，且 `config --images` 只出现 `mysql:8.4`、目标 API 镜像和目标 web 镜像。若出现 `latest`、标签不一致、认证失败或变量缺失，停止部署。
 
 ### 5.3 按依赖顺序启动
 
