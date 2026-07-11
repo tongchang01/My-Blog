@@ -1,0 +1,6 @@
+.git
+.idea
+target
+*.iml
+*.log
+src/test
