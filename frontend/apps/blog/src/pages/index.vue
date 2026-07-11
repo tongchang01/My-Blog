@@ -20,7 +20,10 @@
     <div class="main-grid">
       <div id="article-list" class="flex flex-col relative">
         <ul
-          v-if="articleStore.homeStatus === 'loading'"
+          v-if="
+            articleStore.homeStatus === 'loading' ||
+            articleStore.homeStatus === 'error'
+          "
           class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6"
         >
           <li v-for="n in 6" :key="n"><ArticleCard :data="null" /></li>
@@ -31,20 +34,6 @@
           class="py-24 text-center text-ob-dim"
         >
           {{ emptyMessage }}
-        </div>
-
-        <div
-          v-else-if="articleStore.homeStatus === 'error'"
-          class="py-24 text-center text-ob-dim"
-        >
-          <p>{{ errorMessage }}</p>
-          <button
-            class="mt-4 px-5 py-2 rounded-full text-ob-bright"
-            :style="retryStyle"
-            @click="retry"
-          >
-            {{ retryLabel }}
-          </button>
         </div>
 
         <ul v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -119,24 +108,6 @@ const emptyMessage = computed(() =>
       ? '公開記事はまだありません'
       : 'No public articles yet'
 )
-const errorMessage = computed(() =>
-  currentLocale.value === 'zh'
-    ? '文章加载失败，请稍后重试'
-    : currentLocale.value === 'ja'
-      ? '記事を読み込めませんでした'
-      : 'Unable to load articles'
-)
-const retryLabel = computed(() =>
-  currentLocale.value === 'zh'
-    ? '重试'
-    : currentLocale.value === 'ja'
-      ? '再試行'
-      : 'Retry'
-)
-const retryStyle = computed(() => ({
-  background: appStore.themeConfig.theme.header_gradient_css
-}))
-
 const updateArticleOffset = async () => {
   await nextTick()
   articleOffset.value = document.getElementById('article-list')?.offsetTop ?? 0
@@ -153,8 +124,6 @@ const loadHome = async () => {
 const backToArticleTop = () => {
   window.scrollTo({ top: articleOffset.value, behavior: 'smooth' })
 }
-
-const retry = async () => articleStore.retryHome()
 
 onMounted(async () => {
   await loadHome()
