@@ -1,6 +1,6 @@
 # 本地 MySQL 初始化与种子
 
-> 状态：PowerShell 7+ 自动化入口可用；Windows 与 Ubuntu CI 已通过合约验证
+> 状态：PowerShell 7+ 自动化入口已验证
 > 适用范围：本机 `myblog_v2_dev`
 > 最后校准：2026-07-11
 > 对应代码：`MyBlog-springboot-v2/scripts/dev/mysql/`
@@ -12,7 +12,7 @@
 
 - 仅支持 Windows 或 Linux 上的 PowerShell 7+，命令为 `pwsh`；不支持 Windows PowerShell 5.1。
 - 脚本使用 UTF-8 BOM、当前 `pwsh` 子进程和按平台选择的 Maven/进程终止方式。
-- Windows PowerShell 7 与 Ubuntu GitHub Actions `pwsh` 已通过合约验证；显式 `-Reset` 场景仍待加入合约覆盖。
+- Windows PowerShell 7 与 Ubuntu GitHub Actions `pwsh` 已通过合约验证，覆盖凭据、数据库名、非空库和显式 `-Reset` 的安全边界。
 
 ## 自动初始化
 

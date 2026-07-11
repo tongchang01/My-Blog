@@ -8,13 +8,6 @@
 
 本文件只保留仍需行动或满足触发条件后需要重开的事项。已关闭问题由 Git 历史追溯。
 
-## ISSUE-001：本地 MySQL 显式 reset 缺少合约覆盖
-
-- 优先级：P0，发布准备前修复。
-- 现状：脚本已固定为 Windows/Linux PowerShell 7+，Windows 与 Ubuntu GitHub Actions 合约测试通过；测试尚未断言 `-Reset` 会执行重建且不会误伤其他数据库。
-- 影响：`-Reset` 是破坏性入口，缺少回归保护时不能视为完整的可重复初始化流程。
-- 完成条件：扩充 `initialize.contract-test.ps1` 以覆盖显式 `-Reset` 的重建命令与唯一允许数据库边界，并在 Ubuntu `pwsh` CI 中通过。
-
 ## ISSUE-002：生产部署拓扑和恢复证据缺失
 
 - 优先级：P0，发布阻塞。
