@@ -70,6 +70,7 @@
     "default-category": "記事",
     "default-tag": "未分類",
     "empty-tag": "現在タグはありません",
+    "empty-category": "現在カテゴリーはありません",
     "empty-recent-comments": "現在最新のコメントはありません",
     "pinned": "固定",
     "featured": "おすすめ",

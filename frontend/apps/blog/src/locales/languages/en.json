@@ -70,6 +70,7 @@
     "default-category": "Article",
     "default-tag": "unsorted",
     "empty-tag": "No tags right now.",
+    "empty-category": "No categories right now.",
     "empty-recent-comments": "No recent comments right now.",
     "pinned": "Pin",
     "featured": "Hot",

@@ -70,6 +70,7 @@
     "default-category": "文章",
     "default-tag": "未分类",
     "empty-tag": "目前没有标签",
+    "empty-category": "目前没有分类",
     "empty-recent-comments": "目前没有最新评论",
     "pinned": "置顶",
     "featured": "推荐",
