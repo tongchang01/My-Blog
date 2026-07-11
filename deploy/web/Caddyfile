@@ -2,6 +2,8 @@
     root * /srv/blog
     encode gzip
 
+    respond /healthz 200
+
     handle /api/* {
         reverse_proxy api:8080
     }
@@ -15,6 +17,8 @@
 {$ADMIN_HOST} {
     root * /srv/admin
     encode gzip
+
+    respond /healthz 200
 
     handle /api/* {
         reverse_proxy api:8080
