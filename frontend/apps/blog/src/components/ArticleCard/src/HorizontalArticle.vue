@@ -37,7 +37,8 @@
 
         <div v-if="article" class="article-footer">
           <span class="text-ob-dim">
-            {{ article.publishedAt }} · {{ article.commentCount }} comments
+            {{ article.publishedAt }} · {{ article.commentCount }}
+            {{ t('settings.comments') }}
           </span>
         </div>
       </div>
