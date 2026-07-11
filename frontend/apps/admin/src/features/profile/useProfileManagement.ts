@@ -1,6 +1,7 @@
 import { computed, reactive, ref } from "vue";
 import type { ApiResponse } from "@/api/contract";
 import {
+  changeCurrentUserPassword,
   getCurrentUser,
   updateCurrentUserProfile
 } from "@/api/auth";
@@ -15,17 +16,28 @@ import {
   type UserProfileFormErrors,
   type UserProfilePayload
 } from "./form";
+import {
+  createPasswordForm,
+  passwordFormToPayload,
+  validatePasswordForm,
+  type PasswordForm,
+  type PasswordFormErrors
+} from "./password-form";
 
 export interface ProfileManagementApi {
   getCurrentUser(): Promise<ApiResponse<CurrentUser>>;
   updateCurrentUserProfile(
     payload: UserProfilePayload
   ): Promise<ApiResponse<UserProfile>>;
+  changeCurrentUserPassword(
+    payload: ReturnType<typeof passwordFormToPayload>
+  ): Promise<ApiResponse<null>>;
 }
 
 const defaultApi: ProfileManagementApi = {
   getCurrentUser,
-  updateCurrentUserProfile
+  updateCurrentUserProfile,
+  changeCurrentUserPassword
 };
 
 function asError(error: unknown): Error {
@@ -44,6 +56,10 @@ export function useProfileManagement(api: ProfileManagementApi = defaultApi) {
   const saving = ref(false);
   const error = ref<Error | null>(null);
   const saveError = ref<Error | null>(null);
+  const passwordForm = reactive<PasswordForm>(createPasswordForm());
+  const passwordFormErrors = reactive<PasswordFormErrors>({});
+  const passwordSaving = ref(false);
+  const passwordError = ref<Error | null>(null);
   const currentUser = computed(() => userStore.currentUser);
 
   function resetForm(profile: UserProfile): void {
@@ -98,6 +114,27 @@ export function useProfileManagement(api: ProfileManagementApi = defaultApi) {
     }
   }
 
+  async function changePassword(): Promise<boolean> {
+    const errors = validatePasswordForm(passwordForm);
+    clearRecord(passwordFormErrors);
+    Object.assign(passwordFormErrors, errors);
+    if (Object.keys(errors).length) return false;
+
+    passwordSaving.value = true;
+    passwordError.value = null;
+    try {
+      await api.changeCurrentUserPassword(passwordFormToPayload(passwordForm));
+      Object.assign(passwordForm, createPasswordForm());
+      clearRecord(passwordFormErrors);
+      return true;
+    } catch (reason) {
+      passwordError.value = asError(reason);
+      return false;
+    } finally {
+      passwordSaving.value = false;
+    }
+  }
+
   return {
     currentUser,
     form,
@@ -106,8 +143,13 @@ export function useProfileManagement(api: ProfileManagementApi = defaultApi) {
     saving,
     error,
     saveError,
+    passwordForm,
+    passwordFormErrors,
+    passwordSaving,
+    passwordError,
     initialize,
     refresh,
-    save
+    save,
+    changePassword
   };
 }

@@ -43,6 +43,7 @@ function api(
     updateCurrentUserProfile: vi
       .fn()
       .mockResolvedValue(ok({ ...profile, nickname: "Updated" })),
+    changeCurrentUserPassword: vi.fn().mockResolvedValue(ok(null)),
     ...overrides
   };
 }
@@ -91,5 +92,40 @@ describe("profile management state", () => {
 
     expect(state.form.nickname).toBe("离线昵称");
     expect(state.saveError.value?.message).toBe("offline");
+  });
+
+  it("changes the password and clears the form on success", async () => {
+    const source = api();
+    const state = useProfileManagement(source);
+    state.passwordForm.currentPassword = "old-password";
+    state.passwordForm.newPassword = "new-password";
+    state.passwordForm.confirmPassword = "new-password";
+
+    await expect(state.changePassword()).resolves.toBe(true);
+
+    expect(source.changeCurrentUserPassword).toHaveBeenCalledWith({
+      currentPassword: "old-password",
+      newPassword: "new-password"
+    });
+    expect(state.passwordForm).toEqual({
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: ""
+    });
+  });
+
+  it("keeps password fields and exposes password errors on failure", async () => {
+    const source = api({
+      changeCurrentUserPassword: vi.fn().mockRejectedValue(new Error("offline"))
+    });
+    const state = useProfileManagement(source);
+    state.passwordForm.currentPassword = "old-password";
+    state.passwordForm.newPassword = "new-password";
+    state.passwordForm.confirmPassword = "new-password";
+
+    await expect(state.changePassword()).resolves.toBe(false);
+
+    expect(state.passwordForm.newPassword).toBe("new-password");
+    expect(state.passwordError.value?.message).toBe("offline");
   });
 });

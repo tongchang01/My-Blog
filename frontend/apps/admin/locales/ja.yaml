@@ -408,6 +408,18 @@ settings:
     zhihuUrl: Zhihu URL
     qiitaUrl: Qiita URL
     juejinUrl: Juejin URL
+  password:
+    title: パスワード変更
+    current: 現在のパスワード
+    new: 新しいパスワード
+    confirm: 新しいパスワード（確認）
+    save: パスワードを変更
+    changed: パスワードを変更しました。再度ログインしてください
+    error: パスワードを変更できませんでした。現在のパスワードを確認して再試行してください
+    validation:
+      required: 入力してください
+      length: 新しいパスワードは8〜128文字で入力してください
+      mismatch: 新しいパスワードが一致しません
 attachments:
   readonlyDemo: 現在のデモアカウントは読み取り専用のため、添付ファイルをアップロードできません
   upload:

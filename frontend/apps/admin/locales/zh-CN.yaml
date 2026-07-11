@@ -408,6 +408,18 @@ settings:
     zhihuUrl: 知乎地址
     qiitaUrl: Qiita 地址
     juejinUrl: 掘金地址
+  password:
+    title: 修改密码
+    current: 当前密码
+    new: 新密码
+    confirm: 确认新密码
+    save: 修改密码
+    changed: 密码修改成功，请重新登录
+    error: 密码修改失败，请检查当前密码后重试
+    validation:
+      required: 此项为必填项
+      length: 新密码长度必须为 8 到 128 位
+      mismatch: 两次输入的新密码不一致
 attachments:
   readonlyDemo: 当前演示账号为只读模式，不能上传附件
   upload:

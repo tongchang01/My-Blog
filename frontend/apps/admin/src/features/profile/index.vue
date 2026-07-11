@@ -1,14 +1,18 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
 import type { AttachmentItem } from "@/features/attachments/model";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { sessionService } from "@/features/auth/session";
+import { message } from "@/utils/message";
 import { useProfileManagement } from "./useProfileManagement";
 
 defineOptions({ name: "ProfileManagement" });
 
 const userStore = useUserStoreHook();
+const router = useRouter();
 const isAdmin = computed(() => userStore.isAdmin);
 const state = useProfileManagement();
 const {
@@ -19,9 +23,14 @@ const {
   saving,
   error,
   saveError,
+  passwordForm,
+  passwordFormErrors,
+  passwordSaving,
+  passwordError,
   initialize,
   refresh,
-  save
+  save,
+  changePassword
 } = state;
 
 const readonly = computed(() => !isAdmin.value);
@@ -30,6 +39,20 @@ const avatarPickerOpen = ref(false);
 function fieldError(field: keyof typeof form): string {
   const code = formErrors[field];
   return code ? transformI18n(`settings.validation.${code}`) : "";
+}
+
+function passwordFieldError(
+  field: keyof typeof passwordForm
+): string {
+  const code = passwordFormErrors[field];
+  return code ? transformI18n(`settings.password.validation.${code}`) : "";
+}
+
+async function submitPasswordChange(): Promise<void> {
+  if (!(await changePassword())) return;
+  sessionService.expire();
+  message(transformI18n("settings.password.changed"), { type: "success" });
+  await router.replace("/login");
 }
 
 function selectAvatar(item: AttachmentItem): void {
@@ -210,6 +233,72 @@ onMounted(initialize);
           </el-form-item>
         </el-form>
       </el-card>
+
+      <el-card
+        v-if="isAdmin"
+        data-testid="profile-password-card"
+        class="workspace-card"
+        shadow="never"
+      >
+        <template #header>
+          <div class="card-heading">
+            <h2>{{ transformI18n("settings.password.title") }}</h2>
+            <el-button
+              data-testid="profile-password-save"
+              type="primary"
+              :loading="passwordSaving"
+              @click="submitPasswordChange"
+            >
+              {{ transformI18n("settings.password.save") }}
+            </el-button>
+          </div>
+        </template>
+
+        <el-alert
+          v-if="passwordError"
+          data-testid="profile-password-error"
+          type="error"
+          :closable="false"
+          :title="transformI18n('settings.password.error')"
+          show-icon
+        />
+
+        <el-form :model="passwordForm" label-position="top" class="password-grid">
+          <el-form-item
+            :label="transformI18n('settings.password.current')"
+            :error="passwordFieldError('currentPassword')"
+          >
+            <el-input
+              v-model="passwordForm.currentPassword"
+              type="password"
+              show-password
+              autocomplete="current-password"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="transformI18n('settings.password.new')"
+            :error="passwordFieldError('newPassword')"
+          >
+            <el-input
+              v-model="passwordForm.newPassword"
+              type="password"
+              show-password
+              autocomplete="new-password"
+            />
+          </el-form-item>
+          <el-form-item
+            :label="transformI18n('settings.password.confirm')"
+            :error="passwordFieldError('confirmPassword')"
+          >
+            <el-input
+              v-model="passwordForm.confirmPassword"
+              type="password"
+              show-password
+              autocomplete="new-password"
+            />
+          </el-form-item>
+        </el-form>
+      </el-card>
     </template>
 
     <AttachmentPickerDialog
@@ -249,6 +338,12 @@ onMounted(initialize);
 .profile-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.password-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
 }
 
@@ -297,6 +392,11 @@ onMounted(initialize);
   }
 
   .profile-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .password-grid {
     grid-template-columns: 1fr;
     gap: 0;
   }
