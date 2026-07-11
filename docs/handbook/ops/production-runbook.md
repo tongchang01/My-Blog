@@ -69,6 +69,7 @@
 - [ ] V2 使用只允许访问 `myblog_v2.*` 的专用 MySQL 账号，不使用 root；账号具备 Flyway 和应用运行所需权限。
 - [ ] 生产环境文件仅 root 可读，且未进入 shell history、Git 或日志。
 - [ ] 首次上线保持邮件功能关闭。
+- [ ] 首个管理员初始化使用临时 root-only 文件，成功后已删除；常驻 API 环境不保留 bootstrap 密码变量。
 - [ ] Java 最大堆为 512 MiB，时区为 `Asia/Tokyo`。
 - [ ] 容器环境中禁用 IMDSv1 回退。
 - [ ] 已安排可接受停机的维护窗口。
@@ -87,6 +88,22 @@ sudo stat -c '%a %U:%G %n' /etc/myblog-v2/runtime.env
 ```
 
 预期权限为 `600 root:root`。不要用 `echo` 把密钥追加到文件，也不要提交该文件。
+
+首次创建管理员时，另外创建临时文件 `/etc/myblog-v2/bootstrap.env`，只写入本次命令需要的四个 `MYBLOG_BOOTSTRAP_ADMIN_*` 变量。不要在聊天、工单、终端输出或 Git 中记录文件内容：
+
+```bash
+sudo install -m 0600 /dev/null /etc/myblog-v2/bootstrap.env
+sudo chown root:root /etc/myblog-v2/bootstrap.env
+sudoedit /etc/myblog-v2/bootstrap.env
+sudo stat -c '%a %U:%G %n' /etc/myblog-v2/bootstrap.env
+```
+
+文件中应由维护人员填入真实的 `enabled=true`、管理员用户名、一次性密码（8-128 字符）和 `exit-after-run=true`。该文件不是常驻配置，初始化成功后必须删除并确认不存在：
+
+```bash
+sudo rm -f /etc/myblog-v2/bootstrap.env
+test ! -e /etc/myblog-v2/bootstrap.env
+```
 
 ## 阶段三：只读预检与回滚点
 
@@ -263,7 +280,11 @@ sudo docker compose --env-file /etc/myblog-v2/runtime.env pull
 
 ```bash
 cd /opt/myblog-v2
+set -euo pipefail
 sudo docker compose --env-file /etc/myblog-v2/runtime.env up -d --wait --wait-timeout 180 mysql
+sudo docker compose --env-file /etc/myblog-v2/runtime.env --env-file /etc/myblog-v2/bootstrap.env run --rm --no-deps api --spring.main.web-application-type=none
+sudo rm -f /etc/myblog-v2/bootstrap.env
+test ! -e /etc/myblog-v2/bootstrap.env
 sudo docker compose --env-file /etc/myblog-v2/runtime.env up -d --wait --wait-timeout 180 api
 sudo docker compose --env-file /etc/myblog-v2/runtime.env logs --tail=200 api
 sudo docker compose --env-file /etc/myblog-v2/runtime.env up -d --wait --wait-timeout 180 web
@@ -272,6 +293,8 @@ sudo docker compose --env-file /etc/myblog-v2/runtime.env logs --tail=200 web
 ```
 
 `--wait` 依赖 Compose 中为服务定义有效健康检查。MySQL 未健康时不得启动 API；Flyway、S3 凭据、证书或代理出现错误时不得继续验收。
+
+一次性命令必须以退出码 0 结束，并且日志只应出现初始化成功或已有管理员跳过的结果（日志不得出现密码或密码摘要）。退出码非 0 时不要删除 `bootstrap.env`，先保留现场并处理数据库、配置或镜像问题。初始化成功后再继续启动常驻 `api`，并确认临时文件已删除。
 
 ## 阶段六：生产验收
 
