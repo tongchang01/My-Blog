@@ -12,4 +12,9 @@ describe('Profile.vue', () => {
     expect(source).not.toContain("t('settings.words')")
     expect(source).not.toContain('profile.wordCount')
   })
+
+  it('renders the public author location when available', () => {
+    expect(source).toContain('authorData.location')
+    expect(source).toContain('icon-class="pin"')
+  })
 })
