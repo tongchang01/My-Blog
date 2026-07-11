@@ -26,6 +26,8 @@ describe('article card comment labels', () => {
       expect(source).toContain('settings.pinned')
       expect(source).toContain('settings.featured')
     }
+    expect(sources[1]).not.toContain('class="-mb-0.5 mr-1"')
+    expect(sources[1]).toContain('class="inline-flex items-center"')
     expect(featureSources[0]).toContain(':badge="badge"')
     expect(featureSources[1]).toContain('badge="featured"')
   })

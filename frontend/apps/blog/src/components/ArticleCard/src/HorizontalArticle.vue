@@ -24,7 +24,6 @@
                 icon-class="hot"
                 width="1.05rem"
                 height="1.05rem"
-                class="-mb-0.5 mr-1"
                 stroke="currentColor"
               />
               <span v-if="badge === 'pinned'">{{ t('settings.pinned') }}</span>
