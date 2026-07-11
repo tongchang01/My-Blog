@@ -40,7 +40,7 @@ jobs:
       - name: Build and push API image
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./MyBlog-springboot-v2
           file: ./MyBlog-springboot-v2/Dockerfile
           push: true
           tags: ${{ env.REGISTRY }}/${{ env.OWNER }}/myblog-api:${{ env.IMAGE_TAG }}
