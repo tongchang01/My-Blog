@@ -85,6 +85,42 @@
             </template>
           </li>
         </a>
+        <a
+          :href="socials.linkedin"
+          target="_blank"
+          rel="noreferrer"
+          ref="linkedin"
+          v-if="socials.linkedin"
+        >
+          <li class="diamond-clip-path diamond-icon" aria-label="LinkedIn">
+            in
+          </li>
+        </a>
+        <a
+          :href="socials.qiita"
+          target="_blank"
+          rel="noreferrer"
+          ref="qiita"
+          v-if="socials.qiita"
+        >
+          <li class="diamond-clip-path diamond-icon" aria-label="Qiita">
+            Qiita
+          </li>
+        </a>
+        <a
+          :href="socials.website"
+          target="_blank"
+          rel="noreferrer"
+          ref="website"
+          v-if="socials.website"
+        >
+          <li class="diamond-clip-path diamond-icon" aria-label="Website">
+            Web
+          </li>
+        </a>
+        <a :href="`mailto:${socials.email}`" ref="email" v-if="socials.email">
+          <li class="diamond-clip-path diamond-icon" aria-label="Email">@</li>
+        </a>
       </template>
     </template>
   </ul>

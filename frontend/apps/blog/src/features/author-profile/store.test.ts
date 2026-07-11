@@ -71,11 +71,55 @@ describe('author profile store', () => {
     expect(store.profile.description).toBe('中文作者简介')
     expect(store.profile.socials.github).toBe('https://github.com/tyb')
     expect(store.profile.socials.twitter).toBe('https://x.com/tyb')
+    expect(store.profile.socials.linkedin).toBe('https://linkedin.com/in/tyb')
+    expect(store.profile.socials.qiita).toBe('https://qiita.com/tyb')
+    expect(store.profile.socials.website).toBe('https://example.com')
+    expect(store.profile.socials.email).toBe('public@example.com')
     expect(store.profile.socials.zhihu).toBe('https://zhihu.com/people/tyb')
     expect(store.profile.socials.juejin).toBe('https://juejin.cn/user/tyb')
+    expect(settings.settings.themeConfig.site.author).toBe('三钻')
+    expect(settings.settings.themeConfig.site.avatar).toBe(
+      'https://example.com/author.png'
+    )
+    expect(settings.settings.themeConfig.site.description).toBe('中文作者简介')
     expect(store.profile.articleCount).toBe(8)
     expect(store.profile.categoryCount).toBe(1)
     expect(store.profile.tagCount).toBe(2)
+  })
+
+  it('deduplicates concurrent loads for the same locale', async () => {
+    mockedAuthor.mockResolvedValue({
+      nickname: 'Author',
+      avatarUrl: null,
+      bioZh: 'Bio',
+      bioJa: null,
+      bioEn: null,
+      location: null,
+      website: null,
+      emailPublic: null,
+      githubUrl: null,
+      twitterUrl: null,
+      linkedinUrl: null,
+      zhihuUrl: null,
+      qiitaUrl: null,
+      juejinUrl: null
+    })
+    mockedArticles.mockResolvedValue({
+      records: [],
+      total: 1,
+      page: 1,
+      size: 1
+    })
+    mockedCategories.mockResolvedValue([])
+    mockedTags.mockResolvedValue([])
+    const store = useAuthorProfileStore()
+
+    await Promise.all([store.load('zh'), store.load('zh')])
+
+    expect(mockedAuthor).toHaveBeenCalledTimes(1)
+    expect(mockedArticles).toHaveBeenCalledTimes(1)
+    expect(mockedCategories).toHaveBeenCalledTimes(1)
+    expect(mockedTags).toHaveBeenCalledTimes(1)
   })
 
   it('keeps site settings when author profile and counters fail', async () => {
