@@ -47,7 +47,7 @@
 
           <p
             v-if="authorData.location"
-            class="flex w-full flex-1 self-center items-center justify-center gap-2 text-base font-bold text-black"
+            class="flex w-full flex-1 self-center items-center justify-center gap-2 text-base text-black"
           >
             <SvgIcon
               icon-class="location"

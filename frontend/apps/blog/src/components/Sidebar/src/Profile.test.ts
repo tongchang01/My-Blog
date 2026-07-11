@@ -19,6 +19,7 @@ describe('Profile.vue', () => {
     expect(source).toContain('w-full')
     expect(source).toContain('flex-1')
     expect(source).toContain('text-black')
-    expect(source).toContain('font-bold')
+    expect(source).toContain('text-base')
+    expect(source).not.toContain('text-base font-bold text-black')
   })
 })
