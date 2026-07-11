@@ -21,7 +21,7 @@
           </li>
         </template>
         <template v-else-if="categories">
-          <li><ob-skeleton :count="10" height="20px" width="3rem" /></li>
+          <ob-skeleton tag="li" :count="10" height="20px" width="3rem" />
         </template>
         <template v-else>
           <li class="flex flex-row justify-center items-center">
