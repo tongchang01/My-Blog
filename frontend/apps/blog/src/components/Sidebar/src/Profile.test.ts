@@ -15,6 +15,7 @@ describe('Profile.vue', () => {
 
   it('renders the public author location when available', () => {
     expect(source).toContain('authorData.location')
-    expect(source).toContain('icon-class="pin"')
+    expect(source).toContain('icon-class="location"')
+    expect(source).toContain('w-full')
   })
 })

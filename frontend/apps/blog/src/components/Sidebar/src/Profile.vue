@@ -47,10 +47,10 @@
 
           <p
             v-if="authorData.location"
-            class="flex items-center justify-center gap-1 text-xs text-ob-dim"
+            class="flex w-full self-center items-center justify-center gap-1 text-xs text-ob-dim"
           >
             <SvgIcon
-              icon-class="pin"
+              icon-class="location"
               fill="none"
               stroke="currentColor"
               width="1rem"
