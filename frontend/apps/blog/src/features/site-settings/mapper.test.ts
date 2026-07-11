@@ -19,6 +19,7 @@ describe('site settings mapper', () => {
     expect(mapped.siteTitle).toBe('Backend title')
     expect(mapped.siteSubtitle).toBeNull()
     expect(mapped.themeConfig.site.subtitle).toBe('')
+    expect(mapped.themeConfig.site.nick).toBe('Backend title')
     expect(mapped.themeConfig.site.author).toBe(
       defaults.themeConfig.site.author
     )

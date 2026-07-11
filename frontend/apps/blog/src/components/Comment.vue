@@ -1,7 +1,7 @@
 <template>
   <div :class="wrapperClasses">
     <MainTitle
-      :title="'titles.comment'"
+      :title="title"
       icon="quote"
       paddings="pb-2 pt-0"
       text-size="text-2xl md:text-3xl"
@@ -12,10 +12,7 @@
     </div>
     <template v-else>
       <form class="comment-form" @submit.prevent="handleSubmit">
-        <div
-          v-if="commentStore.replyTarget"
-          class="comment-reply-target"
-        >
+        <div v-if="commentStore.replyTarget" class="comment-reply-target">
           <span>回复 {{ commentStore.replyTarget.authorNickname }}</span>
           <button type="button" @click="commentStore.clearReplyTarget()">
             取消
@@ -157,7 +154,9 @@
         >
           上一页
         </button>
-        <span>{{ commentStore.page.page }} / {{ commentStore.page.pages }}</span>
+        <span
+          >{{ commentStore.page.page }} / {{ commentStore.page.pages }}</span
+        >
         <button
           type="button"
           :disabled="commentStore.page.page >= commentStore.page.pages"
@@ -184,13 +183,16 @@ const props = withDefaults(
   defineProps<{
     articleId?: string
     enabled?: boolean
+    guestbook?: boolean
     title?: string
     body?: string
     uid?: string
   }>(),
   {
     articleId: '',
-    enabled: true
+    enabled: true,
+    guestbook: false,
+    title: 'titles.comment'
   }
 )
 
@@ -204,7 +206,9 @@ const form = reactive<CommentFormState>({
 })
 
 const submitting = computed(() => commentStore.status === 'submitting')
-const effectiveEnabled = computed(() => props.enabled && props.articleId !== '')
+const effectiveEnabled = computed(
+  () => props.enabled && (props.guestbook || props.articleId !== '')
+)
 const wrapperClasses = computed(() => ({
   'bg-ob-deep-800 p-4 mt-8 lg:px-14 lg:py-10 rounded-2xl shadow-xl mb-8 lg:mb-0': true,
   [`comment-${appStore.themeConfig.theme.profile_shape}`]: true
@@ -215,7 +219,8 @@ const loadPage = (page: number): void => {
     articleId: props.articleId,
     page,
     size: commentStore.page.size,
-    locale: appStore.locale
+    locale: appStore.locale,
+    guestbook: props.guestbook
   })
 }
 
@@ -224,8 +229,8 @@ const replyTo = (id: string, authorNickname: string): void => {
 }
 
 const handleSubmit = async (): Promise<void> => {
-  if (!props.articleId) return
-  await commentStore.submit(props.articleId, form)
+  if (!props.guestbook && !props.articleId) return
+  await commentStore.submit(props.guestbook ? null : props.articleId, form)
   if (!commentStore.error) form.contentMd = ''
 }
 
@@ -238,12 +243,13 @@ const flattenReplies = (comment: CommentViewModel): CommentViewModel[] =>
 watch(
   () => [props.articleId, props.enabled] as const,
   ([articleId, enabled]) => {
-    if (enabled && articleId) {
+    if (enabled && (props.guestbook || articleId)) {
       void commentStore.load({
         articleId,
         page: 1,
         size: commentStore.page.size,
-        locale: appStore.locale
+        locale: appStore.locale,
+        guestbook: props.guestbook
       })
     }
   },

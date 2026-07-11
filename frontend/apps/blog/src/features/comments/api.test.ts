@@ -3,7 +3,9 @@ import { requestApi } from '@/shared/http/client'
 import { ApiError } from '@/shared/http/error'
 import {
   createArticleComment,
-  loadArticleComments
+  createGuestbookComment,
+  loadArticleComments,
+  loadGuestbookComments
 } from './api'
 
 vi.mock('@/shared/http/client', () => ({
@@ -84,6 +86,44 @@ describe('comments api', () => {
         site: null,
         contentMd: 'hello',
         replyToCommentId: '9007199254740994'
+      }
+    })
+  })
+
+  it('uses the guestbook endpoints without an article id', async () => {
+    mockedRequestApi.mockResolvedValueOnce({
+      records: [],
+      total: 0,
+      page: 1,
+      size: 20
+    })
+
+    await loadGuestbookComments(1, 20)
+
+    expect(mockedRequestApi).toHaveBeenCalledWith({
+      method: 'GET',
+      url: '/public/guestbook/comments',
+      params: { page: 1, size: 20 }
+    })
+
+    mockedRequestApi.mockResolvedValueOnce({ id: '10', auditStatus: 'PASS' })
+    await createGuestbookComment({
+      nickname: '访客',
+      email: 'guest@example.com',
+      site: null,
+      contentMd: '你好',
+      replyToCommentId: null
+    })
+
+    expect(mockedRequestApi).toHaveBeenCalledWith({
+      method: 'POST',
+      url: '/public/guestbook/comments',
+      data: {
+        nickname: '访客',
+        email: 'guest@example.com',
+        site: null,
+        contentMd: '你好',
+        replyToCommentId: null
       }
     })
   })

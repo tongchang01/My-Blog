@@ -1,8 +1,4 @@
-import {
-  Theme,
-  ThemeConfig,
-  ThemeMenu
-} from '@/models/ThemeConfig.class'
+import { Theme, ThemeConfig, ThemeMenu } from '@/models/ThemeConfig.class'
 import type { SiteSettingsViewModel } from './model'
 
 export const createDefaultSiteSettings = (): SiteSettingsViewModel => {
@@ -14,7 +10,8 @@ export const createDefaultSiteSettings = (): SiteSettingsViewModel => {
     Archives: true,
     Tags: true,
     Categories: true,
-    Links: true
+    Links: true,
+    MessageBoard: true
   })
   themeConfig.theme = new Theme({
     profile_shape: 'circle',
