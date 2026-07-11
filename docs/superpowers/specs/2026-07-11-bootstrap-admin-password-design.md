@@ -50,7 +50,7 @@
 ## 数据与接口边界
 
 - `t_user_auth` 和 `t_user_info` 的表结构不增加字段，Flyway 初始化脚本不插入默认账号。
-- 新增最小持久化能力：判断有效 ADMIN 是否存在，以及原子创建账号和资料。
+- 新增专用 `AdminBootstrapRepository`：判断有效 ADMIN 是否存在，以及创建账号；既有 `UserAccountRepository` 保持单方法登录查询契约不变。
 - 初始化密码通过已有 `PasswordHashService` 转换为 BCrypt 摘要；不得在 SQL 中保存明文或预计算的生产密码摘要。
 - 改密继续使用既有 `ChangePasswordApplicationService`、token version 递增和 refresh token 撤销逻辑。
 
