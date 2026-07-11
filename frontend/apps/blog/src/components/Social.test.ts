@@ -5,12 +5,17 @@ import { dirname, resolve } from 'node:path'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const source = readFileSync(resolve(currentDir, 'Social.vue'), 'utf8')
+const emailIcon = readFileSync(
+  resolve(currentDir, '../icons/email.svg'),
+  'utf8'
+)
 const customSocialsStart = source.indexOf('<template v-if="customSocials')
 const emailLinkStart = source.indexOf(':href="`mailto:${socials.email}`"')
 
 describe('Social.vue', () => {
   it('exposes the public email with the shared email icon', () => {
     expect(existsSync(resolve(currentDir, '../icons/email.svg'))).toBe(true)
+    expect(emailIcon).toContain('fill="none"')
     expect(source).toContain('icon-class="email"')
     expect(emailLinkStart).toBeGreaterThan(-1)
     expect(source.slice(customSocialsStart, emailLinkStart)).toContain(
