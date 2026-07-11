@@ -18,6 +18,19 @@
       </div>
       <div class="feature-content">
         <span v-if="article">
+          <b v-if="badge" class="article-tag">
+            <span class="inline-flex items-center">
+              <SvgIcon
+                icon-class="hot"
+                width="1.05rem"
+                height="1.05rem"
+                class="-mb-0.5 mr-1"
+                stroke="currentColor"
+              />
+              <span v-if="badge === 'pinned'">{{ t('settings.pinned') }}</span>
+              <span v-else>{{ t('settings.featured') }}</span>
+            </span>
+          </b>
           <b>{{ article.category?.name || t('settings.default-category') }}</b>
           <b v-if="article.locked" class="article-tag ml-2">🔒</b>
         </span>
@@ -52,11 +65,18 @@ import { useI18n } from 'vue-i18n'
 import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
+import SvgIcon from '@/components/SvgIcon/index.vue'
 import type { ArticleCardViewModel } from '@/features/articles/model'
+
+type HomepageBadge = 'pinned' | 'featured'
 
 const props = defineProps({
   data: {
     type: Object as PropType<ArticleCardViewModel | null>,
+    default: null
+  },
+  badge: {
+    type: String as PropType<HomepageBadge>,
     default: null
   }
 })

@@ -29,7 +29,7 @@
     <ul class="grid lg:grid-cols-2 gap-7">
       <template v-if="featurePosts.length > 0">
         <li v-for="post in featurePosts" :key="post.slug">
-          <ArticleCard :data="post" />
+          <ArticleCard :data="post" badge="featured" />
         </li>
       </template>
     </ul>

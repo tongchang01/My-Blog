@@ -1,13 +1,21 @@
 <template>
   <div class="block mt-8">
-    <Feature v-if="showFeature && mainArticle" :data="mainArticle">
+    <Feature
+      v-if="showFeature && mainArticle"
+      :data="mainArticle"
+      :badge="hasPinnedArticle ? 'pinned' : 'featured'"
+    >
       <FeatureList
         v-if="featureCards.length > 0"
         :data="featureCards"
         :semantic="hasFeaturedArticles"
       />
     </Feature>
-    <HorizontalArticle v-else-if="mainArticle" class="mb-8" :data="mainArticle" />
+    <HorizontalArticle
+      v-else-if="mainArticle"
+      class="mb-8"
+      :data="mainArticle"
+    />
 
     <div class="main-grid">
       <div id="article-list" class="flex flex-col relative">
@@ -76,7 +84,9 @@ const currentLocale = computed(() =>
   isSupportedLocale(route.params.lang) ? route.params.lang : appStore.locale
 )
 const showFeature = computed(() => appStore.themeConfig.theme.feature)
-const hasPinnedArticle = computed(() => articleStore.home.pinnedArticle !== null)
+const hasPinnedArticle = computed(
+  () => articleStore.home.pinnedArticle !== null
+)
 const hasFeaturedArticles = computed(
   () => articleStore.home.featuredArticles.length > 0
 )

@@ -1,6 +1,6 @@
 <template>
   <div id="feature">
-    <horizontal-article :data="featurePost" />
+    <horizontal-article :data="featurePost" :badge="badge" />
     <!-- Feature sub-component -->
     <slot />
   </div>
@@ -15,10 +15,14 @@ const props = defineProps({
   data: {
     type: Object as PropType<ArticleCardViewModel>,
     required: true
+  },
+  badge: {
+    type: String as PropType<'pinned' | 'featured'>,
+    default: 'featured'
   }
 })
 
-const featurePost = toRefs(props).data
+const { data: featurePost, badge } = toRefs(props)
 </script>
 
 <style lang="scss" scoped></style>
