@@ -14,18 +14,27 @@ import usePageTitle from '@/hooks/usePageTitle'
 import { useCommonStore } from '@/stores/common'
 import defaultCover from '@/assets/default-cover.jpg'
 import { useSiteSettingsStore } from '@/features/site-settings/store'
-import { renderMarkdown } from '@/shared/markdown/render'
+import { renderArticleMarkdown } from '@/shared/markdown/render'
+import { useAppStore } from '@/stores/app'
 
 const commonStore = useCommonStore()
 const siteSettingsStore = useSiteSettingsStore()
+const appStore = useAppStore()
 const { pageTitle, updateTitle } = usePageTitle()
 
 const pageData = computed(() => {
   const page = new Page()
+  const rendered = renderArticleMarkdown(
+    siteSettingsStore.settings.aboutMd ?? '',
+    appStore.locale
+  )
   page.title = pageTitle.value
-  page.content = siteSettingsStore.settings.aboutMd
-    ? renderMarkdown(siteSettingsStore.settings.aboutMd)
-    : ''
+  page.content = rendered.html
+  page.count_time = {
+    symbolsTime: rendered.readingTime,
+    symbolsCount: rendered.wordCount
+  }
+  page.toc = rendered.toc
   page.comments = false
   return page
 })
