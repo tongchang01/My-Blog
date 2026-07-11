@@ -5,7 +5,7 @@
   >
     <span class="flex mr-3">
       <img
-        v-if="appStore.siteTitle"
+        v-if="themeConfig.site.logo || themeConfig.site.avatar"
         :class="avatarClass"
         :src="themeConfig.site.logo || themeConfig.site.avatar"
         alt="site-logo"

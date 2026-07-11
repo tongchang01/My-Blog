@@ -41,6 +41,7 @@ describe('site settings store', () => {
     expect(store.status).toBe('degraded')
     expect(store.settings.siteTitle).not.toBe('')
     expect(store.settings.themeConfig.site.author).not.toBe('')
+    expect(store.settings.themeConfig.site.avatar).toBe('')
   })
 
   it('aborts the previous language request', async () => {

@@ -12,4 +12,10 @@ describe('Logo.vue', () => {
     expect(source).toContain("{{ appStore.siteSubtitle || 'BLOG' }}")
     expect(source).not.toContain('{{ themeConfig.site.author }}')
   })
+
+  it('does not render an image when the backend has not supplied a logo or avatar', () => {
+    expect(source).toContain(
+      'v-if="themeConfig.site.logo || themeConfig.site.avatar"'
+    )
+  })
 })

@@ -27,8 +27,8 @@ export const createDefaultSiteSettings = (): SiteSettingsViewModel => {
   themeConfig.site.author = 'TYB'
   themeConfig.site.nick = 'BLOG'
   themeConfig.site.description = '一个写代码的人，偶尔记下一些想说的话。'
-  themeConfig.site.avatar =
-    'https://avatars.githubusercontent.com/u/24708758?v=4'
+  // Author avatar is supplied by /api/public/author-profile.
+  themeConfig.site.avatar = ''
   themeConfig.site.language = 'zh'
   themeConfig.site.multi_language = true
   themeConfig.site_meta.favicon = '/favicon.ico'
