@@ -1,9 +1,18 @@
 import MockAdapter from "axios-mock-adapter";
 import { config, flushPromises, mount } from "@vue/test-utils";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { sessionService } from "@/features/auth/session";
 import { useUserStoreHook } from "@/store/modules/user";
 import { http } from "@/utils/http";
 import ProfileManagement from "./index.vue";
+
+const { routerReplace, showMessage } = vi.hoisted(() => ({
+  routerReplace: vi.fn(),
+  showMessage: vi.fn()
+}));
+
+vi.mock("vue-router", () => ({ useRouter: () => ({ replace: routerReplace }) }));
+vi.mock("@/utils/message", () => ({ message: showMessage }));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
@@ -20,7 +29,12 @@ const stubs = {
   "el-form": true,
   "el-form-item": true,
   "el-image": true,
-  "el-input": true,
+  "el-input": {
+    props: ["modelValue", "type", "disabled"],
+    emits: ["update:modelValue"],
+    template:
+      "<input :type=\"type || 'text'\" :disabled=\"disabled\" :value=\"modelValue\" @input=\"$emit('update:modelValue', $event.target.value)\" />"
+  },
   "el-pagination": true,
   "el-skeleton": true,
   "el-tag": true
@@ -76,6 +90,9 @@ function currentUser(type: "ADMIN" | "DEMO") {
 afterEach(() => {
   mock.reset();
   useUserStoreHook().CLEAR_USER();
+  routerReplace.mockClear();
+  showMessage.mockClear();
+  vi.restoreAllMocks();
 });
 
 describe("profile management page", () => {
@@ -87,6 +104,9 @@ describe("profile management page", () => {
     expect(wrapper.find('[data-testid="profile-account-card"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="profile-form-card"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="profile-save"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="profile-password-card"]').exists()).toBe(
+      true
+    );
     expect(wrapper.find('[data-testid="profile-readonly"]').exists()).toBe(false);
   });
 
@@ -96,6 +116,9 @@ describe("profile management page", () => {
     await flushPromises();
 
     expect(wrapper.find('[data-testid="profile-save"]').exists()).toBe(false);
+    expect(wrapper.find('[data-testid="profile-password-card"]').exists()).toBe(
+      false
+    );
     expect(wrapper.find('[data-testid="profile-readonly"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="profile-avatar-choose"]').exists()).toBe(false);
   });
@@ -121,5 +144,56 @@ describe("profile management page", () => {
     await flushPromises();
 
     expect(mock.history.patch).toHaveLength(1);
+  });
+
+  it("changes an admin password through the existing endpoint and returns to login", async () => {
+    mock.onGet("/api/auth/me").reply(200, ok(currentUser("ADMIN")));
+    mock.onPut("/api/auth/me/password").reply(config => {
+      expect(JSON.parse(config.data)).toEqual({
+        currentPassword: "old-password",
+        newPassword: "new-password"
+      });
+      return [200, ok(null)];
+    });
+    const expire = vi.spyOn(sessionService, "expire");
+    const wrapper = mount(ProfileManagement, { global: { stubs } });
+    await flushPromises();
+
+    const inputs = wrapper
+      .get('[data-testid="profile-password-card"]')
+      .findAll("input");
+    await inputs[0].setValue("old-password");
+    await inputs[1].setValue("new-password");
+    await inputs[2].setValue("new-password");
+    await wrapper.get('[data-testid="profile-password-save"]').trigger("click");
+    await flushPromises();
+
+    expect(mock.history.put).toHaveLength(1);
+    expect(expire).toHaveBeenCalledOnce();
+    expect(routerReplace).toHaveBeenCalledWith("/login");
+    expect(showMessage).toHaveBeenCalledOnce();
+  });
+
+  it("keeps password fields after a failed password change", async () => {
+    mock.onGet("/api/auth/me").reply(200, ok(currentUser("ADMIN")));
+    mock.onPut("/api/auth/me/password").reply(400, ok(null));
+    const wrapper = mount(ProfileManagement, { global: { stubs } });
+    await flushPromises();
+
+    const card = wrapper.get('[data-testid="profile-password-card"]');
+    const inputs = card.findAll("input");
+    await inputs[0].setValue("old-password");
+    await inputs[1].setValue("new-password");
+    await inputs[2].setValue("new-password");
+    await card.get('[data-testid="profile-password-save"]').trigger("click");
+    await flushPromises();
+
+    expect((inputs[0].element as HTMLInputElement).value).toBe("old-password");
+    expect((inputs[1].element as HTMLInputElement).value).toBe("new-password");
+    expect((inputs[2].element as HTMLInputElement).value).toBe("new-password");
+    expect(wrapper.find('[data-testid="profile-password-error"]').exists()).toBe(
+      true
+    );
+    expect(routerReplace).not.toHaveBeenCalled();
   });
 });

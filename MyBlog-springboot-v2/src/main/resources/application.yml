@@ -108,6 +108,9 @@ myblog:
         path: /api/public/stats/page-views
       - method: GET
         path: /api/public/stats/site-summary
+  bootstrap-admin:
+    enabled: false
+    exit-after-run: false
   content:
     article-publish:
       enabled: true

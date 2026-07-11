@@ -7,6 +7,11 @@ import type {
 import type { UserProfilePayload } from "@/features/profile/form";
 import { http } from "@/utils/http";
 
+export interface ChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export const login = (request: LoginRequest) =>
   http.post<ApiResponse<TokenPair>>(
     "/api/auth/login",
@@ -34,3 +39,8 @@ export const updateCurrentUserProfile = (payload: UserProfilePayload) =>
     "/api/auth/me/profile",
     { data: payload }
   );
+
+export const changeCurrentUserPassword = (payload: ChangePasswordPayload) =>
+  http.request<ApiResponse<null>>("put", "/api/auth/me/password", {
+    data: payload
+  });

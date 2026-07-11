@@ -65,6 +65,9 @@ myblog:
         path: /swagger-ui/**
       - method: GET
         path: /media/**
+  bootstrap-admin:
+    enabled: false
+    exit-after-run: false
   content:
     article-publish:
       enabled: false

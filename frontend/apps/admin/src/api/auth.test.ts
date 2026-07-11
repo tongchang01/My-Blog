@@ -2,7 +2,7 @@ import MockAdapter from "axios-mock-adapter";
 import { afterEach, describe, expect, it } from "vitest";
 import type { UserProfilePayload } from "@/features/profile/form";
 import { http } from "@/utils/http";
-import { updateCurrentUserProfile } from "./auth";
+import { changeCurrentUserPassword, updateCurrentUserProfile } from "./auth";
 
 const mock = new MockAdapter(http.instance);
 
@@ -39,6 +39,21 @@ describe("auth API", () => {
 
     await expect(updateCurrentUserProfile(payload)).resolves.toMatchObject({
       data: { nickname: "Admin" }
+    });
+  });
+
+  it("changes the current user password through the existing endpoint", async () => {
+    const payload = {
+      currentPassword: "old-password",
+      newPassword: "new-password"
+    };
+    mock.onPut("/api/auth/me/password").reply(config => {
+      expect(JSON.parse(config.data)).toEqual(payload);
+      return [200, ok()];
+    });
+
+    await expect(changeCurrentUserPassword(payload)).resolves.toMatchObject({
+      code: "00000"
     });
   });
 });

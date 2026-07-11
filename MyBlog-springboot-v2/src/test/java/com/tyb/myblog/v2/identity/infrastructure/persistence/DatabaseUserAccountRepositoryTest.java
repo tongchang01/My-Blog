@@ -3,6 +3,7 @@ package com.tyb.myblog.v2.identity.infrastructure.persistence;
 import com.tyb.myblog.v2.identity.domain.account.AccountType;
 import com.tyb.myblog.v2.identity.domain.account.UserAccount;
 import com.tyb.myblog.v2.identity.domain.account.UserAccountRepository;
+import com.tyb.myblog.v2.identity.domain.bootstrap.AdminBootstrapRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -25,6 +27,9 @@ class DatabaseUserAccountRepositoryTest {
 
     @Autowired
     private UserAccountRepository userAccountRepository;
+
+    @Autowired
+    private AdminBootstrapRepository adminBootstrapRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -60,6 +65,23 @@ class DatabaseUserAccountRepositoryTest {
         Optional<UserAccount> result = userAccountRepository.findActiveByUsername("deleted-admin");
 
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void shouldCreateAdminWithGeneratedIdAndDetectIt() {
+        assertFalse(adminBootstrapRepository.existsActiveAdmin());
+
+        UserAccount created = adminBootstrapRepository.createAdmin(
+                "admin", "$2a$10$test-password-hash");
+
+        assertTrue(created.id() > 0);
+        assertEquals("admin", created.username());
+        assertEquals(AccountType.ADMIN, created.type());
+        assertTrue(adminBootstrapRepository.existsActiveAdmin());
+        assertEquals("admin", jdbcTemplate.queryForObject(
+                "SELECT username FROM t_user_auth WHERE id = ?",
+                String.class,
+                created.id()));
     }
 
     private void insertAccount(

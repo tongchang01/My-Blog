@@ -1,8 +1,7 @@
 package com.tyb.myblog.v2.identity.infrastructure.persistence.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.tyb.myblog.v2.common.infrastructure.persistence.entity.BaseEntity;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,13 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @TableName("t_user_auth")
-public class UserAccountEntity {
-
-    /**
-     * 账号主键。
-     */
-    @TableId(type = IdType.INPUT)
-    private Long id;
+public class UserAccountEntity extends BaseEntity {
 
     /**
      * 登录用户名。

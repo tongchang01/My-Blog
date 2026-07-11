@@ -408,6 +408,18 @@ settings:
     zhihuUrl: Zhihu URL
     qiitaUrl: Qiita URL
     juejinUrl: Juejin URL
+  password:
+    title: Change password
+    current: Current password
+    new: New password
+    confirm: Confirm new password
+    save: Change password
+    changed: Password changed. Please sign in again.
+    error: Unable to change password. Check the current password and retry.
+    validation:
+      required: This field is required
+      length: The new password must be 8 to 128 characters
+      mismatch: The new passwords do not match
 attachments:
   readonlyDemo: The current demo account is read-only and cannot upload attachments
   upload:
