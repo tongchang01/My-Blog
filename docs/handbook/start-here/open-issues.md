@@ -8,11 +8,11 @@
 
 本文件只保留仍需行动或满足触发条件后需要重开的事项。已关闭问题由 Git 历史追溯。
 
-## ISSUE-002：生产部署拓扑和恢复证据缺失
+## ISSUE-002：生产部署实现和恢复证据缺失
 
 - 优先级：P0，发布阻塞。
-- 现状：prod profile、S3、health、CI 和检查清单存在，但服务器、域名、代理、MySQL、证书、备份和回滚尚未确认。
-- 完成条件：补齐 `../ops/deployment-direction.md` 的环境事实，完成真实 MySQL 备份恢复、S3、CORS、可信代理、手动发布、冒烟和回滚演练。
+- 现状：生产供应商边界、当前 EC2 原地重建方向、Compose 目标拓扑和脱敏运行手册已经确认；首个管理员初始化、Docker 镜像、Caddy/Compose、GHCR 发布、真实备份恢复、S3/IMDSv2 和手动发布证据尚未完成。
+- 完成条件：按 `../ops/production-runbook.md` 完成发布产物、回滚点、原地部署、S3、可信代理、生产冒烟和回滚演练，并通过 `../ops/release-checklist.md`。
 
 ## ISSUE-003：PASSWORD 文章无法解锁
 

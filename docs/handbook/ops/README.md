@@ -13,7 +13,8 @@
 | [环境变量](environment.md) | local/prod 配置来源与必填项 |
 | [构建与测试](build-and-test.md) | 本地和阶段验证命令 |
 | [持续集成](ci-cd.md) | 当前 CI job 与 CD 边界 |
-| [部署方向](deployment-direction.md) | 尚未绑定服务器的推荐运行形态 |
+| [部署方向](deployment-direction.md) | 已确认的生产架构、供应商边界与上线阻塞项 |
+| [生产运行手册](production-runbook.md) | 当前 EC2 原地重建、验收、回滚和七天收尾顺序 |
 | [发布检查](release-checklist.md) | 真实环境上线与回滚门槛 |
 
 CI、测试和本地开发中可复用的故障经验统一记录在 [`../start-here/pitfalls.md`](../start-here/pitfalls.md)，完整过程由 Git 历史追溯。
