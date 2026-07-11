@@ -50,6 +50,11 @@ myblog:
         path: /swagger-ui/**
       - method: GET
         path: /media/**
+  bootstrap-admin:
+    enabled: true
+    username: admin
+    password: 12345678
+    exit-after-run: false
   content:
     article-publish:
       enabled: true
