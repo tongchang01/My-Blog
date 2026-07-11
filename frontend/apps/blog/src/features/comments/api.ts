@@ -42,3 +42,28 @@ export const createArticleComment = async (
   if (data === null) throw new ApiError('Comment create response is empty')
   return data
 }
+
+export const loadGuestbookComments = async (
+  page: number,
+  size: number
+): Promise<PageResponse<PublicCommentDto>> => {
+  const data = await requestApi<PageResponse<PublicCommentDto>>({
+    method: 'GET',
+    url: '/public/guestbook/comments',
+    params: { page, size }
+  })
+  if (data === null) throw new ApiError('Guestbook response is empty')
+  return data
+}
+
+export const createGuestbookComment = async (
+  payload: CreateCommentPayload
+): Promise<CreateCommentResultDto> => {
+  const data = await requestApi<CreateCommentResultDto>({
+    method: 'POST',
+    url: '/public/guestbook/comments',
+    data: payload
+  })
+  if (data === null) throw new ApiError('Guestbook create response is empty')
+  return data
+}

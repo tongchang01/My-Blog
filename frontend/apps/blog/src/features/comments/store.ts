@@ -5,7 +5,9 @@ import type { ApiError } from '@/shared/http/error'
 import type { SupportedLocale } from '@/shared/i18n/locale'
 import {
   createArticleComment,
+  createGuestbookComment,
   loadArticleComments,
+  loadGuestbookComments,
   type LoadArticleCommentsParams
 } from './api'
 import { mapCommentPage } from './mapper'
@@ -22,6 +24,7 @@ interface ReplyTarget {
 
 interface CommentQuery extends Omit<LoadArticleCommentsParams, 'signal'> {
   locale: SupportedLocale
+  guestbook?: boolean
 }
 
 const DEFAULT_SIZE = 20
@@ -60,12 +63,14 @@ export const useCommentStore = defineStore('public-comments', () => {
 
     try {
       page.value = mapCommentPage(
-        await loadArticleComments({
-          articleId: query.articleId,
-          page: query.page,
-          size: query.size,
-          signal: request.signal
-        }),
+        await (query.guestbook
+          ? loadGuestbookComments(query.page, query.size)
+          : loadArticleComments({
+              articleId: query.articleId,
+              page: query.page,
+              size: query.size,
+              signal: request.signal
+            })),
         query.locale
       )
       status.value = page.value.records.length === 0 ? 'empty' : 'ready'
@@ -92,7 +97,7 @@ export const useCommentStore = defineStore('public-comments', () => {
   }
 
   const submit = async (
-    articleId: string,
+    articleId: string | null,
     form: CommentFormState
   ): Promise<void> => {
     status.value = 'submitting'
@@ -100,22 +105,26 @@ export const useCommentStore = defineStore('public-comments', () => {
     notice.value = null
 
     try {
-      const result = await createArticleComment(articleId, {
+      const payload = {
         nickname: form.nickname.trim(),
         email: form.email.trim(),
         site: toNullableString(form.site),
         contentMd: form.contentMd.trim(),
         replyToCommentId: replyTarget.value?.id ?? null
-      })
+      }
+      const result = lastQuery?.guestbook
+        ? await createGuestbookComment(payload)
+        : await createArticleComment(articleId ?? '', payload)
       replyTarget.value = null
 
       if (result.auditStatus === 'PASS') {
         notice.value = '评论已发布'
         await load({
-          articleId,
+          articleId: articleId ?? '',
           page: 1,
           size: lastQuery?.size ?? page.value.size,
-          locale: lastQuery?.locale ?? 'zh'
+          locale: lastQuery?.locale ?? 'zh',
+          guestbook: lastQuery?.guestbook
         })
       } else {
         notice.value = '评论已提交，等待审核'

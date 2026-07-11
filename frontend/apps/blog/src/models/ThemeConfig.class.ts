@@ -132,6 +132,15 @@ export class ThemeMenu implements ObMenu {
           ja: 'リンク集',
           en: 'Friend Links'
         }
+      },
+      MessageBoard: {
+        name: 'MessageBoard',
+        path: '/message-board',
+        i18n: {
+          zh: '留言板',
+          ja: 'メッセージボード',
+          en: 'Message Board'
+        }
       }
     }
 
@@ -147,7 +156,7 @@ export class ThemeMenu implements ObMenu {
       // Theme custom menus
       for (const otherMenu of Object.keys(raw)) {
         // Updating the i18n config from the menu config for default menus
-        if (defaultMenus.indexOf(otherMenu) > 0 && raw[otherMenu].i18n) {
+        if (defaultMenus.indexOf(otherMenu) >= 0 && raw[otherMenu].i18n) {
           Object.assign(this.menus[otherMenu].i18n, { ...raw[otherMenu].i18n })
         }
 
@@ -316,6 +325,10 @@ export class Social {
   csdn = ''
   juejin = ''
   zhihu = ''
+  linkedin = ''
+  qiita = ''
+  website = ''
+  email = ''
   customs: CustomSocials = new CustomSocials()
 
   /**
