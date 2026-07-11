@@ -15,7 +15,6 @@ const fromSiteSettings = (): AuthorProfileViewModel => {
     avatar: settings.themeConfig.site.avatar,
     description: settings.themeConfig.site.description,
     socials: settings.themeConfig.socials,
-    wordCount: 0,
     articleCount: 0,
     categoryCount: 0,
     tagCount: 0

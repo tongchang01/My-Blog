@@ -46,11 +46,7 @@
           </p>
 
           <Social :socials="authorData.socials" />
-          <ul class="grid grid-cols-4 pt-2 w-full px-2 text-lg">
-            <li class="col-span-1 text-center">
-              <span class="text-ob-bright">{{ authorData.word_count }}</span>
-              <p class="text-xs">{{ t('settings.words') }}</p>
-            </li>
+          <ul class="grid grid-cols-3 pt-2 w-full px-2 text-lg">
             <li class="col-span-1 text-center">
               <span class="text-ob-bright">
                 {{ authorData.post_list.length }}
@@ -108,7 +104,6 @@ const authorData = computed(() => ({
   name: authorProfileStore.profile.name,
   description: authorProfileStore.profile.description,
   socials: authorProfileStore.profile.socials,
-  word_count: authorProfileStore.profile.wordCount,
   post_list: { length: authorProfileStore.profile.articleCount },
   categories: authorProfileStore.profile.categoryCount,
   tags: authorProfileStore.profile.tagCount

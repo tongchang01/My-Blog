@@ -7,7 +7,6 @@ export interface AuthorProfileViewModel {
   avatar: string
   description: string
   socials: Social
-  wordCount: number
   articleCount: number
   categoryCount: number
   tagCount: number
