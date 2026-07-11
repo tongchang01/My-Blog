@@ -14,6 +14,13 @@ import java.time.LocalDateTime;
 public interface UserAccountMapper extends BaseMapper<UserAccountEntity> {
 
     /**
+     * 判断是否存在未删除的管理员账号。
+     *
+     * @return 存在时返回 {@code true}
+     */
+    boolean existsActiveAdmin();
+
+    /**
      * 按账号 ID 查询未删除账号的安全投影。
      *
      * @param userId 账号 ID
