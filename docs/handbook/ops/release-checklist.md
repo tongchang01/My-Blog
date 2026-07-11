@@ -29,6 +29,7 @@
 - [ ] trusted proxies 只包含实际代理 IP/CIDR，代理覆盖外部伪造转发头。
 - [ ] 直连后端时不信任 `X-Forwarded-For` 和 `X-Real-IP`。
 - [ ] ADMIN/DEMO 权限、token refresh/退出、PASSWORD 内容阻断通过冒烟。
+- [ ] 首个管理员初始化成功后，已通过管理端修改初始密码；旧会话失效，初始化专用环境变量已从服务器删除。
 
 ## 产品冒烟
 
