@@ -1,6 +1,0 @@
-[
-  { "name": "技术", "slug": "tech", "path": "categories/tech/", "count": 6 },
-  { "name": "随笔", "slug": "essay", "path": "categories/essay/", "count": 3 },
-  { "name": "生活", "slug": "life", "path": "categories/life/", "count": 2 },
-  { "name": "教程", "slug": "tutorial", "path": "categories/tutorial/", "count": 1 }
-]
