@@ -24,7 +24,8 @@ Git 历史承担计划、评审、迁移过程和废弃说明的追溯。`docs/`
 - 查看项目踩坑：[`handbook/start-here/pitfalls.md`](handbook/start-here/pitfalls.md)
 - 开始开发：[`handbook/rules/README.md`](handbook/rules/README.md) 与对应模块文档
 - 本地运行：[`handbook/ops/local-development.md`](handbook/ops/local-development.md)
-- 准备上线：[`handbook/ops/release-checklist.md`](handbook/ops/release-checklist.md)
+- 规划生产部署：[`handbook/ops/deployment-direction.md`](handbook/ops/deployment-direction.md)
+- 执行生产部署：[`handbook/ops/production-runbook.md`](handbook/ops/production-runbook.md) 与 [`handbook/ops/release-checklist.md`](handbook/ops/release-checklist.md)
 
 ## 事实优先级
 
