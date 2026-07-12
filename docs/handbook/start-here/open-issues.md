@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 尚未解决的产品与工程事项
-> 最后校准：2026-07-11
+> 最后校准：2026-07-12
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：未解决事项权威源
 
@@ -36,8 +36,8 @@
 ## ISSUE-007：前端构建债务
 
 - 优先级：P3，非发布阻塞。
-- 现状：博客使用 Sass legacy API 与 `@import`，主 chunk 约 500 kB；管理端 bundle 较大，Browserslist 与 baseline 数据提示过期。
-- 完成条件：分别评估 Sass module 迁移、代码分包、依赖数据更新和性能预算，避免与业务功能提交混合。
+- 现状：博客已消除 Sass legacy API 与 `@import` 弃用提示，主 chunk 仍约 477 kB（gzip 约 182 kB）；管理端 bundle 较大，Browserslist 与 baseline 数据提示过期。
+- 完成条件：评估代码分包、依赖数据更新和性能预算，避免与业务功能提交混合。
 
 ## ISSUE-008：博客端非阻塞体验补齐
 
