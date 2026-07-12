@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 Web、安全和应用层
-> 最后校准：2026-07-10
+> 最后校准：2026-07-12
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/error/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/SecurityProblemSupport.java`
 > 权威程度：规则
 
@@ -10,6 +10,9 @@
 
 - 可预期业务失败抛出携带 `ApiErrorCode` 的 `ApiException`。
 - Bean Validation、请求解析、multipart 和未匹配路由由 `GlobalExceptionHandler` 转换。
+- HTTP Request 中可直接表达的字段约束应通过 `@Valid` 处理；公开评论已校验昵称、邮箱、站点长度、正文和回复 ID。
+- 领域对象构造或状态转换产生的预期 `IllegalArgumentException`，由紧邻该调用的 application service 转成 `ApiException(VALIDATION_ERROR)`；文章创建/更新和公开评论创建均遵循此规则。
+- 不在 `GlobalExceptionHandler` 中全局映射 `IllegalArgumentException`：持久化数据损坏、程序错误等同类型的未预期异常仍须返回 `500 + 99999`。
 - 认证与授权失败由 `SecurityProblemSupport` 输出相同的 `ApiResponse` 结构。
 - 未预期异常记录服务端堆栈并返回 `500 + 99999`，响应不包含内部异常消息。
 - Controller 和 Service 不捕获异常后手写失败响应，也不吞掉异常返回成功。

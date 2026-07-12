@@ -6,6 +6,8 @@ import com.tyb.myblog.v2.comment.domain.CommentContent;
 import com.tyb.myblog.v2.comment.domain.CommentRepository;
 import com.tyb.myblog.v2.comment.domain.CommentTarget;
 import com.tyb.myblog.v2.comment.domain.NewComment;
+import com.tyb.myblog.v2.common.error.ApiErrorCode;
+import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentCountService;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicy;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicyService;
@@ -103,6 +105,24 @@ class CommentCreateServiceTest {
 
         assertThat(result.id()).isEqualTo(300L);
         verify(countService, never()).increment(any(Long.class), any(Integer.class));
+    }
+
+    @Test
+    void mapsDomainValidationFailureToApiValidationError() {
+        CommentCreateCommand invalid = new CommentCreateCommand(
+                0L,
+                " ",
+                "tyb@example.com",
+                null,
+                "hello",
+                null,
+                "127.0.0.1",
+                "JUnit");
+
+        assertThatThrownBy(() -> service.createGuestbookComment(invalid))
+                .isInstanceOfSatisfying(ApiException.class, exception ->
+                        assertThat(exception.code())
+                                .isEqualTo(ApiErrorCode.VALIDATION_ERROR));
     }
 
     @Test

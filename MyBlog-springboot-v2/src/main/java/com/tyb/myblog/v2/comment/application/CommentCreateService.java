@@ -56,28 +56,46 @@ public class CommentCreateService {
                 command.contentMd());
         ReplySnapshot reply = resolveReply(target, command.replyToCommentId());
         CommentAuditStatus status = auditPolicy.audit(command.contentMd());
-        Comment inserted = repository.insert(NewComment.create(
+        Comment inserted = repository.insert(newComment(
                 target,
-                reply.parentId(),
-                command.replyToCommentId(),
-                reply.replyToUserId(),
-                reply.replyToNickname(),
-                null,
-                command.nickname(),
-                command.email(),
-                command.site(),
-                command.clientIp(),
-                command.userAgent(),
-                command.contentMd(),
-                markdownRenderer.render(command.contentMd()),
-                status,
-                LocalDateTime.now(clock),
-                null));
+                reply,
+                command,
+                status));
         if (articleCounted && status.publiclyVisible()) {
             articleCountService.increment(target.targetId(), 1);
         }
         publishNotification(inserted, command.replyToCommentId());
         return new CommentCreateResult(inserted.id(), inserted.auditStatus());
+    }
+
+    private NewComment newComment(
+            CommentTarget target,
+            ReplySnapshot reply,
+            CommentCreateCommand command,
+            CommentAuditStatus status) {
+        try {
+            return NewComment.create(
+                    target,
+                    reply.parentId(),
+                    command.replyToCommentId(),
+                    reply.replyToUserId(),
+                    reply.replyToNickname(),
+                    null,
+                    command.nickname(),
+                    command.email(),
+                    command.site(),
+                    command.clientIp(),
+                    command.userAgent(),
+                    command.contentMd(),
+                    markdownRenderer.render(command.contentMd()),
+                    status,
+                    LocalDateTime.now(clock),
+                    null);
+        } catch (IllegalArgumentException exception) {
+            throw new ApiException(
+                    ApiErrorCode.VALIDATION_ERROR,
+                    exception.getMessage());
+        }
     }
 
     private void publishNotification(

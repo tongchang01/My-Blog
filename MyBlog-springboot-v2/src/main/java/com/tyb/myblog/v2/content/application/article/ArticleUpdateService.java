@@ -51,24 +51,31 @@ public class ArticleUpdateService {
                 command.categoryId(),
                 command.tagIds(),
                 command.coverAttachmentId());
-        Article replacement = current.replace(
-                command.titleZh(),
-                command.titleJa(),
-                command.titleEn(),
-                command.summaryZh(),
-                command.summaryJa(),
-                command.summaryEn(),
-                command.body(),
-                command.categoryId(),
-                command.slug(),
-                command.status(),
-                homepageSlot,
-                hashedPassword,
-                publishAt,
-                command.coverAttachmentId(),
-                command.tagIds(),
-                now,
-                actorId);
+        Article replacement;
+        try {
+            replacement = current.replace(
+                    command.titleZh(),
+                    command.titleJa(),
+                    command.titleEn(),
+                    command.summaryZh(),
+                    command.summaryJa(),
+                    command.summaryEn(),
+                    command.body(),
+                    command.categoryId(),
+                    command.slug(),
+                    command.status(),
+                    homepageSlot,
+                    hashedPassword,
+                    publishAt,
+                    command.coverAttachmentId(),
+                    command.tagIds(),
+                    now,
+                    actorId);
+        } catch (IllegalArgumentException exception) {
+            throw new ApiException(
+                    ApiErrorCode.VALIDATION_ERROR,
+                    exception.getMessage());
+        }
         if (!repository.update(replacement, now, actorId)) {
             throw new ApiException(ApiErrorCode.CONFLICT);
         }
