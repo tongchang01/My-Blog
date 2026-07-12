@@ -41,6 +41,7 @@ SCRIPT
   cat >"$fakebin/docker" <<'SCRIPT'
 #!/usr/bin/env bash
 printf 'docker %s\n' "$*" >>"$CALLS"
+printf '%s\n' "$PWD" >>"$DOCKER_DIRS"
 SCRIPT
 
 cat >"$fakebin/runuser" <<'SCRIPT'
@@ -77,16 +78,19 @@ run_release_contract() {
   local root="$temp/repo"
   local runtime="$temp/runtime.env"
   local calls="$temp/calls"
+  local docker_dirs="$temp/docker-dirs"
   local fakebin="$temp/bin"
   mkdir -p "$root"
   printf 'IMAGE_TAG=old\nOTHER=preserve\n' >"$runtime"
   chmod 600 "$runtime"
   : >"$calls"
+  : >"$docker_dirs"
   prepare_fake_commands "$fakebin" "$calls"
 
   local common_env=(
     "PATH=$fakebin:$PATH"
     "CALLS=$calls"
+    "DOCKER_DIRS=$docker_dirs"
     "MYBLOG_DEPLOY_ROOT=$root"
     "MYBLOG_RUNTIME_ENV=$runtime"
     "MYBLOG_COMPOSE_BIN=docker compose"
@@ -104,6 +108,7 @@ run_release_contract() {
   assert_contains "docker compose --env-file $runtime pull" "$calls"
   assert_contains "docker compose --env-file $runtime up -d --wait --wait-timeout 180" "$calls"
   assert_contains "docker exec myblog-v2-api-1 curl --fail --silent http://127.0.0.1:8080/actuator/health" "$calls"
+  [[ "$(sort -u "$docker_dirs")" == "$root" ]] || fail "docker compose was not run from deployment root"
   [[ "$(grep '^IMAGE_TAG=' "$runtime")" == "IMAGE_TAG=$SHA" ]] || fail "IMAGE_TAG was not updated"
   [[ "$(grep '^OTHER=' "$runtime")" == "OTHER=preserve" ]] || fail "runtime.env content changed unexpectedly"
 }
