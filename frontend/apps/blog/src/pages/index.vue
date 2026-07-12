@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { Feature, FeatureList } from '@/components/Feature'
 import { ArticleCard, HorizontalArticle } from '@/components/ArticleCard'
@@ -66,7 +66,6 @@ const route = useRoute()
 const appStore = useAppStore()
 const articleStore = useArticleStore()
 const { updateTitleByText } = usePageTitle()
-const articleOffset = ref(0)
 const DEFAULT_PAGE_SIZE = 12
 
 const currentLocale = computed(() =>
@@ -108,21 +107,11 @@ const emptyMessage = computed(() =>
       ? '公開記事はまだありません'
       : 'No public articles yet'
 )
-const updateArticleOffset = async () => {
-  await nextTick()
-  articleOffset.value = document.getElementById('article-list')?.offsetTop ?? 0
-}
-
 const loadHome = async () => {
   await articleStore.loadHome({
     size: DEFAULT_PAGE_SIZE,
     lang: currentLocale.value
   })
-  await updateArticleOffset()
-}
-
-const backToArticleTop = () => {
-  window.scrollTo({ top: articleOffset.value, behavior: 'smooth' })
 }
 
 onMounted(async () => {
@@ -134,7 +123,6 @@ watch(
   () => route.params.lang,
   async (next, previous) => {
     if (next !== previous && isSupportedLocale(next)) {
-      backToArticleTop()
       await loadHome()
     }
   }

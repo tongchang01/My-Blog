@@ -45,6 +45,9 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [...localizedRoutes, ...remainingGeneratedRoutes],
   scrollBehavior(to, from, savedPosition) {
+    if (to.name === from.name && to.params.lang !== from.params.lang)
+      return false
+
     return new Promise(resolve => {
       if (to.hash) {
         setTimeout(() => {
