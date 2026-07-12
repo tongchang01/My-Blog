@@ -4,6 +4,7 @@ set -euo pipefail
 readonly SUT_DIR="${SUT_DIR:?SUT_DIR is required}"
 readonly RELEASE="$SUT_DIR/myblog-release"
 readonly ENTRYPOINT="$SUT_DIR/myblog-cd-entrypoint"
+readonly INSTALLER="$SUT_DIR/install-github-cd.sh"
 readonly SHA="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 fail() {
@@ -131,9 +132,97 @@ SCRIPT
   assert_contains "sudo /usr/local/sbin/myblog-release $SHA" "$calls"
 }
 
+prepare_install_commands() {
+  local fakebin="$1"
+  mkdir -p "$fakebin"
+
+  cat >"$fakebin/id" <<'SCRIPT'
+#!/usr/bin/env bash
+if [[ "${1:-}" == "-u" ]]; then
+  printf '0\n'
+  exit 0
+fi
+exit 1
+SCRIPT
+
+  cat >"$fakebin/useradd" <<'SCRIPT'
+#!/usr/bin/env bash
+exit 0
+SCRIPT
+
+  cat >"$fakebin/chown" <<'SCRIPT'
+#!/usr/bin/env bash
+exit 0
+SCRIPT
+
+  cat >"$fakebin/visudo" <<'SCRIPT'
+#!/usr/bin/env bash
+[[ "$1" == "-cf" && -f "$2" ]]
+SCRIPT
+
+  cat >"$fakebin/install" <<'SCRIPT'
+#!/usr/bin/env bash
+directory=false
+mode=''
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    -d) directory=true; shift ;;
+    -m) mode="$2"; shift 2 ;;
+    -o|-g) shift 2 ;;
+    --) shift; break ;;
+    -*) shift ;;
+    *) break ;;
+  esac
+done
+if [[ "$directory" == true ]]; then
+  mkdir -p "$@"
+  [[ -z "$mode" ]] || chmod "$mode" "$@"
+  exit 0
+fi
+source="${@: -2:1}"
+destination="${@: -1}"
+mkdir -p "$(dirname "$destination")"
+cp "$source" "$destination"
+[[ -z "$mode" ]] || chmod "$mode" "$destination"
+SCRIPT
+
+  chmod +x "$fakebin"/*
+}
+
+run_install_contract() {
+  local temp
+  temp="$(mktemp -d)"
+  trap 'rm -rf "$temp"' RETURN
+
+  local fakebin="$temp/bin"
+  local install_root="$temp/install-root"
+  local deploy_root="$temp/repo"
+  local valid_key="$temp/valid.pub"
+  local invalid_key="$temp/invalid.pub"
+  printf 'ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAITest github-cd\n' >"$valid_key"
+  printf 'not-an-ssh-key\n' >"$invalid_key"
+  prepare_install_commands "$fakebin"
+
+  assert_status 64 env PATH="$fakebin:$PATH" "$INSTALLER"
+  assert_status 64 env PATH="$fakebin:$PATH" "$INSTALLER" --public-key-file "$invalid_key"
+  env PATH="$fakebin:$PATH" MYBLOG_INSTALL_ROOT="$install_root" MYBLOG_DEPLOY_ROOT="$deploy_root" \
+    "$INSTALLER" --public-key-file "$valid_key"
+
+  local authorized="$install_root/home/deploy/.ssh/authorized_keys"
+  local sudoers="$install_root/etc/sudoers.d/myblog-release"
+  grep -Fqx 'restrict,command="/usr/local/sbin/myblog-cd-entrypoint" ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAITest github-cd' "$authorized" \
+    || fail 'authorized_keys is not restricted'
+  grep -Fqx 'deploy ALL=(root) NOPASSWD: /usr/local/sbin/myblog-release *' "$sudoers" \
+    || fail 'sudoers is not restricted'
+  [[ "$(stat -c '%a' "$authorized")" == 600 ]] || fail 'authorized_keys mode is not 600'
+  [[ "$(stat -c '%a' "$install_root/usr/local/sbin/myblog-release")" == 755 ]] || fail 'release mode is not 755'
+}
+
 [[ -x "$RELEASE" ]] || fail "missing executable: $RELEASE"
 [[ -x "$ENTRYPOINT" ]] || fail "missing executable: $ENTRYPOINT"
+[[ -x "$INSTALLER" ]] || fail "missing executable: $INSTALLER"
 
 run_release_contract
 run_entrypoint_contract
+run_install_contract
 printf 'release contract: PASS\n'
