@@ -135,6 +135,10 @@ sudo docker exec myblog-v2-api-1 curl --fail --silent http://127.0.0.1:8080/actu
 
 首次真实演练于 2026-07-12 通过：工作流 `29195240729` 的 publish 与 deploy 均使用 `85df0d4b0dad967aed1d915bdd619594bda43e85`；OIDC、临时 SSH /32 放行、受限 SSH、部署和撤销步骤均成功，三个容器均为 healthy。
 
+## 公网 HTTPS 冒烟
+
+部署工作流的公网冒烟增强合入后，`Deploy same SHA` 成功后会由 GitHub Hosted Runner 依次请求主站、www 和管理端的 `/healthz`。每次请求最多 20 秒，不重试；任一请求失败会让 deploy job 失败。临时 SSH 规则撤销仍使用 `if: always()`，因此公网不可达不会遗留 Runner 的 `/32`。
+
 ## 失败与手工撤销
 
 OIDC 失败时核对 trust 的仓库/environment 条件、Role ARN、区域和安全组 ID。SSH 失败时确认临时 /32、deploy 公钥与 known_hosts。发布失败时查看 GitHub run 与 Docker Compose 日志；Flyway 或数据错误时停止，不自动回滚数据库。
