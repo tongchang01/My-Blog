@@ -26,6 +26,7 @@ import { Link } from '@/models/Article.class'
 import { PropType } from 'vue'
 import { localizeLink } from '@/utils/localization'
 import { SubTitle } from '../Title'
+import LinkCard from './LinkCard.vue'
 
 defineProps({
   links: {
