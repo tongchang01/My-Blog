@@ -98,11 +98,11 @@ Content-Type: application/json
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| `nickname` | string | 是 | 评论昵称 |
-| `email` | string | 是 | 邮箱，不在公开响应返回 |
-| `site` | string/null | 否 | 只允许 HTTP/HTTPS |
-| `contentMd` | string | 是 | Markdown 原文 |
-| `replyToCommentId` | string/null | 否 | 回复同一文章下已通过评论；公开 ID 按 string 传递，避免 Snowflake ID 精度损失 |
+| `nickname` | string | 是 | 非空，最长 64 字符 |
+| `email` | string | 是 | 非空、合法邮箱，最长 128 字符；不在公开响应返回 |
+| `site` | string/null | 否 | 最长 255 字符，只允许 HTTP/HTTPS |
+| `contentMd` | string | 是 | 非空，最长 5000 字符的 Markdown 原文 |
+| `replyToCommentId` | string/null | 否 | 正整数；回复同一文章下已通过评论，公开 ID 按 string 传递，避免 Snowflake ID 精度损失 |
 
 成功响应：HTTP 200
 
