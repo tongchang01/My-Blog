@@ -1,6 +1,6 @@
 # 生产部署运行手册
 
-> 状态：操作步骤已达到执行级；上线产物尚未完成，因此当前禁止清理 V1
+> 状态：上线镜像产物已完成；服务器预检、配置核对、部署和验收尚未完成，因此当前禁止清理 V1
 > 适用范围：当前 EC2 清理 V1 后原地部署 MyBlog V2
 > 最后校准：2026-07-11
 > 对应文档：`deployment-direction.md`、`release-checklist.md`、`environment.md`
@@ -39,18 +39,18 @@
 
 以下项目必须全部完成；任何一项未完成，都不得停止或清理 V1：
 
-- [ ] 首个管理员一次性初始化能力已实现并通过测试。
-- [ ] `myblog-api` Dockerfile 已验证 Java 17、非 root 用户和健康检查。
-- [ ] `myblog-web` 已包含 blog/admin 生产构建和 Caddy 配置。
+- [x] 首个管理员一次性初始化能力已实现并通过测试。
+- [x] `myblog-api` Dockerfile 已通过 GHCR 构建，包含 Java 17、非 root 用户和健康检查。
+- [x] `myblog-web` 已通过 GHCR 构建，包含 blog/admin 生产构建和 Caddy 配置。
 - [ ] 生产 Compose 已固定私有网络、MySQL/Caddy 持久卷、资源限制和 restart policy。
-- [ ] 后端、真实 MySQL 专项、blog/admin 测试和生产构建全部通过。
-- [ ] 两个公共 GHCR 镜像已使用同一提交 SHA 发布。
+- [x] 后端、真实 MySQL 专项、blog/admin 测试和生产构建全部通过 CI。
+- [x] 两个公共 GHCR 镜像已使用同一提交 SHA `fb37fac5477183e61d3b8521ba76c2d5ffe9066b` 发布。
 - [ ] 在未登录 GHCR 的服务器上能够匿名拉取两个镜像。
-- [ ] `.github/workflows/images.yml` 已在目标提交上成功运行，两个镜像的 SHA 标签完全一致。
+- [x] `.github/workflows/images.yml` 已在目标提交上成功运行，两个镜像的 SHA 标签完全一致。
 - [ ] `compose.yaml` 已通过 `docker compose config --quiet`。
 - [ ] 待发布提交 SHA、两个镜像完整名称和上一可用 SHA 已写入私有台账。
 
-阶段一目前仍有未完成项，所以这份手册虽然提供了执行命令，但还不能用于实际清理服务器。
+阶段一仍有服务器侧未完成项，所以这份手册虽然提供了执行命令，但还不能用于实际清理服务器。
 
 ## 阶段二：准备 AWS 与生产配置
 
