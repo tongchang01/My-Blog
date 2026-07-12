@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly MYBLOG_DEPLOY_ROOT="${MYBLOG_DEPLOY_ROOT:-/opt/myblog-v2}"
+readonly MYBLOG_RUNTIME_ENV="${MYBLOG_RUNTIME_ENV:-/etc/myblog-v2/runtime.env}"
+readonly MYBLOG_DEPLOY_USER="${MYBLOG_DEPLOY_USER:-deploy}"
+readonly SHA="${1:-}"
+
+fail() {
+  printf 'myblog-release: %s\n' "$*" >&2
+  exit 64
+}
+
+require_root() {
+  [[ "$(id -u)" -eq 0 ]] || fail 'must run as root'
+}
+
+require_sha() {
+  [[ "$1" =~ ^[0-9a-f]{40}$ ]] || fail 'release SHA must be 40 lowercase hexadecimal characters'
+}
+
+require_runtime_env() {
+  [[ -f "$MYBLOG_RUNTIME_ENV" ]] || fail 'runtime.env is missing'
+  [[ "$(stat -c '%a' "$MYBLOG_RUNTIME_ENV")" == 600 ]] || fail 'runtime.env must have mode 600'
+}
+
+replace_image_tag() {
+  local runtime="$1"
+  local sha="$2"
+  local temporary
+  temporary="$(mktemp "${runtime}.XXXXXX")"
+  trap 'rm -f "$temporary"' RETURN
+
+  awk -v sha="$sha" '
+    /^IMAGE_TAG=/ { count += 1; print "IMAGE_TAG=" sha; next }
+    { print }
+    END { exit count == 1 ? 0 : 1 }
+  ' "$runtime" >"$temporary" || fail 'runtime.env must contain exactly one IMAGE_TAG line'
+
+  install -m 600 -o root -g root "$temporary" "$runtime"
+  trap - RETURN
+}
+
+compose() {
+  docker compose "$@"
+}
+
+require_root
+require_sha "$SHA"
+require_runtime_env
+
+runuser -u "$MYBLOG_DEPLOY_USER" -- git -C "$MYBLOG_DEPLOY_ROOT" fetch --prune origin
+runuser -u "$MYBLOG_DEPLOY_USER" -- git -C "$MYBLOG_DEPLOY_ROOT" merge-base --is-ancestor "$SHA" origin/main
+runuser -u "$MYBLOG_DEPLOY_USER" -- git -C "$MYBLOG_DEPLOY_ROOT" checkout --detach "$SHA"
+replace_image_tag "$MYBLOG_RUNTIME_ENV" "$SHA"
+
+compose --env-file "$MYBLOG_RUNTIME_ENV" config --quiet
+compose --env-file "$MYBLOG_RUNTIME_ENV" pull
+compose --env-file "$MYBLOG_RUNTIME_ENV" up -d --wait --wait-timeout 180
+docker exec myblog-v2-api-1 curl --fail --silent http://127.0.0.1:8080/actuator/health
+printf 'myblog-release: deployed %s\n' "$SHA" >&2
+

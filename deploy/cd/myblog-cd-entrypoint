@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+set -euo pipefail
+set -f
+
+set -- ${SSH_ORIGINAL_COMMAND:-}
+if [[ "$#" -ne 2 || "$1" != deploy || ! "$2" =~ ^[0-9a-f]{40}$ ]]; then
+  printf 'myblog-cd-entrypoint: expected deploy <40-hex-sha>\n' >&2
+  exit 64
+fi
+
+exec sudo /usr/local/sbin/myblog-release "$2"
+
