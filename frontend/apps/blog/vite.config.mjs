@@ -10,6 +10,13 @@ export default ({ mode }) => {
   process.env = { ...process.env, ...env }
 
   return defineConfig({
+    css: {
+      preprocessorOptions: {
+        scss: {
+          api: 'modern'
+        }
+      }
+    },
     build: {
       assetsDir: 'static',
       rollupOptions: {

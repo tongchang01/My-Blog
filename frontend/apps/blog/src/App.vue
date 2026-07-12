@@ -31,6 +31,7 @@
   </teleport>
 
   <VueEasyLightbox
+    v-if="lightBoxVisible"
     :visible="lightBoxVisible"
     :imgs="lightBoxImages"
     :index="lightBoxIndex"
@@ -61,10 +62,12 @@ import HeaderMain from '@/components/Header/src/Header.vue'
 import FooterContainer from '@/components/Footer/FooterContainer.vue'
 import MobileMenu from '@/components/MobileMenu.vue'
 import defaultCover from '@/assets/default-cover.jpg'
-import VueEasyLightbox from 'vue-easy-lightbox'
 
 const SearchModal = defineAsyncComponent(
   () => import('@/components/SearchModal.vue')
+)
+const VueEasyLightbox = defineAsyncComponent(
+  () => import('vue-easy-lightbox')
 )
 
 const appStore = useAppStore()
