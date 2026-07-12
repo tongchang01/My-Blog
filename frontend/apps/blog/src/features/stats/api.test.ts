@@ -36,12 +36,12 @@ describe('stats api', () => {
   it('records page views', async () => {
     mockedRequestApi.mockResolvedValueOnce(null)
 
-    await recordPageView({ articleId: 0, lang: 'zh' })
+    await recordPageView({ lang: 'zh' })
 
     expect(mockedRequestApi).toHaveBeenCalledWith({
       method: 'POST',
       url: '/public/stats/page-views',
-      data: { articleId: 0, lang: 'zh' }
+      data: { lang: 'zh' }
     })
   })
 })

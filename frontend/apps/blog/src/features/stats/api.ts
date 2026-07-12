@@ -8,7 +8,7 @@ export interface SiteStatsSummaryDto {
 }
 
 export interface RecordPageViewPayload {
-  articleId: number
+  articleId?: number
   lang: SupportedLocale
 }
 
