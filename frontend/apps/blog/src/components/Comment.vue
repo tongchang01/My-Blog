@@ -60,12 +60,13 @@
         </div>
       </form>
 
-      <div v-if="commentStore.status === 'loading'" class="comment-state">
-        评论加载中...
-      </div>
-      <div v-else-if="commentStore.status === 'error'" class="comment-state">
-        <span>评论加载失败</span>
-        <button type="button" @click="commentStore.retry()">重试</button>
+      <div
+        v-if="
+          commentStore.status === 'loading' || commentStore.status === 'error'
+        "
+        class="comment-state"
+      >
+        <ob-skeleton tag="div" :count="4" height="16px" width="100%" />
       </div>
       <div v-else-if="commentStore.status === 'empty'" class="comment-state">
         暂无评论
@@ -290,8 +291,7 @@ watch(
 }
 
 .comment-submit,
-.comment-pagination button,
-.comment-state button {
+.comment-pagination button {
   @apply rounded-lg px-4 py-2 text-sm text-white;
   background: var(--main-gradient);
   transition: var(--trans-ease);

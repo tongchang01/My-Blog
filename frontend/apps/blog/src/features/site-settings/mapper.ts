@@ -16,8 +16,6 @@ export const mapSiteSettings = (
   settings.startedDate = dto.startedDate
 
   settings.themeConfig.site.subtitle = dto.siteSubtitle ?? ''
-  // Header/Footer use the legacy theme `nick` field as the visible brand.
-  settings.themeConfig.site.nick = dto.siteTitle ?? ''
   settings.themeConfig.site.started_date = dto.startedDate ?? ''
   settings.themeConfig.site.logo = dto.logoUrl ?? ''
   settings.themeConfig.site_meta.favicon = dto.faviconUrl ?? ''

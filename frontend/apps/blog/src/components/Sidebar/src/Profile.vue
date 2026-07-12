@@ -45,12 +45,22 @@
             <ob-skeleton :count="2" height="20px" width="100%" />
           </p>
 
+          <p
+            v-if="authorData.location"
+            class="flex w-full flex-1 self-center items-center justify-center gap-2 text-base text-black"
+          >
+            <SvgIcon
+              icon-class="location"
+              fill="none"
+              stroke="currentColor"
+              width="1.25rem"
+              height="1.25rem"
+            />
+            {{ authorData.location }}
+          </p>
+
           <Social :socials="authorData.socials" />
-          <ul class="grid grid-cols-4 pt-2 w-full px-2 text-lg">
-            <li class="col-span-1 text-center">
-              <span class="text-ob-bright">{{ authorData.word_count }}</span>
-              <p class="text-xs">{{ t('settings.words') }}</p>
-            </li>
+          <ul class="grid grid-cols-3 pt-2 w-full px-2 text-lg">
             <li class="col-span-1 text-center">
               <span class="text-ob-bright">
                 {{ authorData.post_list.length }}
@@ -77,6 +87,7 @@ import { useAppStore } from '@/stores/app'
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Social from '@/components/Social.vue'
+import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useAuthorProfileStore } from '@/features/author-profile/store'
 
 defineProps({
@@ -107,8 +118,8 @@ const authorData = computed(() => ({
   avatar: authorProfileStore.profile.avatar,
   name: authorProfileStore.profile.name,
   description: authorProfileStore.profile.description,
+  location: authorProfileStore.profile.location,
   socials: authorProfileStore.profile.socials,
-  word_count: authorProfileStore.profile.wordCount,
   post_list: { length: authorProfileStore.profile.articleCount },
   categories: authorProfileStore.profile.categoryCount,
   tags: authorProfileStore.profile.tagCount

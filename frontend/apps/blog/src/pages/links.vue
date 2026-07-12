@@ -17,21 +17,7 @@
       </div>
 
       <div class="mt-8">
-        <div
-          v-if="error"
-          class="flex min-h-48 flex-col items-center justify-center gap-3 rounded-2xl bg-ob-deep-800 p-8 text-ob-dim shadow-xl"
-        >
-          <p>{{ error }}</p>
-          <button
-            type="button"
-            class="rounded-lg px-4 py-2 text-sm text-white"
-            style="background: var(--main-gradient)"
-            @click="fetchLinks"
-          >
-            重试
-          </button>
-        </div>
-        <LinkList v-else-if="!loading" :links="links" />
+        <LinkList v-if="!loading && !error" :links="links" />
         <div
           v-else
           class="bg-ob-deep-800 px-14 py-16 rounded-2xl shadow-xl block min-h-screen"
@@ -79,17 +65,17 @@ import { mapFriendLinks } from '@/features/friend-links/model'
 const appStore = useAppStore()
 const links = ref<Link[]>([])
 const loading = ref(true)
-const error = ref<string | null>(null)
+const error = ref(false)
 const { pageTitle, updateTitle } = usePageTitle()
 
 const fetchLinks = async () => {
   loading.value = true
-  error.value = null
+  error.value = false
   try {
     links.value = mapFriendLinks(await loadPublicFriendLinks())
   } catch {
     links.value = []
-    error.value = '友情链接加载失败，请稍后重试'
+    error.value = true
   } finally {
     updateTitle(appStore.locale)
     loading.value = false

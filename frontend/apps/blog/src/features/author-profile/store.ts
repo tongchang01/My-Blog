@@ -14,8 +14,8 @@ const fromSiteSettings = (): AuthorProfileViewModel => {
     name: settings.themeConfig.site.author,
     avatar: settings.themeConfig.site.avatar,
     description: settings.themeConfig.site.description,
+    location: '',
     socials: settings.themeConfig.socials,
-    wordCount: 0,
     articleCount: 0,
     categoryCount: 0,
     tagCount: 0
@@ -39,6 +39,7 @@ const applyAuthorProfile = (
   next.name = dto.nickname || next.name
   next.avatar = dto.avatarUrl || next.avatar
   next.description = localizedBio(dto, locale) || next.description
+  next.location = dto.location || next.location
   next.socials = new Social({
     github: dto.githubUrl || '',
     twitter: dto.twitterUrl || '',

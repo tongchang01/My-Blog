@@ -62,7 +62,7 @@ export class Page implements Detail {
   covers: string | null = null
   excerpt: string | null = null
   content = ''
-  count_time = { symbolsTime: undefined, symbolsCount: undefined }
+  count_time: { symbolsTime?: string; symbolsCount?: number } = {}
   toc = ''
   text = ''
   constructor(raw?: { [key: string]: string }) {

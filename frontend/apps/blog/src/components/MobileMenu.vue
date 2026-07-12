@@ -30,6 +30,19 @@
         >
           <ob-skeleton :count="2" height="20px" width="10rem" />
         </p>
+        <p
+          v-if="authorData.location"
+          class="flex w-full items-center justify-center gap-2 text-base text-black"
+        >
+          <SvgIcon
+            icon-class="location"
+            fill="none"
+            stroke="currentColor"
+            width="1.25rem"
+            height="1.25rem"
+          />
+          {{ authorData.location }}
+        </p>
         <Social :socials="authorData.socials" />
         <ul class="grid grid-cols-3 pt-4 w-full px-2 text-lg">
           <li class="col-span-1 text-center">
@@ -148,6 +161,7 @@ import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
 import { useRouter } from 'vue-router'
 import { useNavigatorStore } from '@/stores/navigator'
 import Social from '@/components/Social.vue'
+import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useAuthorProfileStore } from '@/features/author-profile/store'
 
 const appStore = useAppStore()
@@ -219,6 +233,7 @@ const authorData = computed(() => ({
   avatar: authorProfileStore.profile.avatar,
   name: authorProfileStore.profile.name,
   description: authorProfileStore.profile.description,
+  location: authorProfileStore.profile.location,
   socials: authorProfileStore.profile.socials,
   post_list: { length: authorProfileStore.profile.articleCount },
   categories: authorProfileStore.profile.categoryCount,

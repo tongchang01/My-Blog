@@ -7,14 +7,15 @@
     <div
       class="bg-ob-deep-800 px-14 py-16 rounded-2xl shadow-xl block min-h-screen"
     >
-      <div v-if="articleStore.archiveStatus === 'loading'" class="state-text">
-        Loading...
-      </div>
-      <div v-else-if="articleStore.archiveStatus === 'error'" class="state-text">
-        Unable to load archives.
-        <button class="retry-button" type="button" @click="articleStore.retryArchives">
-          Retry
-        </button>
+      <div
+        v-if="
+          articleStore.archiveStatus === 'loading' ||
+          articleStore.archiveStatus === 'error'
+        "
+        class="flex flex-col gap-4"
+      >
+        <ob-skeleton tag="div" :count="1" height="36px" width="150px" />
+        <ob-skeleton tag="div" :count="12" height="16px" width="100%" />
       </div>
       <div
         v-else-if="articleStore.archiveStatus === 'empty'"
@@ -233,10 +234,6 @@ onUnmounted(() => {
 
 .state-text {
   @apply text-ob-bright text-center py-12;
-}
-
-.retry-button {
-  @apply ml-3 px-4 py-2 rounded bg-ob-bright text-ob-deep-800;
 }
 
 /*----- TIMELINE PERIOD -----*/

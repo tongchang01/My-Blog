@@ -1,6 +1,12 @@
 <template>
   <div class="flex flex-col mt-20">
-    <div v-if="articleStore.detailStatus === 'loading'" class="main-grid">
+    <div
+      v-if="
+        articleStore.detailStatus === 'loading' ||
+        articleStore.detailStatus === 'error'
+      "
+      class="main-grid"
+    >
       <div
         class="bg-ob-deep-800 px-14 py-16 rounded-2xl shadow-xl min-h-screen"
       >
@@ -67,14 +73,6 @@
     <div v-else class="py-32 text-center text-ob-dim">
       <h1 class="text-3xl text-ob-bright">{{ stateTitle }}</h1>
       <p class="mt-4">{{ stateMessage }}</p>
-      <button
-        v-if="articleStore.detailStatus === 'error'"
-        class="mt-6 px-5 py-2 rounded-full text-ob-bright"
-        :style="retryStyle"
-        @click="retry"
-      >
-        {{ retryLabel }}
-      </button>
     </div>
   </div>
 </template>
@@ -130,22 +128,8 @@ const stateMessage = computed(() => {
         ? '記事が見つかりません'
         : 'Article not found'
   }
-  return lang === 'zh'
-    ? '文章加载失败，请稍后重试'
-    : lang === 'ja'
-      ? '記事を読み込めませんでした'
-      : 'Unable to load the article'
+  return ''
 })
-const retryLabel = computed(() =>
-  (locale.value ?? appStore.locale) === 'zh'
-    ? '重试'
-    : (locale.value ?? appStore.locale) === 'ja'
-      ? '再試行'
-      : 'Retry'
-)
-const retryStyle = computed(() => ({
-  background: appStore.themeConfig.theme.header_gradient_css
-}))
 
 const replaceCanonicalSlug = async (slug: string | null) => {
   if (!slug || !article.value || route.params.slug === slug) return
@@ -173,11 +157,6 @@ const load = async () => {
     metaStore.setTitle(article.value.title)
     commonStore.setHeaderImage(article.value.coverUrl ?? '')
   }
-  await replaceCanonicalSlug(slug)
-}
-
-const retry = async () => {
-  const slug = await articleStore.retryDetail()
   await replaceCanonicalSlug(slug)
 }
 

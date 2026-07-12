@@ -3,6 +3,10 @@ import { mapSiteSettings } from './mapper'
 import { createDefaultSiteSettings } from './defaults'
 
 describe('site settings mapper', () => {
+  it('does not use a hardcoded author avatar before the public profile loads', () => {
+    expect(createDefaultSiteSettings().themeConfig.site.avatar).toBe('')
+  })
+
   it('overlays backend fields without replacing frontend-owned settings', () => {
     const defaults = createDefaultSiteSettings()
     const mapped = mapSiteSettings({
@@ -19,7 +23,6 @@ describe('site settings mapper', () => {
     expect(mapped.siteTitle).toBe('Backend title')
     expect(mapped.siteSubtitle).toBeNull()
     expect(mapped.themeConfig.site.subtitle).toBe('')
-    expect(mapped.themeConfig.site.nick).toBe('Backend title')
     expect(mapped.themeConfig.site.author).toBe(
       defaults.themeConfig.site.author
     )

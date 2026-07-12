@@ -69,6 +69,7 @@ describe('author profile store', () => {
     expect(store.profile.name).toBe('三钻')
     expect(store.profile.avatar).toBe('https://example.com/author.png')
     expect(store.profile.description).toBe('中文作者简介')
+    expect(store.profile.location).toBe('Tokyo')
     expect(store.profile.socials.github).toBe('https://github.com/tyb')
     expect(store.profile.socials.twitter).toBe('https://x.com/tyb')
     expect(store.profile.socials.linkedin).toBe('https://linkedin.com/in/tyb')

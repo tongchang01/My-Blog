@@ -5,7 +5,7 @@
   >
     <span class="flex mr-3">
       <img
-        v-if="themeConfig.site.author"
+        v-if="themeConfig.site.logo || themeConfig.site.avatar"
         :class="avatarClass"
         :src="themeConfig.site.logo || themeConfig.site.avatar"
         alt="site-logo"
@@ -16,9 +16,9 @@
     <div class="flex flex-col justify-center">
       <span
         class="text-invert flex text-xl leading-tight text-white font-extrabold"
-        v-if="themeConfig.site.author"
+        v-if="appStore.siteTitle"
       >
-        {{ themeConfig.site.author }}
+        {{ appStore.siteTitle }}
       </span>
       <span
         v-else
@@ -29,7 +29,7 @@
       <span
         class="text-invert font-extrabold text-[0.45rem] leading-tight uppercase text-white"
       >
-        {{ themeConfig.site.nick || 'BLOG' }}
+        {{ appStore.siteSubtitle || 'BLOG' }}
       </span>
     </div>
   </div>
