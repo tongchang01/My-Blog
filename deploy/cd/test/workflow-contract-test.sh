@@ -28,6 +28,11 @@ require_line 'revoke-security-group-ingress'
 require_line 'if: always()'
 require_line 'StrictHostKeyChecking=yes'
 require_line 'deploy $RELEASE_SHA'
+require_line 'Smoke test public HTTPS'
+require_line 'https://tong-yibin.com/healthz'
+require_line 'https://www.tong-yibin.com/healthz'
+require_line 'https://admin.tong-yibin.com/healthz'
+require_line '--max-time 20'
 if grep -F 'deploy \"$RELEASE_SHA\"' "$WORKFLOW" >/dev/null; then
   fail 'SSH command must not send literal quotes to the forced command'
 fi
