@@ -114,6 +114,15 @@ jobs:
           "$PROD_USER@$PROD_HOST"
           "deploy $RELEASE_SHA"
 
+      - name: Smoke test public HTTPS
+        run: |
+          for url in \
+            https://tong-yibin.com/healthz \
+            https://www.tong-yibin.com/healthz \
+            https://admin.tong-yibin.com/healthz; do
+            curl --fail --silent --show-error --max-time 20 --output /dev/null "$url"
+          done
+
       - name: Revoke temporary SSH ingress
         if: always() && steps.ssh-ingress.outcome == 'success'
         env:
