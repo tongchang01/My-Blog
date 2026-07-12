@@ -1,6 +1,6 @@
 # GitHub SSH 自动部署
 
-> 状态：实现待首次真实演练
+> 状态：已启用；2026-07-12 首次真实演练通过
 > 适用范围：当前唯一生产 EC2、GitHub Actions、GHCR、Docker Compose
 
 ## 机制与边界
@@ -41,6 +41,24 @@ IAM → Identity providers → Add provider：
 ```
 
 替换 AWS_ACCOUNT_ID。权限仅授予 DescribeSecurityGroups、DescribeSecurityGroupRules、AuthorizeSecurityGroupIngress、RevokeSecurityGroupIngress；写操作 Resource 限定为 CD 安全组 ARN，Condition 限定当前 VPC。不要给该 Role EC2 全权限或长期 Access Key。
+
+VPC 条件值必须是 **VPC ARN**，不能只填写 `vpc-...`。最小权限策略的写权限部分如下；将三个占位符替换为实际值：
+
+```json
+{
+  "Effect": "Allow",
+  "Action": [
+    "ec2:AuthorizeSecurityGroupIngress",
+    "ec2:RevokeSecurityGroupIngress"
+  ],
+  "Resource": "arn:aws:ec2:<AWS_REGION>:<AWS_ACCOUNT_ID>:security-group/<CD_SECURITY_GROUP_ID>",
+  "Condition": {
+    "StringEquals": {
+      "ec2:Vpc": "arn:aws:ec2:<AWS_REGION>:<AWS_ACCOUNT_ID>:vpc/<VPC_ID>"
+    }
+  }
+}
+```
 
 ## 独立 myblog-github-cd-ssh 安全组
 
@@ -110,11 +128,12 @@ cat /tmp/myblog-known-hosts
 5. run 结束后 CD 安全组没有入站规则。
 
 ```bash
-cd /opt/myblog-v2
-git rev-parse HEAD
+sudo -u deploy git -C /opt/myblog-v2 rev-parse HEAD
 sudo docker compose --env-file /etc/myblog-v2/runtime.env ps
 sudo docker exec myblog-v2-api-1 curl --fail --silent http://127.0.0.1:8080/actuator/health
 ```
+
+首次真实演练于 2026-07-12 通过：工作流 `29195240729` 的 publish 与 deploy 均使用 `85df0d4b0dad967aed1d915bdd619594bda43e85`；OIDC、临时 SSH /32 放行、受限 SSH、部署和撤销步骤均成功，三个容器均为 healthy。
 
 ## 失败与手工撤销
 
