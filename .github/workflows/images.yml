@@ -56,3 +56,69 @@ jobs:
           tags: ${{ env.REGISTRY }}/${{ env.OWNER }}/myblog-web:${{ env.IMAGE_TAG }}
           cache-from: type=gha,scope=myblog-web
           cache-to: type=gha,mode=max,scope=myblog-web
+
+  deploy:
+    name: Deploy production
+    needs: publish
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    concurrency:
+      group: myblog-production
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      RELEASE_SHA: ${{ github.sha }}
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      CD_SECURITY_GROUP_ID: ${{ vars.CD_SECURITY_GROUP_ID }}
+      PROD_HOST: ${{ vars.PROD_HOST }}
+      PROD_PORT: ${{ vars.PROD_PORT }}
+      PROD_USER: ${{ vars.PROD_USER }}
+
+    steps:
+      - name: Configure temporary AWS credentials
+        uses: aws-actions/configure-aws-credentials@v5
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: myblog-cd-${{ github.run_id }}
+
+      - name: Resolve runner SSH address
+        id: runner-ip
+        run: echo "cidr=$(curl -4fsS https://api.ipify.org)/32" >> "$GITHUB_OUTPUT"
+
+      - name: Allow temporary SSH ingress
+        id: ssh-ingress
+        env:
+          RUNNER_CIDR: ${{ steps.runner-ip.outputs.cidr }}
+        run: >-
+          aws ec2 authorize-security-group-ingress
+          --group-id "$CD_SECURITY_GROUP_ID"
+          --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=$RUNNER_CIDR,Description=myblog-github-cd}]"
+
+      - name: Configure deploy SSH identity
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.PROD_SSH_PRIVATE_KEY }}" > ~/.ssh/myblog-cd
+          printf '%s\n' "${{ secrets.PROD_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/myblog-cd ~/.ssh/known_hosts
+
+      - name: Deploy same SHA
+        run: >-
+          ssh -i ~/.ssh/myblog-cd -p "$PROD_PORT"
+          -o BatchMode=yes
+          -o StrictHostKeyChecking=yes
+          -o UserKnownHostsFile=~/.ssh/known_hosts
+          "$PROD_USER@$PROD_HOST"
+          "deploy $RELEASE_SHA"
+
+      - name: Revoke temporary SSH ingress
+        if: always() && steps.ssh-ingress.outcome == 'success'
+        env:
+          RUNNER_CIDR: ${{ steps.runner-ip.outputs.cidr }}
+        run: >-
+          aws ec2 revoke-security-group-ingress
+          --group-id "$CD_SECURITY_GROUP_ID"
+          --ip-permissions "IpProtocol=tcp,FromPort=22,ToPort=22,IpRanges=[{CidrIp=$RUNNER_CIDR}]"
