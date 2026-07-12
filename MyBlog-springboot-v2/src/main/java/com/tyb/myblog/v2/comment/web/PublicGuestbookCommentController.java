@@ -7,6 +7,7 @@ import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.common.web.ClientIpResolver;
 import com.tyb.myblog.v2.common.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,7 +37,7 @@ public class PublicGuestbookCommentController {
     @Operation(summary = "提交公开留言")
     @PostMapping
     public ApiResponse<PublicCommentCreateVO> create(
-            @org.springframework.web.bind.annotation.RequestBody
+            @Valid @org.springframework.web.bind.annotation.RequestBody
             PublicCommentCreateRequest request,
             HttpServletRequest servletRequest) {
         return ApiResponse.ok(PublicCommentCreateVO.from(

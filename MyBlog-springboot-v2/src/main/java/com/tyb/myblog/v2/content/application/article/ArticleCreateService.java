@@ -45,25 +45,32 @@ public class ArticleCreateService {
                 command.categoryId(),
                 command.tagIds(),
                 command.coverAttachmentId());
-        NewArticle candidate = NewArticle.create(
-                command.titleZh(),
-                command.titleJa(),
-                command.titleEn(),
-                command.summaryZh(),
-                command.summaryJa(),
-                command.summaryEn(),
-                command.body(),
-                command.categoryId(),
-                actorId,
-                command.slug(),
-                command.status(),
-                command.homepageSlot(),
-                hashedPassword,
-                publishAt,
-                command.coverAttachmentId(),
-                command.tagIds(),
-                actorId,
-                now);
+        NewArticle candidate;
+        try {
+            candidate = NewArticle.create(
+                    command.titleZh(),
+                    command.titleJa(),
+                    command.titleEn(),
+                    command.summaryZh(),
+                    command.summaryJa(),
+                    command.summaryEn(),
+                    command.body(),
+                    command.categoryId(),
+                    actorId,
+                    command.slug(),
+                    command.status(),
+                    command.homepageSlot(),
+                    hashedPassword,
+                    publishAt,
+                    command.coverAttachmentId(),
+                    command.tagIds(),
+                    actorId,
+                    now);
+        } catch (IllegalArgumentException exception) {
+            throw new ApiException(
+                    ApiErrorCode.VALIDATION_ERROR,
+                    exception.getMessage());
+        }
         Article inserted = repository.insert(candidate);
         repository.replaceTags(inserted.id(), inserted.tagIds());
         return ArticleResult.from(inserted);

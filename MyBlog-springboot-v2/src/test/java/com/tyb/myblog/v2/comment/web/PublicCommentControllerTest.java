@@ -116,6 +116,17 @@ class PublicCommentControllerTest {
         verify(createService).createGuestbookComment(any(CommentCreateCommand.class));
     }
 
+    @Test
+    void rejectsInvalidPublicCommentRequest() throws Exception {
+        mockMvc.perform(post("/api/public/articles/100/comments")
+                        .contentType("application/json")
+                        .content("""
+                                {"nickname":"","email":"tyb@example.com","contentMd":"hello"}
+                                """))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
+    }
+
     private static CommentPageResult.Item item() {
         return new CommentPageResult.Item(
                 COMMENT_ID,

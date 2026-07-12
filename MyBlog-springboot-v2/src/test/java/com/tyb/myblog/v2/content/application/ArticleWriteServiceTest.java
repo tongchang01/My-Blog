@@ -245,6 +245,44 @@ class ArticleWriteServiceTest {
     }
 
     @Test
+    void mapsCreateDomainValidationFailureToApiValidationError() {
+        when(categoryRepository.findActiveByIdsForUpdate(List.of(10L)))
+                .thenReturn(List.of(category(10L)));
+
+        assertError(
+                () -> createService.create(
+                        ADMIN,
+                        new CreateArticleCommand(
+                                " ", null, "Title", "摘要", null, null,
+                                "正文", 10L, List.of(), "article",
+                                ArticleStatus.PUBLISHED, null, null, null,
+                                HomepageSlot.NONE)),
+                ApiErrorCode.VALIDATION_ERROR);
+    }
+
+    @Test
+    void mapsUpdateDomainValidationFailureToApiValidationError() {
+        when(articleRepository.findActiveByIdForUpdate(100L))
+                .thenReturn(Optional.of(currentArticle(
+                        ArticleStatus.PUBLISHED,
+                        null,
+                        NOW.minusDays(1))));
+        when(categoryRepository.findActiveByIdsForUpdate(List.of(10L)))
+                .thenReturn(List.of(category(10L)));
+
+        assertError(
+                () -> updateService.update(
+                        ADMIN,
+                        100L,
+                        new UpdateArticleCommand(
+                                " ", null, "Title", "摘要", null, null,
+                                "正文", 10L, List.of(), "article",
+                                ArticleStatus.PUBLISHED, null, null, null,
+                                HomepageSlot.NONE)),
+                ApiErrorCode.VALIDATION_ERROR);
+    }
+
+    @Test
     void rejectsSecondPinnedHomepageArticle() {
         when(articleRepository.countActiveHomepageSlot(
                 HomepageSlot.PINNED,
