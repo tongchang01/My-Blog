@@ -14,7 +14,7 @@
       <div class="relative z-10">
         <router-view v-slot="{ Component }">
           <transition name="fade-slide-y" mode="out-in">
-            <component :is="Component" />
+            <component :is="Component" :key="pageKey" />
           </transition>
         </router-view>
       </div>
@@ -56,6 +56,7 @@ import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
 import { useLightBoxStore } from '@/stores/lightbox'
 import { useMetaStore } from '@/stores/meta'
+import { useRoute } from 'vue-router'
 import HeaderMain from '@/components/Header/src/Header.vue'
 import FooterContainer from '@/components/Footer/FooterContainer.vue'
 import MobileMenu from '@/components/MobileMenu.vue'
@@ -67,6 +68,7 @@ const SearchModal = defineAsyncComponent(
 )
 
 const appStore = useAppStore()
+const route = useRoute()
 const lightBoxStore = useLightBoxStore()
 const commonStore = useCommonStore()
 const metaStore = useMetaStore()
@@ -177,6 +179,7 @@ watch(
 )
 
 const title = computed(() => metaStore.getTitle)
+const pageKey = computed(() => `${route.fullPath}:${appStore.locale}`)
 const theme = computed(() => appStore.theme)
 const headerImage = computed(() => {
   return {

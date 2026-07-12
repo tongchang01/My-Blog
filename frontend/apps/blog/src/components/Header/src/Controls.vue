@@ -124,7 +124,8 @@ const handleClick = async (name: string): Promise<void> => {
       hash: route.hash
     })
   } else {
-    await router.push({ name: 'home', params: { lang: name } })
+    appStore.changeLocale(name)
+    await appStore.fetchConfig()
   }
 }
 
