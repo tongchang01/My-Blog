@@ -93,9 +93,7 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - >-
-          wget --no-check-certificate --quiet --spider
-          https://$${BLOG_HOST}/healthz
+        - wget --quiet --spider http://127.0.0.1:2019/config/
       interval: 10s
       timeout: 5s
       retries: 12
