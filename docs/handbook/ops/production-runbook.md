@@ -329,6 +329,10 @@ df -h
 
 完整产品冒烟与回滚门槛继续执行 [`release-checklist.md`](release-checklist.md)，本手册不复制其内容。全部通过后，把发布 SHA、时间和结果写入私有台账，再结束维护窗口。
 
+## 自动 CD
+
+常规 main 发布由 GitHub Actions 自动完成；AWS 仅临时放行当前 Runner 的 SSH /32。首次启用、部署用户安装、GitHub Environment 和 OIDC 配置见 [`github-ssh-cd.md`](github-ssh-cd.md)。CD 失败时不自动回滚数据库，按本手册的回滚边界处理。
+
 ## 回滚
 
 ### V2 镜像或配置问题

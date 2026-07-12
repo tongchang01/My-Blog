@@ -14,6 +14,8 @@
 - [ ] prod profile 显式启用，JVM 时区为 `Asia/Tokyo`。
 - [ ] `environment.md` 中生产必填变量由受控环境注入，未进入产物或日志。
 - [ ] OpenAPI、Swagger UI 与 Knife4j 在 prod 关闭。
+- [ ] GitHub deploy job 使用与镜像一致的完整 SHA，production Environment 仅允许 main。
+- [ ] CD 独立安全组只在部署期间临时允许 Runner SSH /32，完成后已撤销。
 
 ## 数据与存储
 

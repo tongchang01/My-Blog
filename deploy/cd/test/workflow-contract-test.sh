@@ -2,6 +2,8 @@
 set -euo pipefail
 
 readonly WORKFLOW="${1:?usage: workflow-contract-test.sh <images.yml>}"
+readonly REPO_ROOT="$(cd -- "$(dirname -- "$WORKFLOW")/../.." && pwd)"
+readonly CD_DOCUMENT="$REPO_ROOT/docs/handbook/ops/github-ssh-cd.md"
 
 fail() {
   printf 'FAIL: %s\n' "$*" >&2
@@ -29,4 +31,18 @@ require_line 'deploy $RELEASE_SHA'
 if grep -F 'deploy \"$RELEASE_SHA\"' "$WORKFLOW" >/dev/null; then
   fail 'SSH command must not send literal quotes to the forced command'
 fi
+
+[[ -f "$CD_DOCUMENT" ]] || fail "missing CD runbook: $CD_DOCUMENT"
+for required in \
+  'GitHub OIDC provider' \
+  'MyBlogGitHubCdRole' \
+  'myblog-github-cd-ssh' \
+  'production Environment' \
+  '临时 /32' \
+  '撤销' \
+  'workflow_dispatch' \
+  '不自动回滚数据库'; do
+  grep -F -- "$required" "$CD_DOCUMENT" >/dev/null || fail "missing CD documentation contract: $required"
+done
+
 printf 'workflow contract: PASS\n'

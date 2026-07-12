@@ -13,6 +13,7 @@
 | [环境变量](environment.md) | local/prod 配置来源与必填项 |
 | [构建与测试](build-and-test.md) | 本地和阶段验证命令 |
 | [持续集成](ci-cd.md) | 当前 CI job 与 CD 边界 |
+| [GitHub SSH CD](github-ssh-cd.md) | OIDC、临时 SSH 放行、部署用户与首次演练 |
 | [部署方向](deployment-direction.md) | 已确认的生产架构、供应商边界与上线阻塞项 |
 | [生产运行手册](production-runbook.md) | 当前 EC2 原地重建、验收、回滚和七天收尾顺序 |
 | [发布检查](release-checklist.md) | 真实环境上线与回滚门槛 |

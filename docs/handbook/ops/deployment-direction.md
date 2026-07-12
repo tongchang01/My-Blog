@@ -1,6 +1,6 @@
 # 生产部署方向
 
-> 状态：当前有效；生产镜像已发布，首次上线尚未实施
+> 状态：当前有效；生产已上线，GitHub SSH CD 待首次真实演练
 > 适用范围：MyBlog V2 生产部署设计
 > 最后校准：2026-07-11
 > 对应代码：`MyBlog-springboot-v2/src/main/resources/application-prod.yml`、`frontend/apps/`、`.github/workflows/`
@@ -17,10 +17,10 @@
 - 继续使用现有 AWS EC2、Elastic IP、Route 53 和 S3。
 - 不重装操作系统；先完成回滚快照，再清理 V1 应用层资源并原地部署 V2。
 - V1 业务数据不迁移；V2 使用全新的 MySQL 8 数据卷和空数据库，由 Flyway 初始化。
-- AWS 只承担基础设施和 S3 最小权限；软件交付不依赖 ECR、SSM、App Runner 或 ECS。
+- AWS 只承担基础设施、S3 最小权限和 GitHub OIDC 的临时 CD SSH 安全组 API；软件交付不依赖 ECR、SSM、App Runner 或 ECS。
 - GitHub Actions 负责测试和镜像构建，公共 GHCR 保存标准 Docker/OCI 镜像。
 - Docker Compose 是生产运行拓扑的单一声明，保持跨云可迁移。
-- 首次上线人工确认并手动发布；稳定后再设计通用 CD。
+- GitHub Actions 在 main 镜像发布成功后自动部署同一 SHA；首次启用前必须完成 GitHub OIDC、独立 CD 安全组和受限 deploy 用户演练。
 
 ## 目标拓扑
 
