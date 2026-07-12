@@ -95,7 +95,7 @@ services:
         - CMD-SHELL
         - >-
           wget --no-check-certificate --quiet --spider
-          --header="Host: $${BLOG_HOST}" https://127.0.0.1/healthz
+          https://$${BLOG_HOST}/healthz
       interval: 10s
       timeout: 5s
       retries: 12
