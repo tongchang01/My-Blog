@@ -59,4 +59,3 @@ compose --env-file "$MYBLOG_RUNTIME_ENV" pull
 compose --env-file "$MYBLOG_RUNTIME_ENV" up -d --wait --wait-timeout 180
 docker exec myblog-v2-api-1 curl --fail --silent http://127.0.0.1:8080/actuator/health
 printf 'myblog-release: deployed %s\n' "$SHA" >&2
-

@@ -9,4 +9,3 @@ if [[ "$#" -ne 2 || "$1" != deploy || ! "$2" =~ ^[0-9a-f]{40}$ ]]; then
 fi
 
 exec sudo /usr/local/sbin/myblog-release "$2"
-

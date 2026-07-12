@@ -1,7 +1,7 @@
 # GitHub Actions SSH 自动部署设计
 
-> 状态：已确认，待用户审阅规格后实施  
-> 日期：2026-07-12  
+> 状态：已确认，待用户审阅规格后实施
+> 日期：2026-07-12
 > 范围：MyBlog V2 单 EC2、GitHub Hosted Runner、GHCR 与 Docker Compose
 
 ## 目标
@@ -92,4 +92,3 @@ sequenceDiagram
 ## 文档同步
 
 实现时更新 deployment-direction、ci-cd、production-runbook、release-checklist 与仓库外维护交接文档，明确 CD 已启用、回滚边界和临时安全组排查方式。
-

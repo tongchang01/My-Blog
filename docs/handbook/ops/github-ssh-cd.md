@@ -1,6 +1,6 @@
 # GitHub SSH 自动部署
 
-> 状态：实现待首次真实演练  
+> 状态：实现待首次真实演练
 > 适用范围：当前唯一生产 EC2、GitHub Actions、GHCR、Docker Compose
 
 ## 机制与边界
@@ -130,4 +130,3 @@ aws ec2 revoke-security-group-ingress \
 ```
 
 确认独立安全组没有入站规则。不要删除 default 安全组中的维护者 SSH 规则。
-

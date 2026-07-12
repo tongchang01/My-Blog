@@ -62,4 +62,3 @@ visudo -cf "$SUDOERS_FILE"
 mkdir -p "$DEPLOY_ROOT"
 chown -R deploy:deploy "$DEPLOY_ROOT"
 printf 'install-github-cd: installed deploy entrypoint\n' >&2
-

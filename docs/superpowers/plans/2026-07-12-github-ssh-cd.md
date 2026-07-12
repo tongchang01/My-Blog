@@ -49,7 +49,7 @@ docker exec myblog-v2-api-1 curl --fail --silent http://127.0.0.1:8080/actuator/
 
 - [ ] **Step 2: 验证 RED**
 
-Run: `bash deploy/cd/test/release-contract-test.sh`  
+Run: `bash deploy/cd/test/release-contract-test.sh`
 Expected: FAIL，两个生产脚本尚不存在。
 
 - [ ] **Step 3: 实现最小脚本**
@@ -102,7 +102,7 @@ git commit -m "新增受限 CD 发布脚本"
 
 - [ ] **Step 2: 验证 RED**
 
-Run: `bash deploy/cd/test/release-contract-test.sh`  
+Run: `bash deploy/cd/test/release-contract-test.sh`
 Expected: FAIL，install-github-cd.sh 尚不存在。
 
 - [ ] **Step 3: 实现安装脚本**
@@ -142,7 +142,7 @@ git commit -m "新增 CD 部署用户安装脚本"
 
 - [ ] **Step 2: 验证 RED**
 
-Run: `bash deploy/cd/test/workflow-contract-test.sh`  
+Run: `bash deploy/cd/test/workflow-contract-test.sh`
 Expected: FAIL，images.yml 尚无 deploy job。
 
 - [ ] **Step 3: 添加 deploy job**
@@ -198,7 +198,7 @@ git commit -m "新增 GitHub SSH 自动部署工作流"
 
 - [ ] **Step 2: 验证 RED**
 
-Run: `bash deploy/cd/test/workflow-contract-test.sh`  
+Run: `bash deploy/cd/test/workflow-contract-test.sh`
 Expected: FAIL，新手册和 CD 运行边界不存在。
 
 - [ ] **Step 3: 写手册并同步旧入口**
@@ -251,4 +251,3 @@ sudo -u deploy SSH_ORIGINAL_COMMAND='deploy not-a-sha' /usr/local/sbin/myblog-cd
 - [ ] **Step 5: 记录结果**
 
 把 run URL、SHA、时间、撤销结果与异常写入私有台账。演练通过后，后续 main push 视为自动部署。
-
