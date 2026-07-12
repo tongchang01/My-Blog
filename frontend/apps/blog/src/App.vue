@@ -79,7 +79,11 @@ const loadingBarClass = ref({
   'nprogress-custom-parent': false
 })
 
-let pagelink = `\n\nRead more at: ${document.location.href}`
+const copyLabelDefaults = {
+  zh: { author: '作者', link: '原文链接' },
+  ja: { author: '著者', link: '元リンク' },
+  en: { author: 'Author', link: 'Source' }
+} as const
 
 /** Initializing App config and other setups */
 const initialApp = async () => {
@@ -96,31 +100,29 @@ const initialApp = async () => {
         link.setAttribute('href', appStore.themeConfig.site_meta.favicon)
     }
 
-    if (appStore.themeConfig.plugins.copy_protection.enable) {
-      const locale = appStore.locale
-      const linkPlaceholder =
-        locale === 'zh'
-          ? appStore.themeConfig.plugins.copy_protection.link.cn
-          : appStore.themeConfig.plugins.copy_protection.link.en
-      const authorPlaceholder =
-        locale === 'zh'
-          ? appStore.themeConfig.plugins.copy_protection.author.cn
-          : appStore.themeConfig.plugins.copy_protection.author.en
-      const licensePlaceholder =
-        locale === 'zh'
-          ? appStore.themeConfig.plugins.copy_protection.license.cn
-          : appStore.themeConfig.plugins.copy_protection.license.en
-
-      pagelink = `\n\n---------------------------------\n${authorPlaceholder}: ${appStore.themeConfig.site.author}\n${linkPlaceholder}: ${document.location.href}\n${licensePlaceholder}`
+    if (appStore.themeConfig.plugins.copy_protection.enable)
       initialCopyrightScript()
-    }
   })
+}
+
+const copyAttribution = () => {
+  const locale = appStore.locale
+  const labels = copyLabelDefaults[locale]
+  const configuredLabels = appStore.themeConfig.plugins.copy_protection
+  const configLocale = locale === 'zh' ? 'cn' : 'en'
+  const authorLabel = configuredLabels.author[configLocale] || labels.author
+  const linkLabel = configuredLabels.link[configLocale] || labels.link
+
+  return `\n\n---------------------------------\n${authorLabel}: ${appStore.themeConfig.site.author}\n${linkLabel}: ${document.location.href}`
 }
 
 const copyEventHandler = (event: ClipboardEvent) => {
   if (document.getSelection() instanceof Selection) {
     if (document.getSelection()?.toString() !== '' && event.clipboardData) {
-      event.clipboardData.setData('text', document.getSelection() + pagelink)
+      event.clipboardData.setData(
+        'text',
+        document.getSelection() + copyAttribution()
+      )
       event.preventDefault()
     }
   }
