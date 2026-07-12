@@ -25,13 +25,13 @@ describe('page view tracking', () => {
     ).toEqual({ articleId: 42, lang: 'en' })
   })
 
-  it('resolves non-article pages to articleId 0', () => {
+  it('resolves non-article pages without an article id', () => {
     expect(
       resolvePageViewPayload({
         name: 'home',
         params: { lang: 'zh' }
       } as never)
-    ).toEqual({ articleId: 0, lang: 'zh' })
+    ).toEqual({ lang: 'zh' })
   })
 
   it('ignores routes without supported languages', () => {
@@ -55,9 +55,6 @@ describe('page view tracking', () => {
     hook?.({ name: 'home', params: { lang: 'ja' } })
     await Promise.resolve()
 
-    expect(mockedRecordPageView).toHaveBeenCalledWith({
-      articleId: 0,
-      lang: 'ja'
-    })
+    expect(mockedRecordPageView).toHaveBeenCalledWith({ lang: 'ja' })
   })
 })

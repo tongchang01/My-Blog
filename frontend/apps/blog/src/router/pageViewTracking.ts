@@ -16,7 +16,7 @@ export const resolvePageViewPayload = (
     return { articleId, lang: lang as SupportedLocale }
   }
 
-  return { articleId: 0, lang: lang as SupportedLocale }
+  return { lang: lang as SupportedLocale }
 }
 
 export const installPageViewTracking = (router: Router): void => {
