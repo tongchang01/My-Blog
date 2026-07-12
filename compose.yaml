@@ -40,7 +40,7 @@ services:
       SPRING_PROFILES_ACTIVE: prod
       TZ: Asia/Tokyo
       JAVA_TOOL_OPTIONS: -Duser.timezone=Asia/Tokyo
-      MYBLOG_DATASOURCE_URL: "jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=false&connectionTimeZone=Asia/Tokyo&forceConnectionToSession=true&sessionVariables=time_zone='%2B09:00'"
+      MYBLOG_DATASOURCE_URL: "jdbc:mysql://mysql:3306/${MYSQL_DATABASE}?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=Asia/Tokyo&forceConnectionToSession=true&sessionVariables=time_zone='%2B09:00'"
       MYBLOG_DATASOURCE_USERNAME: ${MYSQL_USER}
       MYBLOG_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD}
       MYBLOG_JWT_SECRET: ${MYBLOG_JWT_SECRET:?MYBLOG_JWT_SECRET is required}
@@ -93,9 +93,7 @@ services:
     healthcheck:
       test:
         - CMD-SHELL
-        - >-
-          wget --no-check-certificate --quiet --spider
-          --header="Host: $${BLOG_HOST}" https://127.0.0.1/healthz
+        - wget --quiet --spider http://127.0.0.1:2019/config/
       interval: 10s
       timeout: 5s
       retries: 12

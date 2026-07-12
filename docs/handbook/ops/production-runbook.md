@@ -285,7 +285,7 @@ sudo docker compose --env-file /etc/myblog-v2/runtime.env pull
 cd /opt/myblog-v2
 set -euo pipefail
 sudo docker compose --env-file /etc/myblog-v2/runtime.env up -d --wait --wait-timeout 180 mysql
-sudo docker compose --env-file /etc/myblog-v2/runtime.env --env-file /etc/myblog-v2/bootstrap.env run --rm --no-deps api --spring.main.web-application-type=none
+sudo docker compose --env-file /etc/myblog-v2/runtime.env --env-file /etc/myblog-v2/bootstrap.env run --rm --no-deps api
 sudo rm -f /etc/myblog-v2/bootstrap.env
 test ! -e /etc/myblog-v2/bootstrap.env
 sudo docker compose --env-file /etc/myblog-v2/runtime.env up -d --wait --wait-timeout 180 api
@@ -297,7 +297,7 @@ sudo docker compose --env-file /etc/myblog-v2/runtime.env logs --tail=200 web
 
 `--wait` 依赖 Compose 中为服务定义有效健康检查。MySQL 未健康时不得启动 API；Flyway、S3 凭据、证书或代理出现错误时不得继续验收。
 
-一次性命令必须以退出码 0 结束，并且日志只应出现初始化成功或已有管理员跳过的结果（日志不得出现密码或密码摘要）。退出码非 0 时不要删除 `bootstrap.env`，先保留现场并处理数据库、配置或镜像问题。初始化成功后再继续启动常驻 `api`，并确认临时文件已删除。
+一次性命令必须以退出码 0 结束，并且日志只应出现初始化成功或已有管理员跳过的结果（日志不得出现密码或密码摘要）。不要追加 `--spring.main.web-application-type=none`：安全配置需要完整的 Web 应用上下文；`bootstrap.env` 中的 `MYBLOG_BOOTSTRAP_ADMIN_EXIT_AFTER_RUN=true` 会在初始化完成后受控退出。退出码非 0 时不要删除 `bootstrap.env`，先保留现场并处理数据库、配置或镜像问题。初始化成功后再继续启动常驻 `api`，并确认临时文件已删除。
 
 ## 阶段六：生产验收
 
