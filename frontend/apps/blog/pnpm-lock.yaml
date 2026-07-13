@@ -108,6 +108,9 @@ importers:
       globals:
         specifier: ^17.6.0
         version: 17.6.0
+      happy-dom:
+        specifier: 18.0.1
+        version: 18.0.1
       husky:
         specifier: ^8.0.3
         version: 8.0.3
@@ -137,7 +140,7 @@ importers:
         version: 2.0.1(vite@5.4.21(@types/node@25.9.2)(sass@1.100.0)(terser@5.48.0))
       vitest:
         specifier: 2.1.9
-        version: 2.1.9(@types/node@25.9.2)(sass@1.100.0)(terser@5.48.0)
+        version: 2.1.9(@types/node@25.9.2)(happy-dom@18.0.1)(sass@1.100.0)(terser@5.48.0)
       vue-easy-lightbox:
         specifier: ^1.16.0
         version: 1.19.0(vue@3.5.35(typescript@5.6.3))
@@ -938,6 +941,9 @@ packages:
 
   '@types/trusted-types@2.0.7':
     resolution: {integrity: sha512-ScaPdn1dQczgbl0QFTeTOmVHFULt394XJgOQNoyVhZ6r2vLnMLJfBPd53SB52T/3G36VI1/g2MZaX0cwDuXsfw==}
+
+  '@types/whatwg-mimetype@3.0.2':
+    resolution: {integrity: sha512-c2AKvDT8ToxLIOUlN51gTiHXflsfIFisS4pO7pDPoKouJCESkhZnEy623gwP9laCy5lnLDAw1vAzu2vM2YLOrA==}
 
   '@typescript-eslint/eslint-plugin@8.60.1':
     resolution: {integrity: sha512-JQ4S5GB0tfjO8BuJ4fcX+HodkzJjYBV+7OJ+wLygaX7OGQ7FudyHL4NSCA6ob+w3Yn+5MkKIozOwQhXeM7opVg==}
@@ -2163,6 +2169,10 @@ packages:
 
   hachure-fill@0.5.2:
     resolution: {integrity: sha512-3GKBOn+m2LX9iq+JC1064cSFprJY4jL1jCXTcpnfER5HYE2l/4EfWSGzkPa/ZDBmYI0ZOEj5VHV/eKnPGkHuOg==}
+
+  happy-dom@18.0.1:
+    resolution: {integrity: sha512-qn+rKOW7KWpVTtgIUi6RVmTBZJSe2k0Db0vh1f7CWrWclkkc7/Q+FrOfkZIb2eiErLyqu5AXEzE7XthO9JVxRA==}
+    engines: {node: '>=20.0.0'}
 
   hard-rejection@2.1.0:
     resolution: {integrity: sha512-VIZB+ibDhx7ObhAe7OVtoEbuP4h/MuOTHJ+J8h/eBXotJYl0fBgR72xDFCKgIh22OJZIOVNxBMWuhAr10r8HdA==}
@@ -3794,6 +3804,10 @@ packages:
       typescript:
         optional: true
 
+  whatwg-mimetype@3.0.0:
+    resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
+    engines: {node: '>=12'}
+
   which-boxed-primitive@1.1.1:
     resolution: {integrity: sha512-TbX3mj8n0odCBFVlY8AxkqcHASw3L60jIuF8jFP78az3C2YhmGvqbHBpAjTRH2/xqYunrJ9g1jSyjCjpoWzIAA==}
     engines: {node: '>= 0.4'}
@@ -4550,6 +4564,8 @@ snapshots:
 
   '@types/trusted-types@2.0.7':
     optional: true
+
+  '@types/whatwg-mimetype@3.0.2': {}
 
   '@typescript-eslint/eslint-plugin@8.60.1(@typescript-eslint/parser@8.60.1(eslint@9.39.4(jiti@1.21.7))(typescript@5.6.3))(eslint@9.39.4(jiti@1.21.7))(typescript@5.6.3)':
     dependencies:
@@ -5996,6 +6012,12 @@ snapshots:
   graceful-fs@4.2.11: {}
 
   hachure-fill@0.5.2: {}
+
+  happy-dom@18.0.1:
+    dependencies:
+      '@types/node': 20.5.1
+      '@types/whatwg-mimetype': 3.0.2
+      whatwg-mimetype: 3.0.0
 
   hard-rejection@2.1.0: {}
 
@@ -7612,7 +7634,7 @@ snapshots:
       sass: 1.100.0
       terser: 5.48.0
 
-  vitest@2.1.9(@types/node@25.9.2)(sass@1.100.0)(terser@5.48.0):
+  vitest@2.1.9(@types/node@25.9.2)(happy-dom@18.0.1)(sass@1.100.0)(terser@5.48.0):
     dependencies:
       '@vitest/expect': 2.1.9
       '@vitest/mocker': 2.1.9(vite@5.4.21(@types/node@25.9.2)(sass@1.100.0)(terser@5.48.0))
@@ -7636,6 +7658,7 @@ snapshots:
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 25.9.2
+      happy-dom: 18.0.1
     transitivePeerDependencies:
       - less
       - lightningcss
@@ -7714,6 +7737,8 @@ snapshots:
       '@vue/shared': 3.5.35
     optionalDependencies:
       typescript: 5.6.3
+
+  whatwg-mimetype@3.0.0: {}
 
   which-boxed-primitive@1.1.1:
     dependencies:
