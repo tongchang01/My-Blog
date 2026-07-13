@@ -16,6 +16,7 @@
 | [`rules/`](rules/README.md) | 开发、测试、安全和文档维护约束 |
 | [`api/`](api/README.md) | 前后端联调所需的 HTTP 契约 |
 | [`product/`](product/README.md) | 稳定业务范围、规则和数据语义 |
+| [`content/`](content/markdown-authoring.md) | 文章 Markdown 写作、预览与历史恢复规范 |
 | [`frontend/`](frontend/README.md) | blog 与 admin 的当前实现边界 |
 | [`ops/`](ops/README.md) | 本地运行、环境变量、测试、CI、部署和发布 |
 | [`workflows/`](workflows/README.md) | 可重复执行且仍会使用的开发流程 |

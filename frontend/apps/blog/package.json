@@ -7,7 +7,7 @@
   "private": true,
   "packageManager": "pnpm@9.15.9",
   "engines": {
-    "node": "^20.19.0 || >=22.12.0"
+    "node": "^24.0.0"
   },
   "scripts": {
     "dev": "vite",
@@ -18,9 +18,16 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@mdit/plugin-footnote": "1.0.1",
+    "@mdit/plugin-katex": "1.0.1",
+    "@mdit/plugin-tasklist": "1.0.1",
+    "@panzoom/panzoom": "4.6.2",
     "axios": "^1.7.9",
+    "highlight.js": "11.11.1",
     "js-cookie": "^3.0.5",
-    "markdown-it": "14.1.0",
+    "katex": "0.17.0",
+    "markdown-it": "14.3.0",
+    "mermaid": "11.16.0",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "pinia": "2.3.1",
@@ -47,6 +54,7 @@
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-vue": "^10.9.2",
     "globals": "^17.6.0",
+    "happy-dom": "18.0.1",
     "husky": "^8.0.3",
     "postcss": "^8.4.29",
     "prettier": "^3.8.3",

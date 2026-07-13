@@ -22,6 +22,7 @@
       <div class="relative">
         <div
           v-if="post.content"
+          ref="postHtml"
           class="post-html"
           v-html="post.content"
           v-scroll-spy="{ sectionSelector: 'h1, h2, h3, h4, h5, h6' }"
@@ -73,6 +74,7 @@ import {
   nextTick,
   onMounted,
   onUnmounted,
+  ref,
   toRefs,
   watch
 } from 'vue'
@@ -81,6 +83,8 @@ import { useCommonStore } from '@/stores/common'
 import PostStats from './Post/PostStats.vue'
 import useLightBox from '@/hooks/useLightBox'
 import ObSkeleton from '@/components/LoadingSkeleton/Skeleton.vue'
+import { useAppStore } from '@/stores/app'
+import { enhanceMarkdown } from '@/shared/markdown/enhance'
 
 const props = defineProps({
   post: {
@@ -96,9 +100,22 @@ const props = defineProps({
 })
 
 const commonStore = useCommonStore()
+const appStore = useAppStore()
 const post = toRefs(props).post
 const title = toRefs(props).title
+const postHtml = ref<HTMLElement | null>(null)
 const { initializeLightBox } = useLightBox()
+
+const initializeContent = async () => {
+  await nextTick()
+  if (!postHtml.value) return
+  initializeLightBox()
+  await enhanceMarkdown(
+    postHtml.value,
+    appStore.theme === 'theme-dark',
+    appStore.locale
+  )
+}
 
 watch(
   () => post.value.covers,
@@ -108,17 +125,27 @@ watch(
 )
 
 watch(
-  () => post.value.count_time.symbolsTime,
+  () => post.value.content,
   async value => {
-    if (value) {
-      await nextTick()
-      initializeLightBox()
-    }
+    if (value) await initializeContent()
+  }
+)
+
+watch(
+  () => appStore.theme,
+  () => {
+    if (postHtml.value)
+      void enhanceMarkdown(
+        postHtml.value,
+        appStore.theme === 'theme-dark',
+        appStore.locale
+      )
   }
 )
 
 onMounted(() => {
   commonStore.setHeaderImage(post.value.covers)
+  if (post.value.content) void initializeContent()
 })
 
 onUnmounted(() => {

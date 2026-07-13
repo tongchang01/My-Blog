@@ -4,7 +4,9 @@ import { createApp } from 'vue'
 // also it's a much simpler State Management setup
 import { createPinia } from 'pinia'
 
+import 'highlight.js/styles/vs2015.css'
 import '@/styles/index.scss'
+import 'katex/dist/katex.min.css'
 
 import App from './App.vue'
 import router from './router'

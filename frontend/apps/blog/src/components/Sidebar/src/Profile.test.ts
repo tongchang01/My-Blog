@@ -5,6 +5,8 @@ import { dirname, resolve } from 'node:path'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const source = readFileSync(resolve(currentDir, 'Profile.vue'), 'utf8')
+const locationBlock =
+  source.match(/<p\s+v-if="authorData\.location"[\s\S]*?<\/p>/)?.[0] ?? ''
 
 describe('Profile.vue', () => {
   it('does not render the removed author word-count statistic', () => {
@@ -14,12 +16,12 @@ describe('Profile.vue', () => {
   })
 
   it('renders the public author location when available', () => {
-    expect(source).toContain('authorData.location')
-    expect(source).toContain('icon-class="location"')
-    expect(source).toContain('w-full')
-    expect(source).toContain('flex-1')
-    expect(source).toContain('text-black')
-    expect(source).toContain('text-base')
-    expect(source).not.toContain('text-base font-bold text-black')
+    expect(locationBlock).toContain('authorData.location')
+    expect(locationBlock).toContain('icon-class="location"')
+    expect(locationBlock).toContain('w-full')
+    expect(locationBlock).toContain('flex-1')
+    expect(locationBlock).toContain('gap-1')
+    expect(locationBlock).toContain('text-base')
+    expect(locationBlock).not.toMatch(/text-(?:black|ob-bright)/)
   })
 })

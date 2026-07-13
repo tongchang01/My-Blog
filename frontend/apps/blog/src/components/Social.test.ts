@@ -16,19 +16,20 @@ const twitterIcon = readFileSync(
 const csdnIcon = readFileSync(resolve(currentDir, '../icons/csdn.svg'), 'utf8')
 const customSocialsStart = source.indexOf('<template v-if="customSocials')
 const emailLinkStart = source.indexOf(':href="`mailto:${socials.email}`"')
+const emailBlock = source.slice(emailLinkStart)
 
 describe('Social.vue', () => {
-  it('exposes the public email with the shared email icon', () => {
+  it('exposes the public email with the supplied solid envelope icon', () => {
     expect(existsSync(resolve(currentDir, '../icons/email.svg'))).toBe(true)
-    expect(emailIcon).toContain('fill="none"')
-    expect(emailIcon).not.toContain('stroke=""')
-    expect(source).toContain('icon-class="email"')
+    expect(emailIcon).toContain('viewBox="0 0 512 512"')
+    expect(emailIcon).not.toContain('#000000')
+    expect(emailBlock).toContain('icon-class="email"')
     expect(emailLinkStart).toBeGreaterThan(-1)
     expect(source.slice(customSocialsStart, emailLinkStart)).toContain(
       '</template>'
     )
-    expect(source).toContain('fill="none"')
-    expect(source).toContain('stroke="currentColor"')
+    expect(emailBlock).toContain('fill="currentColor"')
+    expect(emailBlock).toContain('stroke="none"')
   })
 
   it('keeps social SVGs free of invalid empty paint attributes', () => {

@@ -1,3 +1,6 @@
+import { footnote } from '@mdit/plugin-footnote'
+import { katex } from '@mdit/plugin-katex'
+import { tasklist } from '@mdit/plugin-tasklist'
 import MarkdownIt from 'markdown-it'
 
 interface Heading {
@@ -23,8 +26,13 @@ const createMarkdown = (headings?: Heading[]): MarkdownIt => {
     linkify: true,
     typographer: false
   })
+    .use(footnote)
+    .use(tasklist, { label: true })
+    .use(katex)
   const defaultLinkOpen = markdown.renderer.rules.link_open
   const defaultHeadingOpen = markdown.renderer.rules.heading_open
+  const defaultTableOpen = markdown.renderer.rules.table_open
+  const defaultTableClose = markdown.renderer.rules.table_close
   const slugCounts = new Map<string, number>()
 
   markdown.renderer.rules.link_open = (tokens, index, options, env, self) => {
@@ -53,6 +61,32 @@ const createMarkdown = (headings?: Heading[]): MarkdownIt => {
         ? defaultHeadingOpen(tokens, index, options, env, self)
         : self.renderToken(tokens, index, options)
     }
+  }
+
+  markdown.renderer.rules.table_open = (tokens, index, options, env, self) =>
+    `<div class="markdown-table-wrapper">${
+      defaultTableOpen
+        ? defaultTableOpen(tokens, index, options, env, self)
+        : self.renderToken(tokens, index, options)
+    }`
+
+  markdown.renderer.rules.table_close = (tokens, index, options, env, self) =>
+    `${
+      defaultTableClose
+        ? defaultTableClose(tokens, index, options, env, self)
+        : self.renderToken(tokens, index, options)
+    }</div>`
+
+  markdown.renderer.rules.fence = (tokens, index, options, env, self) => {
+    const token = tokens[index]
+    const language = token.info.trim().split(/\s+/)[0]?.toLowerCase() ?? 'text'
+
+    if (language === 'mermaid') {
+      return `<pre class="mermaid">${escapeHtml(token.content)}</pre>\n`
+    }
+
+    const safeLanguage = /^[a-z0-9_-]+$/.test(language) ? language : 'text'
+    return `<pre class="code-block" data-language="${safeLanguage}"><code class="language-${safeLanguage}">${escapeHtml(token.content)}</code></pre>\n`
   }
 
   return markdown
