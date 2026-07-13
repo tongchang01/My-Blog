@@ -12,7 +12,7 @@
             id="toc-side-box"
             v-html="tocData"
             v-scroll-spy-active="{ selector: '.toc-item' }"
-            v-scroll-spy-link
+            @click="jumpToTocTarget"
             :style="sideBoxStyle"
           />
         </div>
@@ -36,6 +36,24 @@ const props = defineProps({
 const tocData = toRefs(props).toc
 const sidebarNavigatorHeight = ref(0)
 const sideBoxMaxHeight = ref(0)
+
+const jumpToTocTarget = (event: MouseEvent) => {
+  const target = event.target
+  if (!(target instanceof Element)) return
+
+  const link = target.closest<HTMLAnchorElement>('a[href^="#"]')
+  if (!link) return
+
+  event.preventDefault()
+  const id = link.getAttribute('href')?.slice(1)
+  const heading = id ? document.getElementById(id) : null
+  if (!heading) return
+
+  window.scrollTo({
+    top: window.scrollY + heading.getBoundingClientRect().top - 81,
+    behavior: 'smooth'
+  })
+}
 
 const updateSideBoxMaxHeight = () => {
   const sidebarNavigator = document.getElementById('sidebar-navigator')
