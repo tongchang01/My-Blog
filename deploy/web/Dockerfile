@@ -1,4 +1,4 @@
-FROM node:22-alpine AS blog-build
+FROM node:24-alpine AS blog-build
 
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
@@ -7,7 +7,7 @@ RUN pnpm install --frozen-lockfile
 COPY frontend/apps/blog/ ./
 RUN pnpm build
 
-FROM node:22-alpine AS admin-build
+FROM node:24-alpine AS admin-build
 
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@9.15.9 --activate

@@ -118,7 +118,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           # 按 admin 目录的 pnpm-lock.yaml 生成缓存 key，独立于 blog。
           cache: pnpm
           cache-dependency-path: frontend/apps/admin/pnpm-lock.yaml
@@ -156,7 +156,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
           cache: pnpm
           cache-dependency-path: frontend/apps/blog/pnpm-lock.yaml
 
