@@ -43,7 +43,7 @@ $E=mc^2$
 class App {}
 \`\`\``)
 
-    expect(html).toContain('<table>')
+    expect(html).toContain('<div class="markdown-table-wrapper"><table>')
     expect(html).toContain('task-list-item')
     expect(html).toContain('footnote')
     expect(html).toContain('katex')

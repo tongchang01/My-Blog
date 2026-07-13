@@ -31,6 +31,8 @@ const createMarkdown = (headings?: Heading[]): MarkdownIt => {
     .use(katex)
   const defaultLinkOpen = markdown.renderer.rules.link_open
   const defaultHeadingOpen = markdown.renderer.rules.heading_open
+  const defaultTableOpen = markdown.renderer.rules.table_open
+  const defaultTableClose = markdown.renderer.rules.table_close
   const slugCounts = new Map<string, number>()
 
   markdown.renderer.rules.link_open = (tokens, index, options, env, self) => {
@@ -60,6 +62,20 @@ const createMarkdown = (headings?: Heading[]): MarkdownIt => {
         : self.renderToken(tokens, index, options)
     }
   }
+
+  markdown.renderer.rules.table_open = (tokens, index, options, env, self) =>
+    `<div class="markdown-table-wrapper">${
+      defaultTableOpen
+        ? defaultTableOpen(tokens, index, options, env, self)
+        : self.renderToken(tokens, index, options)
+    }`
+
+  markdown.renderer.rules.table_close = (tokens, index, options, env, self) =>
+    `${
+      defaultTableClose
+        ? defaultTableClose(tokens, index, options, env, self)
+        : self.renderToken(tokens, index, options)
+    }</div>`
 
   markdown.renderer.rules.fence = (tokens, index, options, env, self) => {
     const token = tokens[index]

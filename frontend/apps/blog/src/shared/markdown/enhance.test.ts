@@ -31,17 +31,34 @@ describe('Markdown enhancement', () => {
   })
 
   it('highlights a known code language once', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    const originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      value: { writeText }
+    })
     const root = document.createElement('div')
     root.innerHTML =
       '<pre class="code-block" data-language="java"><code class="language-java">class App {}</code></pre>'
 
-    await enhanceMarkdown(root, false)
+    try {
+      await enhanceMarkdown(root, false, 'ja')
 
-    const block = root.querySelector<HTMLElement>('pre.code-block')
-    const code = root.querySelector<HTMLElement>('code')
-    expect(block?.dataset.highlighted).toBe('true')
-    expect(code?.classList.contains('hljs')).toBe(true)
-    expect(code?.innerHTML).toContain('hljs-title')
+      const block = root.querySelector<HTMLElement>('pre.code-block')
+      const code = root.querySelector<HTMLElement>('code')
+      const copyButton = root.querySelector<HTMLButtonElement>('[data-code-action="copy"]')
+      expect(block?.dataset.highlighted).toBe('true')
+      expect(code?.classList.contains('hljs')).toBe(true)
+      expect(code?.innerHTML).toContain('hljs-title')
+      expect(copyButton?.title).toBe('コードをコピー')
+
+      copyButton?.click()
+      await Promise.resolve()
+      expect(writeText).toHaveBeenCalledWith('class App {}')
+    } finally {
+      if (originalClipboard) Object.defineProperty(navigator, 'clipboard', originalClipboard)
+      else delete (navigator as { clipboard?: unknown }).clipboard
+    }
   })
 
   it('stores Mermaid source and theme after rendering the diagram', async () => {

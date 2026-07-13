@@ -521,11 +521,15 @@
     -webkit-text-fill-color: var(--text-faint);
   }
 
+  .markdown-table-wrapper {
+    max-width: 100%;
+    margin: 1rem 0;
+    overflow-x: auto;
+  }
+
   table {
     border-collapse: collapse;
-    margin: 1rem 0;
-    display: block;
-    overflow-x: auto;
+    width: 100%;
   }
 
   th {
@@ -537,6 +541,13 @@
   th {
     border: 1px solid var(--background-primary-alt) !important;
     padding: 0.6em 1em;
+    vertical-align: top;
+  }
+
+  td code,
+  th code {
+    overflow-wrap: anywhere;
+    white-space: normal;
   }
 
   tr {
@@ -637,7 +648,7 @@
   pre.code-block {
     position: relative;
     margin: 1.5rem 0;
-    padding: 2.75rem 1.25rem 1.25rem;
+    padding: 2.25rem 1.25rem 1.25rem;
     color: var(--text-bright);
     background: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
@@ -646,8 +657,8 @@
 
   pre.code-block::before {
     position: absolute;
-    top: 0.65rem;
-    right: 1rem;
+    top: 0.75rem;
+    left: 1rem;
     color: var(--text-dim);
     content: attr(data-language);
     font-size: 0.75rem;
@@ -655,39 +666,33 @@
     text-transform: uppercase;
   }
 
+  .code-block-copy-button {
+    position: absolute;
+    top: 0.35rem;
+    right: 0.55rem;
+    display: grid;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    color: var(--text-dim);
+    font-size: 1.1rem;
+    line-height: 1;
+    place-items: center;
+    background: transparent;
+    border: 0;
+    border-radius: 0.35rem;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--text-accent);
+      background: var(--background-secondary);
+      outline: none;
+    }
+  }
+
   pre.code-block code {
     display: block;
     min-width: max-content;
-  }
-
-  .hljs-comment,
-  .hljs-quote {
-    color: var(--text-dim);
-  }
-
-  .hljs-keyword,
-  .hljs-selector-tag,
-  .hljs-literal {
-    color: #c678dd;
-  }
-
-  .hljs-string,
-  .hljs-attr,
-  .hljs-template-variable {
-    color: #98c379;
-  }
-
-  .hljs-number,
-  .hljs-built_in,
-  .hljs-type,
-  .hljs-title.class_ {
-    color: #e5c07b;
-  }
-
-  .hljs-title.function_,
-  .hljs-property,
-  .hljs-variable {
-    color: #61afef;
   }
 
   pre.mermaid {
@@ -699,6 +704,14 @@
     background: var(--background-primary);
     border: 1px solid var(--background-modifier-border);
     border-radius: 0.75rem;
+  }
+
+  // Mermaid 标签位于 SVG 内的 HTML 中，不能继承正文段落样式。
+  pre.mermaid foreignObject p {
+    margin: 0;
+    font-size: inherit;
+    line-height: inherit;
+    overflow-wrap: normal;
   }
 
   pre.mermaid svg {

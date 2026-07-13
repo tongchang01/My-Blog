@@ -58,6 +58,12 @@ const mermaidViewerLabels: Record<string, MermaidViewerLabels> = {
   }
 }
 
+const codeBlockCopyLabels: Record<string, string> = {
+  en: 'Copy code',
+  ja: 'コードをコピー',
+  zh: '复制代码'
+}
+
 const loadMermaid = () => {
   mermaidModule ??= import('mermaid')
   return mermaidModule
@@ -79,6 +85,9 @@ const waitForDocumentFonts = async (): Promise<void> => {
 
 const viewerLabelsFor = (locale: string): MermaidViewerLabels =>
   mermaidViewerLabels[locale] ?? mermaidViewerLabels.zh
+
+const codeBlockCopyLabelFor = (locale: string): string =>
+  codeBlockCopyLabels[locale] ?? codeBlockCopyLabels.zh
 
 const createViewerButton = (
   action: string,
@@ -190,7 +199,10 @@ const mountMermaidViewer = async (
   })
 }
 
-const highlightCodeBlocks = async (root: HTMLElement): Promise<void> => {
+const highlightCodeBlocks = async (
+  root: HTMLElement,
+  locale: string
+): Promise<void> => {
   const blocks = Array.from(
     root.querySelectorAll<HTMLElement>('pre.code-block:not([data-highlighted])')
   )
@@ -200,10 +212,27 @@ const highlightCodeBlocks = async (root: HTMLElement): Promise<void> => {
   for (const block of blocks) {
     const code = block.querySelector<HTMLElement>('code')
     const language = block.dataset.language ?? 'text'
+    const source = code?.textContent ?? ''
     if (code && highlighter.getLanguage(language)) {
-      code.innerHTML = highlighter.highlight(code.textContent ?? '', { language }).value
+      code.innerHTML = highlighter.highlight(source, { language }).value
       code.classList.add('hljs')
     }
+    const copyLabel = codeBlockCopyLabelFor(locale)
+    const copyButton = document.createElement('button')
+    copyButton.type = 'button'
+    copyButton.className = 'code-block-copy-button'
+    copyButton.dataset.codeAction = 'copy'
+    copyButton.setAttribute('aria-label', copyLabel)
+    copyButton.title = copyLabel
+    copyButton.textContent = '⧉'
+    copyButton.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard?.writeText(source)
+      } catch {
+        // Clipboard access is optional; the code block remains readable.
+      }
+    })
+    block.append(copyButton)
     block.dataset.highlighted = 'true'
   }
 }
@@ -249,7 +278,7 @@ export const enhanceMarkdown = async (
   locale = 'zh'
 ): Promise<void> => {
   await Promise.all([
-    highlightCodeBlocks(root),
+    highlightCodeBlocks(root, locale),
     renderMermaid(root, isDarkTheme, locale)
   ])
 }
