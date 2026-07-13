@@ -51,6 +51,9 @@
     "url": "https://github.com/xiaoxian521"
   },
   "dependencies": {
+    "@mdit/plugin-footnote": "1.0.1",
+    "@mdit/plugin-katex": "1.0.1",
+    "@mdit/plugin-tasklist": "1.0.1",
     "@pureadmin/descriptions": "^1.2.1",
     "@pureadmin/table": "^3.3.0",
     "@pureadmin/utils": "^2.6.2",
@@ -61,8 +64,12 @@
     "dayjs": "^1.11.18",
     "echarts": "^6.0.0",
     "element-plus": "^2.11.5",
+    "highlight.js": "11.11.1",
     "js-cookie": "^3.0.5",
+    "katex": "0.17.0",
     "localforage": "^1.10.0",
+    "markdown-it": "14.3.0",
+    "mermaid": "11.16.0",
     "mitt": "^3.0.1",
     "nprogress": "^0.2.0",
     "path-browserify": "^1.0.1",

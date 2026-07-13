@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
@@ -22,6 +22,7 @@ import {
 } from "./draftStorage";
 import type { ArticleForm } from "./form";
 import { renderMarkdownPreview } from "./markdownPreview";
+import { enhanceMarkdownPreview } from "./markdownPreviewEnhance";
 import { useArticleEditor } from "./useArticleEditor";
 
 defineOptions({ name: "ArticleEditor" });
@@ -61,6 +62,7 @@ const homepageSlotOptions: ArticleHomepageSlot[] = [
   "FEATURED"
 ];
 const previewHtml = computed(() => renderMarkdownPreview(form.body));
+const previewElement = ref<HTMLElement | null>(null);
 const hasDraft = computed(() => Boolean(draft.value));
 const isDirty = computed(
   () => baselineSnapshot.value !== null && snapshotForm() !== baselineSnapshot.value
@@ -77,6 +79,11 @@ function dictionaryName(item: LocalizedNames): string {
 function fieldError(field: keyof typeof form): string {
   const code = errors.value[field];
   return code ? transformI18n(`articles.editor.validation.${code}`) : "";
+}
+
+async function enhancePreview(): Promise<void> {
+  await nextTick();
+  if (previewElement.value) await enhanceMarkdownPreview(previewElement.value);
 }
 
 function homepageSlotDisabled(slot: ArticleHomepageSlot): boolean {
@@ -135,6 +142,10 @@ watch(
   }
 );
 
+watch(previewHtml, () => {
+  void enhancePreview();
+});
+
 onMounted(async () => {
   try {
     await initialize();
@@ -144,6 +155,7 @@ onMounted(async () => {
     // 请求错误由页面中的 alert 展示，表单数据保持不变。
   } finally {
     autosaveReady.value = true;
+    void enhancePreview();
   }
 });
 
@@ -264,6 +276,7 @@ onBeforeRouteLeave((_to, _from, next) => {
                 {{ transformI18n("articles.editor.preview") }}
               </div>
               <div
+                ref="previewElement"
                 data-testid="article-markdown-preview"
                 class="markdown-preview"
                 v-html="previewHtml"
@@ -567,6 +580,83 @@ onBeforeRouteLeave((_to, _from, next) => {
   :deep(pre code) {
     padding: 0;
     background: transparent;
+  }
+
+  :deep(pre.code-block) {
+    position: relative;
+    padding-top: 30px;
+  }
+
+  :deep(pre.code-block::before) {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    color: var(--el-text-color-secondary);
+    content: attr(data-language);
+    font-size: 11px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  :deep(.hljs-comment),
+  :deep(.hljs-quote) {
+    color: var(--el-text-color-secondary);
+  }
+
+  :deep(.hljs-keyword),
+  :deep(.hljs-selector-tag),
+  :deep(.hljs-literal) {
+    color: #a855f7;
+  }
+
+  :deep(.hljs-string),
+  :deep(.hljs-attr),
+  :deep(.hljs-template-variable) {
+    color: #3a9d5d;
+  }
+
+  :deep(.hljs-number),
+  :deep(.hljs-built_in),
+  :deep(.hljs-type),
+  :deep(.hljs-title.class_) {
+    color: #b7791f;
+  }
+
+  :deep(.hljs-title.function_),
+  :deep(.hljs-property),
+  :deep(.hljs-variable) {
+    color: #3182ce;
+  }
+
+  :deep(pre.mermaid) {
+    padding: 12px;
+    overflow-x: auto;
+    text-align: center;
+  }
+
+  :deep(pre.mermaid svg) {
+    display: inline-block;
+    max-width: none;
+    height: auto;
+  }
+
+  :deep(.katex-display) {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  :deep(.footnotes) {
+    padding-top: 10px;
+    border-top: 1px solid var(--el-border-color-lighter);
+    font-size: 0.9em;
+  }
+
+  :deep(li.task-list-item) {
+    list-style: none;
+  }
+
+  :deep(.task-list-item-checkbox) {
+    margin-right: 6px;
   }
 }
 
