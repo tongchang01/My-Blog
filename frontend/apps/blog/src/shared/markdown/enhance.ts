@@ -12,6 +12,10 @@ const loadHighlighter = () => {
   return highlighterModule
 }
 
+const waitForDocumentFonts = async (): Promise<void> => {
+  await document.fonts?.ready
+}
+
 const highlightCodeBlocks = async (root: HTMLElement): Promise<void> => {
   const blocks = Array.from(
     root.querySelectorAll<HTMLElement>('pre.code-block:not([data-highlighted])')
@@ -40,6 +44,7 @@ const renderMermaid = async (
   ).filter(block => block.dataset.mermaidTheme !== theme)
   if (blocks.length === 0) return
 
+  await waitForDocumentFonts()
   const { default: mermaid } = await loadMermaid()
   mermaid.initialize({ startOnLoad: false, securityLevel: 'strict', theme })
 

@@ -47,4 +47,33 @@ describe('Markdown enhancement', () => {
     expect(block?.dataset.mermaidTheme).toBe('default')
     expect(block?.innerHTML).toContain('data-diagram="true"')
   })
+
+  it('waits for document fonts before rendering a Mermaid diagram', async () => {
+    let resolveFonts: (() => void) | undefined
+    const fontsReady = new Promise<void>(resolve => {
+      resolveFonts = resolve
+    })
+    const originalFonts = Object.getOwnPropertyDescriptor(document, 'fonts')
+    Object.defineProperty(document, 'fonts', {
+      configurable: true,
+      value: { ready: fontsReady }
+    })
+    mermaid.render.mockClear()
+
+    const root = document.createElement('div')
+    root.innerHTML = '<pre class="mermaid">flowchart TD\nA --> B</pre>'
+
+    try {
+      const enhancement = enhanceMarkdown(root, false)
+      await new Promise(resolve => setTimeout(resolve, 0))
+      expect(mermaid.render).not.toHaveBeenCalled()
+
+      resolveFonts?.()
+      await enhancement
+      expect(mermaid.render).toHaveBeenCalledTimes(1)
+    } finally {
+      if (originalFonts) Object.defineProperty(document, 'fonts', originalFonts)
+      else delete (document as { fonts?: unknown }).fonts
+    }
+  })
 })
