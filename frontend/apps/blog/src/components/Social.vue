@@ -161,8 +161,8 @@
         <SvgIcon
           icon-class="email"
           class="fill-current"
-          fill="none"
-          stroke="currentColor"
+          fill="currentColor"
+          stroke="none"
         />
       </li>
     </a>
