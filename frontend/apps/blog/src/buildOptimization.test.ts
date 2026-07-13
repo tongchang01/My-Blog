@@ -3,7 +3,10 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 const source = (path: string) =>
-  readFileSync(fileURLToPath(new URL(path, import.meta.url)), 'utf8')
+  readFileSync(fileURLToPath(new URL(path, import.meta.url)), 'utf8').replace(
+    /\r\n/g,
+    '\n'
+  )
 
 describe('build optimization', () => {
   it('uses the modern Sass API and avoids deprecated Sass imports', () => {
