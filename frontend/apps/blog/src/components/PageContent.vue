@@ -110,7 +110,11 @@ const initializeContent = async () => {
   await nextTick()
   if (!postHtml.value) return
   initializeLightBox()
-  await enhanceMarkdown(postHtml.value, appStore.theme === 'theme-dark')
+  await enhanceMarkdown(
+    postHtml.value,
+    appStore.theme === 'theme-dark',
+    appStore.locale
+  )
 }
 
 watch(
@@ -131,7 +135,11 @@ watch(
   () => appStore.theme,
   () => {
     if (postHtml.value)
-      void enhanceMarkdown(postHtml.value, appStore.theme === 'theme-dark')
+      void enhanceMarkdown(
+        postHtml.value,
+        appStore.theme === 'theme-dark',
+        appStore.locale
+      )
   }
 )
 

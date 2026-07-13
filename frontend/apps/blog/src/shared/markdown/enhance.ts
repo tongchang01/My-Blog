@@ -6,6 +6,58 @@ let panzoomModule: Promise<typeof import('@panzoom/panzoom')> | undefined
 let diagramSequence = 0
 const mermaidViewerCleanup = new WeakMap<HTMLElement, () => void>()
 
+interface MermaidViewerLabels {
+  copy: string
+  exitFullscreen: string
+  fullscreen: string
+  panDown: string
+  panLeft: string
+  panRight: string
+  panUp: string
+  reset: string
+  zoomIn: string
+  zoomOut: string
+}
+
+const mermaidViewerLabels: Record<string, MermaidViewerLabels> = {
+  en: {
+    copy: 'Copy Mermaid source',
+    exitFullscreen: 'Press Esc to exit fullscreen',
+    fullscreen: 'View diagram fullscreen',
+    panDown: 'Pan diagram down',
+    panLeft: 'Pan diagram left',
+    panRight: 'Pan diagram right',
+    panUp: 'Pan diagram up',
+    reset: 'Reset diagram view',
+    zoomIn: 'Zoom in',
+    zoomOut: 'Zoom out'
+  },
+  ja: {
+    copy: 'Mermaid ソースをコピー',
+    exitFullscreen: 'Esc キーで全画面表示を終了',
+    fullscreen: '図を全画面で表示',
+    panDown: '図を下へ移動',
+    panLeft: '図を左へ移動',
+    panRight: '図を右へ移動',
+    panUp: '図を上へ移動',
+    reset: '図の表示をリセット',
+    zoomIn: '拡大',
+    zoomOut: '縮小'
+  },
+  zh: {
+    copy: '复制 Mermaid 源码',
+    exitFullscreen: '按 Esc 退出全屏',
+    fullscreen: '全屏查看图表',
+    panDown: '向下平移图表',
+    panLeft: '向左平移图表',
+    panRight: '向右平移图表',
+    panUp: '向上平移图表',
+    reset: '重置图表视图',
+    zoomIn: '放大图表',
+    zoomOut: '缩小图表'
+  }
+}
+
 const loadMermaid = () => {
   mermaidModule ??= import('mermaid')
   return mermaidModule
@@ -24,6 +76,9 @@ const loadPanzoom = () => {
 const waitForDocumentFonts = async (): Promise<void> => {
   await document.fonts?.ready
 }
+
+const viewerLabelsFor = (locale: string): MermaidViewerLabels =>
+  mermaidViewerLabels[locale] ?? mermaidViewerLabels.zh
 
 const createViewerButton = (
   action: string,
@@ -55,7 +110,8 @@ const getViewer = (block: HTMLElement): HTMLElement => {
 
 const mountMermaidViewer = async (
   block: HTMLElement,
-  source: string
+  source: string,
+  labels: MermaidViewerLabels
 ): Promise<void> => {
   const svg = block.querySelector<SVGSVGElement>('svg')
   if (!svg) return
@@ -89,22 +145,36 @@ const mountMermaidViewer = async (
     }
   }
 
+  const enterFullscreen = async () => {
+    if (!viewer.requestFullscreen) return
+    try {
+      await viewer.requestFullscreen()
+      const previousHint = viewer.querySelector('.mermaid-fullscreen-hint')
+      previousHint?.remove()
+      const hint = document.createElement('div')
+      hint.className = 'mermaid-fullscreen-hint'
+      hint.textContent = labels.exitFullscreen
+      viewer.append(hint)
+      window.setTimeout(() => hint.remove(), 2500)
+    } catch {
+      // Fullscreen access is optional; the inline viewer remains usable.
+    }
+  }
+
   topControls.append(
-    createViewerButton('fullscreen', '全屏查看图表', '↗', () =>
-      viewer.requestFullscreen?.()
-    ),
-    createViewerButton('copy', '复制 Mermaid 源码', '⧉', copySource)
+    createViewerButton('fullscreen', labels.fullscreen, '↗', enterFullscreen),
+    createViewerButton('copy', labels.copy, '⧉', copySource)
   )
   navigation.append(
     document.createElement('span'),
-    createViewerButton('pan-up', '向上平移图表', '↑', () => panBy(0, -80)),
-    createViewerButton('zoom-in', '放大图表', '+', () => panzoom.zoomIn()),
-    createViewerButton('pan-left', '向左平移图表', '←', () => panBy(-80, 0)),
-    createViewerButton('reset', '重置图表视图', '↻', () => panzoom.reset()),
-    createViewerButton('pan-right', '向右平移图表', '→', () => panBy(80, 0)),
+    createViewerButton('pan-up', labels.panUp, '↑', () => panBy(0, -80)),
+    createViewerButton('zoom-in', labels.zoomIn, '+', () => panzoom.zoomIn()),
+    createViewerButton('pan-left', labels.panLeft, '←', () => panBy(-80, 0)),
+    createViewerButton('reset', labels.reset, '↻', () => panzoom.reset()),
+    createViewerButton('pan-right', labels.panRight, '→', () => panBy(80, 0)),
     document.createElement('span'),
-    createViewerButton('pan-down', '向下平移图表', '↓', () => panBy(0, 80)),
-    createViewerButton('zoom-out', '缩小图表', '−', () => panzoom.zoomOut())
+    createViewerButton('pan-down', labels.panDown, '↓', () => panBy(0, 80)),
+    createViewerButton('zoom-out', labels.zoomOut, '−', () => panzoom.zoomOut())
   )
   viewer.append(topControls, navigation)
 
@@ -140,7 +210,8 @@ const highlightCodeBlocks = async (root: HTMLElement): Promise<void> => {
 
 const renderMermaid = async (
   root: HTMLElement,
-  isDarkTheme: boolean
+  isDarkTheme: boolean,
+  locale: string
 ): Promise<void> => {
   const theme = isDarkTheme ? 'dark' : 'default'
   const blocks = Array.from(
@@ -165,7 +236,7 @@ const renderMermaid = async (
       block.dataset.mermaidTheme = theme
       block.innerHTML = svg
       bindFunctions?.(block)
-      await mountMermaidViewer(block, source)
+      await mountMermaidViewer(block, source, viewerLabelsFor(locale))
     } catch {
       // Preserve the source block so an article remains readable on syntax errors.
     }
@@ -174,7 +245,11 @@ const renderMermaid = async (
 
 export const enhanceMarkdown = async (
   root: HTMLElement,
-  isDarkTheme: boolean
+  isDarkTheme: boolean,
+  locale = 'zh'
 ): Promise<void> => {
-  await Promise.all([highlightCodeBlocks(root), renderMermaid(root, isDarkTheme)])
+  await Promise.all([
+    highlightCodeBlocks(root),
+    renderMermaid(root, isDarkTheme, locale)
+  ])
 }

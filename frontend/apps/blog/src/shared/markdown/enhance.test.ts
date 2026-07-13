@@ -102,10 +102,14 @@ describe('Markdown enhancement', () => {
     block.textContent = 'flowchart TD\nA --> B'
     root.append(block)
 
-    await enhanceMarkdown(root, false)
+    await enhanceMarkdown(root, false, 'ja')
 
     expect(root.querySelector('figure.mermaid-viewer')).not.toBeNull()
     expect(panzoom.create).toHaveBeenCalledTimes(1)
+    expect(
+      root.querySelector<HTMLButtonElement>('[data-mermaid-action="copy"]')
+        ?.title
+    ).toBe('Mermaid ソースをコピー')
     root
       .querySelector<HTMLButtonElement>('[data-mermaid-action="zoom-in"]')
       ?.click()
@@ -119,5 +123,36 @@ describe('Markdown enhancement', () => {
     expect(panzoom.zoomIn).toHaveBeenCalledTimes(1)
     expect(panzoom.reset).toHaveBeenCalledTimes(1)
     expect(panzoom.pan).toHaveBeenCalledWith(-80, 0, { relative: true })
+  })
+
+  it('briefly explains how to leave fullscreen mode', async () => {
+    vi.useFakeTimers()
+    const root = document.createElement('div')
+    const block = document.createElement('pre')
+    block.className = 'mermaid'
+    block.textContent = 'flowchart TD\nA --> B'
+    root.append(block)
+
+    try {
+      await enhanceMarkdown(root, false, 'ja')
+      const viewer = root.querySelector<HTMLElement>('figure.mermaid-viewer')
+      Object.defineProperty(viewer, 'requestFullscreen', {
+        configurable: true,
+        value: vi.fn().mockResolvedValue(undefined)
+      })
+
+      viewer
+        ?.querySelector<HTMLButtonElement>('[data-mermaid-action="fullscreen"]')
+        ?.click()
+      await Promise.resolve()
+      expect(viewer?.querySelector('.mermaid-fullscreen-hint')?.textContent).toBe(
+        'Esc キーで全画面表示を終了'
+      )
+
+      vi.advanceTimersByTime(2500)
+      expect(viewer?.querySelector('.mermaid-fullscreen-hint')).toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
