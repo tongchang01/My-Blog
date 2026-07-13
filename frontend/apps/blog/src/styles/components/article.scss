@@ -634,6 +634,104 @@
     overflow-wrap: normal !important;
   }
 
+  pre.code-block {
+    position: relative;
+    margin: 1.5rem 0;
+    padding: 2.75rem 1.25rem 1.25rem;
+    color: var(--text-bright);
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 0.75rem;
+  }
+
+  pre.code-block::before {
+    position: absolute;
+    top: 0.65rem;
+    right: 1rem;
+    color: var(--text-dim);
+    content: attr(data-language);
+    font-size: 0.75rem;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  pre.code-block code {
+    display: block;
+    min-width: max-content;
+  }
+
+  .hljs-comment,
+  .hljs-quote {
+    color: var(--text-dim);
+  }
+
+  .hljs-keyword,
+  .hljs-selector-tag,
+  .hljs-literal {
+    color: #c678dd;
+  }
+
+  .hljs-string,
+  .hljs-attr,
+  .hljs-template-variable {
+    color: #98c379;
+  }
+
+  .hljs-number,
+  .hljs-built_in,
+  .hljs-type,
+  .hljs-title.class_ {
+    color: #e5c07b;
+  }
+
+  .hljs-title.function_,
+  .hljs-property,
+  .hljs-variable {
+    color: #61afef;
+  }
+
+  pre.mermaid {
+    @apply my-6;
+    min-width: 0;
+    padding: 1.25rem;
+    overflow-x: auto;
+    text-align: center;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: 0.75rem;
+  }
+
+  pre.mermaid svg {
+    display: inline-block;
+    max-width: none;
+    height: auto;
+  }
+
+  .katex-display {
+    padding: 0.5rem 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .footnotes {
+    margin-top: 2.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--background-modifier-border);
+    font-size: 0.9em;
+  }
+
+  li.task-list-item {
+    margin-left: 0;
+  }
+
+  li.task-list-item::before {
+    content: none;
+  }
+
+  .task-list-item-checkbox {
+    margin-right: 0.5rem;
+  }
+
   pre::-webkit-scrollbar {
     width: 0.5em;
     height: 0.5em;

@@ -53,6 +53,7 @@
       <div class="main-grid">
         <div>
           <div
+            ref="postHtml"
             class="post-html"
             v-html="article.bodyHtml"
             v-scroll-spy="{ sectionSelector: 'h1, h2, h3, h4, h5, h6' }"
@@ -90,6 +91,7 @@ import { useMetaStore } from '@/stores/meta'
 import { Profile, Sidebar, Toc } from '@/components/Sidebar'
 import PostStats from '@/components/Post/PostStats.vue'
 import useLightBox from '@/hooks/useLightBox'
+import { enhanceMarkdown } from '@/shared/markdown/enhance'
 
 const route = useRoute()
 const router = useRouter()
@@ -99,6 +101,7 @@ const commonStore = useCommonStore()
 const metaStore = useMetaStore()
 const { t } = useI18n()
 const invalidRoute = ref(false)
+const postHtml = ref<HTMLElement | null>(null)
 const { initializeLightBox } = useLightBox()
 
 const article = computed(() => articleStore.detail)
@@ -172,7 +175,16 @@ watch(
   async value => {
     if (!value) return
     await nextTick()
+    if (!postHtml.value) return
     initializeLightBox()
+    await enhanceMarkdown(postHtml.value, appStore.theme === 'theme-dark')
+  }
+)
+watch(
+  () => appStore.theme,
+  () => {
+    if (postHtml.value)
+      void enhanceMarkdown(postHtml.value, appStore.theme === 'theme-dark')
   }
 )
 onBeforeUnmount(() => commonStore.resetHeaderImage())
