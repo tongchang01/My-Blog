@@ -2,14 +2,14 @@
 
 > 状态：当前有效
 > 适用范围：Windows PowerShell 本地开发
-> 最后校准：2026-07-10
+> 最后校准：2026-07-13
 > 对应代码：`MyBlog-springboot-v2/src/main/resources/application-local.yml`、`frontend/apps/blog/.env`、`frontend/apps/admin/.env.development`
 > 权威程度：运行手册
 
 ## 前置条件
 
 - JDK 17、Maven 3.9.x。
-- Node `^20.19.0` 或满足应用 engines 的 22+ 版本，Corepack 与 pnpm 9。
+- Node 24（当前固定基线为 `^24.0.0`），Corepack 与 pnpm 9。Node 20 已结束支持，不再作为本项目的本地运行版本。
 - MySQL 8，默认数据库 `myblog_v2_dev`。
 - JVM 默认时区 `Asia/Tokyo`；其他系统时区需加 `-Duser.timezone=Asia/Tokyo`。
 

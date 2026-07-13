@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端、博客端、管理端和文档
-> 最后校准：2026-07-10
+> 最后校准：2026-07-13
 > 对应代码：`MyBlog-springboot-v2/src/test/`、`frontend/apps/blog/src/`、`frontend/apps/admin/src/`
 > 权威程度：规则
 
@@ -37,7 +37,7 @@ mvn test -Dtest=MySqlFlywayMigrationTest
 
 ## 博客端与管理端
 
-两个应用均要求 Node `^20.19.0` 或兼容的 22+ 版本、pnpm 9。在各应用目录执行：
+两个应用均要求 Node `^24.0.0` 与 pnpm 9。在各应用目录执行：
 
 ```powershell
 corepack pnpm install --frozen-lockfile
