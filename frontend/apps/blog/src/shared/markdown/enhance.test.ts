@@ -8,7 +8,20 @@ const mermaid = vi.hoisted(() => ({
   render: vi.fn().mockResolvedValue({ svg: '<svg data-diagram="true"></svg>' })
 }))
 
+const panzoom = vi.hoisted(() => ({
+  create: vi.fn(),
+  destroy: vi.fn(),
+  pan: vi.fn(),
+  reset: vi.fn(),
+  zoomIn: vi.fn(),
+  zoomOut: vi.fn(),
+  zoomWithWheel: vi.fn()
+}))
+
+panzoom.create.mockReturnValue(panzoom)
+
 vi.mock('mermaid', () => ({ default: mermaid }))
+vi.mock('@panzoom/panzoom', () => ({ default: panzoom.create }))
 
 describe('Markdown enhancement', () => {
   it('does nothing when the rendered article has no diagram or code block', async () => {
@@ -75,5 +88,36 @@ describe('Markdown enhancement', () => {
       if (originalFonts) Object.defineProperty(document, 'fonts', originalFonts)
       else delete (document as { fonts?: unknown }).fonts
     }
+  })
+
+  it('adds GitHub-style controls to a rendered Mermaid diagram', async () => {
+    mermaid.render.mockClear()
+    panzoom.create.mockClear()
+    panzoom.zoomIn.mockClear()
+    panzoom.reset.mockClear()
+    panzoom.pan.mockClear()
+    const root = document.createElement('div')
+    const block = document.createElement('pre')
+    block.className = 'mermaid'
+    block.textContent = 'flowchart TD\nA --> B'
+    root.append(block)
+
+    await enhanceMarkdown(root, false)
+
+    expect(root.querySelector('figure.mermaid-viewer')).not.toBeNull()
+    expect(panzoom.create).toHaveBeenCalledTimes(1)
+    root
+      .querySelector<HTMLButtonElement>('[data-mermaid-action="zoom-in"]')
+      ?.click()
+    root
+      .querySelector<HTMLButtonElement>('[data-mermaid-action="reset"]')
+      ?.click()
+    root
+      .querySelector<HTMLButtonElement>('[data-mermaid-action="pan-left"]')
+      ?.click()
+
+    expect(panzoom.zoomIn).toHaveBeenCalledTimes(1)
+    expect(panzoom.reset).toHaveBeenCalledTimes(1)
+    expect(panzoom.pan).toHaveBeenCalledWith(-80, 0, { relative: true })
   })
 })
