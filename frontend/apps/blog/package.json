@@ -18,9 +18,14 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@mdit/plugin-footnote": "1.0.1",
+    "@mdit/plugin-katex": "1.0.1",
+    "@mdit/plugin-tasklist": "1.0.1",
     "axios": "^1.7.9",
     "js-cookie": "^3.0.5",
-    "markdown-it": "14.1.0",
+    "katex": "0.17.0",
+    "markdown-it": "14.3.0",
+    "mermaid": "11.16.0",
     "normalize.css": "^8.0.1",
     "nprogress": "^0.2.0",
     "pinia": "2.3.1",
