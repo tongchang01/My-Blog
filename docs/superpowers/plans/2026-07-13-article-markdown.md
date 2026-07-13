@@ -18,6 +18,52 @@
 
 ---
 
+### 任务 0：统一 Node 24 构建基线
+
+**文件：**
+- 修改：`.github/workflows/ci.yml`
+- 修改：`deploy/web/Dockerfile`
+- 修改：`frontend/apps/admin/.nvmrc`
+- 修改：`frontend/apps/admin/package.json`
+- 修改：`frontend/apps/blog/package.json`
+
+**产出：** 本地、CI 与 Docker 构建统一使用 Node 24；前端包明确不再承诺已经 EOL 的 Node 20。
+
+- [x] **步骤 1：确认本机版本与源代码迁移项**
+
+运行：
+
+```powershell
+node --version
+rg -n "url\.parse|util\.is[A-Z]|punycode" frontend/apps/blog/src frontend/apps/admin/src
+```
+
+预期：本机为 Node 24，项目源码没有 Node 22→24 的弃用 API 命中。
+
+- [x] **步骤 2：对齐版本声明**
+
+将两个 `package.json` 的 `engines.node` 改为 `^24.0.0`；将管理端 `.nvmrc` 改为 `v24.17.0`；将两个 CI `node-version` 和 `deploy/web/Dockerfile` 的两个构建阶段从 22 改为 24。
+
+- [x] **步骤 3：用 Node 24 验证**
+
+运行：
+
+```powershell
+corepack pnpm --dir frontend/apps/blog typecheck
+corepack pnpm --dir frontend/apps/blog build
+corepack pnpm --dir frontend/apps/admin typecheck
+corepack pnpm --dir frontend/apps/admin build
+```
+
+- [x] **步骤 4：提交**
+
+```powershell
+git add .github/workflows/ci.yml deploy/web/Dockerfile frontend/apps/admin/.nvmrc frontend/apps/admin/package.json frontend/apps/blog/package.json
+git commit -m "升级前端构建 Node 24 基线"
+```
+
+---
+
 ### 任务 1：建立前台 Markdown 语法契约
 
 **文件：**
@@ -28,7 +74,7 @@
 
 **产出：** `renderMarkdown(source)` 和 `renderArticleMarkdown(source, locale)` 能渲染 GFM 表格、任务列表、脚注、KaTeX，且对所有 fenced code block 保留安全的 `language-*` 与 `data-language`。
 
-- [ ] **步骤 1：先加入失败用例**
+- [x] **步骤 1：先加入失败用例**
 
 在 `render.test.ts` 覆盖下列输入和关键输出：
 
@@ -44,13 +90,13 @@ expect(html).toContain('<pre class="mermaid">')
 expect(renderMarkdown('<script>alert(1)</script>')).not.toContain('<script>')
 ```
 
-- [ ] **步骤 2：确认测试当前失败**
+- [x] **步骤 2：确认测试当前失败**
 
 运行：`corepack pnpm test -- render.test.ts`（目录：`frontend/apps/blog`）
 
 预期：任务列表、脚注、公式和普通 fenced code 的语言属性断言失败。
 
-- [ ] **步骤 3：最小实现**
+- [x] **步骤 3：最小实现**
 
 添加 `@mdit/plugin-tasklist`、`@mdit/plugin-footnote`、`@mdit/plugin-katex` 与 `katex`。在 `createMarkdown` 中链式注册插件并保持 `html: false`；重写 fence renderer：
 
@@ -63,13 +109,13 @@ const safeLanguage = /^[a-z0-9_-]+$/.test(language) ? language : 'text'
 return `<pre class="code-block" data-language="${safeLanguage}"><code class="language-${safeLanguage}">${escapeHtml(token.content)}</code></pre>\n`
 ```
 
-- [ ] **步骤 4：确认契约通过**
+- [x] **步骤 4：确认契约通过**
 
 运行：`corepack pnpm test -- render.test.ts`（目录：`frontend/apps/blog`）
 
 预期：全部通过。
 
-- [ ] **步骤 5：提交**
+- [x] **步骤 5：提交**
 
 ```powershell
 git add frontend/apps/blog/package.json frontend/apps/blog/pnpm-lock.yaml frontend/apps/blog/src/shared/markdown/render.ts frontend/apps/blog/src/shared/markdown/render.test.ts
@@ -88,17 +134,17 @@ git commit -m "完善前台 Markdown 解析能力"
 
 **产出：** 已挂载的 `.post-html` 在包含 Mermaid 时绘制 SVG，在包含 `language-*` 代码块时高亮；无效 Mermaid 保留原代码，主题切换后图表可按当前主题重绘。
 
-- [ ] **步骤 1：加入失败用例**
+- [x] **步骤 1：加入失败用例**
 
 为增强器写一个 DOM 测试，验证没有 `.mermaid` 或 `.code-block` 时不触发动态加载；验证 Mermaid 节点保存原文后才以 `data-mermaid-theme` 标记完成。
 
-- [ ] **步骤 2：确认测试失败**
+- [x] **步骤 2：确认测试失败**
 
 运行：`corepack pnpm test -- markdown`（目录：`frontend/apps/blog`）
 
 预期：找不到 `enhanceMarkdown`。
 
-- [ ] **步骤 3：最小实现**
+- [x] **步骤 3：最小实现**
 
 使用一个共享函数避免文章页和关于页重复：
 
@@ -115,11 +161,11 @@ export const enhanceMarkdown = async (root: HTMLElement, isDark: boolean) => {
 
 在文章页和 `PageContent.vue` 的 `nextTick()` 后调用 `enhanceMarkdown(postHtml.value, appStore.theme === 'theme-dark')`；监听主题变化以重绘已经保存原文的 Mermaid 节点。
 
-- [ ] **步骤 4：补齐样式**
+- [x] **步骤 4：补齐样式**
 
 为 `.code-block` 添加语言角标、横向滚动和 token 颜色；为 `.mermaid` 添加居中、窄屏横向滚动与 SVG 自适应。导入 KaTeX CSS，且不覆盖既有图片、表格和行内代码样式。
 
-- [ ] **步骤 5：验证与提交**
+- [x] **步骤 5：验证与提交**
 
 运行：
 
@@ -148,25 +194,25 @@ git commit -m "增强文章图表与代码块渲染"
 
 **产出：** 管理端 textarea 原样提交 Markdown；预览支持与前台相同的 CommonMark、GFM、代码语言、公式和 Mermaid 语法。
 
-- [ ] **步骤 1：写失败测试**
+- [x] **步骤 1：写失败测试**
 
 使用与任务 1 相同的 Markdown 样本，断言 `renderMarkdownPreview` 输出表格、任务列表、脚注、KaTeX class、`language-java`、`pre.mermaid`，并断言脚本标签不会输出。
 
-- [ ] **步骤 2：确认失败**
+- [x] **步骤 2：确认失败**
 
 运行：`corepack pnpm test -- markdownPreview.test.ts`（目录：`frontend/apps/admin`）
 
 预期：当前手写解析器无法满足上述断言。
 
-- [ ] **步骤 3：替换手写解析器**
+- [x] **步骤 3：替换手写解析器**
 
 删除逐行正则解析，改用 `MarkdownIt({ html: false, linkify: true })` 与任务 1 同类插件；保留一个 Mermaid fence renderer，输出 `<pre class="mermaid">`。不在 `form.body` 上调用 replace、trim 以外的格式转换。
 
-- [ ] **步骤 4：在预览容器挂载后增强**
+- [x] **步骤 4：在预览容器挂载后增强**
 
 为预览 HTML 容器增加 `ref`，监听 `previewHtml`；在 `nextTick()` 后调用本应用的 Mermaid 和代码高亮增强器。增强器只处理预览容器，不能查询全局 `document`。
 
-- [ ] **步骤 5：验证与提交**
+- [x] **步骤 5：验证与提交**
 
 运行：
 
@@ -189,9 +235,9 @@ git commit -m "统一管理端 Markdown 预览"
 - 创建：`docs/handbook/content/markdown-authoring.md`
 - 修改：`docs/README.md`
 
-**产出：** 作者可查阅的语法范围和旧文章恢复步骤；当前系列文章可从 `C:\Users\TYB\OneDrive\Desktop\blog-series` 原稿恢复，而无需改后端代码。
+**产出：** 作者可查阅的语法范围和旧文章恢复步骤；当前系列文章可从项目外部写作原稿恢复，而无需改后端代码。
 
-- [ ] **步骤 1：编写写作与迁移说明**
+- [x] **步骤 1：编写写作与迁移说明**
 
 文档必须包含 fenced code、Mermaid、公式、表格、任务列表、脚注示例；并明确恢复步骤为“导出线上原文 → 标题/slug 映射原稿 → 管理端预览核对 → 用既有管理端保存 → 公开接口复查”。
 
@@ -199,7 +245,7 @@ git commit -m "统一管理端 Markdown 预览"
 
 在管理端打开文章 `2076239691205115905`，以 `00-project-structure.md` 的正文替换并保存；通过 `GET /api/public/articles/2076239691205115905?lang=ja` 确认 `body` 含 ` ```mermaid`，再在前台确认图表、代码和公式可显示。
 
-- [ ] **步骤 3：提交**
+- [x] **步骤 3：提交**
 
 ```powershell
 git add docs/handbook/content/markdown-authoring.md docs/README.md
@@ -208,9 +254,9 @@ git commit -m "补充文章 Markdown 写作规范"
 
 ## 完成验证
 
-- [ ] `corepack pnpm test`（前台博客）通过。
-- [ ] `corepack pnpm typecheck && corepack pnpm build`（前台博客）通过。
-- [ ] `corepack pnpm test`（管理端）通过。
-- [ ] `corepack pnpm typecheck && corepack pnpm build`（管理端）通过。
+- [x] `corepack pnpm test`（前台博客）通过。
+- [x] `corepack pnpm typecheck && corepack pnpm build`（前台博客）通过。
+- [x] `corepack pnpm test`（管理端）通过。
+- [x] `corepack pnpm typecheck && corepack pnpm build`（管理端）通过。
 - [ ] 当前系列首篇文章通过管理端保存后，公开接口保留 fenced code 的语言名。
 - [ ] `git diff --check`、`git diff --stat`、`git status --short` 已检查，文章卡片修复与 Markdown 提交相互隔离。
