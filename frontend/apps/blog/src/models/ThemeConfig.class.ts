@@ -93,7 +93,7 @@ export class ThemeMenu implements ObMenu {
         path: '/about',
         i18n: {
           zh: '关于',
-          ja: '概要',
+          ja: 'プロフィール',
           en: 'About'
         }
       },
