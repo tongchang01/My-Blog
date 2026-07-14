@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2
-> 最后校准：2026-07-10
+> 最后校准：2026-07-14
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：开发手册入口
 
@@ -28,5 +28,6 @@
 3. `roadmap.md` 只记录未来顺序，不复制已完成历史。
 4. API、架构、产品和前端文档分别维护各自事实，不复制整段内容。
 5. 代码、配置、迁移或测试发生变化时，同一提交必须更新受影响的权威文档。
+6. `docs/superpowers/` 的历史计划与设计稿不作为当前依据；完成结论必须写回本手册或 `governance/`。
 
 详细规则见 [`rules/documentation.md`](rules/documentation.md)。
