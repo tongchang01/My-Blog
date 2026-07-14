@@ -41,4 +41,11 @@ describe('article card comment labels', () => {
     expect(articleStyles).toContain('lg:text-3xl')
     expect(articleStyles).not.toContain('lg:text-4xl font-extrabold')
   })
+
+  it('collapses localized badge text without a fixed negative margin', () => {
+    expect(articleStyles).toContain('grid-template-columns: auto 0fr')
+    expect(articleStyles).toContain('grid-template-columns: auto 1fr')
+    expect(articleStyles).not.toContain('-mr-[28px]')
+    expect(articleStyles).not.toContain('-mr-[30px]')
+  })
 })
