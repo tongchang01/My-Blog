@@ -1,67 +1,12 @@
 <template>
   <div id="footer" class="relative w-full pt-1" :style="gradientBackground">
-    <span class="bg-ob-deep-800 flex justify-center">
+    <footer class="bg-ob-deep-800 flex justify-center">
       <div
-        class="bg-ob-deep-800 rounded-lg max-w-10/12 lg:max-w-screen-2xl text-sm text-ob-normal w-full py-6 px-6 grid grid-rows-1 lg:grid-rows-none lg:grid-cols-4 justify-center items-center gap-8"
+        class="bg-ob-deep-800 rounded-lg max-w-10/12 lg:max-w-screen-2xl text-sm text-ob-normal flex w-full flex-col items-center gap-5 px-6 py-6 lg:flex-row lg:justify-between"
       >
-        <div
-          class="flex flex-col lg:flex-row gap-6 lg:gap-12 row-span-1 lg:col-span-3 text-center lg:text-left"
-        >
-          <ul class="flex flex-col gap-1.5">
-            <li>
-              Copyright © 2019 - {{ currentYear }}
-              <b class="font-extrabold">{{ themeConfig.site.author }}</b>
-              . All Rights Reserved.
-            </li>
-            <li>
-              Powered by
-              <a href="https://hexo.io/">
-                <b class="font-extrabold border-b-2 border-ob hover:text-ob">
-                  Hexo
-                </b>
-              </a>
-              & Themed by
-              <a href="https://github.com/obsidianext/hexo-theme-obsidianext">
-                <b class="font-extrabold border-b-2 border-ob hover:text-ob">
-                  Aurora v{{ themeConfig.version }}
-                </b>
-              </a>
-            </li>
-            <li
-              v-if="
-                themeConfig.site.beian.number !== '' ||
-                themeConfig.site.police_beian.number !== ''
-              "
-              class="flex flex-row gap-3"
-            >
-              <span v-if="themeConfig.site.police_beian.number !== ''">
-                <img class="inline-block" :src="beianImg" alt="" width="15" />
-                <b>
-                  公安备案信息：
-                  <a :href="themeConfig.site.police_beian.link">
-                    <b
-                      class="font-extrabold border-b-2 border-ob hover:text-ob"
-                    >
-                      {{ themeConfig.site.police_beian.number }}
-                    </b>
-                  </a>
-                </b>
-              </span>
-              <span v-if="themeConfig.site.beian.number !== ''">
-                备案信息：
-                <a :href="themeConfig.site.beian.link">
-                  <b class="font-extrabold border-b-2 border-ob hover:text-ob">
-                    {{ themeConfig.site.beian.number }}
-                  </b>
-                </a>
-              </span>
-            </li>
-          </ul>
-          <ul class="flex flex-col flex-1 gap-1.5">
-            <li
-              class="flex flex-row max-w-[11rem]"
-              v-if="siteStats"
-            >
+        <div class="flex flex-col items-center gap-4 lg:items-start">
+          <ul class="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-6">
+            <li v-if="siteStats" class="flex min-w-[10rem] items-center justify-between gap-3">
               <span>
                 <SvgIcon
                   icon-class="hot"
@@ -74,11 +19,7 @@
                 {{ siteStats.totalPv }}
               </span>
             </li>
-
-            <li
-              class="flex flex-row max-w-[11rem]"
-              v-if="siteStats"
-            >
+            <li v-if="siteStats" class="flex min-w-[10rem] items-center justify-between gap-3">
               <span>
                 <SvgIcon
                   icon-class="friends"
@@ -91,8 +32,7 @@
                 {{ siteStats.todayUv }}
               </span>
             </li>
-
-            <li v-if="runningDays" class="flex flex-row max-w-[11rem]">
+            <li v-if="runningDays" class="flex min-w-[10rem] items-center justify-between gap-3">
               <span>
                 <SvgIcon
                   icon-class="date"
@@ -107,10 +47,33 @@
               >
             </li>
           </ul>
+          <ul
+            v-if="
+              themeConfig.site.beian.number !== '' ||
+              themeConfig.site.police_beian.number !== ''
+            "
+            class="flex flex-wrap justify-center gap-3 text-xs lg:justify-start"
+          >
+            <li v-if="themeConfig.site.police_beian.number !== ''">
+              <img class="inline-block" :src="beianImg" alt="" width="15" />
+              公安备案信息：
+              <a :href="themeConfig.site.police_beian.link">
+                <b class="font-extrabold border-b-2 border-ob hover:text-ob">
+                  {{ themeConfig.site.police_beian.number }}
+                </b>
+              </a>
+            </li>
+            <li v-if="themeConfig.site.beian.number !== ''">
+              备案信息：
+              <a :href="themeConfig.site.beian.link">
+                <b class="font-extrabold border-b-2 border-ob hover:text-ob">
+                  {{ themeConfig.site.beian.number }}
+                </b>
+              </a>
+            </li>
+          </ul>
         </div>
-        <div
-          class="hidden lg:flex lg:col-span-1 justify-center lg:justify-end row-span-1 relative"
-        >
+        <div class="hidden shrink-0 lg:flex">
           <img
             v-show="themeConfig.site.avatar"
             :class="avatarClass"
@@ -119,7 +82,7 @@
           />
         </div>
       </div>
-    </span>
+    </footer>
   </div>
 </template>
 
@@ -156,7 +119,6 @@ const avatarClass = computed(() => {
 const gradientBackground = computed(() => {
   return { background: appStore.themeConfig.theme.header_gradient_css }
 })
-const currentYear = computed(() => new Date().getUTCFullYear())
 const themeConfig = computed(() => appStore.themeConfig)
 const runningDays = computed(() => {
   if (appStore.themeConfig.site.started_date === '') return undefined

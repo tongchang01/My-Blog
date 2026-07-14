@@ -6,6 +6,10 @@ const source = readFileSync(
   fileURLToPath(new URL('../../styles/theme-variables.scss', import.meta.url)),
   'utf8'
 )
+const footerSource = readFileSync(
+  fileURLToPath(new URL('./FooterContainer.vue', import.meta.url)),
+  'utf8'
+)
 const messages = (language: string) =>
   JSON.parse(
     readFileSync(
@@ -17,6 +21,12 @@ const messages = (language: string) =>
   )
 
 describe('footer avatar', () => {
+  it('keeps the footer focused on site stats instead of legacy attribution', () => {
+    expect(footerSource).not.toContain('Copyright ©')
+    expect(footerSource).not.toContain('Powered by')
+    expect(footerSource).toContain('sm:grid-cols-3')
+  })
+
   it('renders without a translucent overlay', () => {
     const footerAvatarStyle = source.match(/\.footer-avatar\s*\{[^}]*\}/s)?.[0]
     expect(footerAvatarStyle).toBeDefined()
