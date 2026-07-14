@@ -2,18 +2,18 @@
 
 [简体中文](README.md) | **English** | [日本語](README.ja.md)
 
-MyBlog V2 is a modular-monolith personal blogging system composed of a Spring Boot API, a public blog, and an independently built admin console. V2 is the active codebase; V1 source has been removed from the main branch and preserved in the read-only `archive/v1-master-2026-06-26` branch.
+MyBlog V2 is a modular-monolith personal blogging system composed of a Spring Boot API, a public blog, and an independently built admin console. V2 is the active codebase and is live at the [public blog](https://tong-yibin.com) and [admin console](https://admin.tong-yibin.com); V1 source has been removed from the main branch and preserved in the read-only `archive/v1-master-2026-06-26` branch.
 
 ## Current capabilities
 
-- Trilingual public blog with home, articles, categories, tags, archives, search, about, friend links, and article comments.
+- Trilingual public blog with home, articles, categories, tags, archives, search, about, a guestbook, friend links, and article comments.
 - Home-page curation with one pinned article, up to two featured articles, and a regular feed.
 - Admin workflows for articles, taxonomy, comments, friend links, attachments, site settings, author profile, and traffic dashboards.
 - ADMIN/DEMO roles, JWT access tokens, database-backed refresh-token rotation, logout, and password-change revocation.
 - Markdown content, sanitized comment HTML, Flyway V1–V4, 14 tables, soft deletion, and audit fields.
-- Local/test/prod profiles, LOCAL/S3 storage, a health endpoint, and GitHub Actions CI.
+- Local/test/prod profiles, LOCAL/S3 storage, a health endpoint, and GitHub Actions CI/CD with GHCR and Docker Compose deployment.
 
-Password-protected article unlocking and a public guestbook page are not implemented. The production server, proxy, backup, and rollback topology is also not yet confirmed. See [current status](docs/handbook/start-here/current-status.md) and [open issues](docs/handbook/start-here/open-issues.md).
+Password-protected article unlocking is not implemented. Publishing to `main` builds commit-SHA-tagged GHCR images and automatically deploys them to AWS EC2; public HTTPS health endpoints are smoke-tested after deployment. See [open issues](docs/handbook/start-here/open-issues.md) for remaining work.
 
 ## Architecture
 
@@ -26,6 +26,7 @@ The backend root package is `com.tyb.myblog.v2`. Five business modules—identit
 | Storage and mail | Local files / AWS S3, optional Resend |
 | Blog | Vue 3, Pinia, Vue Router, vue-i18n, markdown-it, Vite, Vitest |
 | Admin | Vue 3, Pinia, Element Plus, ECharts, Vite, Vitest |
+| Delivery and deployment | Docker Compose, Caddy, GitHub Actions, GHCR, AWS EC2 / Route 53 / S3 |
 | Testing | JUnit 5, Spring Boot Test, ArchUnit, H2, Testcontainers |
 
 V2 has no runtime dependency on Redis, RabbitMQ, Elasticsearch, or Quartz. Its Caffeine rate limits assume a single backend instance.
@@ -43,7 +44,7 @@ Use the read-only `archive/v1-master-2026-06-26` branch when historical V1 imple
 
 ## Local development
 
-Requirements: JDK 17, Maven 3.9.x, MySQL 8, Node 20.19+ or a compatible Node 22+ release, pnpm 9, and an `Asia/Tokyo` JVM timezone.
+Requirements: JDK 17, Maven 3.9.x, MySQL 8, Node 24+, pnpm 9, and an `Asia/Tokyo` JVM timezone.
 
 ```powershell
 # Backend
@@ -61,7 +62,7 @@ corepack pnpm install --frozen-lockfile
 corepack pnpm dev
 ```
 
-The backend requires database, JWT, and statistics secrets. Follow the [local setup](docs/handbook/ops/local-development.md) and [environment variable](docs/handbook/ops/environment.md) guides. The local MySQL helper scripts currently have a PowerShell-version compatibility issue; read the [MySQL guide](docs/handbook/ops/local-mysql-development.md) before using them.
+The backend requires database, JWT, and statistics secrets. Follow the [local setup](docs/handbook/ops/local-development.md), [environment variable](docs/handbook/ops/environment.md), and [MySQL guide](docs/handbook/ops/local-mysql-development.md).
 
 ## Verification
 
@@ -85,6 +86,7 @@ corepack pnpm --dir frontend/apps/admin build
 - [API contracts](docs/handbook/api/README.md)
 - [Product specification](docs/handbook/product/README.md)
 - [Operations and release](docs/handbook/ops/README.md)
+- [Production deployment direction](docs/handbook/ops/deployment-direction.md)
 
 ## License
 

@@ -7,18 +7,18 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F)
 ![Vue](https://img.shields.io/badge/Vue-3-42b883)
 
-MyBlog V2 是一个模块化单体个人博客系统，由 Spring Boot API、公开博客和管理后台三个可独立构建的应用组成。V2 是当前开发主线；V1 源码已从主线移除，由只读分支 `archive/v1-master-2026-06-26` 保存。
+MyBlog V2 是一个模块化单体个人博客系统，由 Spring Boot API、公开博客和管理后台三个可独立构建的应用组成。V2 是当前开发主线，已部署到 [公开博客](https://tong-yibin.com) 与 [管理后台](https://admin.tong-yibin.com)；V1 源码已从主线移除，由只读分支 `archive/v1-master-2026-06-26` 保存。
 
 ## 当前能力
 
-- 三语博客：首页、文章详情、分类、标签、归档、搜索、关于、友链和文章评论。
+- 三语博客：首页、文章详情、分类、标签、归档、搜索、关于、留言板、友链和文章评论。
 - 首页编排：1 篇置顶、最多 2 篇精选和普通文章列表。
 - 管理后台：文章、分类标签、评论、友链、附件、站点配置、作者资料和统计仪表盘。
 - 身份与权限：ADMIN/DEMO、JWT access token、数据库 refresh token、轮换、退出和改密撤销。
 - 内容与数据：Markdown、评论 HTML 清洗、Flyway V1–V4、14 张表、软删除和审计字段。
-- 运维基础：local/test/prod profile、LOCAL/S3 存储、health endpoint 和 GitHub Actions CI。
+- 运维基础：local/test/prod profile、LOCAL/S3 存储、health endpoint，以及 GitHub Actions CI/CD、GHCR 与 Docker Compose 部署。
 
-当前尚未实现 PASSWORD 文章解锁和博客端留言板。实际生产服务器、代理、备份与回滚拓扑仍需确认，详见[当前状态](docs/handbook/start-here/current-status.md)和[开放问题](docs/handbook/start-here/open-issues.md)。
+当前尚未实现 PASSWORD 文章解锁。`main` 发布会构建带提交 SHA 标签的 GHCR 镜像，并自动部署至 AWS EC2；部署后会对公开 HTTPS 健康端点执行冒烟测试。未解决事项见[开放问题](docs/handbook/start-here/open-issues.md)。
 
 ## 架构
 
@@ -50,6 +50,7 @@ flowchart LR
 | 存储与邮件 | 本地文件 / AWS S3、Resend 可选 |
 | 博客端 | Vue 3、Pinia、Vue Router、vue-i18n、markdown-it、Vite、Vitest |
 | 管理端 | Vue 3、Pinia、Element Plus、ECharts、Vite、Vitest |
+| 交付与部署 | Docker Compose、Caddy、GitHub Actions、GHCR、AWS EC2 / Route 53 / S3 |
 | 测试 | JUnit 5、Spring Boot Test、ArchUnit、H2、Testcontainers |
 
 V2 运行时不依赖 Redis、RabbitMQ、Elasticsearch 或 Quartz。Caffeine 限流按当前单实例前提设计。
@@ -67,7 +68,7 @@ docs/                   当前文档、治理和展示资料
 
 ## 本地运行
 
-要求 JDK 17、Maven 3.9.x、MySQL 8、Node 20.19+ 或兼容的 Node 22+、pnpm 9，以及 `Asia/Tokyo` JVM 时区。
+要求 JDK 17、Maven 3.9.x、MySQL 8、Node 24+、pnpm 9，以及 `Asia/Tokyo` JVM 时区。
 
 ```powershell
 # 后端
@@ -85,7 +86,7 @@ corepack pnpm install --frozen-lockfile
 corepack pnpm dev
 ```
 
-后端需要数据库、JWT 和统计密钥环境变量。完整步骤见[本地启动](docs/handbook/ops/local-development.md)和[环境变量](docs/handbook/ops/environment.md)。本地 MySQL 辅助脚本当前存在 PowerShell 版本兼容问题，使用前先阅读[本地 MySQL 手册](docs/handbook/ops/local-mysql-development.md)。
+后端需要数据库、JWT 和统计密钥环境变量。完整步骤见[本地启动](docs/handbook/ops/local-development.md)、[环境变量](docs/handbook/ops/environment.md)和[本地 MySQL 手册](docs/handbook/ops/local-mysql-development.md)。
 
 ## 验证
 
@@ -111,6 +112,7 @@ corepack pnpm build
 - [API 契约](docs/handbook/api/README.md)
 - [业务规格](docs/handbook/product/README.md)
 - [运行与发布](docs/handbook/ops/README.md)
+- [生产部署方向](docs/handbook/ops/deployment-direction.md)
 
 ## License
 
