@@ -183,6 +183,7 @@ watch(
 const title = computed(() => metaStore.getTitle)
 watchEffect(() => {
   document.title = title.value
+  document.documentElement.lang = appStore.locale
 })
 const pageKey = computed(() => `${route.fullPath}:${appStore.locale}`)
 const theme = computed(() => appStore.theme)
