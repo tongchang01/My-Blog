@@ -2,7 +2,7 @@
 
 [简体中文](README.md) | **English** | [日本語](README.ja.md)
 
-MyBlog V2 is a modular-monolith personal blogging system composed of a Spring Boot API, a public blog, and an independently built admin console. V2 is the active codebase and is live at the [public blog](https://tong-yibin.com) and [admin console](https://admin.tong-yibin.com); V1 source has been removed from the main branch and preserved in the read-only `archive/v1-master-2026-06-26` branch.
+MyBlog V2 is a modular-monolith personal blogging system composed of a Spring Boot API, a public blog, and an independently built admin console. V2 is the active codebase and is live at the [public blog](https://tong-yibin.com) and [admin console](https://admin.tong-yibin.com); V1 history is available in the read-only `archive/v1-master-2026-06-26` branch.
 
 ## Current capabilities
 
@@ -39,8 +39,6 @@ frontend/apps/blog/     V2 public blog
 frontend/apps/admin/    V2 admin console
 docs/                   Current documentation and governance
 ```
-
-Use the read-only `archive/v1-master-2026-06-26` branch when historical V1 implementation details are needed. Do not restore the V1 directories on the active main line.
 
 ## Local development
 

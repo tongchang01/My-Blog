@@ -7,7 +7,7 @@
 ![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5-6DB33F)
 ![Vue](https://img.shields.io/badge/Vue-3-42b883)
 
-MyBlog V2 是一个模块化单体个人博客系统，由 Spring Boot API、公开博客和管理后台三个可独立构建的应用组成。V2 是当前开发主线，已部署到 [公开博客](https://tong-yibin.com) 与 [管理后台](https://admin.tong-yibin.com)；V1 源码已从主线移除，由只读分支 `archive/v1-master-2026-06-26` 保存。
+MyBlog V2 是一个模块化单体个人博客系统，由 Spring Boot API、公开博客和管理后台三个可独立构建的应用组成。V2 是当前开发主线，已部署到 [公开博客](https://tong-yibin.com) 与 [管理后台](https://admin.tong-yibin.com)；V1 历史代码见只读分支 `archive/v1-master-2026-06-26`。
 
 ## 当前能力
 
@@ -63,8 +63,6 @@ frontend/apps/blog/     V2 公开博客
 frontend/apps/admin/    V2 管理后台
 docs/                   当前文档、治理和展示资料
 ```
-
-需要对照 V1 历史实现时，切换到只读分支 `archive/v1-master-2026-06-26`，不要在当前主线恢复 V1 目录。
 
 ## 本地运行
 
