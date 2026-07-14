@@ -1,14 +1,31 @@
 .article-container {
   @apply relative h-full rounded-2xl list-none cursor-pointer transform-gpu;
   &:hover {
-    .article-content span b.article-tag span span,
-    .feature-content span b.article-tag span span{
-      @apply opacity-100 mr-0;
+    .article-content span b.article-tag > span,
+    .feature-content span b.article-tag > span {
+      grid-template-columns: auto 1fr;
+      column-gap: 0.25rem;
+      > span {
+        @apply opacity-100;
+      }
     }
     .article,
     .feature-article {
       transform: scale(1.015);
     }
+  }
+}
+
+.article-content span b.article-tag > span,
+.feature-content span b.article-tag > span {
+  @apply relative z-10 inline-grid items-center text-xs;
+  grid-template-columns: auto 0fr;
+  column-gap: 0;
+  transition: grid-template-columns 0.3s ease, column-gap 0.3s ease;
+
+  > span {
+    @apply min-w-0 overflow-hidden whitespace-nowrap opacity-0;
+    transition: opacity 0.3s ease;
   }
 }
 
@@ -44,16 +61,7 @@
       b {
         @apply text-ob text-xs uppercase cursor-pointer hover:opacity-60;
         &.article-tag {
-          @apply inline-flex items-center relative py-0.5 px-1.5 text-white mr-2 hover:opacity-100 cursor-default;
-          span {
-            @apply relative z-10 text-xs flex items-center gap-1;
-            position: relative;
-            z-index: 10;
-            span {
-              @apply -mr-[28px] opacity-0;
-              transition: 0.3s all ease-in-out;
-            }
-          }
+          @apply inline-flex items-center align-middle relative py-0.5 px-1.5 text-white mr-2 hover:opacity-100 cursor-default;
           &::after {
             @apply absolute top-0 left-0 w-full h-full z-0 opacity-60 rounded-md;
             content: '';
@@ -117,19 +125,7 @@
     b {
       @apply text-ob uppercase hover:opacity-60 cursor-pointer;
       &.article-tag {
-        @apply inline-flex items-center relative py-0.5 px-1.5 text-white mr-3 hover:opacity-100 cursor-default;
-
-        span {
-          @apply relative z-10 text-xs flex items-center gap-1;
-          position: relative;
-          z-index: 10;
-
-          span {
-            @apply -mr-[30px] opacity-0;
-            transition: 0.3s all ease-in-out;
-          }
-        }
-
+        @apply inline-flex items-center align-middle relative py-0.5 px-1.5 text-white mr-3 hover:opacity-100 cursor-default;
         &::after {
           @apply absolute top-0 left-0 w-full h-full z-0 opacity-60 rounded-md;
           content: '';
@@ -147,7 +143,7 @@
       }
     }
     h1 {
-      @apply text-ob-bright text-2xl lg:text-4xl font-extrabold mb-6 lg:mt-4 lg:mb-8 line-clamp-2;
+      @apply text-ob-bright text-2xl lg:text-3xl font-extrabold leading-normal lg:leading-normal mb-6 lg:mt-4 lg:mb-8 line-clamp-2;
     }
     p {
       @apply text-base lg:text-lg pb-4 mb-2 lg:pb-6 lg:mb-2 line-clamp-3;

@@ -14,7 +14,7 @@
 | [`governance/`](governance/README.md) | 分支、提交和仓库协作规则 | 仓库治理的权威文档 |
 | [`showcase/`](showcase/README.md) | 中文、英文、日文项目展示 | 对外介绍，不作为开发依据 |
 
-Git 历史承担计划、评审、迁移过程和废弃说明的追溯。`docs/` 不保留归档副本、已完成计划或旧入口。
+`handbook/` 和 `governance/` 是当前事实来源；`superpowers/` 中的计划与设计稿只用于追溯当时的决策，不得作为当前状态依据。其他历史过程由 Git 追溯。
 
 ## 阅读路径
 

@@ -1,7 +1,7 @@
 {
   "menu": {
     "home": "ホーム",
-    "about": "概要",
+    "about": "プロフィール",
     "archives": "アーカイブ",
     "categories": "カテゴリー",
     "tags": "タグ",
@@ -62,7 +62,6 @@
     "cmd-to-select": "表示",
     "cmd-to-navigate": "選択",
     "cmd-to-close": "閉じる",
-    "searched-by": "検索エンジン",
     "tips-back-to-top": "トップに戻る",
     "tips-open-menu": "メニューを開く",
     "tips-back-to-home": "ホームに戻る",

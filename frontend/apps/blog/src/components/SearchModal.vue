@@ -209,23 +209,6 @@
           <p>{{ t('settings.no-search-result') }}</p>
         </div>
         <div class="search-footer">
-          <div class="search-logo">
-            <a
-              href="https://www.algolia.com/docsearch"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span class="search-label">{{ t('settings.searched-by') }}</span>
-              <img
-                class="mr-1.5"
-                src="https://res.cloudinary.com/tridiamond/image/upload/v1625037705/ObsidianestLogo-hex_hecqbw.png"
-                alt="ObsidianNext Logo"
-                height="20"
-                width="20"
-              />
-              <span class="text-ob">Aurora</span>
-            </a>
-          </div>
           <ul class="search-commands">
             <li>
               <span class="search-commands-key">
@@ -310,13 +293,7 @@ import type { ArticleCardViewModel } from '@/features/articles/model'
 import { SearchResultType } from '@/models/Search.class'
 import { useAppStore } from '@/stores/app'
 import { useSearchStore } from '@/stores/search'
-import {
-  computed,
-  onMounted,
-  onUnmounted,
-  ref,
-  watch
-} from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 

@@ -11,6 +11,10 @@ const featureSources = [
   resolve(currentDir, '../../Feature/src/Feature.vue'),
   resolve(currentDir, '../../Feature/src/FeatureList.vue')
 ].map(file => readFileSync(file, 'utf8'))
+const articleStyles = readFileSync(
+  resolve(currentDir, '../../../styles/components/article.scss'),
+  'utf8'
+)
 
 describe('article card comment labels', () => {
   it('uses the localized comments label in every card variant', () => {
@@ -30,5 +34,18 @@ describe('article card comment labels', () => {
     expect(sources[1]).toContain('class="inline-flex items-center"')
     expect(featureSources[0]).toContain(':badge="badge"')
     expect(featureSources[1]).toContain('badge="featured"')
+  })
+
+  it('aligns badges with categories and keeps feature titles within the card', () => {
+    expect(articleStyles).toContain('align-middle')
+    expect(articleStyles).toContain('lg:text-3xl')
+    expect(articleStyles).not.toContain('lg:text-4xl font-extrabold')
+  })
+
+  it('collapses localized badge text without a fixed negative margin', () => {
+    expect(articleStyles).toContain('grid-template-columns: auto 0fr')
+    expect(articleStyles).toContain('grid-template-columns: auto 1fr')
+    expect(articleStyles).not.toContain('-mr-[28px]')
+    expect(articleStyles).not.toContain('-mr-[30px]')
   })
 })

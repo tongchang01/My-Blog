@@ -26,10 +26,6 @@
     <MobileMenu />
   </template>
   <SearchModal />
-  <teleport to="head">
-    <title>{{ title }}</title>
-  </teleport>
-
   <VueEasyLightbox
     v-if="lightBoxVisible"
     :visible="lightBoxVisible"
@@ -51,7 +47,8 @@ import {
   onMounted,
   onUnmounted,
   ref,
-  watch
+  watch,
+  watchEffect
 } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
@@ -184,6 +181,10 @@ watch(
 )
 
 const title = computed(() => metaStore.getTitle)
+watchEffect(() => {
+  document.title = title.value
+  document.documentElement.lang = appStore.locale
+})
 const pageKey = computed(() => `${route.fullPath}:${appStore.locale}`)
 const theme = computed(() => appStore.theme)
 const headerImage = computed(() => {

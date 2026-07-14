@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 开发、测试、CI 与仓库维护
-> 最后校准：2026-07-11
+> 最后校准：2026-07-14
 > 对应代码：`.github/workflows/ci.yml`、`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：可复用工程经验
 
@@ -56,6 +56,20 @@
 - 根因：三套重型验证同时竞争本机 CPU 和内存，Vitest 工作进程没有稳定完成。
 - 处理：安装和轻量检查可以并行；Maven 全量测试、前端完整测试和生产构建按资源情况分批或顺序执行。进程无失败断言却异常退出时，先在无资源竞争条件下复现，再判断是否需要修改代码。
 - 相关：`../ops/build-and-test.md`。
+
+## P-008：本地前端代理到生产 API 会保留 localhost Origin
+
+- 现象：本地 Vite 前端把代理目标临时指向生产域名后，公开访问打点请求返回 `403 Invalid CORS request`；线上同一页面正常。
+- 根因：Vite 代理转发浏览器的 `Origin: http://localhost:<port>`。生产 CORS 只允许真实站点 origin，这正是预期的安全边界，不是统计接口或 Axios 的故障。
+- 处理：本地联调优先启动本地后端；需要临时连生产时接受受限接口失败，或在受控调试窗口明确增加临时 origin 并在结束后撤销。不得为了本地便利把生产 CORS 放宽为任意来源。
+- 相关：`../ops/local-development.md`、`../rules/security-baseline.md`。
+
+## P-009：GitHub Actions 警告不能替代失败诊断
+
+- 现象：`aws-actions/configure-aws-credentials@v5` 提示其 Node 20 运行时已弃用，但 deploy job 仍在 GitHub Hosted Runner 的 Node 24 兼容层成功完成。
+- 根因：action 运行时迁移提示与当前工作流失败是两件事；把 warning 当作失败原因会掩盖真正的 OIDC、SSH、镜像或公网冒烟问题。
+- 处理：先查看失败 job 的完整日志和失败步骤；action 大版本升级单独提交并重新验证 OIDC、临时 SSH 放行/撤销和公网冒烟，不设置不安全的 Node 20 回退开关。
+- 相关：`../ops/ci-cd.md`、`../ops/github-ssh-cd.md`。
 
 ## 维护规则
 

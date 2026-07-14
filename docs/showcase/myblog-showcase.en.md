@@ -4,7 +4,7 @@ MyBlog V2 is a full-stack personal blogging system composed of a public blog, an
 
 ## Product capabilities
 
-The public blog supports Chinese, Japanese, and English interfaces, home-page curation, article detail, categories, tags, archives, search, about content, friend links, article comments, author profile, and traffic statistics. Article URLs use a stable numeric ID with an optional readable slug.
+The public blog supports Chinese, Japanese, and English interfaces, home-page curation, article detail, categories, tags, archives, search, about content, friend links, a guestbook, article comments, author profile, and traffic statistics. Article URLs use a stable numeric ID with an optional readable slug.
 
 The admin console covers authentication sessions, a traffic dashboard, article publishing and scheduling, pinned and featured slots, taxonomy, comment moderation, friend links, attachments, site settings, and author profile. ADMIN can read and write; DEMO is read-only and receives server-side sensitive-field redaction.
 
@@ -18,9 +18,9 @@ Both frontends use Vue 3, TypeScript, Pinia, Vite, and Vitest. The blog evolved 
 
 ## Current boundaries
 
-PASSWORD articles currently expose locked metadata but have no public unlock flow. Guestbook APIs exist, but the blog has no guestbook page. Full SEO/feed support, Spotify Embed, automated CD, and multi-instance coordination are demand-triggered extensions rather than current capabilities.
+PASSWORD articles currently expose locked metadata but have no public unlock flow. Full SEO/feed support, Spotify Embed, and multi-instance coordination are demand-triggered extensions rather than current capabilities.
 
-The production topology is not yet bound to a specific server. The repository already provides a prod profile, S3 support, health checks, CI, and a release checklist; the next operational milestone is validating the real proxy, database recovery, storage, and rollback path.
+Production runs on AWS EC2: Docker Compose hosts MySQL, the API, and Caddy, while S3 stores attachments. GitHub Actions builds GHCR images and uses GitHub OIDC plus restricted SSH to deploy the same commit SHA. Public HTTPS health checks run after deployment; database recovery, the full S3 path, and rollback drills still require ongoing validation.
 
 ## What the project demonstrates
 

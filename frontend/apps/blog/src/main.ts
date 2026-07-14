@@ -4,7 +4,6 @@ import { createApp } from 'vue'
 // also it's a much simpler State Management setup
 import { createPinia } from 'pinia'
 
-import 'highlight.js/styles/vs2015.css'
 import '@/styles/index.scss'
 import 'katex/dist/katex.min.css'
 
@@ -35,10 +34,3 @@ registerObSkeleton(app)
 registerScrollSpy(app)
 
 app.mount('#app')
-
-console.log(
-  '%c Aurora is developed by Benny Guo (三钻)%c',
-  'background:#24272A; color:#73ddd7',
-  '',
-  'https://github.com/auroral-ui/hexo-theme-aurora'
-)
