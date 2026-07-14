@@ -8,6 +8,7 @@
 /* Components css */
 @tailwind components;
 @include meta.load-css('./components/article');
+@include meta.load-css('./components/code-highlight');
 @include meta.load-css('./components/sidebar-box');
 @include meta.load-css('./components/search-modal');
 

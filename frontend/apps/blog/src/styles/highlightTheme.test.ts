@@ -5,12 +5,20 @@ const source = (path: string) =>
   readFileSync(new URL(path, import.meta.url), 'utf8').replace(/\r\n/g, '\n')
 
 describe('代码高亮主题', () => {
-  it('使用 Highlight.js 内置的 VS 深色主题，而不是维护不完整的手写 token 配色', () => {
-    expect(source('../main.ts')).toContain(
-      "import 'highlight.js/styles/vs2015.css'"
+  it('按站点明暗主题加载 Highlight.js 内置的 GitHub 配色', () => {
+    expect(source('./index.scss')).toContain(
+      "meta.load-css('./components/code-highlight')"
     )
-    expect(source('./components/article.scss')).not.toMatch(
-      /\.hljs-comment,\n\s*\.hljs-quote/
+    expect(source('../main.ts')).not.toContain('highlight.js/styles/')
+
+    const themeStyles = source('./components/code-highlight.scss')
+    expect(themeStyles).toContain(
+      "body.theme-dark {\n  @include meta.load-css('highlight.js/styles/github-dark')"
     )
+    expect(themeStyles).toContain(
+      "body.theme-light {\n  @include meta.load-css('highlight.js/styles/github')"
+    )
+    expect(themeStyles).toContain('background: #f6f8fa')
+    expect(themeStyles).toContain('border-color: #d0d7de')
   })
 })
