@@ -12,9 +12,12 @@ export const useMetaStore = defineStore('metaStore', () => {
 
   const getTitle = computed(() => {
     const appStore = useAppStore()
-    const subtitle = appStore.themeConfig.site.subtitle || 'Blog'
-    if (title.value === '') return subtitle
-    return `${title.value} | ${subtitle}`
+    const siteTitle = appStore.siteTitle || 'Blog'
+    const siteSubtitle = appStore.siteSubtitle
+    if (title.value === '') {
+      return siteSubtitle ? `${siteTitle} · ${siteSubtitle}` : siteTitle
+    }
+    return `${title.value} · ${siteTitle}`
   })
 
   const setTitle = (newTitle: string): void => {

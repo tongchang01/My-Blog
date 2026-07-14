@@ -59,13 +59,11 @@ import { useArticleStore } from '@/features/articles/store'
 import { isSupportedLocale } from '@/shared/i18n/locale'
 import { useAppStore } from '@/stores/app'
 import { useMetaStore } from '@/stores/meta'
-import usePageTitle from '@/hooks/usePageTitle'
 
-useMetaStore().setTitle('home')
+useMetaStore().setTitle('')
 const route = useRoute()
 const appStore = useAppStore()
 const articleStore = useArticleStore()
-const { updateTitleByText } = usePageTitle()
 const DEFAULT_PAGE_SIZE = 12
 
 const currentLocale = computed(() =>
@@ -116,7 +114,6 @@ const loadHome = async () => {
 
 onMounted(async () => {
   await loadHome()
-  updateTitleByText(appStore.siteSubtitle ?? '')
 })
 
 watch(
