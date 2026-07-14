@@ -44,7 +44,7 @@
       b {
         @apply text-ob text-xs uppercase cursor-pointer hover:opacity-60;
         &.article-tag {
-          @apply inline-flex items-center relative py-0.5 px-1.5 text-white mr-2 hover:opacity-100 cursor-default;
+          @apply inline-flex items-center align-middle relative py-0.5 px-1.5 text-white mr-2 hover:opacity-100 cursor-default;
           span {
             @apply relative z-10 text-xs flex items-center gap-1;
             position: relative;
@@ -117,7 +117,7 @@
     b {
       @apply text-ob uppercase hover:opacity-60 cursor-pointer;
       &.article-tag {
-        @apply inline-flex items-center relative py-0.5 px-1.5 text-white mr-3 hover:opacity-100 cursor-default;
+        @apply inline-flex items-center align-middle relative py-0.5 px-1.5 text-white mr-3 hover:opacity-100 cursor-default;
 
         span {
           @apply relative z-10 text-xs flex items-center gap-1;
@@ -147,7 +147,7 @@
       }
     }
     h1 {
-      @apply text-ob-bright text-2xl lg:text-4xl font-extrabold mb-6 lg:mt-4 lg:mb-8 line-clamp-2;
+      @apply text-ob-bright text-2xl lg:text-3xl font-extrabold leading-normal lg:leading-normal mb-6 lg:mt-4 lg:mb-8 line-clamp-2;
     }
     p {
       @apply text-base lg:text-lg pb-4 mb-2 lg:pb-6 lg:mb-2 line-clamp-3;
