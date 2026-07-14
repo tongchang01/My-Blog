@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：Windows PowerShell 本地开发
-> 最后校准：2026-07-13
+> 最后校准：2026-07-14
 > 对应代码：`MyBlog-springboot-v2/src/main/resources/application-local.yml`、`frontend/apps/blog/.env`、`frontend/apps/admin/.env.development`
 > 权威程度：运行手册
 
@@ -53,6 +53,7 @@ corepack pnpm dev
 - JVM 时区错误：为 Maven/JVM 设置 `-Duser.timezone=Asia/Tokyo`。
 - 数据库认证或公钥错误：检查用户名、密码和 local JDBC URL；默认 URL 已包含 `allowPublicKeyRetrieval=true` 与 JST session 参数。
 - 管理端请求直连错误地址：确认 `.env.development` 的 API base 为空、代理目标指向后端。
+- 本地代理临时指向生产 API 后出现 `403 Invalid CORS request`：生产端拒绝 `localhost` origin 是预期行为；优先改回本地后端，不要放宽生产 CORS。
 - 端口冲突：博客端可由 Vite 自动选择其他端口；管理端端口来自 `VITE_PORT`。
 
 验证命令见 `build-and-test.md`，安全初始化数据库见 `local-mysql-development.md`。
