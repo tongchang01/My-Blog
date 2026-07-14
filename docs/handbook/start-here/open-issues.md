@@ -36,7 +36,7 @@
 ## ISSUE-007：前端构建债务
 
 - 优先级：P3，非发布阻塞。
-- 现状：博客已消除 Sass legacy API 与 `@import` 弃用提示，主 chunk 仍约 477 kB（gzip 约 182 kB）；管理端 bundle 较大，Browserslist 与 baseline 数据提示过期。
+- 现状：博客已消除 Sass legacy API 与 `@import` 弃用提示；2026-07-14 的生产构建仍报告多个压缩前超过 500 kB 的 JavaScript chunk。管理端 bundle 较大，Browserslist 与 baseline 数据提示过期。
 - 完成条件：评估代码分包、依赖数据更新和性能预算，避免与业务功能提交混合。
 
 ## ISSUE-008：博客端非阻塞体验补齐
