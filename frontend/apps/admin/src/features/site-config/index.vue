@@ -414,12 +414,12 @@ onMounted(initialize);
 
   .settings-grid {
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: 16px;
   }
 
   .about-grid {
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: 16px;
   }
 }
 </style>

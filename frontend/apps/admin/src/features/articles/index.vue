@@ -633,7 +633,7 @@ onMounted(initialize);
 
   .filter-grid {
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: 16px;
   }
 
   .filter-date-range {
