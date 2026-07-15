@@ -44,15 +44,12 @@ const stubs = {
   "el-button": { template: "<button><slot /></button>" },
   "el-card": { template: "<div><slot name='header' /><slot /></div>" },
   "el-date-picker": true,
-  "el-descriptions": true,
-  "el-descriptions-item": true,
   "el-empty": true,
   "el-skeleton": true,
   "el-statistic": {
     props: ["value"],
     template: "<div><slot name='title' />{{ value }}<slot /></div>"
   },
-  "el-tag": true
 };
 
 function setUser(type: "ADMIN" | "DEMO" = "ADMIN") {
@@ -120,6 +117,9 @@ describe("admin dashboard", () => {
       wrapper.get('[data-testid="dashboard-metric-today-uv"]').text()
     ).toContain("34");
     expect(
+      wrapper.find('[data-testid="dashboard-metric-average-daily-uv"]').exists()
+    ).toBe(false);
+    expect(
       wrapper
         .get('[data-testid="dashboard-top-article-9007199254743001"]')
         .text()
@@ -130,12 +130,6 @@ describe("admin dashboard", () => {
     expect(wrapper.find('[data-testid="dashboard-trend-chart"]').exists()).toBe(
       true
     );
-    expect(
-      wrapper.find('[data-testid="dashboard-top-articles-chart"]').exists()
-    ).toBe(true);
-    expect(
-      wrapper.find('[data-testid="dashboard-language-chart"]').exists()
-    ).toBe(true);
     expect(mock.history.get[0].params).toEqual({
       from: undefined,
       to: undefined
