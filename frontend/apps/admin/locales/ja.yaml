@@ -392,6 +392,11 @@ friendLinks:
     url: http または https のURLを入力してください
     maxLength: 値がサーバーの最大長を超えています
     sortOrderRange: 並び順は 0 から 1000000 の整数で入力してください
+  feedback:
+    saved: 友リンクを保存しました
+    statusUpdated: 表示状態を更新しました
+    sortSaved: 並び順を保存しました
+    deleted: 友リンクを削除しました
   errors:
     load: 友リンク一覧の読み込みに失敗しました。再試行してください
     operation: 友リンク操作に失敗しました。再試行してください

@@ -392,6 +392,11 @@ friendLinks:
     url: Enter an http or https URL
     maxLength: The value exceeds the server maximum length
     sortOrderRange: Sort order must be an integer from 0 to 1000000
+  feedback:
+    saved: Friend link saved
+    statusUpdated: Visibility updated
+    sortSaved: Sort order saved
+    deleted: Friend link deleted
   errors:
     load: Failed to load friend links. Please retry.
     operation: Friend link operation failed. Please retry.

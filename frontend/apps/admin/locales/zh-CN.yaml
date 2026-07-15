@@ -392,6 +392,11 @@ friendLinks:
     url: 请输入 http 或 https 地址
     maxLength: 内容超过服务端允许的最大长度
     sortOrderRange: 排序值必须是 0 到 1000000 之间的整数
+  feedback:
+    saved: 友链已保存
+    statusUpdated: 显示状态已更新
+    sortSaved: 排序已保存
+    deleted: 友链已删除
   errors:
     load: 友链列表加载失败，请重试
     operation: 友链操作失败，请重试
