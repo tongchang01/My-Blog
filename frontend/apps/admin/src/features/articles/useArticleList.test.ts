@@ -93,11 +93,26 @@ describe("article list state", () => {
     const state = useArticleList(source);
     state.filters.titleKeyword = "Vue";
     state.filters.status = "PUBLISHED";
+    state.filters.categoryId = "100";
+    state.filters.tagId = "200";
+    state.filters.createdFrom = "2026-07-01T00:00:00";
+    state.filters.createdTo = "2026-07-02T00:00:00";
+    state.filters.publishFrom = "2026-07-03T00:00:00";
+    state.filters.publishTo = "2026-07-04T00:00:00";
     state.filters.page = 3;
 
     await state.search();
     expect(source.listArticles).toHaveBeenLastCalledWith(
-      expect.objectContaining({ page: 1, titleKeyword: "Vue" })
+      expect.objectContaining({
+        page: 1,
+        titleKeyword: "Vue",
+        categoryId: "100",
+        tagId: "200",
+        createdFrom: "2026-07-01T00:00:00",
+        createdTo: "2026-07-02T00:00:00",
+        publishFrom: "2026-07-03T00:00:00",
+        publishTo: "2026-07-04T00:00:00"
+      })
     );
 
     state.filters.page = 2;
@@ -110,6 +125,12 @@ describe("article list state", () => {
     expect(state.filters).toMatchObject({
       titleKeyword: "",
       status: "ALL",
+      categoryId: "",
+      tagId: "",
+      createdFrom: "",
+      createdTo: "",
+      publishFrom: "",
+      publishTo: "",
       page: 1,
       size: 20
     });
@@ -140,6 +161,18 @@ describe("article list state", () => {
 
     expect(state.error.value?.message).toBe("offline");
     expect(state.loading.value).toBe(false);
+  });
+
+  it("does not send an invalid date range", async () => {
+    const source = api();
+    const state = useArticleList(source);
+    state.filters.createdFrom = "2026-07-02T00:00:00";
+    state.filters.createdTo = "2026-07-01T00:00:00";
+
+    await state.search();
+
+    expect(source.listArticles).not.toHaveBeenCalled();
+    expect(state.filterError.value).toBe(true);
   });
 
   it("keeps the latest response when an older request finishes last", async () => {

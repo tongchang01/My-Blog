@@ -139,6 +139,7 @@ watch(
   () => form.status,
   status => {
     if (status !== "PUBLISHED") form.homepageSlot = "NONE";
+    if (status !== "PASSWORD") form.password = "";
   }
 );
 
@@ -318,8 +319,19 @@ onBeforeRouteLeave((_to, _from, next) => {
             {{ transformI18n("articles.editor.homepageSlotHint") }}
           </p>
         </el-form-item>
-        <el-form-item :label="transformI18n('articles.editor.slug')">
-          <el-input v-model="form.slug" placeholder="article-slug" />
+        <el-form-item
+          :label="transformI18n('articles.editor.slug')"
+          :error="fieldError('slug')"
+        >
+          <el-input
+            v-model="form.slug"
+            maxlength="160"
+            placeholder="article-slug"
+            @blur="form.slug = form.slug.trim().toLowerCase()"
+          />
+          <p class="field-hint">
+            {{ transformI18n("articles.editor.slugHint") }}
+          </p>
         </el-form-item>
         <el-form-item
           :label="transformI18n('articles.editor.category')"
@@ -334,8 +346,17 @@ onBeforeRouteLeave((_to, _from, next) => {
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="transformI18n('articles.editor.tags')">
-          <el-select v-model="form.tagIds" multiple clearable class="full-width">
+        <el-form-item
+          :label="transformI18n('articles.editor.tags')"
+          :error="fieldError('tagIds')"
+        >
+          <el-select
+            v-model="form.tagIds"
+            multiple
+            :multiple-limit="20"
+            clearable
+            class="full-width"
+          >
             <el-option
               v-for="tag in tags"
               :key="tag.id"
@@ -343,6 +364,10 @@ onBeforeRouteLeave((_to, _from, next) => {
               :value="tag.id"
             />
           </el-select>
+          <p class="field-hint">
+            {{ transformI18n("articles.editor.tagLimit") }}
+            {{ form.tagIds.length }}/20
+          </p>
         </el-form-item>
         <el-form-item :label="transformI18n('articles.editor.cover')">
           <div class="cover-selector">
@@ -365,6 +390,9 @@ onBeforeRouteLeave((_to, _from, next) => {
                   {{ form.coverUrl }}
                 </a>
               </div>
+              <p class="field-hint">
+                {{ transformI18n("articles.editor.coverActiveHint") }}
+              </p>
             </div>
             <p v-else class="field-hint">
               {{ transformI18n("articles.editor.coverEmpty") }}
@@ -399,6 +427,9 @@ onBeforeRouteLeave((_to, _from, next) => {
             value-format="YYYY-MM-DDTHH:mm:ss"
             class="full-width"
           />
+          <p class="field-hint">
+            {{ transformI18n("articles.editor.publishAtHint") }}
+          </p>
         </el-form-item>
         <el-form-item
           v-if="form.status === 'PASSWORD'"
@@ -406,8 +437,14 @@ onBeforeRouteLeave((_to, _from, next) => {
           :error="fieldError('password')"
         >
           <el-input v-model="form.password" type="password" show-password />
-          <p v-if="mode === 'edit'" class="field-hint">
-            {{ transformI18n("articles.editor.passwordKeepHint") }}
+          <p class="field-hint">
+            {{
+              transformI18n(
+                mode === "edit"
+                  ? "articles.editor.passwordKeepHint"
+                  : "articles.editor.passwordStatusHint"
+              )
+            }}
           </p>
         </el-form-item>
       </el-card>

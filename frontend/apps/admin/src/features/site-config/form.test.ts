@@ -53,11 +53,24 @@ describe("site config form", () => {
     });
   });
 
-  it("requires all three site titles", () => {
+  it("requires only the Chinese title", () => {
     expect(validateSiteConfigForm(createSiteConfigForm())).toEqual({
-      siteTitleZh: "required",
-      siteTitleJa: "required",
-      siteTitleEn: "required"
+      siteTitleZh: "required"
+    });
+  });
+
+  it("validates backend field limits, URLs and Spotify IDs before a full PUT", () => {
+    expect(
+      validateSiteConfigForm({
+        ...siteConfigToForm(config),
+        siteTitleZh: "x".repeat(129),
+        logoUrl: "ftp://example.com/logo.png",
+        spotifyPlaylistId: "invalid id"
+      })
+    ).toEqual({
+      siteTitleZh: "maxLength",
+      logoUrl: "url",
+      spotifyPlaylistId: "spotifyId"
     });
   });
 

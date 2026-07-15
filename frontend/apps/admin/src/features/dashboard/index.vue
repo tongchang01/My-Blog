@@ -11,6 +11,7 @@ import type { ECharts } from "echarts/core";
 import echarts from "@/plugins/echarts";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { lastDaysFilters } from "./query";
 import { useStatsDashboard } from "./useStatsDashboard";
 
 defineOptions({ name: "Dashboard" });
@@ -20,8 +21,21 @@ const user = computed(() => userStore.currentUser);
 const displayName = computed(
   () => user.value?.profile.nickname || user.value?.username || "-"
 );
-const { dashboard, loading, error, isEmpty, refresh, load } =
+const { filters, dashboard, loading, error, filterError, isEmpty, refresh, load } =
   useStatsDashboard();
+const dateRange = computed({
+  get: () =>
+    filters.value.from && filters.value.to
+      ? [filters.value.from, filters.value.to]
+      : [],
+  set: (range: string[] | null) => {
+    if (range?.length === 2) {
+      [filters.value.from, filters.value.to] = range;
+      return;
+    }
+    filters.value = {};
+  }
+});
 const trendChartRef = ref<HTMLElement | null>(null);
 const topArticlesChartRef = ref<HTMLElement | null>(null);
 const languageChartRef = ref<HTMLElement | null>(null);
@@ -33,6 +47,16 @@ function languageLabel(language: string): string {
 
 function ratioLabel(ratio: number): string {
   return `${(ratio * 100).toFixed(1)}%`;
+}
+
+function loadLastDays(days: number): void {
+  filters.value = lastDaysFilters(days);
+  void load();
+}
+
+function resetFilters(): void {
+  filters.value = {};
+  void load();
 }
 
 function chartFor(element: HTMLElement): ECharts {
@@ -144,6 +168,41 @@ onBeforeUnmount(() => {
       </el-descriptions>
     </el-card>
 
+    <el-card data-testid="dashboard-filter" class="mt-4" shadow="never">
+      <div class="dashboard-filter">
+        <el-date-picker
+          v-model="dateRange"
+          data-testid="dashboard-date-range"
+          type="daterange"
+          value-format="YYYY-MM-DD"
+          clearable
+        />
+        <el-button data-testid="dashboard-last-7" @click="loadLastDays(7)">
+          {{ transformI18n("dashboard.filter.last7") }}
+        </el-button>
+        <el-button data-testid="dashboard-last-30" @click="loadLastDays(30)">
+          {{ transformI18n("dashboard.filter.last30") }}
+        </el-button>
+        <el-button type="primary" @click="load">
+          {{ transformI18n("articles.actions.search") }}
+        </el-button>
+        <el-button @click="resetFilters">
+          {{ transformI18n("articles.actions.reset") }}
+        </el-button>
+      </div>
+      <p v-if="!filters.from" data-testid="dashboard-default-period">
+        {{ transformI18n("dashboard.filter.defaultPeriod") }}
+      </p>
+      <el-alert
+        v-if="filterError"
+        data-testid="dashboard-filter-error"
+        type="error"
+        :closable="false"
+        :title="transformI18n(`dashboard.filter.errors.${filterError}`)"
+        show-icon
+      />
+    </el-card>
+
     <el-skeleton
       v-if="loading && !dashboard"
       data-testid="dashboard-loading"
@@ -234,7 +293,11 @@ onBeforeUnmount(() => {
               :data-testid="`dashboard-top-article-${article.articleId}`"
             >
               <span>{{ article.title || article.articleId }}</span>
-              <span>PV {{ article.pv }} / UV {{ article.dailyUvSum }}</span>
+              <span>
+                PV {{ article.pv }} /
+                {{ transformI18n("dashboard.dailyUvSum") }}
+                {{ article.dailyUvSum }}
+              </span>
             </li>
           </ul>
         </el-card>
@@ -267,6 +330,19 @@ onBeforeUnmount(() => {
 <style scoped lang="scss">
 .dashboard-page {
   padding: 20px;
+}
+
+.dashboard-filter {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.dashboard-filter + p {
+  margin: 12px 0 0;
+  font-size: 13px;
+  color: var(--el-text-color-secondary);
 }
 
 .metric-grid,

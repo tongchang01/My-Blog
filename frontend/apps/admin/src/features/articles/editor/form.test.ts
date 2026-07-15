@@ -62,7 +62,7 @@ describe("article editor form", () => {
   it("normalizes optional values and preserves large id strings", () => {
     const form = articleDetailToForm(detail);
     form.titleJa = "  ";
-    form.slug = "  custom-slug  ";
+    form.slug = "  Custom-Slug  ";
     form.password = "  ";
     form.tagIds = ["9007199254741202", "9007199254741202"];
 
@@ -86,13 +86,9 @@ describe("article editor form", () => {
     expect(articleFormToPayload(form)).not.toHaveProperty("coverUrl");
   });
 
-  it("validates required content and status-specific fields", () => {
+  it("keeps drafts minimal and validates non-draft rules", () => {
     const empty = createEmptyArticleForm();
-    expect(validateArticleForm(empty, "create")).toEqual({
-      titleZh: "required",
-      summaryZh: "required",
-      body: "required"
-    });
+    expect(validateArticleForm(empty, "create")).toEqual({});
 
     const scheduled = {
       ...empty,
@@ -121,5 +117,24 @@ describe("article editor form", () => {
         "edit"
       )
     ).toEqual({ categoryId: "categoryRequired" });
+  });
+
+  it("checks scheduled time, tag limit and slug before sending", () => {
+    const form = {
+      ...createEmptyArticleForm(),
+      titleZh: "标题",
+      body: "正文",
+      categoryId: "10",
+      status: "SCHEDULED" as const,
+      publishAt: "2000-01-01T00:00:00",
+      tagIds: Array.from({ length: 21 }, (_, index) => String(index + 1)),
+      slug: "not valid"
+    };
+
+    expect(validateArticleForm(form, "create")).toEqual({
+      publishAt: "scheduledFuture",
+      tagIds: "tagLimit",
+      slug: "slugFormat"
+    });
   });
 });

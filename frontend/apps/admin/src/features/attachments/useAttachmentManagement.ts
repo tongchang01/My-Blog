@@ -33,6 +33,8 @@ const defaultApi: AttachmentManagementApi = {
   restoreAttachment
 };
 
+export const MAX_ATTACHMENT_UPLOAD_BYTES = 10 * 1024 * 1024;
+
 function asError(error: unknown): Error {
   return error instanceof Error ? error : new Error(String(error));
 }
@@ -94,6 +96,11 @@ export function useAttachmentManagement(
   async function upload(file: File): Promise<boolean> {
     uploading.value = true;
     uploadError.value = null;
+    if (file.size > MAX_ATTACHMENT_UPLOAD_BYTES) {
+      uploadError.value = new Error("FILE_TOO_LARGE");
+      uploading.value = false;
+      return false;
+    }
     try {
       await api.uploadAttachment(file);
       pagination.page = 1;

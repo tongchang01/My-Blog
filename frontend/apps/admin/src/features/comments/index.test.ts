@@ -121,6 +121,7 @@ describe("comment management page", () => {
     expect(
       wrapper.find('[data-testid="comment-approve-9007199254740995"]').exists()
     ).toBe(true);
+    expect(wrapper.text()).toContain("Audit details");
 
     await wrapper
       .get('[data-testid="comment-approve-9007199254740995"]')

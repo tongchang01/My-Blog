@@ -120,39 +120,50 @@ onMounted(initialize);
           show-icon
         />
 
+        <p class="field-hint">
+          {{ transformI18n("settings.siteConfig.fullReplaceHint") }}
+        </p>
+
         <el-form :model="form" label-position="top" class="settings-grid">
           <el-form-item
             :label="transformI18n('settings.siteConfig.siteTitleZh')"
             :error="fieldError('siteTitleZh')"
           >
-            <el-input v-model="form.siteTitleZh" :disabled="readonly" />
+          <el-input v-model="form.siteTitleZh" :disabled="readonly" maxlength="128" show-word-limit />
           </el-form-item>
           <el-form-item
             :label="transformI18n('settings.siteConfig.siteTitleJa')"
             :error="fieldError('siteTitleJa')"
           >
-            <el-input v-model="form.siteTitleJa" :disabled="readonly" />
+            <el-input v-model="form.siteTitleJa" :disabled="readonly" maxlength="128" show-word-limit />
+            <p class="field-hint">
+              {{ transformI18n("settings.siteConfig.fallbackHint") }}
+            </p>
           </el-form-item>
           <el-form-item
             :label="transformI18n('settings.siteConfig.siteTitleEn')"
             :error="fieldError('siteTitleEn')"
           >
-            <el-input v-model="form.siteTitleEn" :disabled="readonly" />
+            <el-input v-model="form.siteTitleEn" :disabled="readonly" maxlength="128" show-word-limit />
+            <p class="field-hint">
+              {{ transformI18n("settings.siteConfig.fallbackHint") }}
+            </p>
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.siteConfig.siteSubtitleZh')">
-            <el-input v-model="form.siteSubtitleZh" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.siteConfig.siteSubtitleZh')" :error="fieldError('siteSubtitleZh')">
+            <el-input v-model="form.siteSubtitleZh" :disabled="readonly" maxlength="255" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.siteConfig.siteSubtitleJa')">
-            <el-input v-model="form.siteSubtitleJa" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.siteConfig.siteSubtitleJa')" :error="fieldError('siteSubtitleJa')">
+            <el-input v-model="form.siteSubtitleJa" :disabled="readonly" maxlength="255" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.siteConfig.siteSubtitleEn')">
-            <el-input v-model="form.siteSubtitleEn" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.siteConfig.siteSubtitleEn')" :error="fieldError('siteSubtitleEn')">
+            <el-input v-model="form.siteSubtitleEn" :disabled="readonly" maxlength="255" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.siteConfig.logoUrl')">
+          <el-form-item :label="transformI18n('settings.siteConfig.logoUrl')" :error="fieldError('logoUrl')">
             <div class="image-url-field">
               <el-input
                 v-model="form.logoUrl"
                 :disabled="readonly"
+                maxlength="255"
                 :placeholder="transformI18n('settings.image.currentUrl')"
               />
               <div v-if="form.logoUrl" class="image-preview">
@@ -180,11 +191,12 @@ onMounted(initialize);
               </div>
             </div>
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.siteConfig.faviconUrl')">
+          <el-form-item :label="transformI18n('settings.siteConfig.faviconUrl')" :error="fieldError('faviconUrl')">
             <div class="image-url-field">
               <el-input
                 v-model="form.faviconUrl"
                 :disabled="readonly"
+                maxlength="255"
                 :placeholder="transformI18n('settings.image.currentUrl')"
               />
               <div v-if="form.faviconUrl" class="image-preview">
@@ -212,11 +224,11 @@ onMounted(initialize);
               </div>
             </div>
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.siteConfig.icpNo')">
-            <el-input v-model="form.icpNo" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.siteConfig.icpNo')" :error="fieldError('icpNo')">
+            <el-input v-model="form.icpNo" :disabled="readonly" maxlength="64" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.siteConfig.spotifyPlaylistId')">
-            <el-input v-model="form.spotifyPlaylistId" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.siteConfig.spotifyPlaylistId')" :error="fieldError('spotifyPlaylistId')">
+            <el-input v-model="form.spotifyPlaylistId" :disabled="readonly" maxlength="64" show-word-limit />
           </el-form-item>
           <el-form-item :label="transformI18n('settings.siteConfig.startedDate')">
             <el-date-picker
@@ -238,14 +250,14 @@ onMounted(initialize);
           <h2>{{ transformI18n("settings.siteConfig.about") }}</h2>
         </template>
         <el-form :model="form" label-position="top">
-          <el-form-item :label="transformI18n('settings.siteConfig.aboutMdZh')">
-            <el-input v-model="form.aboutMdZh" type="textarea" :rows="5" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.siteConfig.aboutMdZh')" :error="fieldError('aboutMdZh')">
+            <el-input v-model="form.aboutMdZh" type="textarea" :rows="5" :disabled="readonly" maxlength="50000" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.siteConfig.aboutMdJa')">
-            <el-input v-model="form.aboutMdJa" type="textarea" :rows="5" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.siteConfig.aboutMdJa')" :error="fieldError('aboutMdJa')">
+            <el-input v-model="form.aboutMdJa" type="textarea" :rows="5" :disabled="readonly" maxlength="50000" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.siteConfig.aboutMdEn')">
-            <el-input v-model="form.aboutMdEn" type="textarea" :rows="5" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.siteConfig.aboutMdEn')" :error="fieldError('aboutMdEn')">
+            <el-input v-model="form.aboutMdEn" type="textarea" :rows="5" :disabled="readonly" maxlength="50000" show-word-limit />
           </el-form-item>
         </el-form>
       </el-card>
@@ -293,6 +305,12 @@ onMounted(initialize);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 
 .image-url-field {

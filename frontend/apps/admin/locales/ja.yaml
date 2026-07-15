@@ -105,10 +105,19 @@ dashboard:
   trend: アクセス推移
   topArticles: 上位記事
   languageDistribution: 言語分布
+  dailyUvSum: 期間内の日別 UV 合計
+  filter:
+    last7: 直近 7 日
+    last30: 直近 30 日
+    defaultPeriod: 既定では JST の直近 30 暦日を表示します
+    errors:
+      incomplete: 開始日と終了日を両方入力してください
+      reversed: 開始日は終了日より後にできません
+      tooLong: 日付範囲は最大 366 日です
   metrics:
     periodPv: 期間 PV
-    todayPv: 今日の PV
-    todayUv: 今日の UV
+    todayPv: JST 今日の PV
+    todayUv: JST 今日の UV
     averageDailyUv: 平均日次 UV
   languages:
     zh: 中国語
@@ -124,7 +133,7 @@ articles:
     titlePlaceholder: 多言語タイトルを検索
     status: 記事ステータス
     statusPlaceholder: ステータスを選択
-    futureHint: カテゴリ、タグ、日付の条件を今後ここに追加できます。
+    rangeError: 日時範囲の開始は終了より後にできません
   result:
     eyebrow: Content Inventory
     total: 記事総数
@@ -146,6 +155,7 @@ articles:
     category: カテゴリ
     tags: タグ
     comments: コメント数
+    createdAt: 作成日時
     publishAt: 公開日時
     updatedAt: 更新日時
     operations: 操作
@@ -202,22 +212,30 @@ articles:
     homepageSlot: ホーム表示枠
     homepageSlotHint: 固定は最大 1 件、おすすめは最大 2 件です。公開済み記事だけがホーム枠を使えます。
     slug: 記事スラッグ
+    slugHint: 空欄にできます。入力値は小文字化され、小文字・数字・ハイフンだけが使えます。
     category: カテゴリ
     tags: タグ
+    tagLimit: 選択済みタグ：
     cover: カバー添付
     coverEmpty: カバーは未選択です
+    coverActiveHint: 選択した添付を削除すると次回の保存に失敗します。カバーは有効な画像添付である必要があります。
     coverSelected: カバー選択済み
     coverChoose: カバーを選択
     coverClear: カバーをクリア
     publishAt: 公開予約日時
+    publishAtHint: JST を使用し、現在時刻より後である必要があります。
     password: 閲覧パスワード
     passwordKeepHint: 空欄の場合は現在のパスワードを保持します
+    passwordStatusHint: 閲覧パスワードはパスワード記事専用です。ステータスを切り替えると保持されません。
     requestError: 記事の読み込みまたは保存に失敗しました。再試行してください
     validation:
       required: 必須項目です
       categoryRequired: 下書き以外の記事にはカテゴリが必要です
       scheduledRequired: 公開予約日時を選択してください
+      scheduledFuture: 公開予約日時は現在の JST 時刻より後にしてください
       passwordRequired: パスワード記事には閲覧パスワードが必要です
+      tagLimit: タグは最大 20 件まで選択できます
+      slugFormat: Slug は小文字・数字・ハイフンだけが使えます
 taxonomy:
   filter:
     title: 絞り込み条件
@@ -240,30 +258,32 @@ taxonomy:
     nameJa: 日本語名
     nameEn: 英語名
     slug: Slug
-    slugLockHint: Slug は公開 URL の一部として使われ、作成後は固定されます。
+    slugLockHint: Slug は小文字、数字、ハイフンのみ使用でき、最大64文字です。作成後は固定されます。
     sortOrder: 並び順
   categories:
     title: カテゴリ総数
     create: カテゴリを追加
     edit: カテゴリを編集
     empty: 条件に一致するカテゴリがありません
-    deleteConfirm: このカテゴリを削除しますか？
+    deleteConfirm: このカテゴリを削除しますか？有効な記事が参照中の場合は、先に記事を移動してください。
   tags:
     title: タグ総数
     create: タグを追加
     edit: タグを編集
     empty: 条件に一致するタグがありません
-    deleteConfirm: このタグを削除しますか？
+    deleteConfirm: このタグを削除しますか？有効な記事が参照中の場合は、先に記事を移動してください。
   states:
     error: データの読み込みに失敗しました。再試行してください
   validation:
     required: 必須項目です
+    slugFormat: Slug は小文字、数字、ハイフンのみ使用でき、最大64文字です
     sortOrderRange: 並び順は 0 から 1000000 の整数で入力してください
   errors:
     saveConflict: 名前または Slug は既に使用されています
     deleteConflict: 公開中の記事から参照されているため削除できません
     forbidden: このアカウントには書き込み権限がありません
     request: 操作に失敗しました。再試行してください
+  sortHint: 保存すると変更した並び順を原子的に更新します。項目が1つでも不正ならサーバー側で全体をロールバックします。
 comments:
   filter:
     title: コメント絞り込み
@@ -285,6 +305,12 @@ comments:
     pass: 承認済み
     pending: 審査待ち
     hidden: 非表示
+  auditDetails:
+    title: 審査詳細
+    site: 個人サイト
+    ip: IP アドレス
+    userAgent: User-Agent
+    parent: 親コメント ID
   columns:
     content: 内容
     author: 投稿者
@@ -300,10 +326,14 @@ comments:
     reply: 返信
     approve: 承認
     hide: 非表示
-    approveConfirm: このコメントを承認しますか
-    hideConfirm: このコメントを非表示にしますか
-    deleteConfirm: このコメントを削除しますか
-    restoreConfirm: このコメントを復元しますか
+    approveArticleConfirm: このコメントを承認しますか？記事のコメント数が増加します。
+    approveGuestbookConfirm: このゲストブックコメントを承認しますか？ゲストブックは記事のコメント数に影響しません。
+    hideArticleConfirm: このコメントを非表示にしますか？記事のコメント数が減少します。
+    hideGuestbookConfirm: このゲストブックコメントを非表示にしますか？ゲストブックは記事のコメント数に影響しません。
+    deleteArticleConfirm: このコメントを削除しますか？論理削除になり、記事のコメント数が減少します。
+    deleteGuestbookConfirm: このゲストブックコメントを削除しますか？論理削除になりますが、記事のコメント数には影響しません。
+    restoreArticleConfirm: 復元は論理削除だけを戻し、非表示コメントを公開しません。公開中の記事コメントを復元するとコメント数が増加します。続行しますか。
+    restoreGuestbookConfirm: 復元は論理削除だけを戻し、非表示コメントを公開しません。ゲストブックは記事のコメント数に影響しません。続行しますか。
   errors:
     load: コメント一覧の読み込みに失敗しました。再試行してください
     operation: コメント操作に失敗しました。再試行してください
@@ -348,21 +378,27 @@ friendLinks:
     show: 表示
     hide: 非表示
     saveSort: 並び順を保存
-    statusConfirm: この友リンクの表示状態を切り替えますか？
+    showConfirm: 表示すると、この友リンクは公開友リンクページに表示されます。続行しますか？
+    hideConfirm: 非表示にすると、公開友リンクページには表示されませんが、レコードは削除されません。続行しますか？
     deleteConfirm: この友リンクを削除しますか？
   validation:
     required: 必須項目です
     url: http または https のURLを入力してください
+    maxLength: 値がサーバーの最大長を超えています
     sortOrderRange: 並び順は 0 から 1000000 の整数で入力してください
   errors:
     load: 友リンク一覧の読み込みに失敗しました。再試行してください
     operation: 友リンク操作に失敗しました。再試行してください
   empty: 条件に一致する友リンクはありません
+  sortHint: 保存すると変更した並び順を原子的に更新します。項目が1つでも不正ならサーバー側で全体をロールバックします。
 settings:
   readonlyDemo: 現在のデモアカウントは読み取り専用です
   updatedAt: "更新日時："
   validation:
     required: 必須項目です
+    maxLength: 値がサーバーの最大長を超えています
+    url: 有効な絶対 HTTP または HTTPS URL を入力してください
+    spotifyId: Spotify ID には英数字、アンダースコア、ハイフンのみ使用できます
   image:
     choose: 添付ファイルを選択
     clear: 画像をクリア
@@ -372,6 +408,8 @@ settings:
     about: About コンテンツ
     loadError: サイト設定を読み込めませんでした。再試行してください
     saveError: サイト設定を保存できませんでした。再試行してください
+    fullReplaceHint: 保存すると現在のフォーム全体でサイト設定を上書きします。先に更新してから編集してください。
+    fallbackHint: 空欄の場合、公開サイトでは項目ごとに中国語へフォールバックします。
     siteTitleZh: 中国語タイトル
     siteTitleJa: 日本語タイトル
     siteTitleEn: 英語タイトル
@@ -391,6 +429,7 @@ settings:
     form: 作者プロフィール
     loadError: プロフィールを読み込めませんでした。再試行してください
     saveError: プロフィールを保存できませんでした。再試行してください
+    publicHint: 以下のプロフィール項目は公開されます。保存前に内容とリンクを確認してください。
     id: ID
     username: ユーザー名
     role: ロール
@@ -420,11 +459,13 @@ settings:
       required: 入力してください
       length: 新しいパスワードは8〜128文字で入力してください
       mismatch: 新しいパスワードが一致しません
+      sameAsCurrent: 新しいパスワードは現在のパスワードと同じにできません
+    revokeHint: 変更が成功すると、すべての端末で再ログインが必要です。
 attachments:
   readonlyDemo: 現在のデモアカウントは読み取り専用のため、添付ファイルをアップロードできません
   upload:
     title: 画像添付をアップロード
-    description: JPEG、PNG、WebP、GIF に対応します。サーバー側で画像内容とサイズ制限を検証します。
+    description: JPEG、PNG、WebP、GIF に対応し、最大 10 MiB です。サーバーは実データを検証し、SHA-256 で重複排除するため既存添付を再利用または復元することがあります。
   result:
     total: 添付ファイル数
     deletedTotal: 回収済み添付ファイル数
@@ -444,6 +485,7 @@ attachments:
   errors:
     load: 添付ファイル一覧を読み込めませんでした。再試行してください
     upload: 添付ファイルをアップロードできませんでした。ファイルを確認して再試行してください
+    tooLarge: 画像は 10 MiB 以下にしてください
     operation: 添付ファイル操作に失敗しました。再試行してください
   empty: 添付ファイルはまだありません
 login:

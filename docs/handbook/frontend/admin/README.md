@@ -27,3 +27,5 @@
 本地默认端口为 8848，路由使用 hash 模式。运行与验证命令见 `../../ops/local-development.md`。
 
 文章预览支持的语法和历史文章恢复步骤见 [`../../content/markdown-authoring.md`](../../content/markdown-authoring.md)。
+
+后端已有能力、管理端消费状态、表单业务语义与后续纯前端补齐顺序见[管理端后端能力消费审查](backend-consumption-audit.md)。

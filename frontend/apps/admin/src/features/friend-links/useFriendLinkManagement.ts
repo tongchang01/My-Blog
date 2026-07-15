@@ -57,8 +57,6 @@ const defaultApi: FriendLinkManagementApi = {
 };
 
 const DEFAULT_FILTERS: FriendLinkListFilters = {
-  keyword: "",
-  status: "ALL",
   page: 1,
   size: 20
 };
@@ -127,16 +125,6 @@ export function useFriendLinkManagement(
   }
 
   async function initialize(): Promise<void> {
-    await loadFriendLinks();
-  }
-
-  async function search(): Promise<void> {
-    filters.page = 1;
-    await loadFriendLinks();
-  }
-
-  async function reset(): Promise<void> {
-    Object.assign(filters, DEFAULT_FILTERS);
     await loadFriendLinks();
   }
 
@@ -275,8 +263,6 @@ export function useFriendLinkManagement(
     sortDrafts,
     dirtySortItems,
     initialize,
-    search,
-    reset,
     refresh,
     changePage,
     openCreate,

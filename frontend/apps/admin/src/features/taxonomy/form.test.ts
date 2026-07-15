@@ -60,7 +60,7 @@ describe("taxonomy forms", () => {
     expect(category.id).toBe("9007199254741202");
   });
 
-  it("validates required fields and category sort range", () => {
+  it("validates required fields, normalized slug format and category sort range", () => {
     expect(validateCategoryForm(createCategoryForm())).toEqual({
       nameZh: "required",
       slug: "required"
@@ -77,6 +77,9 @@ describe("taxonomy forms", () => {
       nameZh: "required",
       slug: "required"
     });
+    expect(
+      validateTagForm({ ...createTagForm(), nameZh: "标签", slug: "bad_slug" })
+    ).toEqual({ slug: "slugFormat" });
   });
 
   it("normalizes whitespace and optional language names", () => {
@@ -85,7 +88,7 @@ describe("taxonomy forms", () => {
         nameZh: " 后端 ",
         nameJa: "  ",
         nameEn: " Backend ",
-        slug: " backend ",
+        slug: " Backend ",
         sortOrder: 20
       })
     ).toEqual({
@@ -100,7 +103,7 @@ describe("taxonomy forms", () => {
         nameZh: " Vue ",
         nameJa: " ",
         nameEn: " Vue ",
-        slug: " vue "
+        slug: " Vue "
       })
     ).toEqual({
       nameZh: "Vue",

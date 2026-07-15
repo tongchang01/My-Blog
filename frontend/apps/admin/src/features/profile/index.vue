@@ -158,18 +158,23 @@ onMounted(initialize);
           show-icon
         />
 
+        <p class="field-hint">
+          {{ transformI18n("settings.profile.publicHint") }}
+        </p>
+
         <el-form :model="form" label-position="top" class="profile-grid">
           <el-form-item
             :label="transformI18n('settings.profile.nickname')"
             :error="fieldError('nickname')"
           >
-            <el-input v-model="form.nickname" :disabled="readonly" />
+            <el-input v-model="form.nickname" :disabled="readonly" maxlength="64" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.avatarUrl')">
+          <el-form-item :label="transformI18n('settings.profile.avatarUrl')" :error="fieldError('avatarUrl')">
             <div class="image-url-field">
               <el-input
                 v-model="form.avatarUrl"
                 :disabled="readonly"
+                maxlength="255"
                 :placeholder="transformI18n('settings.image.currentUrl')"
               />
               <div v-if="form.avatarUrl" class="image-preview image-preview-avatar">
@@ -195,41 +200,41 @@ onMounted(initialize);
               </div>
             </div>
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.location')">
-            <el-input v-model="form.location" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.location')" :error="fieldError('location')">
+            <el-input v-model="form.location" :disabled="readonly" maxlength="64" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.website')">
-            <el-input v-model="form.website" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.website')" :error="fieldError('website')">
+            <el-input v-model="form.website" :disabled="readonly" maxlength="255" />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.emailPublic')">
-            <el-input v-model="form.emailPublic" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.emailPublic')" :error="fieldError('emailPublic')">
+            <el-input v-model="form.emailPublic" :disabled="readonly" maxlength="128" />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.githubUrl')">
-            <el-input v-model="form.githubUrl" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.githubUrl')" :error="fieldError('githubUrl')">
+            <el-input v-model="form.githubUrl" :disabled="readonly" maxlength="255" />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.twitterUrl')">
-            <el-input v-model="form.twitterUrl" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.twitterUrl')" :error="fieldError('twitterUrl')">
+            <el-input v-model="form.twitterUrl" :disabled="readonly" maxlength="255" />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.linkedinUrl')">
-            <el-input v-model="form.linkedinUrl" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.linkedinUrl')" :error="fieldError('linkedinUrl')">
+            <el-input v-model="form.linkedinUrl" :disabled="readonly" maxlength="255" />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.zhihuUrl')">
-            <el-input v-model="form.zhihuUrl" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.zhihuUrl')" :error="fieldError('zhihuUrl')">
+            <el-input v-model="form.zhihuUrl" :disabled="readonly" maxlength="255" />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.qiitaUrl')">
-            <el-input v-model="form.qiitaUrl" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.qiitaUrl')" :error="fieldError('qiitaUrl')">
+            <el-input v-model="form.qiitaUrl" :disabled="readonly" maxlength="255" />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.juejinUrl')">
-            <el-input v-model="form.juejinUrl" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.juejinUrl')" :error="fieldError('juejinUrl')">
+            <el-input v-model="form.juejinUrl" :disabled="readonly" maxlength="255" />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.bioZh')">
-            <el-input v-model="form.bioZh" type="textarea" :rows="4" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.bioZh')" :error="fieldError('bioZh')">
+            <el-input v-model="form.bioZh" type="textarea" :rows="4" :disabled="readonly" maxlength="5000" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.bioJa')">
-            <el-input v-model="form.bioJa" type="textarea" :rows="4" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.bioJa')" :error="fieldError('bioJa')">
+            <el-input v-model="form.bioJa" type="textarea" :rows="4" :disabled="readonly" maxlength="5000" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('settings.profile.bioEn')">
-            <el-input v-model="form.bioEn" type="textarea" :rows="4" :disabled="readonly" />
+          <el-form-item :label="transformI18n('settings.profile.bioEn')" :error="fieldError('bioEn')">
+            <el-input v-model="form.bioEn" type="textarea" :rows="4" :disabled="readonly" maxlength="5000" show-word-limit />
           </el-form-item>
         </el-form>
       </el-card>
@@ -298,6 +303,9 @@ onMounted(initialize);
             />
           </el-form-item>
         </el-form>
+        <p class="field-hint">
+          {{ transformI18n("settings.password.revokeHint") }}
+        </p>
       </el-card>
     </template>
 
@@ -345,6 +353,12 @@ onMounted(initialize);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 
 .image-url-field {

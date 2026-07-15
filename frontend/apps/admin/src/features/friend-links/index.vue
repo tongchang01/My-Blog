@@ -30,8 +30,6 @@ const {
   sortDrafts,
   dirtySortItems,
   initialize,
-  search,
-  reset,
   refresh,
   changePage,
   openCreate,
@@ -42,13 +40,11 @@ const {
   saveSortOrders
 } = state;
 
-const statuses: Array<FriendLinkStatus | "ALL"> = ["ALL", "VISIBLE", "HIDDEN"];
 const avatarPickerOpen = ref(false);
 
-function statusKey(status: FriendLinkStatus | "ALL"): string {
+function statusKey(status: FriendLinkStatus): string {
   if (status === "VISIBLE") return "friendLinks.status.visible";
-  if (status === "HIDDEN") return "friendLinks.status.hidden";
-  return "friendLinks.status.all";
+  return "friendLinks.status.hidden";
 }
 
 function statusTagType(status: FriendLinkStatus) {
@@ -76,6 +72,12 @@ function fieldError(field: keyof typeof form): string {
   return code ? transformI18n(`friendLinks.validation.${code}`) : "";
 }
 
+function statusConfirmKey(item: FriendLinkItem): string {
+  return item.status === "VISIBLE"
+    ? "friendLinks.actions.hideConfirm"
+    : "friendLinks.actions.showConfirm";
+}
+
 function selectAvatar(item: AttachmentItem): void {
   form.avatarUrl = item.publicUrl;
 }
@@ -87,7 +89,7 @@ function clearAvatar(): void {
 async function confirmStatus(item: FriendLinkItem): Promise<void> {
   try {
     await ElMessageBox.confirm(
-      transformI18n("friendLinks.actions.statusConfirm"),
+      transformI18n(statusConfirmKey(item)),
       transformI18n("friendLinks.actions.confirmTitle"),
       { type: "warning" }
     );
@@ -115,57 +117,6 @@ onMounted(initialize);
 
 <template>
   <section class="friend-link-page">
-    <el-card
-      data-testid="friend-link-filter-card"
-      class="workspace-card filter-card"
-      shadow="never"
-    >
-      <template #header>
-        <div class="card-heading">
-          <h2>{{ transformI18n("friendLinks.filter.title") }}</h2>
-        </div>
-      </template>
-
-      <el-form :model="filters" label-position="top" class="filter-grid">
-        <el-form-item :label="transformI18n('friendLinks.filter.keyword')">
-          <el-input
-            v-model="filters.keyword"
-            data-testid="friend-link-keyword"
-            clearable
-            :placeholder="
-              transformI18n('friendLinks.filter.keywordPlaceholder')
-            "
-            @keyup.enter="search"
-          />
-        </el-form-item>
-        <el-form-item :label="transformI18n('friendLinks.filter.status')">
-          <el-select v-model="filters.status" data-testid="friend-link-status">
-            <el-option
-              v-for="status in statuses"
-              :key="status"
-              :label="transformI18n(statusKey(status))"
-              :value="status"
-            />
-          </el-select>
-        </el-form-item>
-      </el-form>
-
-      <div class="filter-actions">
-        <div class="filter-buttons">
-          <el-button
-            data-testid="friend-link-search"
-            type="primary"
-            @click="search"
-          >
-            {{ transformI18n("articles.actions.search") }}
-          </el-button>
-          <el-button data-testid="friend-link-reset" @click="reset">
-            {{ transformI18n("articles.actions.reset") }}
-          </el-button>
-        </div>
-      </div>
-    </el-card>
-
     <el-card
       data-testid="friend-link-result-card"
       class="workspace-card result-card"
@@ -214,6 +165,9 @@ onMounted(initialize);
         :title="transformI18n('friendLinks.errors.operation')"
         show-icon
       />
+      <p v-if="isAdmin" class="field-hint">
+        {{ transformI18n("friendLinks.sortHint") }}
+      </p>
 
       <el-skeleton
         v-if="loading && items.length === 0"
@@ -377,13 +331,13 @@ onMounted(initialize);
           :label="transformI18n('friendLinks.fields.name')"
           :error="fieldError('name')"
         >
-          <el-input v-model="form.name" />
+          <el-input v-model="form.name" maxlength="64" />
         </el-form-item>
         <el-form-item
           :label="transformI18n('friendLinks.fields.url')"
           :error="fieldError('url')"
         >
-          <el-input v-model="form.url" />
+          <el-input v-model="form.url" maxlength="255" />
         </el-form-item>
         <el-form-item
           :label="transformI18n('friendLinks.fields.avatarUrl')"
@@ -392,6 +346,7 @@ onMounted(initialize);
           <div class="image-url-field">
             <el-input
               v-model="form.avatarUrl"
+              maxlength="255"
               :placeholder="transformI18n('settings.image.currentUrl')"
             />
             <div v-if="form.avatarUrl" class="image-preview">
@@ -417,8 +372,8 @@ onMounted(initialize);
             </div>
           </div>
         </el-form-item>
-        <el-form-item :label="transformI18n('friendLinks.fields.description')">
-          <el-input v-model="form.description" type="textarea" :rows="3" />
+        <el-form-item :label="transformI18n('friendLinks.fields.description')" :error="fieldError('description')">
+          <el-input v-model="form.description" type="textarea" :rows="3" maxlength="255" show-word-limit />
         </el-form-item>
         <el-form-item
           :label="transformI18n('friendLinks.fields.sortOrder')"
@@ -476,7 +431,6 @@ onMounted(initialize);
 }
 
 .card-heading,
-.filter-actions,
 .result-heading,
 .result-actions {
   display: flex;
@@ -491,19 +445,14 @@ onMounted(initialize);
   font-weight: 600;
 }
 
-.filter-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.filter-buttons {
-  display: flex;
-  gap: 10px;
-}
-
 .result-count {
   color: var(--el-color-primary);
+}
+
+.field-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 
 .table-scroll {
@@ -576,11 +525,6 @@ onMounted(initialize);
 @media (width <= 900px) {
   .friend-link-page {
     padding: 12px;
-  }
-
-  .filter-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
   }
 
   .result-heading,

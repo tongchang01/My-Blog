@@ -66,7 +66,7 @@ describe("friend link API", () => {
       .reply(200, ok());
 
     await expect(
-      listFriendLinks({ keyword: "", status: "ALL", page: 2, size: 20 })
+      listFriendLinks({ page: 2, size: 20 })
     ).resolves.toMatchObject({ data: { page: 2 } });
     await expect(getFriendLink("9007199254742501")).resolves.toMatchObject({
       data: { id: "9007199254742501" }

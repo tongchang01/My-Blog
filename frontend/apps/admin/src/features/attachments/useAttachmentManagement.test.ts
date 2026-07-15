@@ -3,6 +3,7 @@ import type { ApiResponse } from "@/api/contract";
 import type { AttachmentItem, AttachmentPageResponse } from "./model";
 import {
   type AttachmentManagementApi,
+  MAX_ATTACHMENT_UPLOAD_BYTES,
   useAttachmentManagement
 } from "./useAttachmentManagement";
 
@@ -157,5 +158,20 @@ describe("attachment management state", () => {
 
     expect(state.items.value[0].id).toBe("9007199254743001");
     expect(state.uploadError.value?.message).toBe("invalid image");
+  });
+
+  it("rejects files over 10 MiB before uploading", async () => {
+    const source = api();
+    const state = useAttachmentManagement(source);
+    const file = new File(
+      [new Uint8Array(MAX_ATTACHMENT_UPLOAD_BYTES + 1)],
+      "large.png",
+      { type: "image/png" }
+    );
+
+    await expect(state.upload(file)).resolves.toBe(false);
+
+    expect(source.uploadAttachment).not.toHaveBeenCalled();
+    expect(state.uploadError.value?.message).toBe("FILE_TOO_LARGE");
   });
 });

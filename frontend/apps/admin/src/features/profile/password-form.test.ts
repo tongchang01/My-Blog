@@ -35,6 +35,16 @@ describe("password form", () => {
     });
   });
 
+  it("does not allow reusing the current password", () => {
+    expect(
+      validatePasswordForm({
+        currentPassword: "same-password",
+        newPassword: "same-password",
+        confirmPassword: "same-password"
+      })
+    ).toEqual({ newPassword: "sameAsCurrent" });
+  });
+
   it("trims only the current password payload boundary", () => {
     const form: PasswordForm = {
       currentPassword: " old-password ",

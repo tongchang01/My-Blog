@@ -105,10 +105,19 @@ dashboard:
   trend: Traffic trend
   topArticles: Top articles
   languageDistribution: Language distribution
+  dailyUvSum: Sum of daily UVs in period
+  filter:
+    last7: Last 7 days
+    last30: Last 30 days
+    defaultPeriod: Defaults to the latest 30 JST calendar days
+    errors:
+      incomplete: Enter both a start and end date
+      reversed: The start date cannot be after the end date
+      tooLong: The date range can be at most 366 days
   metrics:
     periodPv: Period PV
-    todayPv: Today PV
-    todayUv: Today UV
+    todayPv: Today PV (JST)
+    todayUv: Today UV (JST)
     averageDailyUv: Average daily UV
   languages:
     zh: Chinese
@@ -124,7 +133,7 @@ articles:
     titlePlaceholder: Search multilingual titles
     status: Article status
     statusPlaceholder: Select a status
-    futureHint: Category, tag and date filters can be added here later.
+    rangeError: The start of a date range cannot be after its end
   result:
     eyebrow: Content Inventory
     total: Total articles
@@ -146,6 +155,7 @@ articles:
     category: Category
     tags: Tags
     comments: Comments
+    createdAt: Created at
     publishAt: Publish time
     updatedAt: Update time
     operations: Actions
@@ -202,22 +212,30 @@ articles:
     homepageSlot: Homepage slot
     homepageSlotHint: Pinned allows 1 article and Featured allows 2. Only published articles can use homepage slots.
     slug: Article slug
+    slugHint: Optional; it is lowercased and may contain only lowercase letters, numbers and hyphens.
     category: Category
     tags: Tags
+    tagLimit: "Selected tags:"
     cover: Cover attachment
     coverEmpty: No cover selected
+    coverActiveHint: Deleting the selected attachment makes a later save fail; the cover must be an active image attachment.
     coverSelected: Cover selected
     coverChoose: Choose cover
     coverClear: Clear cover
     publishAt: Scheduled publish time
+    publishAtHint: Uses JST and must be later than the current time.
     password: Access password
     passwordKeepHint: Leave blank to keep the current password
+    passwordStatusHint: Access passwords apply only to password articles and are cleared when changing status.
     requestError: Unable to load or save the article. Please retry
     validation:
       required: This field is required
       categoryRequired: Non-draft articles require a category
       scheduledRequired: Scheduled articles require a publish time
+      scheduledFuture: Scheduled publish time must be later than the current JST time
       passwordRequired: Password articles require an access password
+      tagLimit: Select at most 20 tags
+      slugFormat: Slug may contain only lowercase letters, numbers and hyphens
 taxonomy:
   filter:
     title: Filters
@@ -240,30 +258,32 @@ taxonomy:
     nameJa: Japanese name
     nameEn: English name
     slug: Slug
-    slugLockHint: Slug is part of the public URL and is locked after creation.
+    slugLockHint: Use lowercase letters, numbers, and hyphens only (64 characters max). Slug is locked after creation.
     sortOrder: Sort order
   categories:
     title: Total categories
     create: New category
     edit: Edit category
     empty: No categories match the current filter
-    deleteConfirm: Delete this category?
+    deleteConfirm: Delete this category? Move articles first if active articles still reference it.
   tags:
     title: Total tags
     create: New tag
     edit: Edit tag
     empty: No tags match the current filter
-    deleteConfirm: Delete this tag?
+    deleteConfirm: Delete this tag? Move articles first if active articles still reference it.
   states:
     error: Unable to load data. Please retry
   validation:
     required: This field is required
+    slugFormat: Use lowercase letters, numbers, and hyphens only (64 characters max)
     sortOrderRange: Sort order must be an integer from 0 to 1000000
   errors:
     saveConflict: The name or slug is already in use
     deleteConflict: This item is still referenced by active articles
     forbidden: This account does not have write permission
     request: The operation failed. Please retry
+  sortHint: Saving updates the changed sort items atomically; the server rolls back the whole batch if any item is invalid.
 comments:
   filter:
     title: Comment Filters
@@ -285,6 +305,12 @@ comments:
     pass: Passed
     pending: Pending
     hidden: Hidden
+  auditDetails:
+    title: Audit details
+    site: Website
+    ip: IP address
+    userAgent: User-Agent
+    parent: Parent comment ID
   columns:
     content: Content
     author: Author
@@ -300,10 +326,14 @@ comments:
     reply: Reply
     approve: Approve
     hide: Hide
-    approveConfirm: Approve this comment?
-    hideConfirm: Hide this comment?
-    deleteConfirm: Delete this comment?
-    restoreConfirm: Restore this comment?
+    approveArticleConfirm: Approve this comment? The article comment count will increase.
+    approveGuestbookConfirm: Approve this guestbook comment? Guestbook comments do not affect article comment counts.
+    hideArticleConfirm: Hide this comment? The article comment count will decrease.
+    hideGuestbookConfirm: Hide this guestbook comment? Guestbook comments do not affect article comment counts.
+    deleteArticleConfirm: Delete this comment? It becomes soft-deleted and the article comment count will decrease.
+    deleteGuestbookConfirm: Delete this guestbook comment? It becomes soft-deleted and does not affect article comment counts.
+    restoreArticleConfirm: Restore only reverses soft deletion; it does not republish a hidden comment. Restoring a public article comment increases the article comment count. Continue?
+    restoreGuestbookConfirm: Restore only reverses soft deletion; it does not republish a hidden comment. Guestbook comments do not affect article comment counts. Continue?
   errors:
     load: Unable to load comments. Please retry
     operation: Comment operation failed. Please retry
@@ -348,21 +378,27 @@ friendLinks:
     show: Show
     hide: Hide
     saveSort: Save sort
-    statusConfirm: Confirm changing this friend link visibility?
+    showConfirm: Showing this link makes it appear on the public friend-links page. Continue?
+    hideConfirm: Hiding this link removes it from the public friend-links page but does not delete it. Continue?
     deleteConfirm: Confirm deleting this friend link?
   validation:
     required: This field is required
     url: Enter an http or https URL
+    maxLength: The value exceeds the server maximum length
     sortOrderRange: Sort order must be an integer from 0 to 1000000
   errors:
     load: Failed to load friend links. Please retry.
     operation: Friend link operation failed. Please retry.
   empty: No friend links match the current filters
+  sortHint: Saving updates the changed sort items atomically; the server rolls back the whole batch if any item is invalid.
 settings:
   readonlyDemo: The current demo account is read-only
   updatedAt: "Updated at:"
   validation:
     required: This field is required
+    maxLength: The value exceeds the server maximum length
+    url: Enter a valid absolute HTTP or HTTPS URL
+    spotifyId: Spotify ID may contain only letters, numbers, underscores, and hyphens
   image:
     choose: Choose attachment
     clear: Clear image
@@ -372,6 +408,8 @@ settings:
     about: About content
     loadError: Unable to load site config. Please retry.
     saveError: Unable to save site config. Please retry.
+    fullReplaceHint: Saving replaces the site config with the complete current form; refresh before editing.
+    fallbackHint: Empty fields fall back to Chinese field by field on the public site.
     siteTitleZh: Chinese title
     siteTitleJa: Japanese title
     siteTitleEn: English title
@@ -391,6 +429,7 @@ settings:
     form: Author profile
     loadError: Unable to load profile. Please retry.
     saveError: Unable to save profile. Please retry.
+    publicHint: The following profile fields are public. Confirm their content and links before saving.
     id: ID
     username: Username
     role: Role
@@ -420,11 +459,13 @@ settings:
       required: This field is required
       length: The new password must be 8 to 128 characters
       mismatch: The new passwords do not match
+      sameAsCurrent: The new password must differ from the current password
+    revokeHint: After success, every device must sign in again.
 attachments:
   readonlyDemo: The current demo account is read-only and cannot upload attachments
   upload:
     title: Upload image attachment
-    description: Supports JPEG, PNG, WebP, and GIF. The server validates real image content and size limits.
+    description: Supports JPEG, PNG, WebP, and GIF up to 10 MiB. The server validates actual content and SHA-256 deduplicates, so it may reuse or restore an existing attachment.
   result:
     total: Total attachments
     deletedTotal: Deleted attachments
@@ -444,6 +485,7 @@ attachments:
   errors:
     load: Unable to load attachments. Please retry.
     upload: Unable to upload attachment. Please check the file and retry.
+    tooLarge: Images must not exceed 10 MiB
     operation: Unable to complete attachment operation. Please retry.
   empty: No attachments yet
 login:

@@ -6,7 +6,11 @@ export interface PasswordForm {
   confirmPassword: string;
 }
 
-export type PasswordFormErrorCode = "required" | "length" | "mismatch";
+export type PasswordFormErrorCode =
+  | "required"
+  | "length"
+  | "mismatch"
+  | "sameAsCurrent";
 
 export type PasswordFormErrors = Partial<
   Record<keyof PasswordForm, PasswordFormErrorCode>
@@ -27,6 +31,8 @@ export function validatePasswordForm(form: PasswordForm): PasswordFormErrors {
     errors.newPassword = "required";
   } else if (form.newPassword.length < 8 || form.newPassword.length > 128) {
     errors.newPassword = "length";
+  } else if (form.newPassword === form.currentPassword) {
+    errors.newPassword = "sameAsCurrent";
   }
   if (!form.confirmPassword.trim()) {
     errors.confirmPassword = "required";
