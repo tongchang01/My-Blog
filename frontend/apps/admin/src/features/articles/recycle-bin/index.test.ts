@@ -5,14 +5,16 @@ import { http } from "@/utils/http";
 import { useUserStoreHook } from "@/store/modules/user";
 import ArticleRecycleBin from "./index.vue";
 
-const { confirm } = vi.hoisted(() => ({
-  confirm: vi.fn().mockResolvedValue("confirm")
+const { confirm, showMessage } = vi.hoisted(() => ({
+  confirm: vi.fn().mockResolvedValue("confirm"),
+  showMessage: vi.fn()
 }));
 
 vi.mock("element-plus", async importOriginal => ({
   ...(await importOriginal<typeof import("element-plus")>()),
   ElMessageBox: { confirm }
 }));
+vi.mock("@/utils/message", () => ({ message: showMessage }));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
@@ -57,6 +59,7 @@ function replyPage() {
 afterEach(() => {
   mock.reset();
   confirm.mockClear();
+  showMessage.mockReset();
 });
 
 describe("article recycle bin page", () => {
@@ -89,6 +92,9 @@ describe("article recycle bin page", () => {
 
     expect(confirm).toHaveBeenCalledOnce();
     expect(mock.history.post).toHaveLength(1);
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("keeps DEMO users read-only", async () => {

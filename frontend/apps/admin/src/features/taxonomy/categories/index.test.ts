@@ -6,6 +6,10 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { http } from "@/utils/http";
 import CategoryManagement from "./index.vue";
 
+const { showMessage } = vi.hoisted(() => ({ showMessage: vi.fn() }));
+
+vi.mock("@/utils/message", () => ({ message: showMessage }));
+
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
 const stubs = {
@@ -67,6 +71,7 @@ function replyList() {
 
 afterEach(() => {
   mock.reset();
+  showMessage.mockClear();
   vi.restoreAllMocks();
 });
 
@@ -113,6 +118,11 @@ describe("category management page", () => {
       profile
     });
     replyList();
+    mock.onDelete("/api/admin/categories/100").reply(200, {
+      code: "00000",
+      msg: "success",
+      data: null
+    });
     vi.spyOn(ElMessageBox, "confirm").mockResolvedValue({
       action: "confirm"
     } as any);
@@ -124,6 +134,9 @@ describe("category management page", () => {
 
     expect(ElMessageBox.confirm).toHaveBeenCalledOnce();
     expect(remove).toHaveBeenCalledWith("100");
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("locks the slug input while editing a category", async () => {

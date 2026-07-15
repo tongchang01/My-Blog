@@ -5,14 +5,16 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { http } from "@/utils/http";
 import FriendLinkManagement from "./index.vue";
 
-const { confirm } = vi.hoisted(() => ({
-  confirm: vi.fn().mockResolvedValue("confirm")
+const { confirm, showMessage } = vi.hoisted(() => ({
+  confirm: vi.fn().mockResolvedValue("confirm"),
+  showMessage: vi.fn()
 }));
 
 vi.mock("element-plus", async importOriginal => ({
   ...(await importOriginal<typeof import("element-plus")>()),
   ElMessageBox: { confirm }
 }));
+vi.mock("@/utils/message", () => ({ message: showMessage }));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
@@ -85,6 +87,7 @@ function replyPage(records = [row]) {
 afterEach(() => {
   mock.reset();
   confirm.mockClear();
+  showMessage.mockClear();
 });
 
 describe("friend link management page", () => {
@@ -127,6 +130,9 @@ describe("friend link management page", () => {
     expect(mock.history.patch[0].url).toBe(
       "/api/admin/friend-links/9007199254742501/status"
     );
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("keeps DEMO users read-only", async () => {
@@ -220,5 +226,8 @@ describe("friend link management page", () => {
     await flushPromises();
 
     expect(mock.history.post).toHaveLength(1);
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 });

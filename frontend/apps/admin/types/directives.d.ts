@@ -1,5 +1,5 @@
 import type { Directive } from "vue";
-import type { CopyEl, OptimizeOptions, RippleOptions } from "@/directives";
+import type { RippleOptions } from "@/directives";
 
 declare module "vue" {
   export interface ComponentCustomProperties {
@@ -7,12 +7,6 @@ declare module "vue" {
     vLoading: Directive<Element, boolean>;
     /** 按钮权限指令（根据路由`meta`中的`auths`字段进行判断）*/
     vAuth: Directive<HTMLElement, string | Array<string>>;
-    /** 文本复制指令（默认双击复制） */
-    vCopy: Directive<CopyEl, string>;
-    /** 长按指令 */
-    vLongpress: Directive<HTMLElement, Function>;
-    /** 防抖、节流指令 */
-    vOptimize: Directive<HTMLElement, OptimizeOptions>;
     /** 按钮权限指令（根据登录接口返回的`permissions`字段进行判断）*/
     vPerms: Directive<HTMLElement, string | Array<string>>;
     /**

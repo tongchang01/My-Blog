@@ -17,10 +17,6 @@ import { useStatsDashboard } from "./useStatsDashboard";
 defineOptions({ name: "Dashboard" });
 
 const userStore = useUserStoreHook();
-const user = computed(() => userStore.currentUser);
-const displayName = computed(
-  () => user.value?.profile.nickname || user.value?.username || "-"
-);
 const { filters, dashboard, loading, error, filterError, isEmpty, refresh, load } =
   useStatsDashboard();
 const dateRange = computed({
@@ -37,8 +33,6 @@ const dateRange = computed({
   }
 });
 const trendChartRef = ref<HTMLElement | null>(null);
-const topArticlesChartRef = ref<HTMLElement | null>(null);
-const languageChartRef = ref<HTMLElement | null>(null);
 const chartInstances: ECharts[] = [];
 
 function languageLabel(language: string): string {
@@ -90,42 +84,6 @@ async function renderCharts(): Promise<void> {
     });
   }
 
-  if (topArticlesChartRef.value && canRenderChart(topArticlesChartRef.value)) {
-    chartFor(topArticlesChartRef.value).setOption({
-      tooltip: { trigger: "axis" },
-      grid: { left: 36, right: 12, top: 12, bottom: 28 },
-      xAxis: {
-        type: "category",
-        data: current.topArticles.map(item => item.title || item.articleId)
-      },
-      yAxis: { type: "value" },
-      series: [
-        {
-          name: "PV",
-          type: "bar",
-          data: current.topArticles.map(item => item.pv)
-        }
-      ]
-    });
-  }
-
-  if (languageChartRef.value && canRenderChart(languageChartRef.value)) {
-    chartFor(languageChartRef.value).setOption({
-      tooltip: { trigger: "item" },
-      legend: { bottom: 0 },
-      series: [
-        {
-          name: transformI18n("dashboard.languageDistribution"),
-          type: "pie",
-          radius: ["45%", "70%"],
-          data: current.languageDistribution.map(item => ({
-            name: languageLabel(item.language),
-            value: item.pv
-          }))
-        }
-      ]
-    });
-  }
 }
 
 watch(dashboard, () => {
@@ -149,30 +107,14 @@ onBeforeUnmount(() => {
       show-icon
     />
 
-    <el-card class="dashboard-overview mt-4" shadow="never">
-      <template #header>
-        <div class="dashboard-overview__heading">
-          <h1>{{ transformI18n("menus.dashboard") }}</h1>
-          <p>{{ transformI18n("dashboard.welcome") }}, {{ displayName }}</p>
-        </div>
-      </template>
-      <el-descriptions :column="1" border>
-        <el-descriptions-item :label="transformI18n('dashboard.account')">
-          {{ user?.username }}
-        </el-descriptions-item>
-        <el-descriptions-item :label="transformI18n('dashboard.role')">
-          {{ user?.type }}
-        </el-descriptions-item>
-        <el-descriptions-item :label="transformI18n('dashboard.backendStatus')">
-          <el-tag type="success">
-            {{ transformI18n("dashboard.connected") }}
-          </el-tag>
-        </el-descriptions-item>
-      </el-descriptions>
-    </el-card>
-
-    <el-card data-testid="dashboard-filter" class="mt-4" shadow="never">
-      <div class="dashboard-filter">
+    <header class="dashboard-heading">
+      <div>
+        <h1>{{ transformI18n("menus.dashboard") }}</h1>
+        <p v-if="!filters.from" data-testid="dashboard-default-period">
+          {{ transformI18n("dashboard.filter.defaultPeriod") }}
+        </p>
+      </div>
+      <div data-testid="dashboard-filter" class="dashboard-filter">
         <el-date-picker
           v-model="dateRange"
           data-testid="dashboard-date-range"
@@ -195,18 +137,16 @@ onBeforeUnmount(() => {
           </el-button>
         </div>
       </div>
-      <p v-if="!filters.from" data-testid="dashboard-default-period">
-        {{ transformI18n("dashboard.filter.defaultPeriod") }}
-      </p>
-      <el-alert
-        v-if="filterError"
-        data-testid="dashboard-filter-error"
-        type="error"
-        :closable="false"
-        :title="transformI18n(`dashboard.filter.errors.${filterError}`)"
-        show-icon
-      />
-    </el-card>
+    </header>
+    <el-alert
+      v-if="filterError"
+      data-testid="dashboard-filter-error"
+      class="dashboard-filter-error"
+      type="error"
+      :closable="false"
+      :title="transformI18n(`dashboard.filter.errors.${filterError}`)"
+      show-icon
+    />
 
     <el-skeleton
       v-if="loading && !dashboard"
@@ -243,59 +183,49 @@ onBeforeUnmount(() => {
     />
 
     <template v-else-if="dashboard">
-      <section class="metric-grid mt-4">
-        <el-card data-testid="dashboard-metric-period-pv" shadow="never">
+      <section class="metric-grid">
+        <el-card
+          data-testid="dashboard-metric-period-pv"
+          class="metric-card"
+          shadow="never"
+        >
           <el-statistic :value="dashboard.periodPv">
             <template #title>{{ transformI18n("dashboard.metrics.periodPv") }}</template>
           </el-statistic>
         </el-card>
-        <el-card data-testid="dashboard-metric-today-pv" shadow="never">
+        <el-card
+          data-testid="dashboard-metric-today-pv"
+          class="metric-card"
+          shadow="never"
+        >
           <el-statistic :value="dashboard.todayPv">
             <template #title>{{ transformI18n("dashboard.metrics.todayPv") }}</template>
           </el-statistic>
         </el-card>
-        <el-card data-testid="dashboard-metric-today-uv" shadow="never">
+        <el-card
+          data-testid="dashboard-metric-today-uv"
+          class="metric-card"
+          shadow="never"
+        >
           <el-statistic :value="dashboard.todayUv">
             <template #title>{{ transformI18n("dashboard.metrics.todayUv") }}</template>
           </el-statistic>
         </el-card>
-        <el-card data-testid="dashboard-metric-average-daily-uv" shadow="never">
-          <el-statistic :value="dashboard.averageDailyUv">
-            <template #title>{{ transformI18n("dashboard.metrics.averageDailyUv") }}</template>
-          </el-statistic>
-        </el-card>
       </section>
 
-      <section class="dashboard-grid mt-4">
-        <el-card shadow="never">
+      <section class="dashboard-main-grid">
+        <el-card class="dashboard-card" shadow="never">
           <template #header>{{ transformI18n("dashboard.trend") }}</template>
           <div
             ref="trendChartRef"
             data-testid="dashboard-trend-chart"
             class="dashboard-chart"
           />
-          <ul class="stat-list">
-            <li
-              v-for="point in dashboard.trend"
-              :key="point.date"
-              :data-testid="`dashboard-trend-${point.date}`"
-            >
-              <span>{{ point.date }}</span>
-              <span>PV {{ point.pv }} / UV {{ point.uv }}</span>
-            </li>
-          </ul>
         </el-card>
 
-        <el-card shadow="never">
-          <template #header>{{
-            transformI18n("dashboard.topArticles")
-          }}</template>
-          <div
-            ref="topArticlesChartRef"
-            data-testid="dashboard-top-articles-chart"
-            class="dashboard-chart"
-          />
-          <ul class="stat-list">
+        <el-card class="dashboard-card" shadow="never">
+          <template #header>{{ transformI18n("dashboard.topArticles") }}</template>
+          <ol class="article-ranking">
             <li
               v-for="article in dashboard.topArticles"
               :key="article.articleId"
@@ -308,43 +238,69 @@ onBeforeUnmount(() => {
                 {{ article.dailyUvSum }}
               </span>
             </li>
-          </ul>
+          </ol>
         </el-card>
+      </section>
 
-        <el-card shadow="never">
-          <template #header>{{
-            transformI18n("dashboard.languageDistribution")
-          }}</template>
-          <div
-            ref="languageChartRef"
-            data-testid="dashboard-language-chart"
-            class="dashboard-chart"
-          />
-          <ul class="stat-list">
+      <el-card class="dashboard-card language-card" shadow="never">
+        <template #header>{{ transformI18n("dashboard.languageDistribution") }}</template>
+        <ul class="language-list">
             <li
               v-for="item in dashboard.languageDistribution"
               :key="item.language"
               :data-testid="`dashboard-language-${item.language}`"
             >
-              <span>{{ languageLabel(item.language) }}</span>
-              <span>{{ item.pv }} / {{ ratioLabel(item.ratio) }}</span>
+              <div class="language-list__heading">
+                <span>{{ languageLabel(item.language) }}</span>
+                <span>{{ item.pv }} / {{ ratioLabel(item.ratio) }}</span>
+              </div>
+              <div class="language-list__bar" aria-hidden="true">
+                <span :style="{ width: ratioLabel(item.ratio) }" />
+              </div>
             </li>
-          </ul>
-        </el-card>
-      </section>
+        </ul>
+      </el-card>
     </template>
   </section>
 </template>
 
 <style scoped lang="scss">
 .dashboard-page {
-  padding: 20px;
+  padding: 20px 24px;
+}
+
+.dashboard-heading,
+.dashboard-filter {
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-heading {
+  justify-content: space-between;
+  gap: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+
+  h1,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  p {
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+  }
 }
 
 .dashboard-filter {
-  display: flex;
+  justify-content: flex-end;
   gap: 12px;
-  align-items: center;
   flex-wrap: wrap;
 }
 
@@ -354,20 +310,23 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
 }
 
-.dashboard-filter + p {
-  margin: 12px 0 0;
-  font-size: 13px;
-  color: var(--el-text-color-secondary);
+.dashboard-filter-error {
+  margin-top: 16px;
 }
 
 .metric-grid,
-.dashboard-grid {
+.dashboard-main-grid {
   display: grid;
   gap: 16px;
 }
 
 .metric-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 20px;
+
+  .metric-card {
+    border-color: var(--el-border-color-lighter);
+  }
 
   :deep(.el-statistic__head) {
     margin-bottom: 8px;
@@ -382,46 +341,98 @@ onBeforeUnmount(() => {
   }
 }
 
-.dashboard-overview__heading {
-  h1,
-  p {
-    margin: 0;
-  }
-
-  h1 {
-    font-size: 20px;
-    line-height: 28px;
-  }
-
-  p {
-    margin-top: 4px;
-    color: var(--el-text-color-secondary);
-  }
+.dashboard-main-grid {
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  margin-top: 16px;
 }
 
-.dashboard-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.dashboard-card {
+  border-color: var(--el-border-color-lighter);
 }
 
 .dashboard-chart {
-  height: 240px;
-  margin-bottom: 14px;
+  height: 286px;
 }
 
-.stat-list {
+.article-ranking,
+.language-list {
   display: grid;
-  gap: 10px;
   padding: 0;
   margin: 0;
   list-style: none;
+}
+
+.article-ranking {
+  counter-reset: article-rank;
 
   li {
     display: flex;
     gap: 12px;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 0;
+    min-height: 48px;
     border-bottom: 1px solid var(--el-border-color-lighter);
+
+    &::before {
+      min-width: 20px;
+      font-weight: 600;
+      color: var(--el-text-color-secondary);
+      content: counter(article-rank);
+      counter-increment: article-rank;
+    }
+
+    > span:first-of-type {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    > span:last-of-type {
+      font-size: 13px;
+      color: var(--el-text-color-secondary);
+      white-space: nowrap;
+    }
+  }
+}
+
+.language-card {
+  margin-top: 16px;
+}
+
+.language-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+
+  li {
+    min-width: 0;
+  }
+}
+
+.language-list__heading {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 13px;
+
+  span:last-child {
+    color: var(--el-color-primary);
+    white-space: nowrap;
+  }
+}
+
+.language-list__bar {
+  height: 6px;
+  overflow: hidden;
+  background: var(--el-fill-color-light);
+  border-radius: 999px;
+
+  span {
+    display: block;
+    height: 100%;
+    background: var(--el-color-primary);
+    border-radius: inherit;
   }
 }
 
@@ -430,14 +441,32 @@ onBeforeUnmount(() => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .dashboard-grid {
+  .dashboard-main-grid {
     grid-template-columns: 1fr;
+  }
+
+  .language-list {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 }
 
 @media (width <= 700px) {
   .dashboard-page {
     padding: 12px;
+  }
+
+  .dashboard-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-filter {
+    justify-content: flex-start;
+  }
+
+  .dashboard-filter :deep(.el-date-editor) {
+    width: 100%;
   }
 
   .metric-grid {

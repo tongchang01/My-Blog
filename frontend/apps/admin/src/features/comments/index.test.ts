@@ -5,14 +5,16 @@ import { http } from "@/utils/http";
 import { useUserStoreHook } from "@/store/modules/user";
 import CommentManagement from "./index.vue";
 
-const { confirm } = vi.hoisted(() => ({
-  confirm: vi.fn().mockResolvedValue("confirm")
+const { confirm, showMessage } = vi.hoisted(() => ({
+  confirm: vi.fn().mockResolvedValue("confirm"),
+  showMessage: vi.fn()
 }));
 
 vi.mock("element-plus", async importOriginal => ({
   ...(await importOriginal<typeof import("element-plus")>()),
   ElMessageBox: { confirm }
 }));
+vi.mock("@/utils/message", () => ({ message: showMessage }));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
@@ -82,6 +84,7 @@ function replyPage(records = [row]) {
 afterEach(() => {
   mock.reset();
   confirm.mockClear();
+  showMessage.mockClear();
   tableRow = row;
 });
 
@@ -132,6 +135,9 @@ describe("comment management page", () => {
     expect(mock.history.post[0].url).toBe(
       "/api/admin/comments/9007199254740995/approve"
     );
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("keeps DEMO users read-only", async () => {
@@ -199,6 +205,9 @@ describe("comment management page", () => {
     );
     expect(JSON.parse(mock.history.post[0].data)).toEqual({
       contentMd: "谢谢反馈"
+    });
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
     });
   });
 

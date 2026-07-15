@@ -2,6 +2,7 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
+import { message } from "@/utils/message";
 import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
 import type { AttachmentItem } from "@/features/attachments/model";
 import type {
@@ -119,6 +120,7 @@ async function submit(): Promise<void> {
     if (result) {
       clearDraft();
       baselineSnapshot.value = snapshotForm();
+      message(transformI18n("articles.editor.saved"), { type: "success" });
       await router.push("/articles/list");
     }
   } catch {
@@ -238,6 +240,7 @@ onBeforeRouteLeave((_to, _from, next) => {
           <el-form-item
             :label="transformI18n('articles.editor.titleZh')"
             :error="fieldError('titleZh')"
+            :required="form.status !== 'DRAFT'"
           >
             <el-input v-model="form.titleZh" maxlength="255" show-word-limit />
           </el-form-item>
@@ -263,6 +266,7 @@ onBeforeRouteLeave((_to, _from, next) => {
         <el-form-item
           :label="transformI18n('articles.editor.body')"
           :error="fieldError('body')"
+          :required="form.status !== 'DRAFT'"
         >
           <div class="markdown-workspace">
             <el-input
@@ -336,6 +340,7 @@ onBeforeRouteLeave((_to, _from, next) => {
         <el-form-item
           :label="transformI18n('articles.editor.category')"
           :error="fieldError('categoryId')"
+          :required="form.status !== 'DRAFT'"
         >
           <el-select v-model="form.categoryId" clearable class="full-width">
             <el-option
@@ -420,6 +425,7 @@ onBeforeRouteLeave((_to, _from, next) => {
           v-if="form.status === 'SCHEDULED'"
           :label="transformI18n('articles.editor.publishAt')"
           :error="fieldError('publishAt')"
+          required
         >
           <el-date-picker
             v-model="form.publishAt"
@@ -435,6 +441,7 @@ onBeforeRouteLeave((_to, _from, next) => {
           v-if="form.status === 'PASSWORD'"
           :label="transformI18n('articles.editor.password')"
           :error="fieldError('password')"
+          :required="mode === 'create'"
         >
           <el-input v-model="form.password" type="password" show-password />
           <p class="field-hint">

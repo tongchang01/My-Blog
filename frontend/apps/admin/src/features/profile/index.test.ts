@@ -103,6 +103,8 @@ describe("profile management page", () => {
 
     expect(wrapper.find('[data-testid="profile-account-card"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="profile-form-card"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="profile-social-card"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="profile-bio-card"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="profile-save"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="profile-password-card"]').exists()).toBe(
       true

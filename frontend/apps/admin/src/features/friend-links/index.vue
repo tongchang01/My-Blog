@@ -5,6 +5,7 @@ import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialo
 import type { AttachmentItem } from "@/features/attachments/model";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "@/utils/message";
 import { formatJstDateTime } from "@/features/articles/presentation";
 import type { FriendLinkItem, FriendLinkStatus } from "./model";
 import { useFriendLinkManagement } from "./useFriendLinkManagement";
@@ -96,7 +97,11 @@ async function confirmStatus(item: FriendLinkItem): Promise<void> {
   } catch {
     return;
   }
-  await state.updateStatus(item.id, nextStatus(item));
+  if (await state.updateStatus(item.id, nextStatus(item))) {
+    message(transformI18n("friendLinks.feedback.statusUpdated"), {
+      type: "success"
+    });
+  }
 }
 
 async function confirmRemove(item: FriendLinkItem): Promise<void> {
@@ -109,7 +114,23 @@ async function confirmRemove(item: FriendLinkItem): Promise<void> {
   } catch {
     return;
   }
-  await state.remove(item.id);
+  if (await state.remove(item.id)) {
+    message(transformI18n("friendLinks.feedback.deleted"), { type: "success" });
+  }
+}
+
+async function submitSave(): Promise<void> {
+  if (await save()) {
+    message(transformI18n("friendLinks.feedback.saved"), { type: "success" });
+  }
+}
+
+async function submitSort(): Promise<void> {
+  if (await saveSortOrders()) {
+    message(transformI18n("friendLinks.feedback.sortSaved"), {
+      type: "success"
+    });
+  }
 }
 
 onMounted(initialize);
@@ -141,7 +162,7 @@ onMounted(initialize);
               data-testid="friend-link-save-sort"
               :disabled="dirtySortItems.length === 0"
               type="primary"
-              @click="saveSortOrders"
+              @click="submitSort"
             >
               {{ transformI18n("friendLinks.actions.saveSort") }}
             </el-button>
@@ -274,12 +295,13 @@ onMounted(initialize);
               width="220"
             >
               <template #default="{ row }">
-                <el-button link type="primary" @click="openEdit(row)">
+                <el-button size="small" plain type="primary" @click="openEdit(row)">
                   {{ transformI18n("articles.actions.edit") }}
                 </el-button>
                 <el-button
                   :data-testid="statusButtonTestId(row)"
-                  link
+                  size="small"
+                  plain
                   type="warning"
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
@@ -289,7 +311,8 @@ onMounted(initialize);
                 </el-button>
                 <el-button
                   :data-testid="`friend-link-delete-${row.id}`"
-                  link
+                  size="small"
+                  plain
                   type="danger"
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
@@ -328,12 +351,14 @@ onMounted(initialize);
     >
       <el-form :model="form" label-position="top">
         <el-form-item
+          required
           :label="transformI18n('friendLinks.fields.name')"
           :error="fieldError('name')"
         >
           <el-input v-model="form.name" maxlength="64" />
         </el-form-item>
         <el-form-item
+          required
           :label="transformI18n('friendLinks.fields.url')"
           :error="fieldError('url')"
         >
@@ -405,7 +430,7 @@ onMounted(initialize);
           data-testid="friend-link-save"
           type="primary"
           :loading="saving"
-          @click="save"
+          @click="submitSave"
         >
           {{ transformI18n("taxonomy.actions.save") }}
         </el-button>
@@ -419,8 +444,8 @@ onMounted(initialize);
 <style scoped lang="scss">
 .friend-link-page {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  padding: 20px 24px;
   color: var(--el-text-color-primary);
   background: var(--el-bg-color-page);
 }

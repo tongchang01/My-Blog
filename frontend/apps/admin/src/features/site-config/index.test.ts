@@ -119,6 +119,7 @@ describe("site config management page", () => {
     await flushPromises();
 
     expect(wrapper.find('[data-testid="site-config-basic-card"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="site-config-assets-card"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="site-config-about-card"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="site-config-save"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="site-config-readonly"]').exists()).toBe(false);

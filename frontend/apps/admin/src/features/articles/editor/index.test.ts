@@ -11,6 +11,7 @@ const routerState = vi.hoisted(() => ({
   route: { name: "ArticleCreate", params: {} as Record<string, string> },
   leaveGuard: undefined as undefined | ((...args: any[]) => void)
 }));
+const showMessage = vi.hoisted(() => vi.fn());
 
 vi.mock("vue-router", () => ({
   onBeforeRouteLeave: (guard: (...args: any[]) => void) => {
@@ -19,6 +20,7 @@ vi.mock("vue-router", () => ({
   useRoute: () => routerState.route,
   useRouter: () => ({ push: routerState.push })
 }));
+vi.mock("@/utils/message", () => ({ message: showMessage }));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
@@ -64,6 +66,7 @@ afterEach(() => {
   mock.reset();
   localStorage.clear();
   routerState.push.mockReset();
+  showMessage.mockReset();
   routerState.leaveGuard = undefined;
   routerState.route = { name: "ArticleCreate", params: {} };
 });
@@ -97,6 +100,9 @@ describe("article editor page", () => {
 
     expect(mock.history.post).toHaveLength(1);
     expect(JSON.parse(mock.history.post[0].data).homepageSlot).toBe("PINNED");
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
     expect(routerState.push).toHaveBeenCalledWith("/articles/list");
   });
 

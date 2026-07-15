@@ -12,7 +12,6 @@ const include = [
   "pinia",
   "vue-i18n",
   "vue-types",
-  "js-cookie",
   "vue-tippy",
   "pinyin-pro",
   "sortablejs",

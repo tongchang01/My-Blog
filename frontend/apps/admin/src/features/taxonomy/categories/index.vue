@@ -3,6 +3,7 @@ import { computed, onMounted } from "vue";
 import { ElMessageBox } from "element-plus";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "@/utils/message";
 import type { AdminLocale } from "@/features/articles/model";
 import {
   formatJstDateTime,
@@ -78,7 +79,21 @@ async function confirmRemove(id: string): Promise<void> {
     transformI18n("taxonomy.actions.delete"),
     { type: "warning" }
   );
-  await state.remove(id);
+  if (await state.remove(id)) {
+    message(transformI18n("taxonomy.feedback.deleted"), { type: "success" });
+  }
+}
+
+async function submitSave(): Promise<void> {
+  if (await save()) {
+    message(transformI18n("taxonomy.feedback.saved"), { type: "success" });
+  }
+}
+
+async function submitSort(): Promise<void> {
+  if (await saveSortOrders()) {
+    message(transformI18n("taxonomy.feedback.sortSaved"), { type: "success" });
+  }
 }
 
 onMounted(initialize);
@@ -90,13 +105,13 @@ defineExpose({ state, confirmRemove });
   <section class="taxonomy-page">
     <el-card
       data-testid="category-filter-card"
-      class="workspace-card"
+      class="workspace-card compact-filter-card"
       shadow="never"
     >
       <template #header>
         <h2>{{ transformI18n("taxonomy.filter.title") }}</h2>
       </template>
-      <el-form label-position="top">
+      <el-form label-position="top" class="taxonomy-filter-form">
         <el-form-item :label="transformI18n('taxonomy.filter.keyword')">
           <el-input
             v-model="keyword"
@@ -122,7 +137,7 @@ defineExpose({ state, confirmRemove });
             <el-button
               data-testid="category-save-sort"
               :disabled="dirtySortItems.length === 0"
-              @click="saveSortOrders"
+              @click="submitSort"
             >
               {{ transformI18n("taxonomy.actions.saveSort") }}
             </el-button>
@@ -199,13 +214,13 @@ defineExpose({ state, confirmRemove });
           data-testid="category-operation-column"
           :label="transformI18n('taxonomy.columns.operations')"
           fixed="right"
-          width="150"
+          width="170"
         >
           <template #default="{ row }">
-            <el-button link type="primary" @click="openEdit(row)">
+            <el-button size="small" plain type="primary" @click="openEdit(row)">
               {{ transformI18n("taxonomy.actions.edit") }}
             </el-button>
-            <el-button link type="danger" @click="confirmRemove(row.id)">
+            <el-button size="small" plain type="danger" @click="confirmRemove(row.id)">
               {{ transformI18n("taxonomy.actions.delete") }}
             </el-button>
           </template>
@@ -221,7 +236,7 @@ defineExpose({ state, confirmRemove });
       @closed="closeDialog"
     >
       <el-form :model="form" label-position="top">
-        <el-form-item :label="transformI18n('taxonomy.fields.nameZh')" :error="fieldError('nameZh')">
+        <el-form-item required :label="transformI18n('taxonomy.fields.nameZh')" :error="fieldError('nameZh')">
           <el-input v-model="form.nameZh" maxlength="64" show-word-limit />
         </el-form-item>
         <el-form-item :label="transformI18n('taxonomy.fields.nameJa')" :error="fieldError('nameJa')">
@@ -230,7 +245,7 @@ defineExpose({ state, confirmRemove });
         <el-form-item :label="transformI18n('taxonomy.fields.nameEn')" :error="fieldError('nameEn')">
           <el-input v-model="form.nameEn" maxlength="64" show-word-limit />
         </el-form-item>
-        <el-form-item :label="transformI18n('taxonomy.fields.slug')" :error="fieldError('slug')">
+        <el-form-item required :label="transformI18n('taxonomy.fields.slug')" :error="fieldError('slug')">
           <el-input
             v-model="form.slug"
             data-testid="category-slug-input"
@@ -248,7 +263,7 @@ defineExpose({ state, confirmRemove });
       </el-form>
       <template #footer>
         <el-button @click="closeDialog">{{ transformI18n("taxonomy.actions.cancel") }}</el-button>
-        <el-button type="primary" :loading="saving" @click="save">
+        <el-button type="primary" :loading="saving" @click="submitSave">
           {{ transformI18n("taxonomy.actions.save") }}
         </el-button>
       </template>
@@ -259,14 +274,22 @@ defineExpose({ state, confirmRemove });
 <style scoped lang="scss">
 .taxonomy-page {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  padding: 20px 24px;
   background: var(--el-bg-color-page);
 }
 
 .workspace-card {
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 8px;
+}
+
+.compact-filter-card {
+  width: min(100%, 460px);
+}
+
+.taxonomy-filter-form :deep(.el-form-item) {
+  margin-bottom: 0;
 }
 
 .card-heading,

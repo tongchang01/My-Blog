@@ -104,6 +104,28 @@ onMounted(initialize);
     </el-alert>
 
     <template v-else>
+      <header class="profile-heading">
+        <h1>{{ transformI18n("settings.profile.form") }}</h1>
+        <el-button
+          v-if="isAdmin"
+          data-testid="profile-save"
+          type="primary"
+          :loading="saving"
+          @click="submitProfileSave"
+        >
+          {{ transformI18n("taxonomy.actions.save") }}
+        </el-button>
+      </header>
+
+      <el-alert
+        v-if="saveError"
+        data-testid="profile-save-error"
+        type="error"
+        :closable="false"
+        :title="transformI18n('settings.profile.saveError')"
+        show-icon
+      />
+
       <el-card
         data-testid="profile-account-card"
         class="workspace-card"
@@ -141,28 +163,8 @@ onMounted(initialize);
         shadow="never"
       >
         <template #header>
-          <div class="card-heading">
-            <h2>{{ transformI18n("settings.profile.form") }}</h2>
-            <el-button
-              v-if="isAdmin"
-              data-testid="profile-save"
-              type="primary"
-              :loading="saving"
-              @click="submitProfileSave"
-            >
-              {{ transformI18n("taxonomy.actions.save") }}
-            </el-button>
-          </div>
+          <h2>{{ transformI18n("settings.profile.identity") }}</h2>
         </template>
-
-        <el-alert
-          v-if="saveError"
-          data-testid="profile-save-error"
-          type="error"
-          :closable="false"
-          :title="transformI18n('settings.profile.saveError')"
-          show-icon
-        />
 
         <p class="field-hint">
           {{ transformI18n("settings.profile.publicHint") }}
@@ -215,6 +217,18 @@ onMounted(initialize);
           <el-form-item :label="transformI18n('settings.profile.emailPublic')" :error="fieldError('emailPublic')">
             <el-input v-model="form.emailPublic" :disabled="readonly" maxlength="128" />
           </el-form-item>
+        </el-form>
+      </el-card>
+
+      <el-card
+        data-testid="profile-social-card"
+        class="workspace-card"
+        shadow="never"
+      >
+        <template #header>
+          <h2>{{ transformI18n("settings.profile.social") }}</h2>
+        </template>
+        <el-form :model="form" label-position="top" class="profile-grid">
           <el-form-item :label="transformI18n('settings.profile.githubUrl')" :error="fieldError('githubUrl')">
             <el-input v-model="form.githubUrl" :disabled="readonly" maxlength="255" />
           </el-form-item>
@@ -233,6 +247,18 @@ onMounted(initialize);
           <el-form-item :label="transformI18n('settings.profile.juejinUrl')" :error="fieldError('juejinUrl')">
             <el-input v-model="form.juejinUrl" :disabled="readonly" maxlength="255" />
           </el-form-item>
+        </el-form>
+      </el-card>
+
+      <el-card
+        data-testid="profile-bio-card"
+        class="workspace-card"
+        shadow="never"
+      >
+        <template #header>
+          <h2>{{ transformI18n("settings.profile.biographies") }}</h2>
+        </template>
+        <el-form :model="form" label-position="top" class="bio-grid">
           <el-form-item :label="transformI18n('settings.profile.bioZh')" :error="fieldError('bioZh')">
             <el-input v-model="form.bioZh" type="textarea" :rows="4" :disabled="readonly" maxlength="5000" show-word-limit />
           </el-form-item>
@@ -328,8 +354,8 @@ onMounted(initialize);
 <style scoped lang="scss">
 .profile-page {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  padding: 20px 24px;
   background: var(--el-bg-color-page);
 }
 
@@ -338,12 +364,24 @@ onMounted(initialize);
   border-radius: 8px;
 }
 
+.profile-heading,
 .card-heading,
 .account-summary {
   display: flex;
   gap: 16px;
   align-items: center;
   justify-content: space-between;
+}
+
+.profile-heading {
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
+
+  h1 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 28px;
+  }
 }
 
 .card-heading h2 {
@@ -355,7 +393,21 @@ onMounted(initialize);
 .profile-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 16px 20px;
+
+  :deep(.el-form-item) {
+    margin-bottom: 0;
+  }
+}
+
+.bio-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+
+  :deep(.el-form-item) {
+    margin-bottom: 0;
+  }
 }
 
 .password-grid {
@@ -420,6 +472,11 @@ onMounted(initialize);
   }
 
   .password-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .bio-grid {
     grid-template-columns: 1fr;
     gap: 0;
   }
