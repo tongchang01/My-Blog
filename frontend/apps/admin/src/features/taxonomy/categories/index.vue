@@ -105,13 +105,13 @@ defineExpose({ state, confirmRemove });
   <section class="taxonomy-page">
     <el-card
       data-testid="category-filter-card"
-      class="workspace-card"
+      class="workspace-card compact-filter-card"
       shadow="never"
     >
       <template #header>
         <h2>{{ transformI18n("taxonomy.filter.title") }}</h2>
       </template>
-      <el-form label-position="top">
+      <el-form label-position="top" class="taxonomy-filter-form">
         <el-form-item :label="transformI18n('taxonomy.filter.keyword')">
           <el-input
             v-model="keyword"
@@ -214,13 +214,13 @@ defineExpose({ state, confirmRemove });
           data-testid="category-operation-column"
           :label="transformI18n('taxonomy.columns.operations')"
           fixed="right"
-          width="150"
+          width="170"
         >
           <template #default="{ row }">
-            <el-button link type="primary" @click="openEdit(row)">
+            <el-button size="small" plain type="primary" @click="openEdit(row)">
               {{ transformI18n("taxonomy.actions.edit") }}
             </el-button>
-            <el-button link type="danger" @click="confirmRemove(row.id)">
+            <el-button size="small" plain type="danger" @click="confirmRemove(row.id)">
               {{ transformI18n("taxonomy.actions.delete") }}
             </el-button>
           </template>
@@ -274,14 +274,22 @@ defineExpose({ state, confirmRemove });
 <style scoped lang="scss">
 .taxonomy-page {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  padding: 20px 24px;
   background: var(--el-bg-color-page);
 }
 
 .workspace-card {
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 8px;
+}
+
+.compact-filter-card {
+  width: min(100%, 460px);
+}
+
+.taxonomy-filter-form :deep(.el-form-item) {
+  margin-bottom: 0;
 }
 
 .card-heading,
