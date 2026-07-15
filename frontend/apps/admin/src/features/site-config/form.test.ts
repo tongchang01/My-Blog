@@ -53,11 +53,9 @@ describe("site config form", () => {
     });
   });
 
-  it("requires all three site titles", () => {
+  it("requires only the Chinese title", () => {
     expect(validateSiteConfigForm(createSiteConfigForm())).toEqual({
-      siteTitleZh: "required",
-      siteTitleJa: "required",
-      siteTitleEn: "required"
+      siteTitleZh: "required"
     });
   });
 

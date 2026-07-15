@@ -120,6 +120,10 @@ onMounted(initialize);
           show-icon
         />
 
+        <p class="field-hint">
+          {{ transformI18n("settings.siteConfig.fullReplaceHint") }}
+        </p>
+
         <el-form :model="form" label-position="top" class="settings-grid">
           <el-form-item
             :label="transformI18n('settings.siteConfig.siteTitleZh')"
@@ -132,12 +136,18 @@ onMounted(initialize);
             :error="fieldError('siteTitleJa')"
           >
             <el-input v-model="form.siteTitleJa" :disabled="readonly" />
+            <p class="field-hint">
+              {{ transformI18n("settings.siteConfig.fallbackHint") }}
+            </p>
           </el-form-item>
           <el-form-item
             :label="transformI18n('settings.siteConfig.siteTitleEn')"
             :error="fieldError('siteTitleEn')"
           >
             <el-input v-model="form.siteTitleEn" :disabled="readonly" />
+            <p class="field-hint">
+              {{ transformI18n("settings.siteConfig.fallbackHint") }}
+            </p>
           </el-form-item>
           <el-form-item :label="transformI18n('settings.siteConfig.siteSubtitleZh')">
             <el-input v-model="form.siteSubtitleZh" :disabled="readonly" />
@@ -293,6 +303,12 @@ onMounted(initialize);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 
 .image-url-field {

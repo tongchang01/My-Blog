@@ -396,6 +396,8 @@ settings:
     about: About content
     loadError: Unable to load site config. Please retry.
     saveError: Unable to save site config. Please retry.
+    fullReplaceHint: Saving replaces the site config with the complete current form; refresh before editing.
+    fallbackHint: Empty fields fall back to Chinese field by field on the public site.
     siteTitleZh: Chinese title
     siteTitleJa: Japanese title
     siteTitleEn: English title
@@ -444,6 +446,8 @@ settings:
       required: This field is required
       length: The new password must be 8 to 128 characters
       mismatch: The new passwords do not match
+      sameAsCurrent: The new password must differ from the current password
+    revokeHint: After success, every device must sign in again.
 attachments:
   readonlyDemo: The current demo account is read-only and cannot upload attachments
   upload:

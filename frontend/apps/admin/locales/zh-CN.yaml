@@ -396,6 +396,8 @@ settings:
     about: 关于内容
     loadError: 站点配置加载失败，请重试
     saveError: 站点配置保存失败，请重试
+    fullReplaceHint: 保存会用当前完整表单覆盖站点配置；请先刷新，再修改。
+    fallbackHint: 留空时前台会逐字段回退中文。
     siteTitleZh: 中文标题
     siteTitleJa: 日文标题
     siteTitleEn: 英文标题
@@ -444,6 +446,8 @@ settings:
       required: 此项为必填项
       length: 新密码长度必须为 8 到 128 位
       mismatch: 两次输入的新密码不一致
+      sameAsCurrent: 新密码不能与当前密码相同
+    revokeHint: 修改成功后，所有设备都需要重新登录。
 attachments:
   readonlyDemo: 当前演示账号为只读模式，不能上传附件
   upload:

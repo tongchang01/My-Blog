@@ -298,6 +298,9 @@ onMounted(initialize);
             />
           </el-form-item>
         </el-form>
+        <p class="field-hint">
+          {{ transformI18n("settings.password.revokeHint") }}
+        </p>
       </el-card>
     </template>
 
@@ -345,6 +348,12 @@ onMounted(initialize);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 18px;
+}
+
+.field-hint {
+  margin: 6px 0 0;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 
 .image-url-field {

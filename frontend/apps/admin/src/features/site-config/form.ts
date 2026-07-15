@@ -50,8 +50,6 @@ export function validateSiteConfigForm(
 ): SiteConfigFormErrors {
   const errors: SiteConfigFormErrors = {};
   if (!form.siteTitleZh.trim()) errors.siteTitleZh = "required";
-  if (!form.siteTitleJa.trim()) errors.siteTitleJa = "required";
-  if (!form.siteTitleEn.trim()) errors.siteTitleEn = "required";
   return errors;
 }
 
