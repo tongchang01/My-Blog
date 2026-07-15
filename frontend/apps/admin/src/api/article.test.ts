@@ -41,6 +41,12 @@ describe("article API", () => {
       listArticles({
         titleKeyword: " Vue ",
         status: "PUBLISHED",
+        categoryId: "",
+        tagId: "",
+        createdFrom: "",
+        createdTo: "",
+        publishFrom: "",
+        publishTo: "",
         page: 1,
         size: 20
       })

@@ -124,7 +124,7 @@ articles:
     titlePlaceholder: Search multilingual titles
     status: Article status
     statusPlaceholder: Select a status
-    futureHint: Category, tag and date filters can be added here later.
+    rangeError: The start of a date range cannot be after its end
   result:
     eyebrow: Content Inventory
     total: Total articles
@@ -146,6 +146,7 @@ articles:
     category: Category
     tags: Tags
     comments: Comments
+    createdAt: Created at
     publishAt: Publish time
     updatedAt: Update time
     operations: Actions

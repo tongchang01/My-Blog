@@ -124,7 +124,7 @@ articles:
     titlePlaceholder: 多言語タイトルを検索
     status: 記事ステータス
     statusPlaceholder: ステータスを選択
-    futureHint: カテゴリ、タグ、日付の条件を今後ここに追加できます。
+    rangeError: 日時範囲の開始は終了より後にできません
   result:
     eyebrow: Content Inventory
     total: 記事総数
@@ -146,6 +146,7 @@ articles:
     category: カテゴリ
     tags: タグ
     comments: コメント数
+    createdAt: 作成日時
     publishAt: 公開日時
     updatedAt: 更新日時
     operations: 操作

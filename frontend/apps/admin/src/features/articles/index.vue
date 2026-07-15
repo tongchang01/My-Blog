@@ -28,6 +28,7 @@ const {
   total,
   loading,
   error,
+  filterError,
   operationError,
   deletingId,
   initialize,
@@ -40,6 +41,24 @@ const {
 const locale = computed(
   () => (i18n.global.locale as unknown as { value: AdminLocale }).value
 );
+const createdRange = computed({
+  get: () =>
+    filters.createdFrom && filters.createdTo
+      ? [filters.createdFrom, filters.createdTo]
+      : [],
+  set: (range: string[]) => {
+    [filters.createdFrom = "", filters.createdTo = ""] = range;
+  }
+});
+const publishRange = computed({
+  get: () =>
+    filters.publishFrom && filters.publishTo
+      ? [filters.publishFrom, filters.publishTo]
+      : [],
+  set: (range: string[]) => {
+    [filters.publishFrom = "", filters.publishTo = ""] = range;
+  }
+});
 
 function articleTitle(item: ArticleListItem): string {
   return localizedName(
@@ -180,6 +199,52 @@ onMounted(initialize);
               />
             </el-select>
           </el-form-item>
+          <el-form-item :label="transformI18n('articles.columns.category')">
+            <el-select
+              v-model="filters.categoryId"
+              data-testid="category-filter"
+              clearable
+            >
+              <el-option
+                v-for="category in categories"
+                :key="category.id"
+                :label="localizedName(category, locale)"
+                :value="category.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="transformI18n('articles.columns.tags')">
+            <el-select
+              v-model="filters.tagId"
+              data-testid="tag-filter"
+              clearable
+            >
+              <el-option
+                v-for="tag in tags"
+                :key="tag.id"
+                :label="localizedName(tag, locale)"
+                :value="tag.id"
+              />
+            </el-select>
+          </el-form-item>
+          <el-form-item :label="transformI18n('articles.columns.createdAt')">
+            <el-date-picker
+              v-model="createdRange"
+              data-testid="created-at-filter"
+              type="datetimerange"
+              value-format="YYYY-MM-DDTHH:mm:ss"
+              clearable
+            />
+          </el-form-item>
+          <el-form-item :label="transformI18n('articles.columns.publishAt')">
+            <el-date-picker
+              v-model="publishRange"
+              data-testid="publish-at-filter"
+              type="datetimerange"
+              value-format="YYYY-MM-DDTHH:mm:ss"
+              clearable
+            />
+          </el-form-item>
         </el-form>
 
         <div class="filter-actions">
@@ -194,9 +259,6 @@ onMounted(initialize);
             {{ transformI18n("articles.actions.reset") }}
           </el-button>
         </div>
-        <p class="future-filter-note">
-          {{ transformI18n("articles.filter.futureHint") }}
-        </p>
       </div>
     </el-card>
 
@@ -232,6 +294,15 @@ onMounted(initialize);
           </div>
         </div>
       </template>
+
+      <el-alert
+        v-if="filterError"
+        data-testid="article-filter-error"
+        type="error"
+        :closable="false"
+        :title="transformI18n('articles.filter.rangeError')"
+        show-icon
+      />
 
       <el-alert
         v-if="operationError"
@@ -443,7 +514,7 @@ onMounted(initialize);
 
 .filter-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.7fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 28px;
 }
 
@@ -455,14 +526,6 @@ onMounted(initialize);
 .result-actions {
   display: flex;
   gap: 10px;
-}
-
-.future-filter-note {
-  padding-top: 14px;
-  margin: 18px 0 0;
-  font-size: 13px;
-  color: var(--el-text-color-secondary);
-  border-top: 1px dashed var(--el-border-color-lighter);
 }
 
 .result-count {

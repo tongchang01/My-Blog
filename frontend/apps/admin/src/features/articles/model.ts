@@ -24,6 +24,12 @@ export type AdminLocale = "zh" | "ja" | "en";
 export interface ArticleListFilters {
   titleKeyword: string;
   status: ArticleStatusFilter;
+  categoryId: string;
+  tagId: string;
+  createdFrom: string;
+  createdTo: string;
+  publishFrom: string;
+  publishTo: string;
   page: number;
   size: number;
 }
@@ -31,6 +37,12 @@ export interface ArticleListFilters {
 export interface ArticleListParams {
   titleKeyword?: string;
   status?: ArticleStatus;
+  categoryId?: string;
+  tagId?: string;
+  createdFrom?: string;
+  createdTo?: string;
+  publishFrom?: string;
+  publishTo?: string;
   page: number;
   size: number;
 }

@@ -124,7 +124,7 @@ articles:
     titlePlaceholder: 请输入三语标题关键词
     status: 文章状态
     statusPlaceholder: 请选择状态
-    futureHint: 后续可在此扩展分类、标签和日期筛选。
+    rangeError: 日期范围的开始时间不能晚于结束时间
   result:
     eyebrow: Content Inventory
     total: 文章总数
@@ -146,6 +146,7 @@ articles:
     category: 分类
     tags: 标签
     comments: 评论数
+    createdAt: 创建时间
     publishAt: 发布时间
     updatedAt: 更新时间
     operations: 操作

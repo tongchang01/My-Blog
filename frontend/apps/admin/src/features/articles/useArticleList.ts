@@ -33,12 +33,29 @@ const defaultApi: ArticleListApi = {
 const DEFAULT_FILTERS: ArticleListFilters = {
   titleKeyword: "",
   status: "ALL",
+  categoryId: "",
+  tagId: "",
+  createdFrom: "",
+  createdTo: "",
+  publishFrom: "",
+  publishTo: "",
   page: 1,
   size: 20
 };
 
 function asError(error: unknown): Error {
   return error instanceof Error ? error : new Error(String(error));
+}
+
+function hasInvalidDateRange(filters: ArticleListFilters): boolean {
+  return Boolean(
+    (filters.createdFrom &&
+      filters.createdTo &&
+      filters.createdFrom > filters.createdTo) ||
+      (filters.publishFrom &&
+        filters.publishTo &&
+        filters.publishFrom > filters.publishTo)
+  );
 }
 
 export function useArticleList(api: ArticleListApi = defaultApi) {
@@ -49,11 +66,17 @@ export function useArticleList(api: ArticleListApi = defaultApi) {
   const total = ref(0);
   const loading = ref(false);
   const error = ref<Error | null>(null);
+  const filterError = ref(false);
   const operationError = ref<Error | null>(null);
   const deletingId = ref<string | null>(null);
   let requestVersion = 0;
 
   async function loadArticles(): Promise<void> {
+    if (hasInvalidDateRange(filters)) {
+      filterError.value = true;
+      return;
+    }
+    filterError.value = false;
     const version = ++requestVersion;
     loading.value = true;
     error.value = null;
@@ -143,6 +166,7 @@ export function useArticleList(api: ArticleListApi = defaultApi) {
     total,
     loading,
     error,
+    filterError,
     operationError,
     deletingId,
     initialize,

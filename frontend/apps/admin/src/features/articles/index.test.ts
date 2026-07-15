@@ -24,6 +24,7 @@ const stubs = {
   "el-card": {
     template: "<div><slot name='header' /><slot /></div>"
   },
+  "el-date-picker": true,
   "el-empty": true,
   "el-form": true,
   "el-form-item": true,
@@ -152,6 +153,14 @@ describe("article list page", () => {
     );
     expect(wrapper.find('[data-testid="title-filter"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="status-filter"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="category-filter"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="tag-filter"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="created-at-filter"]').exists()).toBe(
+      true
+    );
+    expect(wrapper.find('[data-testid="publish-at-filter"]').exists()).toBe(
+      true
+    );
     expect(
       wrapper.find('[data-testid="article-homepage-slot-column"]').exists()
     ).toBe(true);
