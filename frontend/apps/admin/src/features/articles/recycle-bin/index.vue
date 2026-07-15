@@ -3,6 +3,7 @@ import { computed, onMounted } from "vue";
 import { ElMessageBox } from "element-plus";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "@/utils/message";
 import type {
   AdminLocale,
   DeletedArticleListItem
@@ -86,7 +87,9 @@ async function confirmRestore(item: DeletedArticleListItem): Promise<void> {
   } catch {
     return;
   }
-  await state.restore(item.id);
+  if (await state.restore(item.id)) {
+    message(transformI18n("articles.recycle.restored"), { type: "success" });
+  }
 }
 
 onMounted(initialize);

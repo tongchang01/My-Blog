@@ -148,6 +148,7 @@ articles:
   delete:
     confirm: The article will be moved to the recycle bin. Continue
     error: Unable to delete the article. Please retry
+    deleted: Article moved to the recycle bin
   columns:
     title: Title
     status: Status
@@ -181,6 +182,7 @@ articles:
     deletedAt: Deleted at
     deletedBy: Deleted by ID
     restore: Restore
+    restored: Article restored
     restoreConfirm: Restoring keeps the original status, so a published article may become public immediately. Continue
     errors:
       load: Unable to load the recycle bin. Please retry
@@ -194,6 +196,7 @@ articles:
     subtitle: Edit Markdown content and publishing settings
     back: Back to list
     save: Save article
+    saved: Article saved
     contentSection: Article content
     settingsSection: Publishing settings
     titleZh: Chinese title

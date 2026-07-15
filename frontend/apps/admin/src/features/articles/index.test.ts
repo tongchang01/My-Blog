@@ -5,8 +5,9 @@ import { http } from "@/utils/http";
 import { useUserStoreHook } from "@/store/modules/user";
 import ArticleList from "./index.vue";
 
-const { confirm } = vi.hoisted(() => ({
-  confirm: vi.fn().mockResolvedValue("confirm")
+const { confirm, showMessage } = vi.hoisted(() => ({
+  confirm: vi.fn().mockResolvedValue("confirm"),
+  showMessage: vi.fn()
 }));
 
 vi.mock("element-plus", async importOriginal => ({
@@ -15,6 +16,7 @@ vi.mock("element-plus", async importOriginal => ({
 }));
 
 vi.mock("vue-router", () => ({ useRouter: () => ({ push: vi.fn() }) }));
+vi.mock("@/utils/message", () => ({ message: showMessage }));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
@@ -81,6 +83,7 @@ function replyDictionaries() {
 afterEach(() => {
   mock.reset();
   confirm.mockClear();
+  showMessage.mockReset();
 });
 
 describe("article list page", () => {
@@ -183,6 +186,9 @@ describe("article list page", () => {
 
     expect(confirm).toHaveBeenCalledOnce();
     expect(mock.history.delete).toHaveLength(1);
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("keeps DEMO users read-only", async () => {

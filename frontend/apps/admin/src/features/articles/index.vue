@@ -4,6 +4,7 @@ import { ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "@/utils/message";
 import type { AdminLocale, ArticleListItem, TagItem } from "./model";
 import {
   formatJstDateTime,
@@ -127,7 +128,9 @@ async function confirmRemove(item: ArticleListItem): Promise<void> {
   } catch {
     return;
   }
-  await state.remove(item.id);
+  if (await state.remove(item.id)) {
+    message(transformI18n("articles.delete.deleted"), { type: "success" });
+  }
 }
 
 onMounted(initialize);
