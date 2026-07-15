@@ -451,6 +451,9 @@ settings:
   profile:
     account: 账号概览
     form: 作者资料
+    identity: 公开身份资料
+    social: 社交链接
+    biographies: 三语简介
     loadError: 作者资料加载失败，请重试
     saveError: 作者资料保存失败，请重试
     saved: 作者资料已保存

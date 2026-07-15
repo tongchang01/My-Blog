@@ -451,6 +451,9 @@ settings:
   profile:
     account: アカウント概要
     form: 作者プロフィール
+    identity: 公開プロフィール
+    social: ソーシャルリンク
+    biographies: 3言語の紹介
     loadError: プロフィールを読み込めませんでした。再試行してください
     saveError: プロフィールを保存できませんでした。再試行してください
     saved: プロフィールを保存しました

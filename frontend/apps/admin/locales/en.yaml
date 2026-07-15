@@ -451,6 +451,9 @@ settings:
   profile:
     account: Account overview
     form: Author profile
+    identity: Public identity
+    social: Social links
+    biographies: Multilingual bios
     loadError: Unable to load profile. Please retry.
     saveError: Unable to save profile. Please retry.
     saved: Profile saved
