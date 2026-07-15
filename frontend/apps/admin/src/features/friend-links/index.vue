@@ -295,12 +295,13 @@ onMounted(initialize);
               width="220"
             >
               <template #default="{ row }">
-                <el-button link type="primary" @click="openEdit(row)">
+                <el-button size="small" plain type="primary" @click="openEdit(row)">
                   {{ transformI18n("articles.actions.edit") }}
                 </el-button>
                 <el-button
                   :data-testid="statusButtonTestId(row)"
-                  link
+                  size="small"
+                  plain
                   type="warning"
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
@@ -310,7 +311,8 @@ onMounted(initialize);
                 </el-button>
                 <el-button
                   :data-testid="`friend-link-delete-${row.id}`"
-                  link
+                  size="small"
+                  plain
                   type="danger"
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
@@ -442,8 +444,8 @@ onMounted(initialize);
 <style scoped lang="scss">
 .friend-link-page {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  padding: 20px 24px;
   color: var(--el-text-color-primary);
   background: var(--el-bg-color-page);
 }
