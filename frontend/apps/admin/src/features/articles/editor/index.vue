@@ -239,25 +239,25 @@ onBeforeRouteLeave((_to, _from, next) => {
             :label="transformI18n('articles.editor.titleZh')"
             :error="fieldError('titleZh')"
           >
-            <el-input v-model="form.titleZh" maxlength="200" show-word-limit />
+            <el-input v-model="form.titleZh" maxlength="255" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.editor.titleJa')">
-            <el-input v-model="form.titleJa" maxlength="200" show-word-limit />
+          <el-form-item :label="transformI18n('articles.editor.titleJa')" :error="fieldError('titleJa')">
+            <el-input v-model="form.titleJa" maxlength="255" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.editor.titleEn')">
-            <el-input v-model="form.titleEn" maxlength="200" show-word-limit />
+          <el-form-item :label="transformI18n('articles.editor.titleEn')" :error="fieldError('titleEn')">
+            <el-input v-model="form.titleEn" maxlength="255" show-word-limit />
           </el-form-item>
           <el-form-item
             :label="transformI18n('articles.editor.summaryZh')"
             :error="fieldError('summaryZh')"
           >
-            <el-input v-model="form.summaryZh" type="textarea" :rows="3" />
+            <el-input v-model="form.summaryZh" type="textarea" :rows="3" maxlength="500" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.editor.summaryJa')">
-            <el-input v-model="form.summaryJa" type="textarea" :rows="3" />
+          <el-form-item :label="transformI18n('articles.editor.summaryJa')" :error="fieldError('summaryJa')">
+            <el-input v-model="form.summaryJa" type="textarea" :rows="3" maxlength="500" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.editor.summaryEn')">
-            <el-input v-model="form.summaryEn" type="textarea" :rows="3" />
+          <el-form-item :label="transformI18n('articles.editor.summaryEn')" :error="fieldError('summaryEn')">
+            <el-input v-model="form.summaryEn" type="textarea" :rows="3" maxlength="500" show-word-limit />
           </el-form-item>
         </div>
         <el-form-item

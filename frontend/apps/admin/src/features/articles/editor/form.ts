@@ -13,7 +13,8 @@ export type ArticleFormErrorCode =
   | "scheduledFuture"
   | "passwordRequired"
   | "tagLimit"
-  | "slugFormat";
+  | "slugFormat"
+  | "maxLength";
 
 export interface ArticleForm {
   titleZh: string;
@@ -130,6 +131,12 @@ export function validateArticleForm(
     errors.password = "passwordRequired";
   }
   if (form.tagIds.length > 20) errors.tagIds = "tagLimit";
+  for (const field of ["titleZh", "titleJa", "titleEn"] as const) {
+    if (form[field].trim().length > 255) errors[field] = "maxLength";
+  }
+  for (const field of ["summaryZh", "summaryJa", "summaryEn"] as const) {
+    if (form[field].trim().length > 500) errors[field] = "maxLength";
+  }
   const slug = form.slug.trim();
   if (slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug.toLowerCase())) {
     errors.slug = "slugFormat";

@@ -8,7 +8,8 @@ import type {
 export type TaxonomyFormErrorCode =
   | "required"
   | "slugFormat"
-  | "sortOrderRange";
+  | "sortOrderRange"
+  | "maxLength";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -54,6 +55,9 @@ export function categoryToForm(category: CategoryItem): CategoryForm {
 function validateBase(form: TagForm): TagFormErrors {
   const errors: TagFormErrors = {};
   if (!form.nameZh.trim()) errors.nameZh = "required";
+  for (const field of ["nameZh", "nameJa", "nameEn"] as const) {
+    if (form[field].trim().length > 64) errors[field] = "maxLength";
+  }
   const slug = normalizeSlug(form.slug);
   if (!slug) errors.slug = "required";
   else if (slug.length > 64 || !SLUG_PATTERN.test(slug)) {

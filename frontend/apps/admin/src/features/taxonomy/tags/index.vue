@@ -154,10 +154,10 @@ defineExpose({ state, confirmRemove });
     >
       <el-form :model="form" label-position="top">
         <el-form-item :label="transformI18n('taxonomy.fields.nameZh')" :error="fieldError('nameZh')">
-          <el-input v-model="form.nameZh" />
+          <el-input v-model="form.nameZh" maxlength="64" show-word-limit />
         </el-form-item>
-        <el-form-item :label="transformI18n('taxonomy.fields.nameJa')"><el-input v-model="form.nameJa" /></el-form-item>
-        <el-form-item :label="transformI18n('taxonomy.fields.nameEn')"><el-input v-model="form.nameEn" /></el-form-item>
+        <el-form-item :label="transformI18n('taxonomy.fields.nameJa')" :error="fieldError('nameJa')"><el-input v-model="form.nameJa" maxlength="64" show-word-limit /></el-form-item>
+        <el-form-item :label="transformI18n('taxonomy.fields.nameEn')" :error="fieldError('nameEn')"><el-input v-model="form.nameEn" maxlength="64" show-word-limit /></el-form-item>
         <el-form-item :label="transformI18n('taxonomy.fields.slug')" :error="fieldError('slug')">
           <el-input
             v-model="form.slug"

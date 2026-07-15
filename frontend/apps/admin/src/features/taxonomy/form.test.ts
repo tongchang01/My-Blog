@@ -80,6 +80,14 @@ describe("taxonomy forms", () => {
     expect(
       validateTagForm({ ...createTagForm(), nameZh: "标签", slug: "bad_slug" })
     ).toEqual({ slug: "slugFormat" });
+    expect(
+      validateTagForm({
+        ...createTagForm(),
+        nameZh: "标签",
+        nameEn: "a".repeat(65),
+        slug: "tag"
+      })
+    ).toEqual({ nameEn: "maxLength" });
   });
 
   it("normalizes whitespace and optional language names", () => {

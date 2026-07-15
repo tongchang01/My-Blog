@@ -137,4 +137,15 @@ describe("article editor form", () => {
       slug: "slugFormat"
     });
   });
+
+  it("rejects titles and summaries beyond the server limits", () => {
+    const form = createEmptyArticleForm();
+    form.titleJa = "a".repeat(256);
+    form.summaryEn = "a".repeat(501);
+
+    expect(validateArticleForm(form, "create")).toEqual({
+      titleJa: "maxLength",
+      summaryEn: "maxLength"
+    });
+  });
 });

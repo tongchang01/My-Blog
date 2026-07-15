@@ -9,6 +9,7 @@ export interface PasswordForm {
 export type PasswordFormErrorCode =
   | "required"
   | "length"
+  | "currentLength"
   | "mismatch"
   | "sameAsCurrent";
 
@@ -27,6 +28,9 @@ export function createPasswordForm(): PasswordForm {
 export function validatePasswordForm(form: PasswordForm): PasswordFormErrors {
   const errors: PasswordFormErrors = {};
   if (!form.currentPassword.trim()) errors.currentPassword = "required";
+  else if (form.currentPassword.length > 128) {
+    errors.currentPassword = "currentLength";
+  }
   if (!form.newPassword.trim()) {
     errors.newPassword = "required";
   } else if (form.newPassword.length < 8 || form.newPassword.length > 128) {

@@ -236,6 +236,7 @@ articles:
       passwordRequired: パスワード記事には閲覧パスワードが必要です
       tagLimit: タグは最大 20 件まで選択できます
       slugFormat: Slug は小文字・数字・ハイフンだけが使えます
+      maxLength: 値がサーバーの最大長を超えています
 taxonomy:
   filter:
     title: 絞り込み条件
@@ -278,6 +279,7 @@ taxonomy:
     required: 必須項目です
     slugFormat: Slug は小文字、数字、ハイフンのみ使用でき、最大64文字です
     sortOrderRange: 並び順は 0 から 1000000 の整数で入力してください
+    maxLength: 値がサーバーの最大長を超えています
   errors:
     saveConflict: 名前または Slug は既に使用されています
     deleteConflict: 公開中の記事から参照されているため削除できません
@@ -458,6 +460,7 @@ settings:
     validation:
       required: 入力してください
       length: 新しいパスワードは8〜128文字で入力してください
+      currentLength: 現在のパスワードは128文字以内で入力してください
       mismatch: 新しいパスワードが一致しません
       sameAsCurrent: 新しいパスワードは現在のパスワードと同じにできません
     revokeHint: 変更が成功すると、すべての端末で再ログインが必要です。
@@ -499,5 +502,6 @@ login:
   errorNetwork: ネットワークに接続できません。接続を確認してください
   errorUnknown: ログインに失敗しました。しばらくしてから再試行してください
   pureUsernameReg: ユーザー名を入力してください
+  pureUsernameLength: ユーザー名は64文字以内で入力してください
   purePassWordReg: パスワードを入力してください
-  purePassWordRuleReg: パスワードは8〜18文字で入力してください
+  purePassWordLength: パスワードは128文字以内で入力してください

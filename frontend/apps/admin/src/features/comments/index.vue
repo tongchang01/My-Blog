@@ -5,7 +5,10 @@ import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { formatJstDateTime } from "@/features/articles/presentation";
 import type { CommentAuditStatus, CommentListItem } from "./model";
-import { useCommentManagement } from "./useCommentManagement";
+import {
+  MAX_COMMENT_REPLY_LENGTH,
+  useCommentManagement
+} from "./useCommentManagement";
 
 defineOptions({ name: "CommentManagement" });
 
@@ -444,6 +447,8 @@ watch(
         data-testid="comment-reply-content"
         type="textarea"
         :rows="5"
+        :maxlength="MAX_COMMENT_REPLY_LENGTH"
+        show-word-limit
         :placeholder="transformI18n('comments.reply.placeholder')"
       />
       <template #footer>
@@ -454,7 +459,7 @@ watch(
           data-testid="comment-reply-submit"
           type="primary"
           :loading="replySubmitting"
-          :disabled="!replyContent.trim()"
+          :disabled="!replyContent.trim() || replyContent.trim().length > MAX_COMMENT_REPLY_LENGTH"
           @click="submitReply"
         >
           {{ transformI18n("comments.reply.submit") }}
