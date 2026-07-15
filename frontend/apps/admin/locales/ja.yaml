@@ -343,10 +343,17 @@ comments:
   errors:
     load: コメント一覧の読み込みに失敗しました。再試行してください
     operation: コメント操作に失敗しました。再試行してください
+  feedback:
+    approved: コメントを承認しました
+    hidden: コメントを非表示にしました
+    deleted: コメントを削除しました
+    restored: コメントを復元しました
+    replied: 返信を投稿しました
   reply:
     title: コメントに返信
     target: 返信先
     replyTo: 返信先
+    content: 返信内容
     placeholder: 管理者返信を入力してください。Markdown が使えます。
     submit: 返信を投稿
   empty: 条件に一致するコメントはありません

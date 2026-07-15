@@ -3,6 +3,7 @@ import { computed, onMounted, watch } from "vue";
 import { ElMessageBox } from "element-plus";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "@/utils/message";
 import { formatJstDateTime } from "@/features/articles/presentation";
 import type { CommentAuditStatus, CommentListItem } from "./model";
 import {
@@ -104,6 +105,7 @@ function handleReplyDialogBeforeClose(done: () => void): void {
 async function confirmAction(
   item: CommentListItem,
   titleKey: string,
+  successKey: string,
   action: (id: string) => Promise<boolean>
 ): Promise<void> {
   try {
@@ -115,7 +117,15 @@ async function confirmAction(
   } catch {
     return;
   }
-  await action(item.id);
+  if (await action(item.id)) {
+    message(transformI18n(successKey), { type: "success" });
+  }
+}
+
+async function submitReplyAndNotify(): Promise<void> {
+  if (await submitReply()) {
+    message(transformI18n("comments.feedback.replied"), { type: "success" });
+  }
 }
 
 onMounted(initialize);
@@ -369,7 +379,7 @@ watch(
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
                   @click="
-                    confirmAction(row, actionConfirmKey(row, 'approve'), state.approve)
+                    confirmAction(row, actionConfirmKey(row, 'approve'), 'comments.feedback.approved', state.approve)
                   "
                 >
                   {{ transformI18n("comments.actions.approve") }}
@@ -381,7 +391,7 @@ watch(
                   type="warning"
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
-                  @click="confirmAction(row, actionConfirmKey(row, 'hide'), state.hide)"
+                  @click="confirmAction(row, actionConfirmKey(row, 'hide'), 'comments.feedback.hidden', state.hide)"
                 >
                   {{ transformI18n("comments.actions.hide") }}
                 </el-button>
@@ -393,7 +403,7 @@ watch(
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
                   @click="
-                    confirmAction(row, actionConfirmKey(row, 'delete'), state.remove)
+                    confirmAction(row, actionConfirmKey(row, 'delete'), 'comments.feedback.deleted', state.remove)
                   "
                 >
                   {{ transformI18n("articles.actions.delete") }}
@@ -406,7 +416,7 @@ watch(
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
                   @click="
-                    confirmAction(row, actionConfirmKey(row, 'restore'), state.restore)
+                    confirmAction(row, actionConfirmKey(row, 'restore'), 'comments.feedback.restored', state.restore)
                   "
                 >
                   {{ transformI18n("articles.recycle.restore") }}
@@ -442,15 +452,17 @@ watch(
           replyTarget.authorNickname
         }}
       </p>
-      <el-input
-        v-model="replyContent"
-        data-testid="comment-reply-content"
-        type="textarea"
-        :rows="5"
-        :maxlength="MAX_COMMENT_REPLY_LENGTH"
-        show-word-limit
-        :placeholder="transformI18n('comments.reply.placeholder')"
-      />
+      <el-form-item required :label="transformI18n('comments.reply.content')">
+        <el-input
+          v-model="replyContent"
+          data-testid="comment-reply-content"
+          type="textarea"
+          :rows="5"
+          :maxlength="MAX_COMMENT_REPLY_LENGTH"
+          show-word-limit
+          :placeholder="transformI18n('comments.reply.placeholder')"
+        />
+      </el-form-item>
       <template #footer>
         <el-button @click="closeReplyDialog">
           {{ transformI18n("articles.actions.cancel") }}
@@ -460,7 +472,7 @@ watch(
           type="primary"
           :loading="replySubmitting"
           :disabled="!replyContent.trim() || replyContent.trim().length > MAX_COMMENT_REPLY_LENGTH"
-          @click="submitReply"
+          @click="submitReplyAndNotify"
         >
           {{ transformI18n("comments.reply.submit") }}
         </el-button>

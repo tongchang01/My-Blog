@@ -343,10 +343,17 @@ comments:
   errors:
     load: 评论列表加载失败，请重试
     operation: 评论操作失败，请重试
+  feedback:
+    approved: 评论已通过
+    hidden: 评论已隐藏
+    deleted: 评论已删除
+    restored: 评论已恢复
+    replied: 回复已发布
   reply:
     title: 回复评论
     target: 回复对象
     replyTo: 回复
+    content: 回复内容
     placeholder: 输入站长回复内容，支持 Markdown
     submit: 发布回复
   empty: 没有符合条件的评论

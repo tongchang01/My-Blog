@@ -343,10 +343,17 @@ comments:
   errors:
     load: Unable to load comments. Please retry
     operation: Comment operation failed. Please retry
+  feedback:
+    approved: Comment approved
+    hidden: Comment hidden
+    deleted: Comment deleted
+    restored: Comment restored
+    replied: Reply published
   reply:
     title: Reply to comment
     target: Reply target
     replyTo: Reply to
+    content: Reply content
     placeholder: Enter the owner reply. Markdown is supported.
     submit: Publish reply
   empty: No comments match the current filters
