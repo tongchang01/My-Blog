@@ -230,7 +230,10 @@ onMounted(initialize);
               />
             </el-select>
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.columns.createdAt')">
+          <el-form-item
+            class="filter-date-range"
+            :label="transformI18n('articles.columns.createdAt')"
+          >
             <el-date-picker
               v-model="createdRange"
               data-testid="created-at-filter"
@@ -239,7 +242,10 @@ onMounted(initialize);
               clearable
             />
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.columns.publishAt')">
+          <el-form-item
+            class="filter-date-range"
+            :label="transformI18n('articles.columns.publishAt')"
+          >
             <el-date-picker
               v-model="publishRange"
               data-testid="publish-at-filter"
@@ -447,15 +453,21 @@ onMounted(initialize);
               data-testid="article-operation-column"
               :label="transformI18n('articles.columns.operations')"
               fixed="right"
-              width="150"
+              width="170"
             >
               <template #default="{ row }">
-                <el-button link type="primary" @click="editArticle(row.id)">
+                <el-button
+                  size="small"
+                  plain
+                  type="primary"
+                  @click="editArticle(row.id)"
+                >
                   {{ transformI18n("articles.actions.edit") }}
                 </el-button>
                 <el-button
                   :data-testid="`article-delete-${row.id}`"
-                  link
+                  size="small"
+                  plain
                   type="danger"
                   :loading="deletingId === row.id"
                   :disabled="deletingId !== null"
@@ -487,8 +499,8 @@ onMounted(initialize);
 <style scoped lang="scss">
 .article-page {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  padding: 20px 24px;
   color: var(--el-text-color-primary);
   background: var(--el-bg-color-page);
 }
@@ -517,13 +529,28 @@ onMounted(initialize);
 
 .filter-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px 20px;
+
+  :deep(.el-form-item) {
+    margin-bottom: 0;
+  }
+
+  :deep(.el-select),
+  :deep(.el-date-editor) {
+    width: 100%;
+  }
+}
+
+.filter-date-range {
+  grid-column: span 2;
 }
 
 .filter-actions {
   display: flex;
   gap: 10px;
+  justify-content: flex-end;
+  margin-top: 16px;
 }
 
 .result-actions {
@@ -589,6 +616,16 @@ onMounted(initialize);
   margin-top: 18px;
 }
 
+@media (width <= 1100px) {
+  .filter-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .filter-date-range {
+    grid-column: auto;
+  }
+}
+
 @media (width <= 760px) {
   .article-page {
     padding: 12px;
@@ -597,6 +634,10 @@ onMounted(initialize);
   .filter-grid {
     grid-template-columns: 1fr;
     gap: 0;
+  }
+
+  .filter-date-range {
+    grid-column: auto;
   }
 
   .card-heading {
