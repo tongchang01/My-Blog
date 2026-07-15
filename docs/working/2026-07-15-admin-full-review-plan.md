@@ -1,6 +1,6 @@
 # 管理端全量审查与交互改造计划
 
-> 状态：产品方向已确认；DEMO 首次登录说明、项目页脚、仪表盘首屏、表单必填标记与各业务写操作成功反馈已实施；上游模板遗留清理与其余视觉收敛待单独批次。
+> 状态：产品方向已确认；DEMO 首次登录说明、项目页脚、仪表盘首屏、表单必填标记、各业务写操作成功反馈与构建欢迎语清理已实施；其余上游模板遗留与视觉收敛待单独批次。
 > 审查基线：`feature/admin-consumption-alignment` 的 `16aaa8a`
 > 范围：`frontend/apps/admin/` 与 `MyBlog-springboot-v2/` 的管理端契约、表单、反馈、交互和上游模板遗留
 > 约束：本轮审查与分批实施均不改后端业务代码、不新建接口、不替代后端校验；前端只复用既有接口、校验与 `message()`。
@@ -92,7 +92,7 @@
 
 | 项目 | 当前证据 | 建议处理 | 是否需要你确认 |
 | --- | --- | --- | --- |
-| pure-admin 启动/构建欢迎语 | `build/info.ts` 在 `buildStart` 直接 `console.log` | 删除插件及其仅用依赖；保留 Vite 原生日志 | 否，属于明确噪声 |
+| pure-admin 启动/构建欢迎语 | 原 `build/info.ts` 在 `buildStart` 直接 `console.log` | 已删除插件、递归体积统计与仅用的 `boxen`/`gradient-string`；保留 Vite 原生日志 | 否，属于明确噪声 |
 | pure-admin 页脚链接 | `lay-footer/index.vue` 已改为项目版权，并读取现有站点配置的 `icpNo` | 已实施：备案号非空时显示工信部备案入口，读取失败时保留版权 | 已确认保留页脚 |
 | 全局搜索、通知中心、系统设置、多布局、多标签页 | `layout/` 全局挂载 | 本轮保留，不与视觉收敛混合删除 | 已确认保留后台壳 |
 | `ReDialog`、`RePureTableBar`、`@pureadmin/table` | 目前未发现业务页调用；前者仅在 `App.vue` 挂载，后者仅在自身定义和 `main.ts` 注册 | 作为首批候选，先做一次动态调用与构建引用复核后删除 | 否，技术清理 |
@@ -174,7 +174,7 @@
 
 | 功能簇 | 当前引用证据 | 初步结论 |
 | --- | --- | --- |
-| 构建欢迎语 | `build/plugins.ts` 始终注册 `viteBuildInfo()`；`build/info.ts` 的 `buildStart()` 直接输出 pure-admin 文案 | 可直接删除，且应连同 `boxen`、`gradient-string` 与只为它服务的构建统计逻辑逐项复核。 |
+| 构建欢迎语 | 原 `build/plugins.ts` 注册 `viteBuildInfo()`，`build/info.ts` 直接输出 pure-admin 文案 | 已删除，并同步移除 `boxen`、`gradient-string` 与只为它服务的构建统计逻辑；构建验证通过。 |
 | 页脚上游链接 | `lay-footer/index.vue` 直接链接 `https://github.com/pure-admin` | 必须替换或删除，内容由第 7 节的产品决定确定。 |
 | 全局弹窗与表格工具栏 | `ReDialog` 只在 `App.vue` 挂载；`RePureTableBar` 与 `@pureadmin/table` 仅在自身/`main.ts` 出现，未发现业务页调用 | 可作为同一技术清理批次候选；删除前以构建与路由回归确认动态引用不存在。 |
 | localForage、Cookie 与通用指令 | `localforage` 仅被本地包装文件导入；未发现 `js-cookie` 运行时导入；未发现 `v-copy`、`v-longpress`、`v-optimize` 模板使用 | 可随依赖和全局注册清理；`v-ripple` 仍被系统设置面板使用，需等后台壳决定。 |
