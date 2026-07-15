@@ -105,10 +105,19 @@ dashboard:
   trend: アクセス推移
   topArticles: 上位記事
   languageDistribution: 言語分布
+  dailyUvSum: 期間内の日別 UV 合計
+  filter:
+    last7: 直近 7 日
+    last30: 直近 30 日
+    defaultPeriod: 既定では JST の直近 30 暦日を表示します
+    errors:
+      incomplete: 開始日と終了日を両方入力してください
+      reversed: 開始日は終了日より後にできません
+      tooLong: 日付範囲は最大 366 日です
   metrics:
     periodPv: 期間 PV
-    todayPv: 今日の PV
-    todayUv: 今日の UV
+    todayPv: JST 今日の PV
+    todayUv: JST 今日の UV
     averageDailyUv: 平均日次 UV
   languages:
     zh: 中国語

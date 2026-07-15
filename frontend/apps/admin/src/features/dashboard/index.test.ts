@@ -43,6 +43,7 @@ const stubs = {
   "el-alert": true,
   "el-button": { template: "<button><slot /></button>" },
   "el-card": { template: "<div><slot name='header' /><slot /></div>" },
+  "el-date-picker": true,
   "el-descriptions": true,
   "el-descriptions-item": true,
   "el-empty": true,
@@ -135,6 +136,12 @@ describe("admin dashboard", () => {
       from: undefined,
       to: undefined
     });
+    expect(
+      wrapper.find('[data-testid="dashboard-default-period"]').exists()
+    ).toBe(true);
+    expect(
+      wrapper.get('[data-testid="dashboard-top-article-9007199254743001"]').text()
+    ).toContain("UV");
   });
 
   it("shows an empty state when stats are all empty", async () => {

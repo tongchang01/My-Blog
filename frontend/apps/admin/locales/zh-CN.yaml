@@ -105,10 +105,19 @@ dashboard:
   trend: 访问趋势
   topArticles: TOP 文章
   languageDistribution: 语言分布
+  dailyUvSum: 区间内逐日 UV 合计
+  filter:
+    last7: 近 7 天
+    last30: 近 30 天
+    defaultPeriod: 默认显示最近 30 个 JST 自然日
+    errors:
+      incomplete: 请同时填写开始和结束日期
+      reversed: 开始日期不能晚于结束日期
+      tooLong: 日期范围最长为 366 天
   metrics:
     periodPv: 区间 PV
-    todayPv: 今日 PV
-    todayUv: 今日 UV
+    todayPv: JST 今日 PV
+    todayUv: JST 今日 UV
     averageDailyUv: 平均日 UV
   languages:
     zh: 中文

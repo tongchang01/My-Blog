@@ -105,10 +105,19 @@ dashboard:
   trend: Traffic trend
   topArticles: Top articles
   languageDistribution: Language distribution
+  dailyUvSum: Sum of daily UVs in period
+  filter:
+    last7: Last 7 days
+    last30: Last 30 days
+    defaultPeriod: Defaults to the latest 30 JST calendar days
+    errors:
+      incomplete: Enter both a start and end date
+      reversed: The start date cannot be after the end date
+      tooLong: The date range can be at most 366 days
   metrics:
     periodPv: Period PV
-    todayPv: Today PV
-    todayUv: Today UV
+    todayPv: Today PV (JST)
+    todayUv: Today UV (JST)
     averageDailyUv: Average daily UV
   languages:
     zh: Chinese
