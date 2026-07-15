@@ -5,14 +5,16 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { http } from "@/utils/http";
 import AttachmentManagement from "./index.vue";
 
-const { confirm } = vi.hoisted(() => ({
-  confirm: vi.fn().mockResolvedValue("confirm")
+const { confirm, showMessage } = vi.hoisted(() => ({
+  confirm: vi.fn().mockResolvedValue("confirm"),
+  showMessage: vi.fn()
 }));
 
 vi.mock("element-plus", async importOriginal => ({
   ...(await importOriginal<typeof import("element-plus")>()),
   ElMessageBox: { confirm }
 }));
+vi.mock("@/utils/message", () => ({ message: showMessage }));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
@@ -80,6 +82,7 @@ function setUser(type: "ADMIN" | "DEMO") {
 afterEach(() => {
   mock.reset();
   confirm.mockClear();
+  showMessage.mockClear();
   vi.unstubAllGlobals();
   useUserStoreHook().CLEAR_USER();
 });
@@ -140,6 +143,9 @@ describe("attachment management page", () => {
 
     expect(mock.history.post).toHaveLength(1);
     expect(mock.history.get).toHaveLength(2);
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("copies the public URL", async () => {
@@ -155,6 +161,9 @@ describe("attachment management page", () => {
       .trigger("click");
 
     expect(writeText).toHaveBeenCalledWith("http://localhost/media/a.png");
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("lets admin soft delete an attachment", async () => {
@@ -176,6 +185,9 @@ describe("attachment management page", () => {
     expect(mock.history.delete[0].url).toBe(
       "/api/admin/attachments/9007199254743001"
     );
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("switches to the deleted attachment list", async () => {
@@ -225,5 +237,8 @@ describe("attachment management page", () => {
     expect(mock.history.post[0].url).toBe(
       "/api/admin/attachments/9007199254743001/restore"
     );
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 });

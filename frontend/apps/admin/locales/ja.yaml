@@ -508,6 +508,11 @@ attachments:
     upload: 添付ファイルをアップロードできませんでした。ファイルを確認して再試行してください
     tooLarge: 画像は 10 MiB 以下にしてください
     operation: 添付ファイル操作に失敗しました。再試行してください
+  feedback:
+    uploaded: アップロードが完了しました。同じ内容のファイルは既存の添付を再利用します。
+    copied: 添付ファイルのURLをコピーしました
+    deleted: 添付ファイルを削除しました
+    restored: 添付ファイルを復元しました
   empty: 添付ファイルはまだありません
 login:
   pureUsername: ユーザー名

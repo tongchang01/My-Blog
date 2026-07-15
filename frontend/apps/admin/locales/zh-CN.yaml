@@ -508,6 +508,11 @@ attachments:
     upload: 附件上传失败，请检查文件后重试
     tooLarge: 图片不能超过 10 MiB
     operation: 附件操作失败，请重试
+  feedback:
+    uploaded: 上传完成；内容相同的文件会复用已有附件
+    copied: 附件地址已复制
+    deleted: 附件已删除
+    restored: 附件已恢复
   empty: 暂无附件
 login:
   pureUsername: 账号

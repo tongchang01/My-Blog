@@ -3,6 +3,7 @@ import { computed, onMounted } from "vue";
 import { ElMessageBox } from "element-plus";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "@/utils/message";
 import { formatJstDateTime } from "@/features/articles/presentation";
 import type { AttachmentItem } from "./model";
 import { useAttachmentManagement } from "./useAttachmentManagement";
@@ -48,12 +49,18 @@ async function handleFileChange(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
   if (!file) return;
-  await upload(file);
+  if (await upload(file)) {
+    message(transformI18n("attachments.feedback.uploaded"), {
+      type: "success"
+    });
+  }
   input.value = "";
 }
 
 async function copyUrl(item: AttachmentItem): Promise<void> {
-  await navigator.clipboard?.writeText(item.publicUrl);
+  if (!navigator.clipboard) return;
+  await navigator.clipboard.writeText(item.publicUrl);
+  message(transformI18n("attachments.feedback.copied"), { type: "success" });
 }
 
 async function confirmRemove(item: AttachmentItem): Promise<void> {
@@ -66,7 +73,15 @@ async function confirmRemove(item: AttachmentItem): Promise<void> {
   } catch {
     return;
   }
-  await remove(item.id);
+  if (await remove(item.id)) {
+    message(transformI18n("attachments.feedback.deleted"), { type: "success" });
+  }
+}
+
+async function restoreAttachment(id: string): Promise<void> {
+  if (await restore(id)) {
+    message(transformI18n("attachments.feedback.restored"), { type: "success" });
+  }
 }
 
 onMounted(initialize);
@@ -265,7 +280,7 @@ onMounted(initialize);
                 :data-testid="`attachment-restore-${item.id}`"
                 link
                 type="primary"
-                @click="restore(item.id)"
+                @click="restoreAttachment(item.id)"
               >
                 {{ transformI18n("attachments.actions.restore") }}
               </el-button>

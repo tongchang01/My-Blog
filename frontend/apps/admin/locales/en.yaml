@@ -508,6 +508,11 @@ attachments:
     upload: Unable to upload attachment. Please check the file and retry.
     tooLarge: Images must not exceed 10 MiB
     operation: Unable to complete attachment operation. Please retry.
+  feedback:
+    uploaded: Upload complete; identical content reuses the existing attachment.
+    copied: Attachment URL copied
+    deleted: Attachment deleted
+    restored: Attachment restored
   empty: No attachments yet
 login:
   pureUsername: Username
