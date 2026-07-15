@@ -426,6 +426,8 @@ settings:
     currentUrl: 現在の画像URL
   siteConfig:
     basic: サイト基本設定
+    identity: サイト名とサブタイトル
+    assets: ブランド素材と連携
     about: About コンテンツ
     loadError: サイト設定を読み込めませんでした。再試行してください
     saveError: サイト設定を保存できませんでした。再試行してください

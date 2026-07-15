@@ -92,44 +92,46 @@ onMounted(initialize);
     </el-alert>
 
     <template v-else>
+      <header class="settings-heading">
+        <div>
+          <h1>{{ transformI18n("settings.siteConfig.basic") }}</h1>
+          <p v-if="current">
+            {{ transformI18n("settings.updatedAt") }}
+            {{ formatJstDateTime(current.updatedAt) }}
+          </p>
+        </div>
+        <el-button
+          v-if="isAdmin"
+          data-testid="site-config-save"
+          type="primary"
+          :loading="saving"
+          @click="submitSave"
+        >
+          {{ transformI18n("taxonomy.actions.save") }}
+        </el-button>
+      </header>
+
+      <el-alert
+        v-if="saveError"
+        data-testid="site-config-save-error"
+        type="error"
+        :closable="false"
+        :title="transformI18n('settings.siteConfig.saveError')"
+        show-icon
+      />
+
+      <p class="field-hint full-replace-hint">
+        {{ transformI18n("settings.siteConfig.fullReplaceHint") }}
+      </p>
+
       <el-card
         data-testid="site-config-basic-card"
         class="workspace-card"
         shadow="never"
       >
         <template #header>
-          <div class="card-heading">
-            <div>
-              <h2>{{ transformI18n("settings.siteConfig.basic") }}</h2>
-              <p v-if="current">
-                {{ transformI18n("settings.updatedAt") }}
-                {{ formatJstDateTime(current.updatedAt) }}
-              </p>
-            </div>
-            <el-button
-              v-if="isAdmin"
-              data-testid="site-config-save"
-              type="primary"
-              :loading="saving"
-              @click="submitSave"
-            >
-              {{ transformI18n("taxonomy.actions.save") }}
-            </el-button>
-          </div>
+          <h2>{{ transformI18n("settings.siteConfig.identity") }}</h2>
         </template>
-
-        <el-alert
-          v-if="saveError"
-          data-testid="site-config-save-error"
-          type="error"
-          :closable="false"
-          :title="transformI18n('settings.siteConfig.saveError')"
-          show-icon
-        />
-
-        <p class="field-hint">
-          {{ transformI18n("settings.siteConfig.fullReplaceHint") }}
-        </p>
 
         <el-form :model="form" label-position="top" class="settings-grid">
           <el-form-item
@@ -165,6 +167,19 @@ onMounted(initialize);
           <el-form-item :label="transformI18n('settings.siteConfig.siteSubtitleEn')" :error="fieldError('siteSubtitleEn')">
             <el-input v-model="form.siteSubtitleEn" :disabled="readonly" maxlength="255" show-word-limit />
           </el-form-item>
+        </el-form>
+      </el-card>
+
+      <el-card
+        data-testid="site-config-assets-card"
+        class="workspace-card"
+        shadow="never"
+      >
+        <template #header>
+          <h2>{{ transformI18n("settings.siteConfig.assets") }}</h2>
+        </template>
+
+        <el-form :model="form" label-position="top" class="settings-grid">
           <el-form-item :label="transformI18n('settings.siteConfig.logoUrl')" :error="fieldError('logoUrl')">
             <div class="image-url-field">
               <el-input
@@ -256,7 +271,7 @@ onMounted(initialize);
         <template #header>
           <h2>{{ transformI18n("settings.siteConfig.about") }}</h2>
         </template>
-        <el-form :model="form" label-position="top">
+        <el-form :model="form" label-position="top" class="about-grid">
           <el-form-item :label="transformI18n('settings.siteConfig.aboutMdZh')" :error="fieldError('aboutMdZh')">
             <el-input v-model="form.aboutMdZh" type="textarea" :rows="5" :disabled="readonly" maxlength="50000" show-word-limit />
           </el-form-item>
@@ -280,8 +295,8 @@ onMounted(initialize);
 <style scoped lang="scss">
 .settings-page {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  padding: 20px 24px;
   background: var(--el-bg-color-page);
 }
 
@@ -290,15 +305,22 @@ onMounted(initialize);
   border-radius: 8px;
 }
 
-.card-heading {
+.settings-heading {
   display: flex;
-  gap: 12px;
-  align-items: flex-start;
+  gap: 16px;
+  align-items: center;
   justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--el-border-color-lighter);
 
-  h2,
+  h1,
   p {
     margin: 0;
+  }
+
+  h1 {
+    font-size: 20px;
+    line-height: 28px;
   }
 
   p {
@@ -311,13 +333,31 @@ onMounted(initialize);
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
+  gap: 16px 20px;
+
+  :deep(.el-form-item) {
+    margin-bottom: 0;
+  }
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+
+  :deep(.el-form-item) {
+    margin-bottom: 0;
+  }
 }
 
 .field-hint {
   margin: 6px 0 0;
   font-size: 12px;
   color: var(--el-text-color-secondary);
+}
+
+.full-replace-hint {
+  margin-top: -6px;
 }
 
 .image-url-field {
@@ -373,6 +413,11 @@ onMounted(initialize);
   }
 
   .settings-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .about-grid {
     grid-template-columns: 1fr;
     gap: 0;
   }

@@ -426,6 +426,8 @@ settings:
     currentUrl: 当前图片地址
   siteConfig:
     basic: 站点基础配置
+    identity: 站点名称与副标题
+    assets: 品牌资源与集成
     about: 关于内容
     loadError: 站点配置加载失败，请重试
     saveError: 站点配置保存失败，请重试

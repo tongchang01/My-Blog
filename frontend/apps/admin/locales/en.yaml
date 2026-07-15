@@ -426,6 +426,8 @@ settings:
     currentUrl: Current image URL
   siteConfig:
     basic: Site basics
+    identity: Site name and subtitle
+    assets: Brand assets and integrations
     about: About content
     loadError: Unable to load site config. Please retry.
     saveError: Unable to save site config. Please retry.
