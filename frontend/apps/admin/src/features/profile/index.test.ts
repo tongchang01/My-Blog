@@ -144,6 +144,9 @@ describe("profile management page", () => {
     await flushPromises();
 
     expect(mock.history.patch).toHaveLength(1);
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("changes an admin password through the existing endpoint and returns to login", async () => {

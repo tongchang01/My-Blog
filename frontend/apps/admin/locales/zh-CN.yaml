@@ -410,6 +410,7 @@ settings:
     about: 关于内容
     loadError: 站点配置加载失败，请重试
     saveError: 站点配置保存失败，请重试
+    saved: 站点配置已保存
     fullReplaceHint: 保存会用当前完整表单覆盖站点配置；请先刷新，再修改。
     fallbackHint: 留空时前台会逐字段回退中文。
     siteTitleZh: 中文标题
@@ -431,6 +432,7 @@ settings:
     form: 作者资料
     loadError: 作者资料加载失败，请重试
     saveError: 作者资料保存失败，请重试
+    saved: 作者资料已保存
     publicHint: 以下资料会公开展示在前台，请确认内容与链接正确。
     id: ID
     username: 账号
@@ -505,3 +507,7 @@ login:
   pureUsernameLength: 账号长度不能超过 64 位
   purePassWordReg: 请输入密码
   purePassWordLength: 密码长度不能超过 128 位
+  demoNotice:
+    title: 演示账号（只读）
+    message: 当前账号仅用于演示。你可以浏览后台数据，但新建、编辑、删除、排序、上传、回复和修改密码等写操作均已禁用，服务端也会拒绝。为保护真实数据，非公开文章正文、评论邮箱/IP/User-Agent 和附件内部存储信息不会展示。如需管理操作，请使用 ADMIN 账号。
+    confirm: 我知道了

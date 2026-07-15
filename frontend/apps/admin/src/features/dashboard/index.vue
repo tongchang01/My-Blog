@@ -149,9 +149,12 @@ onBeforeUnmount(() => {
       show-icon
     />
 
-    <el-card class="mt-4">
+    <el-card class="dashboard-overview mt-4" shadow="never">
       <template #header>
-        {{ transformI18n("dashboard.welcome") }}, {{ displayName }}
+        <div class="dashboard-overview__heading">
+          <h1>{{ transformI18n("menus.dashboard") }}</h1>
+          <p>{{ transformI18n("dashboard.welcome") }}, {{ displayName }}</p>
+        </div>
       </template>
       <el-descriptions :column="1" border>
         <el-descriptions-item :label="transformI18n('dashboard.account')">
@@ -177,18 +180,20 @@ onBeforeUnmount(() => {
           value-format="YYYY-MM-DD"
           clearable
         />
-        <el-button data-testid="dashboard-last-7" @click="loadLastDays(7)">
-          {{ transformI18n("dashboard.filter.last7") }}
-        </el-button>
-        <el-button data-testid="dashboard-last-30" @click="loadLastDays(30)">
-          {{ transformI18n("dashboard.filter.last30") }}
-        </el-button>
-        <el-button type="primary" @click="load">
-          {{ transformI18n("articles.actions.search") }}
-        </el-button>
-        <el-button @click="resetFilters">
-          {{ transformI18n("articles.actions.reset") }}
-        </el-button>
+        <div class="dashboard-filter__actions">
+          <el-button data-testid="dashboard-last-7" @click="loadLastDays(7)">
+            {{ transformI18n("dashboard.filter.last7") }}
+          </el-button>
+          <el-button data-testid="dashboard-last-30" @click="loadLastDays(30)">
+            {{ transformI18n("dashboard.filter.last30") }}
+          </el-button>
+          <el-button type="primary" @click="load">
+            {{ transformI18n("articles.actions.search") }}
+          </el-button>
+          <el-button @click="resetFilters">
+            {{ transformI18n("articles.actions.reset") }}
+          </el-button>
+        </div>
       </div>
       <p v-if="!filters.from" data-testid="dashboard-default-period">
         {{ transformI18n("dashboard.filter.defaultPeriod") }}
@@ -240,20 +245,24 @@ onBeforeUnmount(() => {
     <template v-else-if="dashboard">
       <section class="metric-grid mt-4">
         <el-card data-testid="dashboard-metric-period-pv" shadow="never">
-          <p>{{ transformI18n("dashboard.metrics.periodPv") }}</p>
-          <strong>{{ dashboard.periodPv }}</strong>
+          <el-statistic :value="dashboard.periodPv">
+            <template #title>{{ transformI18n("dashboard.metrics.periodPv") }}</template>
+          </el-statistic>
         </el-card>
         <el-card data-testid="dashboard-metric-today-pv" shadow="never">
-          <p>{{ transformI18n("dashboard.metrics.todayPv") }}</p>
-          <strong>{{ dashboard.todayPv }}</strong>
+          <el-statistic :value="dashboard.todayPv">
+            <template #title>{{ transformI18n("dashboard.metrics.todayPv") }}</template>
+          </el-statistic>
         </el-card>
         <el-card data-testid="dashboard-metric-today-uv" shadow="never">
-          <p>{{ transformI18n("dashboard.metrics.todayUv") }}</p>
-          <strong>{{ dashboard.todayUv }}</strong>
+          <el-statistic :value="dashboard.todayUv">
+            <template #title>{{ transformI18n("dashboard.metrics.todayUv") }}</template>
+          </el-statistic>
         </el-card>
         <el-card data-testid="dashboard-metric-average-daily-uv" shadow="never">
-          <p>{{ transformI18n("dashboard.metrics.averageDailyUv") }}</p>
-          <strong>{{ dashboard.averageDailyUv }}</strong>
+          <el-statistic :value="dashboard.averageDailyUv">
+            <template #title>{{ transformI18n("dashboard.metrics.averageDailyUv") }}</template>
+          </el-statistic>
         </el-card>
       </section>
 
@@ -339,6 +348,12 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
 }
 
+.dashboard-filter__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .dashboard-filter + p {
   margin: 12px 0 0;
   font-size: 13px;
@@ -354,16 +369,33 @@ onBeforeUnmount(() => {
 .metric-grid {
   grid-template-columns: repeat(4, minmax(0, 1fr));
 
-  p {
-    margin: 0 0 8px;
+  :deep(.el-statistic__head) {
+    margin-bottom: 8px;
     font-size: 13px;
     color: var(--el-text-color-secondary);
   }
 
-  strong {
+  :deep(.el-statistic__content) {
     font-size: 26px;
     font-weight: 700;
     color: var(--el-text-color-primary);
+  }
+}
+
+.dashboard-overview__heading {
+  h1,
+  p {
+    margin: 0;
+  }
+
+  h1 {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  p {
+    margin-top: 4px;
+    color: var(--el-text-color-secondary);
   }
 }
 

@@ -1,9 +1,13 @@
 import MockAdapter from "axios-mock-adapter";
 import { config, flushPromises, mount } from "@vue/test-utils";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { useUserStoreHook } from "@/store/modules/user";
 import { http } from "@/utils/http";
 import SiteConfigManagement from "./index.vue";
+
+const { showMessage } = vi.hoisted(() => ({ showMessage: vi.fn() }));
+
+vi.mock("@/utils/message", () => ({ message: showMessage }));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
@@ -104,6 +108,7 @@ function setUser(type: "ADMIN" | "DEMO") {
 afterEach(() => {
   mock.reset();
   useUserStoreHook().CLEAR_USER();
+  showMessage.mockClear();
 });
 
 describe("site config management page", () => {
@@ -175,5 +180,8 @@ describe("site config management page", () => {
     await flushPromises();
 
     expect(mock.history.put).toHaveLength(1);
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 });

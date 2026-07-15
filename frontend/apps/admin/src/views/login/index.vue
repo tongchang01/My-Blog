@@ -4,6 +4,7 @@ import Motion from "./utils/motion";
 import { useRouter } from "vue-router";
 import { message } from "@/utils/message";
 import { loginRules } from "./utils/rule";
+import { showDemoLoginNotice } from "./utils/demo-notice";
 import { ref, reactive, toRaw } from "vue";
 import { debounce } from "@pureadmin/utils";
 import { useNav } from "@/layout/hooks/useNav";
@@ -63,10 +64,11 @@ const onLogin = async (formEl: FormInstance | undefined) => {
   loading.value = true;
   disabled.value = true;
   try {
-    await sessionService.signIn({ ...ruleForm });
+    const user = await sessionService.signIn({ ...ruleForm });
     await initRouter();
     await router.push("/dashboard");
-    message(t("login.pureLoginSuccess"), { type: "success" });
+    if (user.type === "DEMO") await showDemoLoginNotice(t);
+    else message(t("login.pureLoginSuccess"), { type: "success" });
   } catch (error) {
     message(t(loginErrorKey(error)), { type: "error" });
   } finally {
