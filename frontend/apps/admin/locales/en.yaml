@@ -505,3 +505,7 @@ login:
   pureUsernameLength: Username must not exceed 64 characters
   purePassWordReg: Please enter password
   purePassWordLength: Password must not exceed 128 characters
+  demoNotice:
+    title: Demo account (read-only)
+    message: This account is for demonstration only. You can browse admin data, but create, edit, delete, sort, upload, reply, and password changes are disabled and the server will reject them. To protect real data, non-public article bodies, comment email/IP/User-Agent data, and attachment storage details are hidden. Use an ADMIN account for management actions.
+    confirm: I understand
