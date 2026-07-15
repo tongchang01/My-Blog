@@ -236,6 +236,7 @@ articles:
       passwordRequired: 密码文章必须设置访问密码
       tagLimit: 最多选择 20 个标签
       slugFormat: Slug 只允许小写字母、数字和连字符
+      maxLength: 内容超过服务端允许的最大长度
 taxonomy:
   filter:
     title: 筛选条件
@@ -278,6 +279,7 @@ taxonomy:
     required: 此项为必填项
     slugFormat: Slug 仅可使用小写字母、数字和连字符，最长 64 位
     sortOrderRange: 排序值必须是 0 到 1000000 之间的整数
+    maxLength: 内容超过服务端允许的最大长度
   errors:
     saveConflict: 名称或 Slug 已被占用
     deleteConflict: 仍被活动文章引用，无法删除
@@ -458,6 +460,7 @@ settings:
     validation:
       required: 此项为必填项
       length: 新密码长度必须为 8 到 128 位
+      currentLength: 当前密码长度不能超过 128 位
       mismatch: 两次输入的新密码不一致
       sameAsCurrent: 新密码不能与当前密码相同
     revokeHint: 修改成功后，所有设备都需要重新登录。
@@ -499,5 +502,6 @@ login:
   errorNetwork: 网络连接失败，请检查网络后重试
   errorUnknown: 登录失败，请稍后重试
   pureUsernameReg: 请输入账号
+  pureUsernameLength: 账号长度不能超过 64 位
   purePassWordReg: 请输入密码
-  purePassWordRuleReg: 密码格式应为8-18位数字、字母、符号的任意两种组合
+  purePassWordLength: 密码长度不能超过 128 位

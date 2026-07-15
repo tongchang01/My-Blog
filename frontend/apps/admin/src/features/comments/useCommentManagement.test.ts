@@ -6,6 +6,7 @@ import type {
   CommentReplyResponse
 } from "./model";
 import {
+  MAX_COMMENT_REPLY_LENGTH,
   useCommentManagement,
   type CommentManagementApi
 } from "./useCommentManagement";
@@ -211,6 +212,18 @@ describe("comment management state", () => {
     const state = useCommentManagement(source);
     state.openReplyDialog(comment("1"));
     state.replyContent.value = "   ";
+
+    await expect(state.submitReply()).resolves.toBe(false);
+
+    expect(source.replyComment).not.toHaveBeenCalled();
+    expect(state.replyDialogVisible.value).toBe(true);
+  });
+
+  it("does not submit a reply longer than the server limit", async () => {
+    const source = api();
+    const state = useCommentManagement(source);
+    state.openReplyDialog(comment("1"));
+    state.replyContent.value = "a".repeat(MAX_COMMENT_REPLY_LENGTH + 1);
 
     await expect(state.submitReply()).resolves.toBe(false);
 

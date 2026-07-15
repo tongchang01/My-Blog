@@ -9,7 +9,6 @@ import { debounce } from "@pureadmin/utils";
 import { useNav } from "@/layout/hooks/useNav";
 import { useEventListener } from "@vueuse/core";
 import type { FormInstance } from "element-plus";
-import { $t, transformI18n } from "@/plugins/i18n";
 import { useLayout } from "@/layout/hooks/useLayout";
 import { initRouter } from "@/router/utils";
 import { bg, avatar, illustration } from "./utils/static";
@@ -165,19 +164,11 @@ useEventListener(document, "keydown", ({ code }) => {
             size="large"
           >
             <Motion :delay="100">
-              <el-form-item
-                :rules="[
-                  {
-                    required: true,
-                    message: transformI18n($t('login.pureUsernameReg')),
-                    trigger: 'blur'
-                  }
-                ]"
-                prop="username"
-              >
+              <el-form-item prop="username">
                 <el-input
                   v-model="ruleForm.username"
                   clearable
+                  maxlength="64"
                   :placeholder="t('login.pureUsername')"
                   :prefix-icon="useRenderIcon(User)"
                 />
@@ -190,6 +181,7 @@ useEventListener(document, "keydown", ({ code }) => {
                   v-model="ruleForm.password"
                   clearable
                   show-password
+                  maxlength="128"
                   :placeholder="t('login.purePassword')"
                   :prefix-icon="useRenderIcon(Lock)"
                 />

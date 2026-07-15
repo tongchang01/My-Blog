@@ -35,6 +35,16 @@ describe("password form", () => {
     });
   });
 
+  it("rejects a current password longer than the backend limit", () => {
+    expect(
+      validatePasswordForm({
+        currentPassword: "x".repeat(129),
+        newPassword: "new-password",
+        confirmPassword: "new-password"
+      })
+    ).toEqual({ currentPassword: "currentLength" });
+  });
+
   it("does not allow reusing the current password", () => {
     expect(
       validatePasswordForm({

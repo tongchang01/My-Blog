@@ -278,6 +278,7 @@ onMounted(initialize);
               type="password"
               show-password
               autocomplete="current-password"
+              maxlength="128"
             />
           </el-form-item>
           <el-form-item
@@ -289,6 +290,7 @@ onMounted(initialize);
               type="password"
               show-password
               autocomplete="new-password"
+              maxlength="128"
             />
           </el-form-item>
           <el-form-item
@@ -300,6 +302,7 @@ onMounted(initialize);
               type="password"
               show-password
               autocomplete="new-password"
+              maxlength="128"
             />
           </el-form-item>
         </el-form>

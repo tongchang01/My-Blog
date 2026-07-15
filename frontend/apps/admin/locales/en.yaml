@@ -236,6 +236,7 @@ articles:
       passwordRequired: Password articles require an access password
       tagLimit: Select at most 20 tags
       slugFormat: Slug may contain only lowercase letters, numbers and hyphens
+      maxLength: The value exceeds the server maximum length
 taxonomy:
   filter:
     title: Filters
@@ -278,6 +279,7 @@ taxonomy:
     required: This field is required
     slugFormat: Use lowercase letters, numbers, and hyphens only (64 characters max)
     sortOrderRange: Sort order must be an integer from 0 to 1000000
+    maxLength: The value exceeds the server maximum length
   errors:
     saveConflict: The name or slug is already in use
     deleteConflict: This item is still referenced by active articles
@@ -458,6 +460,7 @@ settings:
     validation:
       required: This field is required
       length: The new password must be 8 to 128 characters
+      currentLength: The current password must not exceed 128 characters
       mismatch: The new passwords do not match
       sameAsCurrent: The new password must differ from the current password
     revokeHint: After success, every device must sign in again.
@@ -499,5 +502,6 @@ login:
   errorNetwork: Network connection failed. Please try again
   errorUnknown: Login failed. Please try again later
   pureUsernameReg: Please enter username
+  pureUsernameLength: Username must not exceed 64 characters
   purePassWordReg: Please enter password
-  purePassWordRuleReg: The password format should be any combination of 8-18 digits
+  purePassWordLength: Password must not exceed 128 characters

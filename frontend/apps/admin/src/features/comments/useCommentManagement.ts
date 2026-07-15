@@ -48,6 +48,8 @@ const DEFAULT_FILTERS: CommentListFilters = {
   size: 20
 };
 
+export const MAX_COMMENT_REPLY_LENGTH = 5_000;
+
 function asError(error: unknown): Error {
   return error instanceof Error ? error : new Error(String(error));
 }
@@ -154,7 +156,12 @@ export function useCommentManagement(api: CommentManagementApi = defaultApi) {
   }
 
   async function submitReply(): Promise<boolean> {
-    if (!replyTarget.value || !replyContent.value.trim()) {
+    const content = replyContent.value.trim();
+    if (
+      !replyTarget.value ||
+      !content ||
+      content.length > MAX_COMMENT_REPLY_LENGTH
+    ) {
       return false;
     }
     operationError.value = null;
@@ -162,7 +169,7 @@ export function useCommentManagement(api: CommentManagementApi = defaultApi) {
     try {
       await api.replyComment(
         replyTarget.value.id,
-        replyContent.value.trim()
+        content
       );
       replyDialogVisible.value = false;
       replyTarget.value = null;
