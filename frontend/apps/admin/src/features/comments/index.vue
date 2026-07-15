@@ -87,6 +87,11 @@ function canReply(item: CommentListItem): boolean {
   return isAdmin.value && !item.deleted && item.auditStatus === "PASS";
 }
 
+function actionConfirmKey(item: CommentListItem, action: string): string {
+  const target = item.targetType === "ARTICLE" ? "Article" : "Guestbook";
+  return `comments.actions.${action}${target}Confirm`;
+}
+
 function handleReplyDialogBeforeClose(done: () => void): void {
   if (replySubmitting.value) return;
   closeReplyDialog();
@@ -361,7 +366,7 @@ watch(
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
                   @click="
-                    confirmAction(row, 'comments.actions.approveConfirm', state.approve)
+                    confirmAction(row, actionConfirmKey(row, 'approve'), state.approve)
                   "
                 >
                   {{ transformI18n("comments.actions.approve") }}
@@ -373,7 +378,7 @@ watch(
                   type="warning"
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
-                  @click="confirmAction(row, 'comments.actions.hideConfirm', state.hide)"
+                  @click="confirmAction(row, actionConfirmKey(row, 'hide'), state.hide)"
                 >
                   {{ transformI18n("comments.actions.hide") }}
                 </el-button>
@@ -385,7 +390,7 @@ watch(
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
                   @click="
-                    confirmAction(row, 'comments.actions.deleteConfirm', state.remove)
+                    confirmAction(row, actionConfirmKey(row, 'delete'), state.remove)
                   "
                 >
                   {{ transformI18n("articles.actions.delete") }}
@@ -398,7 +403,7 @@ watch(
                   :loading="operatingId === row.id"
                   :disabled="operatingId !== null"
                   @click="
-                    confirmAction(row, 'comments.actions.restoreConfirm', state.restore)
+                    confirmAction(row, actionConfirmKey(row, 'restore'), state.restore)
                   "
                 >
                   {{ transformI18n("articles.recycle.restore") }}

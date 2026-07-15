@@ -9,6 +9,7 @@ import {
   localizedName
 } from "@/features/articles/presentation";
 import type { CategoryItem } from "../model";
+import { normalizeSlug } from "../form";
 import { useCategoryManagement } from "./useCategoryManagement";
 
 defineOptions({ name: "CategoryManagement" });
@@ -52,6 +53,10 @@ function languageBadges(item: CategoryItem): string[] {
 function fieldError(field: keyof typeof form): string {
   const code = formErrors[field];
   return code ? transformI18n(`taxonomy.validation.${code}`) : "";
+}
+
+function normalizeFormSlug(): void {
+  form.slug = normalizeSlug(form.slug);
 }
 
 const operationErrorKey = computed(() => {
@@ -138,6 +143,9 @@ defineExpose({ state, confirmRemove });
         :closable="false"
         :title="transformI18n(operationErrorKey)"
       />
+      <p v-if="isAdmin" class="field-hint">
+        {{ transformI18n("taxonomy.sortHint") }}
+      </p>
       <el-skeleton v-if="loading && !filteredItems.length" :rows="6" animated />
       <el-alert
         v-else-if="requestError"
@@ -227,6 +235,8 @@ defineExpose({ state, confirmRemove });
             v-model="form.slug"
             data-testid="category-slug-input"
             :disabled="Boolean(editingId)"
+            maxlength="64"
+            @blur="normalizeFormSlug"
           />
           <p class="field-hint">
             {{ transformI18n("taxonomy.fields.slugLockHint") }}

@@ -258,30 +258,32 @@ taxonomy:
     nameJa: 日文名称
     nameEn: 英文名称
     slug: Slug
-    slugLockHint: Slug 会作为公开 URL 的一部分，创建后将锁定。
+    slugLockHint: Slug 仅可使用小写字母、数字和连字符，最长 64 位；创建后将锁定。
     sortOrder: 排序值
   categories:
     title: 分类总数
     create: 新增分类
     edit: 编辑分类
     empty: 没有符合条件的分类
-    deleteConfirm: 确认删除这个分类吗？
+    deleteConfirm: 确认删除这个分类吗？如仍被活动文章引用，需先迁移文章。
   tags:
     title: 标签总数
     create: 新增标签
     edit: 编辑标签
     empty: 没有符合条件的标签
-    deleteConfirm: 确认删除这个标签吗？
+    deleteConfirm: 确认删除这个标签吗？如仍被活动文章引用，需先迁移文章。
   states:
     error: 数据加载失败，请重试
   validation:
     required: 此项为必填项
+    slugFormat: Slug 仅可使用小写字母、数字和连字符，最长 64 位
     sortOrderRange: 排序值必须是 0 到 1000000 之间的整数
   errors:
     saveConflict: 名称或 Slug 已被占用
     deleteConflict: 仍被活动文章引用，无法删除
     forbidden: 当前账号没有写权限
     request: 操作失败，请重试
+  sortHint: 保存会原子更新当前修改的排序项；服务端会在任一项无效时整体回滚。
 comments:
   filter:
     title: 评论筛选
@@ -324,10 +326,14 @@ comments:
     reply: 回复
     approve: 通过
     hide: 隐藏
-    approveConfirm: 确认通过这条评论吗
-    hideConfirm: 确认隐藏这条评论吗
-    deleteConfirm: 删除后评论将进入软删除状态，确认继续吗
-    restoreConfirm: 恢复仅撤销软删除，不会把已隐藏评论重新公开，确认继续吗
+    approveArticleConfirm: 确认通过这条评论吗？文章评论数会增加。
+    approveGuestbookConfirm: 确认通过这条留言吗？留言板不计入文章评论数。
+    hideArticleConfirm: 确认隐藏这条评论吗？文章评论数会减少。
+    hideGuestbookConfirm: 确认隐藏这条留言吗？留言板不计入文章评论数。
+    deleteArticleConfirm: 删除后评论将进入软删除状态，且文章评论数会减少，确认继续吗？
+    deleteGuestbookConfirm: 删除后留言将进入软删除状态，留言板不计入文章评论数，确认继续吗？
+    restoreArticleConfirm: 恢复仅撤销软删除，不会把已隐藏评论重新公开；恢复公开文章评论会增加文章评论数，确认继续吗？
+    restoreGuestbookConfirm: 恢复仅撤销软删除，不会把已隐藏留言重新公开；留言板不计入文章评论数，确认继续吗？
   errors:
     load: 评论列表加载失败，请重试
     operation: 评论操作失败，请重试
@@ -372,21 +378,27 @@ friendLinks:
     show: 显示
     hide: 隐藏
     saveSort: 保存排序
-    statusConfirm: 确认切换这条友链的显示状态？
+    showConfirm: 显示后，这条友链会出现在公开友链页；确认继续吗？
+    hideConfirm: 隐藏后，这条友链不会出现在公开友链页，但不会删除记录；确认继续吗？
     deleteConfirm: 确认删除这条友链？
   validation:
     required: 此项为必填项
     url: 请输入 http 或 https 地址
+    maxLength: 内容超过服务端允许的最大长度
     sortOrderRange: 排序值必须是 0 到 1000000 之间的整数
   errors:
     load: 友链列表加载失败，请重试
     operation: 友链操作失败，请重试
   empty: 没有符合条件的友链
+  sortHint: 保存会原子更新当前修改的排序项；服务端会在任一项无效时整体回滚。
 settings:
   readonlyDemo: 当前演示账号为只读模式
   updatedAt: "更新时间："
   validation:
     required: 此项为必填项
+    maxLength: 内容超过服务端允许的最大长度
+    url: 请输入有效的绝对 HTTP 或 HTTPS 地址
+    spotifyId: Spotify ID 仅可使用字母、数字、下划线和连字符
   image:
     choose: 选择附件
     clear: 清除图片
@@ -417,6 +429,7 @@ settings:
     form: 作者资料
     loadError: 作者资料加载失败，请重试
     saveError: 作者资料保存失败，请重试
+    publicHint: 以下资料会公开展示在前台，请确认内容与链接正确。
     id: ID
     username: 账号
     role: 角色

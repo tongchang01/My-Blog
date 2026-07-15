@@ -72,6 +72,12 @@ function fieldError(field: keyof typeof form): string {
   return code ? transformI18n(`friendLinks.validation.${code}`) : "";
 }
 
+function statusConfirmKey(item: FriendLinkItem): string {
+  return item.status === "VISIBLE"
+    ? "friendLinks.actions.hideConfirm"
+    : "friendLinks.actions.showConfirm";
+}
+
 function selectAvatar(item: AttachmentItem): void {
   form.avatarUrl = item.publicUrl;
 }
@@ -83,7 +89,7 @@ function clearAvatar(): void {
 async function confirmStatus(item: FriendLinkItem): Promise<void> {
   try {
     await ElMessageBox.confirm(
-      transformI18n("friendLinks.actions.statusConfirm"),
+      transformI18n(statusConfirmKey(item)),
       transformI18n("friendLinks.actions.confirmTitle"),
       { type: "warning" }
     );
@@ -159,6 +165,9 @@ onMounted(initialize);
         :title="transformI18n('friendLinks.errors.operation')"
         show-icon
       />
+      <p v-if="isAdmin" class="field-hint">
+        {{ transformI18n("friendLinks.sortHint") }}
+      </p>
 
       <el-skeleton
         v-if="loading && items.length === 0"
@@ -322,13 +331,13 @@ onMounted(initialize);
           :label="transformI18n('friendLinks.fields.name')"
           :error="fieldError('name')"
         >
-          <el-input v-model="form.name" />
+          <el-input v-model="form.name" maxlength="64" />
         </el-form-item>
         <el-form-item
           :label="transformI18n('friendLinks.fields.url')"
           :error="fieldError('url')"
         >
-          <el-input v-model="form.url" />
+          <el-input v-model="form.url" maxlength="255" />
         </el-form-item>
         <el-form-item
           :label="transformI18n('friendLinks.fields.avatarUrl')"
@@ -337,6 +346,7 @@ onMounted(initialize);
           <div class="image-url-field">
             <el-input
               v-model="form.avatarUrl"
+              maxlength="255"
               :placeholder="transformI18n('settings.image.currentUrl')"
             />
             <div v-if="form.avatarUrl" class="image-preview">
@@ -362,8 +372,8 @@ onMounted(initialize);
             </div>
           </div>
         </el-form-item>
-        <el-form-item :label="transformI18n('friendLinks.fields.description')">
-          <el-input v-model="form.description" type="textarea" :rows="3" />
+        <el-form-item :label="transformI18n('friendLinks.fields.description')" :error="fieldError('description')">
+          <el-input v-model="form.description" type="textarea" :rows="3" maxlength="255" show-word-limit />
         </el-form-item>
         <el-form-item
           :label="transformI18n('friendLinks.fields.sortOrder')"
@@ -437,6 +447,12 @@ onMounted(initialize);
 
 .result-count {
   color: var(--el-color-primary);
+}
+
+.field-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--el-text-color-secondary);
 }
 
 .table-scroll {

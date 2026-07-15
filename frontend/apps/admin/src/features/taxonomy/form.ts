@@ -5,7 +5,12 @@ import type {
   TagWritePayload
 } from "./model";
 
-export type TaxonomyFormErrorCode = "required" | "sortOrderRange";
+export type TaxonomyFormErrorCode =
+  | "required"
+  | "slugFormat"
+  | "sortOrderRange";
+
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 export interface TagForm {
   nameZh: string;
@@ -49,7 +54,11 @@ export function categoryToForm(category: CategoryItem): CategoryForm {
 function validateBase(form: TagForm): TagFormErrors {
   const errors: TagFormErrors = {};
   if (!form.nameZh.trim()) errors.nameZh = "required";
-  if (!form.slug.trim()) errors.slug = "required";
+  const slug = normalizeSlug(form.slug);
+  if (!slug) errors.slug = "required";
+  else if (slug.length > 64 || !SLUG_PATTERN.test(slug)) {
+    errors.slug = "slugFormat";
+  }
   return errors;
 }
 
@@ -81,7 +90,7 @@ export function tagFormToPayload(form: TagForm): TagWritePayload {
     nameZh: form.nameZh.trim(),
     nameJa: optional(form.nameJa),
     nameEn: optional(form.nameEn),
-    slug: form.slug.trim()
+    slug: normalizeSlug(form.slug)
   };
 }
 
@@ -89,4 +98,8 @@ export function categoryFormToPayload(
   form: CategoryForm
 ): CategoryWritePayload {
   return { ...tagFormToPayload(form), sortOrder: form.sortOrder };
+}
+
+export function normalizeSlug(value: string): string {
+  return value.trim().toLowerCase();
 }

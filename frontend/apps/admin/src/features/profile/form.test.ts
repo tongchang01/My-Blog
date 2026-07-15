@@ -56,6 +56,23 @@ describe("user profile form", () => {
     });
   });
 
+  it("validates public-profile lengths, URL fields and email", () => {
+    expect(
+      validateUserProfileForm({
+        ...userProfileToForm(profile),
+        nickname: "x".repeat(65),
+        website: "not-a-url",
+        emailPublic: "not-an-email",
+        bioZh: "x".repeat(5_001)
+      })
+    ).toEqual({
+      nickname: "maxLength",
+      website: "url",
+      emailPublic: "email",
+      bioZh: "maxLength"
+    });
+  });
+
   it("normalizes whitespace and emits nullable optional fields", () => {
     expect(
       userProfileFormToPayload({

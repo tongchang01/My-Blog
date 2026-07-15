@@ -6,6 +6,7 @@ import { formatJstDateTime, localizedName } from "@/features/articles/presentati
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import type { TagItem } from "../model";
+import { normalizeSlug } from "../form";
 import { useTagManagement } from "./useTagManagement";
 
 defineOptions({ name: "TagManagement" });
@@ -45,6 +46,10 @@ function languageBadges(item: TagItem): string[] {
 function fieldError(field: keyof typeof form): string {
   const code = formErrors[field];
   return code ? transformI18n(`taxonomy.validation.${code}`) : "";
+}
+
+function normalizeFormSlug(): void {
+  form.slug = normalizeSlug(form.slug);
 }
 
 const operationErrorKey = computed(() => {
@@ -158,6 +163,8 @@ defineExpose({ state, confirmRemove });
             v-model="form.slug"
             data-testid="tag-slug-input"
             :disabled="Boolean(editingId)"
+            maxlength="64"
+            @blur="normalizeFormSlug"
           />
           <p class="field-hint">
             {{ transformI18n("taxonomy.fields.slugLockHint") }}

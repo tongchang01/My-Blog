@@ -7,6 +7,7 @@ import type {
 export type FriendLinkFormErrorCode =
   | "required"
   | "url"
+  | "maxLength"
   | "sortOrderRange";
 
 export interface FriendLinkForm {
@@ -49,15 +50,21 @@ export function validateFriendLinkForm(
 ): FriendLinkFormErrors {
   const errors: FriendLinkFormErrors = {};
   if (!form.name.trim()) errors.name = "required";
+  else if (form.name.trim().length > 64) errors.name = "maxLength";
   const url = form.url.trim();
   if (!url) {
     errors.url = "required";
-  } else if (!isHttpUrl(url)) {
+  } else if (url.length > 255 || !isHttpUrl(url)) {
     errors.url = "url";
   }
-  if (form.avatarUrl.trim() && !isHttpUrl(form.avatarUrl.trim())) {
+  if (
+    form.avatarUrl.trim() &&
+    (form.avatarUrl.trim().length > 255 ||
+      !isHttpUrl(form.avatarUrl.trim()))
+  ) {
     errors.avatarUrl = "url";
   }
+  if (form.description.trim().length > 255) errors.description = "maxLength";
   if (
     !Number.isInteger(form.sortOrder) ||
     form.sortOrder < 0 ||
@@ -89,7 +96,12 @@ function optional(value: string): string | null {
 function isHttpUrl(value: string): boolean {
   try {
     const url = new URL(value);
-    return url.protocol === "http:" || url.protocol === "https:";
+    return (
+      (url.protocol === "http:" || url.protocol === "https:") &&
+      Boolean(url.hostname) &&
+      !url.username &&
+      !url.password
+    );
   } catch {
     return false;
   }

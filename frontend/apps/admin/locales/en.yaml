@@ -258,30 +258,32 @@ taxonomy:
     nameJa: Japanese name
     nameEn: English name
     slug: Slug
-    slugLockHint: Slug is part of the public URL and is locked after creation.
+    slugLockHint: Use lowercase letters, numbers, and hyphens only (64 characters max). Slug is locked after creation.
     sortOrder: Sort order
   categories:
     title: Total categories
     create: New category
     edit: Edit category
     empty: No categories match the current filter
-    deleteConfirm: Delete this category?
+    deleteConfirm: Delete this category? Move articles first if active articles still reference it.
   tags:
     title: Total tags
     create: New tag
     edit: Edit tag
     empty: No tags match the current filter
-    deleteConfirm: Delete this tag?
+    deleteConfirm: Delete this tag? Move articles first if active articles still reference it.
   states:
     error: Unable to load data. Please retry
   validation:
     required: This field is required
+    slugFormat: Use lowercase letters, numbers, and hyphens only (64 characters max)
     sortOrderRange: Sort order must be an integer from 0 to 1000000
   errors:
     saveConflict: The name or slug is already in use
     deleteConflict: This item is still referenced by active articles
     forbidden: This account does not have write permission
     request: The operation failed. Please retry
+  sortHint: Saving updates the changed sort items atomically; the server rolls back the whole batch if any item is invalid.
 comments:
   filter:
     title: Comment Filters
@@ -324,10 +326,14 @@ comments:
     reply: Reply
     approve: Approve
     hide: Hide
-    approveConfirm: Approve this comment?
-    hideConfirm: Hide this comment?
-    deleteConfirm: Delete this comment?
-    restoreConfirm: Restore only reverses soft deletion; it does not republish a hidden comment. Continue?
+    approveArticleConfirm: Approve this comment? The article comment count will increase.
+    approveGuestbookConfirm: Approve this guestbook comment? Guestbook comments do not affect article comment counts.
+    hideArticleConfirm: Hide this comment? The article comment count will decrease.
+    hideGuestbookConfirm: Hide this guestbook comment? Guestbook comments do not affect article comment counts.
+    deleteArticleConfirm: Delete this comment? It becomes soft-deleted and the article comment count will decrease.
+    deleteGuestbookConfirm: Delete this guestbook comment? It becomes soft-deleted and does not affect article comment counts.
+    restoreArticleConfirm: Restore only reverses soft deletion; it does not republish a hidden comment. Restoring a public article comment increases the article comment count. Continue?
+    restoreGuestbookConfirm: Restore only reverses soft deletion; it does not republish a hidden comment. Guestbook comments do not affect article comment counts. Continue?
   errors:
     load: Unable to load comments. Please retry
     operation: Comment operation failed. Please retry
@@ -372,21 +378,27 @@ friendLinks:
     show: Show
     hide: Hide
     saveSort: Save sort
-    statusConfirm: Confirm changing this friend link visibility?
+    showConfirm: Showing this link makes it appear on the public friend-links page. Continue?
+    hideConfirm: Hiding this link removes it from the public friend-links page but does not delete it. Continue?
     deleteConfirm: Confirm deleting this friend link?
   validation:
     required: This field is required
     url: Enter an http or https URL
+    maxLength: The value exceeds the server maximum length
     sortOrderRange: Sort order must be an integer from 0 to 1000000
   errors:
     load: Failed to load friend links. Please retry.
     operation: Friend link operation failed. Please retry.
   empty: No friend links match the current filters
+  sortHint: Saving updates the changed sort items atomically; the server rolls back the whole batch if any item is invalid.
 settings:
   readonlyDemo: The current demo account is read-only
   updatedAt: "Updated at:"
   validation:
     required: This field is required
+    maxLength: The value exceeds the server maximum length
+    url: Enter a valid absolute HTTP or HTTPS URL
+    spotifyId: Spotify ID may contain only letters, numbers, underscores, and hyphens
   image:
     choose: Choose attachment
     clear: Clear image
@@ -417,6 +429,7 @@ settings:
     form: Author profile
     loadError: Unable to load profile. Please retry.
     saveError: Unable to save profile. Please retry.
+    publicHint: The following profile fields are public. Confirm their content and links before saving.
     id: ID
     username: Username
     role: Role

@@ -19,7 +19,11 @@ export interface UserProfilePayload {
 
 export type UserProfileForm = Record<keyof UserProfilePayload, string>;
 
-export type UserProfileFormErrorCode = "required";
+export type UserProfileFormErrorCode =
+  | "required"
+  | "maxLength"
+  | "url"
+  | "email";
 
 export type UserProfileFormErrors = Partial<
   Record<keyof UserProfileForm, UserProfileFormErrorCode>
@@ -67,7 +71,55 @@ export function validateUserProfileForm(
 ): UserProfileFormErrors {
   const errors: UserProfileFormErrors = {};
   if (!form.nickname.trim()) errors.nickname = "required";
+  validateMaxLength(errors, form, ["nickname", "location"], 64);
+  validateMaxLength(errors, form, ["bioZh", "bioJa", "bioEn"], 5_000);
+  validateMaxLength(errors, form, ["emailPublic"], 128);
+  const urlFields: Array<keyof UserProfileForm> = [
+    "avatarUrl",
+    "website",
+    "githubUrl",
+    "twitterUrl",
+    "linkedinUrl",
+    "zhihuUrl",
+    "qiitaUrl",
+    "juejinUrl"
+  ];
+  validateMaxLength(errors, form, urlFields, 255);
+  urlFields.forEach(field => {
+    if (form[field].trim() && !isHttpUrl(form[field].trim())) {
+      errors[field] = "url";
+    }
+  });
+  if (
+    form.emailPublic.trim() &&
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.emailPublic.trim())
+  ) {
+    errors.emailPublic = "email";
+  }
   return errors;
+}
+
+function validateMaxLength(
+  errors: UserProfileFormErrors,
+  form: UserProfileForm,
+  fields: Array<keyof UserProfileForm>,
+  maxLength: number
+): void {
+  fields.forEach(field => {
+    if (form[field].trim().length > maxLength) errors[field] = "maxLength";
+  });
+}
+
+function isHttpUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return (
+      (url.protocol === "http:" || url.protocol === "https:") &&
+      Boolean(url.hostname)
+    );
+  } catch {
+    return false;
+  }
 }
 
 export function userProfileFormToPayload(

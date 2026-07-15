@@ -59,6 +59,21 @@ describe("site config form", () => {
     });
   });
 
+  it("validates backend field limits, URLs and Spotify IDs before a full PUT", () => {
+    expect(
+      validateSiteConfigForm({
+        ...siteConfigToForm(config),
+        siteTitleZh: "x".repeat(129),
+        logoUrl: "ftp://example.com/logo.png",
+        spotifyPlaylistId: "invalid id"
+      })
+    ).toEqual({
+      siteTitleZh: "maxLength",
+      logoUrl: "url",
+      spotifyPlaylistId: "spotifyId"
+    });
+  });
+
   it("normalizes whitespace and emits a complete PUT payload", () => {
     expect(
       siteConfigFormToPayload({

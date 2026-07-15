@@ -42,7 +42,7 @@ describe("friend link form", () => {
     expect(item.id).toBe("9007199254742501");
   });
 
-  it("validates required fields, URL and sort range", () => {
+  it("validates required fields, URL, length and sort range", () => {
     expect(validateFriendLinkForm(createFriendLinkForm())).toEqual({
       name: "required",
       url: "required"
@@ -58,6 +58,14 @@ describe("friend link form", () => {
       url: "url",
       sortOrder: "sortOrderRange"
     });
+    expect(
+      validateFriendLinkForm({
+        ...createFriendLinkForm(),
+        name: "Example",
+        url: "https://user:password@example.com",
+        description: "x".repeat(256)
+      })
+    ).toEqual({ url: "url", description: "maxLength" });
   });
 
   it("normalizes whitespace and keeps nullable fields in complete payload", () => {
