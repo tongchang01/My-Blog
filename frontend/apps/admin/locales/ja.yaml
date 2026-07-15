@@ -212,22 +212,30 @@ articles:
     homepageSlot: ホーム表示枠
     homepageSlotHint: 固定は最大 1 件、おすすめは最大 2 件です。公開済み記事だけがホーム枠を使えます。
     slug: 記事スラッグ
+    slugHint: 空欄にできます。入力値は小文字化され、小文字・数字・ハイフンだけが使えます。
     category: カテゴリ
     tags: タグ
+    tagLimit: 選択済みタグ：
     cover: カバー添付
     coverEmpty: カバーは未選択です
+    coverActiveHint: 選択した添付を削除すると次回の保存に失敗します。カバーは有効な画像添付である必要があります。
     coverSelected: カバー選択済み
     coverChoose: カバーを選択
     coverClear: カバーをクリア
     publishAt: 公開予約日時
+    publishAtHint: JST を使用し、現在時刻より後である必要があります。
     password: 閲覧パスワード
     passwordKeepHint: 空欄の場合は現在のパスワードを保持します
+    passwordStatusHint: 閲覧パスワードはパスワード記事専用です。ステータスを切り替えると保持されません。
     requestError: 記事の読み込みまたは保存に失敗しました。再試行してください
     validation:
       required: 必須項目です
       categoryRequired: 下書き以外の記事にはカテゴリが必要です
       scheduledRequired: 公開予約日時を選択してください
+      scheduledFuture: 公開予約日時は現在の JST 時刻より後にしてください
       passwordRequired: パスワード記事には閲覧パスワードが必要です
+      tagLimit: タグは最大 20 件まで選択できます
+      slugFormat: Slug は小文字・数字・ハイフンだけが使えます
 taxonomy:
   filter:
     title: 絞り込み条件

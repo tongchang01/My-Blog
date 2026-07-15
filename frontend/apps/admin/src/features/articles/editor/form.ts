@@ -10,7 +10,10 @@ export type ArticleFormErrorCode =
   | "required"
   | "categoryRequired"
   | "scheduledRequired"
-  | "passwordRequired";
+  | "scheduledFuture"
+  | "passwordRequired"
+  | "tagLimit"
+  | "slugFormat";
 
 export interface ArticleForm {
   titleZh: string;
@@ -82,19 +85,42 @@ function optional(value: string): string | null {
   return normalized || null;
 }
 
+function currentJstDateTime(): string {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23"
+  }).formatToParts(new Date());
+  const value = Object.fromEntries(
+    parts
+      .filter(part => part.type !== "literal")
+      .map(part => [part.type, part.value])
+  );
+  return `${value.year}-${value.month}-${value.day}T${value.hour}:${value.minute}:${value.second}`;
+}
+
 export function validateArticleForm(
   form: ArticleForm,
   mode: ArticleEditorMode
 ): ArticleFormErrors {
   const errors: ArticleFormErrors = {};
-  if (!form.titleZh.trim()) errors.titleZh = "required";
-  if (!form.summaryZh.trim()) errors.summaryZh = "required";
-  if (!form.body.trim()) errors.body = "required";
+  if (form.status !== "DRAFT" && !form.titleZh.trim()) {
+    errors.titleZh = "required";
+  }
+  if (form.status !== "DRAFT" && !form.body.trim()) errors.body = "required";
   if (form.status !== "DRAFT" && !form.categoryId) {
     errors.categoryId = "categoryRequired";
   }
-  if (form.status === "SCHEDULED" && !form.publishAt) {
-    errors.publishAt = "scheduledRequired";
+  if (form.status === "SCHEDULED") {
+    if (!form.publishAt) errors.publishAt = "scheduledRequired";
+    else if (form.publishAt <= currentJstDateTime()) {
+      errors.publishAt = "scheduledFuture";
+    }
   }
   if (
     form.status === "PASSWORD" &&
@@ -102,6 +128,11 @@ export function validateArticleForm(
     !form.password.trim()
   ) {
     errors.password = "passwordRequired";
+  }
+  if (form.tagIds.length > 20) errors.tagIds = "tagLimit";
+  const slug = form.slug.trim();
+  if (slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug.toLowerCase())) {
+    errors.slug = "slugFormat";
   }
   return errors;
 }
@@ -117,7 +148,7 @@ export function articleFormToPayload(form: ArticleForm): ArticleWritePayload {
     body: form.body.trim(),
     categoryId: form.categoryId,
     tagIds: [...new Set(form.tagIds)],
-    slug: optional(form.slug),
+    slug: optional(form.slug)?.toLowerCase() ?? null,
     status: form.status,
     homepageSlot: form.homepageSlot,
     password: optional(form.password),

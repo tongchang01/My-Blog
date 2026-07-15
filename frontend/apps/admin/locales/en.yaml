@@ -212,22 +212,30 @@ articles:
     homepageSlot: Homepage slot
     homepageSlotHint: Pinned allows 1 article and Featured allows 2. Only published articles can use homepage slots.
     slug: Article slug
+    slugHint: Optional; it is lowercased and may contain only lowercase letters, numbers and hyphens.
     category: Category
     tags: Tags
+    tagLimit: "Selected tags:"
     cover: Cover attachment
     coverEmpty: No cover selected
+    coverActiveHint: Deleting the selected attachment makes a later save fail; the cover must be an active image attachment.
     coverSelected: Cover selected
     coverChoose: Choose cover
     coverClear: Clear cover
     publishAt: Scheduled publish time
+    publishAtHint: Uses JST and must be later than the current time.
     password: Access password
     passwordKeepHint: Leave blank to keep the current password
+    passwordStatusHint: Access passwords apply only to password articles and are cleared when changing status.
     requestError: Unable to load or save the article. Please retry
     validation:
       required: This field is required
       categoryRequired: Non-draft articles require a category
       scheduledRequired: Scheduled articles require a publish time
+      scheduledFuture: Scheduled publish time must be later than the current JST time
       passwordRequired: Password articles require an access password
+      tagLimit: Select at most 20 tags
+      slugFormat: Slug may contain only lowercase letters, numbers and hyphens
 taxonomy:
   filter:
     title: Filters

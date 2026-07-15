@@ -65,6 +65,7 @@ describe("article editor state", () => {
   it("validates before create and submits normalized payload", async () => {
     const source = api();
     const state = useArticleEditor("create", undefined, source);
+    state.form.status = "PUBLISHED";
 
     await expect(state.save()).resolves.toBeNull();
     expect(source.createArticle).not.toHaveBeenCalled();
@@ -73,7 +74,8 @@ describe("article editor state", () => {
     Object.assign(state.form, {
       titleZh: " 标题 ",
       summaryZh: " 摘要 ",
-      body: " 正文 "
+      body: " 正文 ",
+      categoryId: "10"
     });
     await expect(state.save()).resolves.toMatchObject({ id: "101" });
     expect(source.createArticle).toHaveBeenCalledWith(

@@ -212,22 +212,30 @@ articles:
     homepageSlot: 首页展示槽位
     homepageSlotHint: 置顶最多 1 篇，推荐最多 2 篇；只有已发布文章可以进入首页槽位。
     slug: 文章路径
+    slugHint: 可留空；填写后会转为小写，只允许小写字母、数字和连字符。
     category: 分类
     tags: 标签
+    tagLimit: 已选择标签：
     cover: 封面附件
     coverEmpty: 未选择封面
+    coverActiveHint: 删除已选附件后，后续保存会失败；封面必须是活动图片附件。
     coverSelected: 已选择封面
     coverChoose: 选择封面
     coverClear: 清除封面
     publishAt: 定时发布时间
+    publishAtHint: 使用 JST，且必须晚于当前时间。
     password: 访问密码
     passwordKeepHint: 留空将保留当前密码
+    passwordStatusHint: 仅密码文章使用访问密码；切换状态后不会保留密码。
     requestError: 文章加载或保存失败，请重试
     validation:
       required: 此项为必填项
       categoryRequired: 非草稿文章必须选择分类
       scheduledRequired: 定时发布必须选择发布时间
+      scheduledFuture: 定时发布时间必须晚于当前 JST 时间
       passwordRequired: 密码文章必须设置访问密码
+      tagLimit: 最多选择 20 个标签
+      slugFormat: Slug 只允许小写字母、数字和连字符
 taxonomy:
   filter:
     title: 筛选条件
