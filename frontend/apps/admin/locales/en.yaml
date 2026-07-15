@@ -410,6 +410,7 @@ settings:
     about: About content
     loadError: Unable to load site config. Please retry.
     saveError: Unable to save site config. Please retry.
+    saved: Site config saved
     fullReplaceHint: Saving replaces the site config with the complete current form; refresh before editing.
     fallbackHint: Empty fields fall back to Chinese field by field on the public site.
     siteTitleZh: Chinese title
@@ -431,6 +432,7 @@ settings:
     form: Author profile
     loadError: Unable to load profile. Please retry.
     saveError: Unable to save profile. Please retry.
+    saved: Profile saved
     publicHint: The following profile fields are public. Confirm their content and links before saving.
     id: ID
     username: Username

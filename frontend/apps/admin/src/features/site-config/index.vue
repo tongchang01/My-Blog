@@ -4,6 +4,7 @@ import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialo
 import type { AttachmentItem } from "@/features/attachments/model";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "@/utils/message";
 import { formatJstDateTime } from "@/features/articles/presentation";
 import { useSiteConfigManagement } from "./useSiteConfigManagement";
 
@@ -48,6 +49,12 @@ function selectImage(item: AttachmentItem): void {
 
 function clearImage(field: ImageField): void {
   form[field] = "";
+}
+
+async function submitSave(): Promise<void> {
+  if (await save()) {
+    message(transformI18n("settings.siteConfig.saved"), { type: "success" });
+  }
 }
 
 onMounted(initialize);
@@ -104,7 +111,7 @@ onMounted(initialize);
               data-testid="site-config-save"
               type="primary"
               :loading="saving"
-              @click="save"
+              @click="submitSave"
             >
               {{ transformI18n("taxonomy.actions.save") }}
             </el-button>

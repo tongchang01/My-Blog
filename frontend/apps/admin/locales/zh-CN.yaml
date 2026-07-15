@@ -410,6 +410,7 @@ settings:
     about: 关于内容
     loadError: 站点配置加载失败，请重试
     saveError: 站点配置保存失败，请重试
+    saved: 站点配置已保存
     fullReplaceHint: 保存会用当前完整表单覆盖站点配置；请先刷新，再修改。
     fallbackHint: 留空时前台会逐字段回退中文。
     siteTitleZh: 中文标题
@@ -431,6 +432,7 @@ settings:
     form: 作者资料
     loadError: 作者资料加载失败，请重试
     saveError: 作者资料保存失败，请重试
+    saved: 作者资料已保存
     publicHint: 以下资料会公开展示在前台，请确认内容与链接正确。
     id: ID
     username: 账号

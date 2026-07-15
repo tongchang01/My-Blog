@@ -55,6 +55,12 @@ async function submitPasswordChange(): Promise<void> {
   await router.replace("/login");
 }
 
+async function submitProfileSave(): Promise<void> {
+  if (await save()) {
+    message(transformI18n("settings.profile.saved"), { type: "success" });
+  }
+}
+
 function selectAvatar(item: AttachmentItem): void {
   form.avatarUrl = item.publicUrl;
 }
@@ -142,7 +148,7 @@ onMounted(initialize);
               data-testid="profile-save"
               type="primary"
               :loading="saving"
-              @click="save"
+              @click="submitProfileSave"
             >
               {{ transformI18n("taxonomy.actions.save") }}
             </el-button>
