@@ -448,7 +448,7 @@ attachments:
   readonlyDemo: 当前演示账号为只读模式，不能上传附件
   upload:
     title: 上传图片附件
-    description: 支持 JPEG、PNG、WebP、GIF；服务端会校验真实图片内容和大小限制
+    description: 支持 JPEG、PNG、WebP、GIF；最大 10 MiB。服务端按真实内容校验并按 SHA-256 去重，可能复用或恢复已有附件。
   result:
     total: 附件总数
     deletedTotal: 回收站附件总数
@@ -468,6 +468,7 @@ attachments:
   errors:
     load: 附件列表加载失败，请重试
     upload: 附件上传失败，请检查文件后重试
+    tooLarge: 图片不能超过 10 MiB
     operation: 附件操作失败，请重试
   empty: 暂无附件
 login:

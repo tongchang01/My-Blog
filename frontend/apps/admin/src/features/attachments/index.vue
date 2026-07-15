@@ -110,7 +110,13 @@ onMounted(initialize);
         class="upload-error"
         type="error"
         :closable="false"
-        :title="transformI18n('attachments.errors.upload')"
+        :title="
+          transformI18n(
+            uploadError.message === 'FILE_TOO_LARGE'
+              ? 'attachments.errors.tooLarge'
+              : 'attachments.errors.upload'
+          )
+        "
         show-icon
       />
     </el-card>

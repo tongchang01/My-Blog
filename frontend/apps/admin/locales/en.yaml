@@ -448,7 +448,7 @@ attachments:
   readonlyDemo: The current demo account is read-only and cannot upload attachments
   upload:
     title: Upload image attachment
-    description: Supports JPEG, PNG, WebP, and GIF. The server validates real image content and size limits.
+    description: Supports JPEG, PNG, WebP, and GIF up to 10 MiB. The server validates actual content and SHA-256 deduplicates, so it may reuse or restore an existing attachment.
   result:
     total: Total attachments
     deletedTotal: Deleted attachments
@@ -468,6 +468,7 @@ attachments:
   errors:
     load: Unable to load attachments. Please retry.
     upload: Unable to upload attachment. Please check the file and retry.
+    tooLarge: Images must not exceed 10 MiB
     operation: Unable to complete attachment operation. Please retry.
   empty: No attachments yet
 login:
