@@ -303,6 +303,12 @@ comments:
     pass: 承認済み
     pending: 審査待ち
     hidden: 非表示
+  auditDetails:
+    title: 審査詳細
+    site: 個人サイト
+    ip: IP アドレス
+    userAgent: User-Agent
+    parent: 親コメント ID
   columns:
     content: 内容
     author: 投稿者
@@ -321,7 +327,7 @@ comments:
     approveConfirm: このコメントを承認しますか
     hideConfirm: このコメントを非表示にしますか
     deleteConfirm: このコメントを削除しますか
-    restoreConfirm: このコメントを復元しますか
+    restoreConfirm: 復元は論理削除だけを戻し、非表示コメントを公開しません。続行しますか
   errors:
     load: コメント一覧の読み込みに失敗しました。再試行してください
     operation: コメント操作に失敗しました。再試行してください

@@ -303,6 +303,12 @@ comments:
     pass: 已通过
     pending: 待审核
     hidden: 已隐藏
+  auditDetails:
+    title: 审核详情
+    site: 个人网站
+    ip: IP 地址
+    userAgent: User-Agent
+    parent: 父评论 ID
   columns:
     content: 内容
     author: 作者
@@ -321,7 +327,7 @@ comments:
     approveConfirm: 确认通过这条评论吗
     hideConfirm: 确认隐藏这条评论吗
     deleteConfirm: 删除后评论将进入软删除状态，确认继续吗
-    restoreConfirm: 确认恢复这条评论吗
+    restoreConfirm: 恢复仅撤销软删除，不会把已隐藏评论重新公开，确认继续吗
   errors:
     load: 评论列表加载失败，请重试
     operation: 评论操作失败，请重试

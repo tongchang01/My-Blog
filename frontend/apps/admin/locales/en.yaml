@@ -303,6 +303,12 @@ comments:
     pass: Passed
     pending: Pending
     hidden: Hidden
+  auditDetails:
+    title: Audit details
+    site: Website
+    ip: IP address
+    userAgent: User-Agent
+    parent: Parent comment ID
   columns:
     content: Content
     author: Author
@@ -321,7 +327,7 @@ comments:
     approveConfirm: Approve this comment?
     hideConfirm: Hide this comment?
     deleteConfirm: Delete this comment?
-    restoreConfirm: Restore this comment?
+    restoreConfirm: Restore only reverses soft deletion; it does not republish a hidden comment. Continue?
   errors:
     load: Unable to load comments. Please retry
     operation: Comment operation failed. Please retry

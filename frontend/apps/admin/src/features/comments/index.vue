@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { ElMessageBox } from "element-plus";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -40,6 +40,9 @@ const auditStatuses: Array<CommentAuditStatus | "ALL"> = [
   "PENDING",
   "HIDDEN"
 ];
+const isGuestbookFilter = computed(
+  () => filters.targetType === "GUESTBOOK"
+);
 
 function targetTypeKey(targetType: string): string {
   if (targetType === "ARTICLE") return "comments.target.article";
@@ -63,6 +66,13 @@ function auditTagType(status: string) {
 
 function commentSummary(item: CommentListItem): string {
   return item.contentMd.trim() || item.contentHtml.replace(/<[^>]+>/g, "");
+}
+
+function targetLabel(item: CommentListItem): string {
+  if (item.targetType === "GUESTBOOK") {
+    return transformI18n("comments.target.guestbook");
+  }
+  return `${transformI18n("comments.target.article")} #${item.targetId}`;
 }
 
 function canApprove(item: CommentListItem): boolean {
@@ -101,6 +111,14 @@ async function confirmAction(
 }
 
 onMounted(initialize);
+
+watch(
+  () => filters.targetType,
+  targetType => {
+    if (targetType === "GUESTBOOK") filters.targetId = "0";
+    else if (filters.targetId === "0") filters.targetId = "";
+  }
+);
 </script>
 
 <template>
@@ -130,7 +148,10 @@ onMounted(initialize);
             />
           </el-select>
         </el-form-item>
-        <el-form-item :label="transformI18n('comments.filter.targetId')">
+        <el-form-item
+          v-if="!isGuestbookFilter"
+          :label="transformI18n('comments.filter.targetId')"
+        >
           <el-input
             v-model="filters.targetId"
             data-testid="comment-target-id"
@@ -264,6 +285,13 @@ onMounted(initialize);
                 <div class="comment-author-cell">
                   <strong>{{ row.authorNickname }}</strong>
                   <span>{{ row.authorEmail || "—" }}</span>
+                  <details v-if="isAdmin" class="comment-audit-details">
+                    <summary>{{ transformI18n("comments.auditDetails.title") }}</summary>
+                    <span>{{ transformI18n("comments.auditDetails.site") }}：{{ row.authorSite || "—" }}</span>
+                    <span>{{ transformI18n("comments.auditDetails.ip") }}：{{ row.authorIp || "—" }}</span>
+                    <span>{{ transformI18n("comments.auditDetails.userAgent") }}：{{ row.authorUserAgent || "—" }}</span>
+                    <span>{{ transformI18n("comments.auditDetails.parent") }}：{{ row.parentId || "—" }}</span>
+                  </details>
                 </div>
               </template>
             </el-table-column>
@@ -272,7 +300,7 @@ onMounted(initialize);
               min-width="190"
             >
               <template #default="{ row }">
-                {{ transformI18n(targetTypeKey(row.targetType)) }} #{{ row.targetId }}
+                {{ targetLabel(row) }}
               </template>
             </el-table-column>
             <el-table-column
@@ -499,6 +527,18 @@ onMounted(initialize);
 
 .reply-meta {
   color: var(--el-color-primary);
+}
+
+.comment-audit-details {
+  display: grid;
+  gap: 3px;
+  margin-top: 4px;
+
+  summary {
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--el-color-primary);
+  }
 }
 
 .reply-target {
