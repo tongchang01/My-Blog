@@ -280,6 +280,10 @@ taxonomy:
     slugFormat: Use lowercase letters, numbers, and hyphens only (64 characters max)
     sortOrderRange: Sort order must be an integer from 0 to 1000000
     maxLength: The value exceeds the server maximum length
+  feedback:
+    saved: Saved
+    deleted: Deleted
+    sortSaved: Sort order saved
   errors:
     saveConflict: The name or slug is already in use
     deleteConflict: This item is still referenced by active articles

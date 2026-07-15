@@ -280,6 +280,10 @@ taxonomy:
     slugFormat: Slug は小文字、数字、ハイフンのみ使用でき、最大64文字です
     sortOrderRange: 並び順は 0 から 1000000 の整数で入力してください
     maxLength: 値がサーバーの最大長を超えています
+  feedback:
+    saved: 保存しました
+    deleted: 削除しました
+    sortSaved: 並び順を保存しました
   errors:
     saveConflict: 名前または Slug は既に使用されています
     deleteConflict: 公開中の記事から参照されているため削除できません

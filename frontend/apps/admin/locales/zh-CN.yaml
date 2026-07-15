@@ -280,6 +280,10 @@ taxonomy:
     slugFormat: Slug 仅可使用小写字母、数字和连字符，最长 64 位
     sortOrderRange: 排序值必须是 0 到 1000000 之间的整数
     maxLength: 内容超过服务端允许的最大长度
+  feedback:
+    saved: 已保存
+    deleted: 已删除
+    sortSaved: 排序已保存
   errors:
     saveConflict: 名称或 Slug 已被占用
     deleteConflict: 仍被活动文章引用，无法删除

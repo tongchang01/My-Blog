@@ -6,6 +6,10 @@ import { useUserStoreHook } from "@/store/modules/user";
 import { http } from "@/utils/http";
 import TagManagement from "./index.vue";
 
+const { showMessage } = vi.hoisted(() => ({ showMessage: vi.fn() }));
+
+vi.mock("@/utils/message", () => ({ message: showMessage }));
+
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
 const stubs = {
@@ -65,6 +69,7 @@ function replyList() {
 
 afterEach(() => {
   mock.reset();
+  showMessage.mockClear();
   vi.restoreAllMocks();
 });
 
@@ -93,6 +98,11 @@ describe("tag management page", () => {
   it("confirms before delegating tag deletion", async () => {
     useUserStoreHook().SET_CURRENT_USER({ id: "1001", username: "admin", type: "ADMIN", profile });
     replyList();
+    mock.onDelete("/api/admin/tags/200").reply(200, {
+      code: "00000",
+      msg: "success",
+      data: null
+    });
     vi.spyOn(ElMessageBox, "confirm").mockResolvedValue({ action: "confirm" } as any);
     const wrapper = mount(TagManagement, { global: { stubs } });
     await flushPromises();
@@ -100,6 +110,9 @@ describe("tag management page", () => {
     await (wrapper.vm as any).confirmRemove("200");
     expect(ElMessageBox.confirm).toHaveBeenCalledOnce();
     expect(remove).toHaveBeenCalledWith("200");
+    expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
+      type: "success"
+    });
   });
 
   it("locks the slug input while editing a tag", async () => {

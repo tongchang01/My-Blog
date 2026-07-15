@@ -5,6 +5,7 @@ import type { AdminLocale } from "@/features/articles/model";
 import { formatJstDateTime, localizedName } from "@/features/articles/presentation";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "@/utils/message";
 import type { TagItem } from "../model";
 import { normalizeSlug } from "../form";
 import { useTagManagement } from "./useTagManagement";
@@ -71,7 +72,15 @@ async function confirmRemove(id: string): Promise<void> {
     transformI18n("taxonomy.actions.delete"),
     { type: "warning" }
   );
-  await state.remove(id);
+  if (await state.remove(id)) {
+    message(transformI18n("taxonomy.feedback.deleted"), { type: "success" });
+  }
+}
+
+async function submitSave(): Promise<void> {
+  if (await save()) {
+    message(transformI18n("taxonomy.feedback.saved"), { type: "success" });
+  }
 }
 
 onMounted(initialize);
@@ -153,12 +162,12 @@ defineExpose({ state, confirmRemove });
       @closed="closeDialog"
     >
       <el-form :model="form" label-position="top">
-        <el-form-item :label="transformI18n('taxonomy.fields.nameZh')" :error="fieldError('nameZh')">
+        <el-form-item required :label="transformI18n('taxonomy.fields.nameZh')" :error="fieldError('nameZh')">
           <el-input v-model="form.nameZh" maxlength="64" show-word-limit />
         </el-form-item>
         <el-form-item :label="transformI18n('taxonomy.fields.nameJa')" :error="fieldError('nameJa')"><el-input v-model="form.nameJa" maxlength="64" show-word-limit /></el-form-item>
         <el-form-item :label="transformI18n('taxonomy.fields.nameEn')" :error="fieldError('nameEn')"><el-input v-model="form.nameEn" maxlength="64" show-word-limit /></el-form-item>
-        <el-form-item :label="transformI18n('taxonomy.fields.slug')" :error="fieldError('slug')">
+        <el-form-item required :label="transformI18n('taxonomy.fields.slug')" :error="fieldError('slug')">
           <el-input
             v-model="form.slug"
             data-testid="tag-slug-input"
@@ -173,7 +182,7 @@ defineExpose({ state, confirmRemove });
       </el-form>
       <template #footer>
         <el-button @click="closeDialog">{{ transformI18n("taxonomy.actions.cancel") }}</el-button>
-        <el-button type="primary" :loading="saving" @click="save">{{ transformI18n("taxonomy.actions.save") }}</el-button>
+        <el-button type="primary" :loading="saving" @click="submitSave">{{ transformI18n("taxonomy.actions.save") }}</el-button>
       </template>
     </el-dialog>
   </section>

@@ -3,6 +3,7 @@ import { computed, onMounted } from "vue";
 import { ElMessageBox } from "element-plus";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { message } from "@/utils/message";
 import type { AdminLocale } from "@/features/articles/model";
 import {
   formatJstDateTime,
@@ -78,7 +79,21 @@ async function confirmRemove(id: string): Promise<void> {
     transformI18n("taxonomy.actions.delete"),
     { type: "warning" }
   );
-  await state.remove(id);
+  if (await state.remove(id)) {
+    message(transformI18n("taxonomy.feedback.deleted"), { type: "success" });
+  }
+}
+
+async function submitSave(): Promise<void> {
+  if (await save()) {
+    message(transformI18n("taxonomy.feedback.saved"), { type: "success" });
+  }
+}
+
+async function submitSort(): Promise<void> {
+  if (await saveSortOrders()) {
+    message(transformI18n("taxonomy.feedback.sortSaved"), { type: "success" });
+  }
 }
 
 onMounted(initialize);
@@ -122,7 +137,7 @@ defineExpose({ state, confirmRemove });
             <el-button
               data-testid="category-save-sort"
               :disabled="dirtySortItems.length === 0"
-              @click="saveSortOrders"
+              @click="submitSort"
             >
               {{ transformI18n("taxonomy.actions.saveSort") }}
             </el-button>
@@ -221,7 +236,7 @@ defineExpose({ state, confirmRemove });
       @closed="closeDialog"
     >
       <el-form :model="form" label-position="top">
-        <el-form-item :label="transformI18n('taxonomy.fields.nameZh')" :error="fieldError('nameZh')">
+        <el-form-item required :label="transformI18n('taxonomy.fields.nameZh')" :error="fieldError('nameZh')">
           <el-input v-model="form.nameZh" maxlength="64" show-word-limit />
         </el-form-item>
         <el-form-item :label="transformI18n('taxonomy.fields.nameJa')" :error="fieldError('nameJa')">
@@ -230,7 +245,7 @@ defineExpose({ state, confirmRemove });
         <el-form-item :label="transformI18n('taxonomy.fields.nameEn')" :error="fieldError('nameEn')">
           <el-input v-model="form.nameEn" maxlength="64" show-word-limit />
         </el-form-item>
-        <el-form-item :label="transformI18n('taxonomy.fields.slug')" :error="fieldError('slug')">
+        <el-form-item required :label="transformI18n('taxonomy.fields.slug')" :error="fieldError('slug')">
           <el-input
             v-model="form.slug"
             data-testid="category-slug-input"
@@ -248,7 +263,7 @@ defineExpose({ state, confirmRemove });
       </el-form>
       <template #footer>
         <el-button @click="closeDialog">{{ transformI18n("taxonomy.actions.cancel") }}</el-button>
-        <el-button type="primary" :loading="saving" @click="save">
+        <el-button type="primary" :loading="saving" @click="submitSave">
           {{ transformI18n("taxonomy.actions.save") }}
         </el-button>
       </template>
