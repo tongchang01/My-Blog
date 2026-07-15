@@ -48,6 +48,10 @@ const stubs = {
   "el-descriptions-item": true,
   "el-empty": true,
   "el-skeleton": true,
+  "el-statistic": {
+    props: ["value"],
+    template: "<div><slot name='title' />{{ value }}<slot /></div>"
+  },
   "el-tag": true
 };
 
