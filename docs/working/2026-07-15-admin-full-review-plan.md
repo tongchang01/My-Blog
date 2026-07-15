@@ -1,6 +1,6 @@
 # 管理端全量审查与交互改造计划
 
-> 状态：产品方向已确认；DEMO 首次登录说明、项目页脚、仪表盘首屏、表单必填标记、各业务写操作成功反馈，以及构建欢迎语、未使用弹窗与表格工具清理已实施；其余上游模板遗留与视觉收敛待单独批次。
+> 状态：产品方向已确认；DEMO 首次登录说明、项目页脚、仪表盘首屏、表单必填标记、各业务写操作成功反馈，以及构建欢迎语、未使用弹窗、表格工具、存储与指令清理已实施；其余上游模板遗留与视觉收敛待单独批次。
 > 审查基线：`feature/admin-consumption-alignment` 的 `16aaa8a`
 > 范围：`frontend/apps/admin/` 与 `MyBlog-springboot-v2/` 的管理端契约、表单、反馈、交互和上游模板遗留
 > 约束：本轮审查与分批实施均不改后端业务代码、不新建接口、不替代后端校验；前端只复用既有接口、校验与 `message()`。
@@ -96,7 +96,7 @@
 | pure-admin 页脚链接 | `lay-footer/index.vue` 已改为项目版权，并读取现有站点配置的 `icpNo` | 已实施：备案号非空时显示工信部备案入口，读取失败时保留版权 | 已确认保留页脚 |
 | 全局搜索、通知中心、系统设置、多布局、多标签页 | `layout/` 全局挂载 | 本轮保留，不与视觉收敛混合删除 | 已确认保留后台壳 |
 | `ReDialog`、`RePureTableBar`、`@pureadmin/table` | 已确认没有业务调用；前者仅在 `App.vue` 挂载，后者仅在自身定义和 `main.ts` 注册 | 已删除组件、全局注册、类型与依赖；类型检查、测试和构建通过 | 否，技术清理 |
-| `localforage`、`js-cookie`、未使用指令 | `localforage` 仅由自身包装文件导入；未发现 `js-cookie` 运行时导入；`copy/longpress/optimize` 未发现模板使用 | 随相关模板簇删除并从依赖/预构建清单移除 | 否，技术清理 |
+| `localforage`、`js-cookie`、未使用指令 | 已确认 `localforage` 仅由自身包装文件导入，`js-cookie` 无运行时导入，`copy/longpress/optimize` 无模板使用 | 已删除封装、指令、类型、依赖与预构建配置；保留仍被设置面板使用的 `v-ripple` | 否，技术清理 |
 | `vue-tippy`、`sortablejs`、动效与深色主题 | 仍被侧栏、设置面板、搜索历史、表格工具栏或错误页引用 | 随保留的后台壳继续保留；不能仅为减包先删依赖 | 已确认保留后台壳 |
 | 构建 4 MB chunk 警告阈值 | `vite.config.ts` 把 `chunkSizeWarningLimit` 提升至 4000 | 恢复合理阈值后按真实报告拆包；不与本轮功能改造混合 | 否，单独性能任务 |
 
@@ -177,7 +177,7 @@
 | 构建欢迎语 | 原 `build/plugins.ts` 注册 `viteBuildInfo()`，`build/info.ts` 直接输出 pure-admin 文案 | 已删除，并同步移除 `boxen`、`gradient-string` 与只为它服务的构建统计逻辑；构建验证通过。 |
 | 页脚上游链接 | `lay-footer/index.vue` 已替换为项目版权，并按 `icpNo` 显示备案入口 | 已实施。 |
 | 全局弹窗与表格工具栏 | 已确认无业务调用 | 已删除 `ReDialog`、`RePureTableBar`、`@pureadmin/table` 及其全局注册、类型；类型检查、测试和构建通过。 |
-| localForage、Cookie 与通用指令 | `localforage` 仅被本地包装文件导入；未发现 `js-cookie` 运行时导入；未发现 `v-copy`、`v-longpress`、`v-optimize` 模板使用 | 可随依赖和全局注册清理；`v-ripple` 仍被系统设置面板使用，需等后台壳决定。 |
+| localForage、Cookie 与通用指令 | 已确认无运行调用 | 已删除 `localforage`、`js-cookie`、`v-copy`、`v-longpress` 与 `v-optimize` 及对应类型、依赖和预构建配置；`v-ripple` 因设置面板仍在使用而保留。 |
 | 搜索、通知、系统设置、多布局、多标签 | 由 `layout/index.vue`、navbar、sidebar、setting、tag、search、notice 和对应 store 互相引用 | 不是孤立依赖，必须先确认保留的后台壳，再按功能簇清理。 |
 | Tooltip、拖拽与动效 | `vue-tippy`、`sortablejs`、`@vueuse/motion` 仍被侧栏、搜索历史、登录/错误页或设置面板引用 | 不应先删包；若上游壳收敛，可跟随其唯一调用点删除。 |
 | 调试检查器与构建阈值 | Vite 始终注册 `codeInspectorPlugin`；`chunkSizeWarningLimit` 被设为 4000 | 已确认保留开发用检查器；构建阈值及按报告拆包仍作为独立性能任务。 |
