@@ -191,12 +191,13 @@ onMounted(initialize);
               data-testid="article-operation-column"
               :label="transformI18n('articles.columns.operations')"
               fixed="right"
-              width="100"
+              width="110"
             >
               <template #default="{ row }">
                 <el-button
                   :data-testid="`article-restore-${row.id}`"
-                  link
+                  size="small"
+                  plain
                   type="primary"
                   :loading="restoringId === row.id"
                   :disabled="restoringId !== null"
@@ -227,7 +228,7 @@ onMounted(initialize);
 
 <style scoped lang="scss">
 .recycle-page {
-  padding: 20px;
+  padding: 20px 24px;
   color: var(--el-text-color-primary);
   background: var(--el-bg-color-page);
 }
