@@ -69,15 +69,13 @@ function api(
 }
 
 describe("friend link management state", () => {
-  it("loads the first page with default filters", async () => {
+  it("loads the first page with pagination only", async () => {
     const source = api();
     const state = useFriendLinkManagement(source);
 
     await state.initialize();
 
     expect(source.listFriendLinks).toHaveBeenCalledWith({
-      keyword: "",
-      status: "ALL",
       page: 1,
       size: 20
     });
@@ -86,29 +84,14 @@ describe("friend link management state", () => {
     expect(state.sortDrafts["9007199254742501"]).toBe(10);
   });
 
-  it("searches from page one, changes page and resets defaults", async () => {
+  it("changes the page without inventing unsupported filters", async () => {
     const source = api();
     const state = useFriendLinkManagement(source);
-    state.filters.keyword = "example";
-    state.filters.status = "VISIBLE";
-    state.filters.page = 3;
-
-    await state.search();
-    expect(source.listFriendLinks).toHaveBeenLastCalledWith(
-      expect.objectContaining({ page: 1, keyword: "example" })
-    );
 
     await state.changePage(2, 50);
-    expect(source.listFriendLinks).toHaveBeenLastCalledWith(
-      expect.objectContaining({ page: 2, size: 50 })
-    );
-
-    await state.reset();
-    expect(state.filters).toMatchObject({
-      keyword: "",
-      status: "ALL",
-      page: 1,
-      size: 20
+    expect(source.listFriendLinks).toHaveBeenLastCalledWith({
+      page: 2,
+      size: 50
     });
   });
 

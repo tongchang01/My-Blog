@@ -88,7 +88,7 @@ afterEach(() => {
 });
 
 describe("friend link management page", () => {
-  it("renders filters, results and ADMIN actions", async () => {
+  it("renders pagination and ADMIN actions without unsupported filters", async () => {
     useUserStoreHook().SET_CURRENT_USER({
       id: "1001",
       username: "admin",
@@ -106,16 +106,10 @@ describe("friend link management page", () => {
     await flushPromises();
 
     expect(
-      wrapper.find('[data-testid="friend-link-filter-card"]').exists()
-    ).toBe(true);
-    expect(
       wrapper.find('[data-testid="friend-link-result-card"]').exists()
     ).toBe(true);
-    expect(wrapper.find('[data-testid="friend-link-keyword"]').exists()).toBe(
-      true
-    );
-    expect(wrapper.find('[data-testid="friend-link-status"]').exists()).toBe(
-      true
+    expect(wrapper.find('[data-testid="friend-link-filter-card"]').exists()).toBe(
+      false
     );
     expect(
       wrapper.find('[data-testid="friend-link-operation-column"]').exists()

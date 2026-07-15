@@ -7,13 +7,12 @@ import type {
   FriendLinkStatus,
   FriendLinkWritePayload
 } from "@/features/friend-links/model";
-import { buildFriendLinkListParams } from "@/features/friend-links/query";
 import { http } from "@/utils/http";
 
 export const listFriendLinks = (filters: FriendLinkListFilters) =>
   http.get<ApiResponse<FriendLinkPageResponse>>(
     "/api/admin/friend-links",
-    { params: buildFriendLinkListParams(filters) }
+    { params: filters }
   );
 
 export const getFriendLink = (id: string) =>

@@ -1,5 +1,4 @@
 export type FriendLinkStatus = "VISIBLE" | "HIDDEN";
-export type FriendLinkStatusFilter = FriendLinkStatus | "ALL";
 
 export interface FriendLinkItem {
   id: string;
@@ -23,15 +22,6 @@ export interface FriendLinkPageResponse {
 }
 
 export interface FriendLinkListFilters {
-  keyword: string;
-  status: FriendLinkStatusFilter;
-  page: number;
-  size: number;
-}
-
-export interface FriendLinkListParams {
-  keyword?: string;
-  status?: FriendLinkStatus;
   page: number;
   size: number;
 }

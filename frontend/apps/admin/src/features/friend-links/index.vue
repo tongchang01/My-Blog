@@ -30,8 +30,6 @@ const {
   sortDrafts,
   dirtySortItems,
   initialize,
-  search,
-  reset,
   refresh,
   changePage,
   openCreate,
@@ -42,13 +40,11 @@ const {
   saveSortOrders
 } = state;
 
-const statuses: Array<FriendLinkStatus | "ALL"> = ["ALL", "VISIBLE", "HIDDEN"];
 const avatarPickerOpen = ref(false);
 
-function statusKey(status: FriendLinkStatus | "ALL"): string {
+function statusKey(status: FriendLinkStatus): string {
   if (status === "VISIBLE") return "friendLinks.status.visible";
-  if (status === "HIDDEN") return "friendLinks.status.hidden";
-  return "friendLinks.status.all";
+  return "friendLinks.status.hidden";
 }
 
 function statusTagType(status: FriendLinkStatus) {
@@ -115,57 +111,6 @@ onMounted(initialize);
 
 <template>
   <section class="friend-link-page">
-    <el-card
-      data-testid="friend-link-filter-card"
-      class="workspace-card filter-card"
-      shadow="never"
-    >
-      <template #header>
-        <div class="card-heading">
-          <h2>{{ transformI18n("friendLinks.filter.title") }}</h2>
-        </div>
-      </template>
-
-      <el-form :model="filters" label-position="top" class="filter-grid">
-        <el-form-item :label="transformI18n('friendLinks.filter.keyword')">
-          <el-input
-            v-model="filters.keyword"
-            data-testid="friend-link-keyword"
-            clearable
-            :placeholder="
-              transformI18n('friendLinks.filter.keywordPlaceholder')
-            "
-            @keyup.enter="search"
-          />
-        </el-form-item>
-        <el-form-item :label="transformI18n('friendLinks.filter.status')">
-          <el-select v-model="filters.status" data-testid="friend-link-status">
-            <el-option
-              v-for="status in statuses"
-              :key="status"
-              :label="transformI18n(statusKey(status))"
-              :value="status"
-            />
-          </el-select>
-        </el-form-item>
-      </el-form>
-
-      <div class="filter-actions">
-        <div class="filter-buttons">
-          <el-button
-            data-testid="friend-link-search"
-            type="primary"
-            @click="search"
-          >
-            {{ transformI18n("articles.actions.search") }}
-          </el-button>
-          <el-button data-testid="friend-link-reset" @click="reset">
-            {{ transformI18n("articles.actions.reset") }}
-          </el-button>
-        </div>
-      </div>
-    </el-card>
-
     <el-card
       data-testid="friend-link-result-card"
       class="workspace-card result-card"
@@ -476,7 +421,6 @@ onMounted(initialize);
 }
 
 .card-heading,
-.filter-actions,
 .result-heading,
 .result-actions {
   display: flex;
@@ -489,17 +433,6 @@ onMounted(initialize);
   margin: 0;
   font-size: 18px;
   font-weight: 600;
-}
-
-.filter-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
-.filter-buttons {
-  display: flex;
-  gap: 10px;
 }
 
 .result-count {
@@ -576,11 +509,6 @@ onMounted(initialize);
 @media (width <= 900px) {
   .friend-link-page {
     padding: 12px;
-  }
-
-  .filter-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
   }
 
   .result-heading,
