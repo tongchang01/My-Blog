@@ -20,9 +20,6 @@ importers:
       '@pureadmin/descriptions':
         specifier: ^1.2.1
         version: 1.2.1(echarts@6.0.0)(element-plus@2.11.5(vue@3.5.22(typescript@5.9.3)))(typescript@5.9.3)
-      '@pureadmin/table':
-        specifier: ^3.3.0
-        version: 3.3.0(element-plus@2.11.5(vue@3.5.22(typescript@5.9.3)))(typescript@5.9.3)
       '@pureadmin/utils':
         specifier: ^2.6.2
         version: 2.6.2(echarts@6.0.0)(vue@3.5.22(typescript@5.9.3))
@@ -1030,11 +1027,6 @@ packages:
 
   '@pureadmin/descriptions@1.2.1':
     resolution: {integrity: sha512-7jDJuqz8xnhcmwXdWQnBzOYeX2WK27TRFaVgs9AdiRr+DnKb9W+krHByJwQtxo5lg4qyRh4/IWQGEMfhC2ljeQ==}
-    peerDependencies:
-      element-plus: ^2.0.0
-
-  '@pureadmin/table@3.3.0':
-    resolution: {integrity: sha512-06vp/IWUOsvt1zpPXMbVvGfrBWKBv5O1q3nZIlbSFJejJNWHG1HU+EWGuCzJD6KCsQdwNettv1wUuAleH4+YQQ==}
     peerDependencies:
       element-plus: ^2.0.0
 
@@ -5163,13 +5155,6 @@ snapshots:
       vue: 3.5.22(typescript@5.9.3)
     transitivePeerDependencies:
       - echarts
-      - typescript
-
-  '@pureadmin/table@3.3.0(element-plus@2.11.5(vue@3.5.22(typescript@5.9.3)))(typescript@5.9.3)':
-    dependencies:
-      element-plus: 2.11.5(vue@3.5.22(typescript@5.9.3))
-      vue: 3.5.22(typescript@5.9.3)
-    transitivePeerDependencies:
       - typescript
 
   '@pureadmin/utils@2.6.2(echarts@6.0.0)(vue@3.5.22(typescript@5.9.3))':

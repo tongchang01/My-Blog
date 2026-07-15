@@ -55,7 +55,6 @@
     "@mdit/plugin-katex": "1.0.1",
     "@mdit/plugin-tasklist": "1.0.1",
     "@pureadmin/descriptions": "^1.2.1",
-    "@pureadmin/table": "^3.3.0",
     "@pureadmin/utils": "^2.6.2",
     "@vueuse/core": "^14.0.0",
     "@vueuse/motion": "^3.0.3",
