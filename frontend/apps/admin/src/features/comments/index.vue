@@ -358,69 +358,76 @@ watch(
               data-testid="comment-operation-column"
               :label="transformI18n('articles.columns.operations')"
               fixed="right"
-              width="280"
+              width="320"
             >
               <template #default="{ row }">
-                <el-button
-                  v-if="canReply(row)"
-                  :data-testid="`comment-reply-${row.id}`"
-                  link
-                  type="primary"
-                  :disabled="operatingId !== null"
-                  @click="openReplyDialog(row)"
-                >
-                  {{ transformI18n("comments.actions.reply") }}
-                </el-button>
-                <el-button
-                  v-if="canApprove(row)"
-                  :data-testid="`comment-approve-${row.id}`"
-                  link
-                  type="success"
-                  :loading="operatingId === row.id"
-                  :disabled="operatingId !== null"
-                  @click="
-                    confirmAction(row, actionConfirmKey(row, 'approve'), 'comments.feedback.approved', state.approve)
-                  "
-                >
-                  {{ transformI18n("comments.actions.approve") }}
-                </el-button>
-                <el-button
-                  v-if="canHide(row)"
-                  :data-testid="`comment-hide-${row.id}`"
-                  link
-                  type="warning"
-                  :loading="operatingId === row.id"
-                  :disabled="operatingId !== null"
-                  @click="confirmAction(row, actionConfirmKey(row, 'hide'), 'comments.feedback.hidden', state.hide)"
-                >
-                  {{ transformI18n("comments.actions.hide") }}
-                </el-button>
-                <el-button
-                  v-if="!row.deleted"
-                  :data-testid="`comment-delete-${row.id}`"
-                  link
-                  type="danger"
-                  :loading="operatingId === row.id"
-                  :disabled="operatingId !== null"
-                  @click="
-                    confirmAction(row, actionConfirmKey(row, 'delete'), 'comments.feedback.deleted', state.remove)
-                  "
-                >
-                  {{ transformI18n("articles.actions.delete") }}
-                </el-button>
-                <el-button
-                  v-if="row.deleted"
-                  :data-testid="`comment-restore-${row.id}`"
-                  link
-                  type="primary"
-                  :loading="operatingId === row.id"
-                  :disabled="operatingId !== null"
-                  @click="
-                    confirmAction(row, actionConfirmKey(row, 'restore'), 'comments.feedback.restored', state.restore)
-                  "
-                >
-                  {{ transformI18n("articles.recycle.restore") }}
-                </el-button>
+                <div class="comment-actions">
+                  <el-button
+                    v-if="canReply(row)"
+                    :data-testid="`comment-reply-${row.id}`"
+                    size="small"
+                    plain
+                    type="primary"
+                    :disabled="operatingId !== null"
+                    @click="openReplyDialog(row)"
+                  >
+                    {{ transformI18n("comments.actions.reply") }}
+                  </el-button>
+                  <el-button
+                    v-if="canApprove(row)"
+                    :data-testid="`comment-approve-${row.id}`"
+                    size="small"
+                    plain
+                    type="success"
+                    :loading="operatingId === row.id"
+                    :disabled="operatingId !== null"
+                    @click="
+                      confirmAction(row, actionConfirmKey(row, 'approve'), 'comments.feedback.approved', state.approve)
+                    "
+                  >
+                    {{ transformI18n("comments.actions.approve") }}
+                  </el-button>
+                  <el-button
+                    v-if="canHide(row)"
+                    :data-testid="`comment-hide-${row.id}`"
+                    size="small"
+                    plain
+                    type="warning"
+                    :loading="operatingId === row.id"
+                    :disabled="operatingId !== null"
+                    @click="confirmAction(row, actionConfirmKey(row, 'hide'), 'comments.feedback.hidden', state.hide)"
+                  >
+                    {{ transformI18n("comments.actions.hide") }}
+                  </el-button>
+                  <el-button
+                    v-if="!row.deleted"
+                    :data-testid="`comment-delete-${row.id}`"
+                    size="small"
+                    plain
+                    type="danger"
+                    :loading="operatingId === row.id"
+                    :disabled="operatingId !== null"
+                    @click="
+                      confirmAction(row, actionConfirmKey(row, 'delete'), 'comments.feedback.deleted', state.remove)
+                    "
+                  >
+                    {{ transformI18n("articles.actions.delete") }}
+                  </el-button>
+                  <el-button
+                    v-if="row.deleted"
+                    :data-testid="`comment-restore-${row.id}`"
+                    size="small"
+                    plain
+                    type="primary"
+                    :loading="operatingId === row.id"
+                    :disabled="operatingId !== null"
+                    @click="
+                      confirmAction(row, actionConfirmKey(row, 'restore'), 'comments.feedback.restored', state.restore)
+                    "
+                  >
+                    {{ transformI18n("articles.recycle.restore") }}
+                  </el-button>
+                </div>
               </template>
             </el-table-column>
           </el-table>
@@ -484,8 +491,8 @@ watch(
 <style scoped lang="scss">
 .comment-page {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  padding: 20px 24px;
   color: var(--el-text-color-primary);
   background: var(--el-bg-color-page);
 }
@@ -513,7 +520,15 @@ watch(
 .filter-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
+  gap: 16px 20px;
+
+  :deep(.el-form-item) {
+    margin-bottom: 0;
+  }
+
+  :deep(.el-select) {
+    width: 100%;
+  }
 }
 
 .filter-buttons {
@@ -563,6 +578,16 @@ watch(
   }
 }
 
+.comment-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+
+  :deep(.el-button + .el-button) {
+    margin-left: 0;
+  }
+}
+
 .reply-target {
   margin: 0 0 12px;
   color: var(--el-text-color-secondary);
@@ -580,7 +605,7 @@ watch(
 
   .filter-grid {
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: 16px;
   }
 
   .filter-actions {

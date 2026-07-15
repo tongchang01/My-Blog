@@ -251,14 +251,16 @@ onMounted(initialize);
             <div class="attachment-actions">
               <el-button
                 :data-testid="`attachment-copy-${item.id}`"
-                link
+                size="small"
+                plain
                 type="primary"
                 @click="copyUrl(item)"
               >
                 {{ transformI18n("attachments.actions.copyUrl") }}
               </el-button>
               <el-button
-                link
+                size="small"
+                plain
                 type="primary"
                 tag="a"
                 :href="item.publicUrl"
@@ -269,7 +271,8 @@ onMounted(initialize);
               <el-button
                 v-if="isAdmin && !showDeleted"
                 :data-testid="`attachment-delete-${item.id}`"
-                link
+                size="small"
+                plain
                 type="danger"
                 @click="confirmRemove(item)"
               >
@@ -278,7 +281,8 @@ onMounted(initialize);
               <el-button
                 v-if="isAdmin && showDeleted"
                 :data-testid="`attachment-restore-${item.id}`"
-                link
+                size="small"
+                plain
                 type="primary"
                 @click="restoreAttachment(item.id)"
               >
@@ -307,8 +311,8 @@ onMounted(initialize);
 <style scoped lang="scss">
 .attachment-page {
   display: grid;
-  gap: 18px;
-  padding: 20px;
+  gap: 16px;
+  padding: 20px 24px;
   color: var(--el-text-color-primary);
   background: var(--el-bg-color-page);
 }
