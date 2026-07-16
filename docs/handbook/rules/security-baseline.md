@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 认证、授权、匿名入口、上传和前端会话
-> 最后校准：2026-07-10
+> 最后校准：2026-07-16
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/`、`frontend/apps/admin/src/features/auth/`
 > 权威程度：规则
 
@@ -30,6 +30,7 @@
 - CORS origins 必须显式配置，不使用 `*`；生产反向代理需验证同源转发。
 - 只有远端地址命中 `myblog.web.trusted-proxies` 时才读取 `X-Forwarded-For` 或 `X-Real-IP`。
 - 管理端当前把 access/refresh token 放在专用 localStorage session 中；不得写入 URL、console、第三方 SDK 或其他任意 key。
+- 编辑器草稿不得持久化密码、token 等认证秘密；包含未发布内容的草稿必须按当前用户隔离，并在退出、会话失效和改密时清理该用户草稿。
 - 未清洗 HTML 不得进入管理端和博客端 DOM，降低 localStorage token 被 XSS 窃取的风险。
 
 ## 匿名入口与上传

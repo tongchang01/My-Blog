@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端、博客端、管理端和文档
-> 最后校准：2026-07-13
+> 最后校准：2026-07-16
 > 对应代码：`MyBlog-springboot-v2/src/test/`、`frontend/apps/blog/src/`、`frontend/apps/admin/src/`
 > 权威程度：规则
 
@@ -10,6 +10,7 @@
 
 - 每个小任务先运行与变更风险匹配的局部测试，阶段结束再运行完整验证。
 - 业务规则、权限、安全、状态流转、持久化和复杂交互的变更必须有自动化测试。
+- 跨端 HTTP 契约变更不能只以 MockMvc 或前端 mock 作为通过证据；至少对受影响关键流程执行一次运行中 API 验证。
 - 不在长期文档中固化测试总数。
 - Testcontainers 因 Docker 不可用而跳过时，结果中必须说明；发布前必须补真实 MySQL 验证。
 - 仅修改文档也需检查链接、路径、元数据、过期引用、`git diff --check` 和变更范围。
@@ -58,6 +59,7 @@ corepack pnpm build
 | Mapper/Flyway | 持久化与迁移测试 | H2 全量，必要时 MySQL |
 | 包结构 | `ArchitectureRulesTest` | `mvn test` |
 | 前端 API/store/component | 对应 Vitest | test + typecheck + build |
+| 跨端 HTTP 契约 | 运行中 API 的针对性请求 | 关键契约集 + 三端各自完整验证 |
 | 文档 | 链接、路径、措辞、diff | 全仓文档扫描 |
 
 提交或阶段说明记录命令、结果、skipped 和未执行项原因。
