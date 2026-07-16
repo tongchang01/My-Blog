@@ -8,6 +8,9 @@ import {
 vi.mock('@/features/stats/api', () => ({
   recordPageView: vi.fn()
 }))
+vi.mock('@/stores/app', () => ({
+  useAppStore: () => ({ locale: 'ja' })
+}))
 
 const mockedRecordPageView = vi.mocked(recordPageView)
 
@@ -34,6 +37,15 @@ describe('page view tracking', () => {
     ).toEqual({ lang: 'zh' })
   })
 
+  it('uses the active locale for public static pages', () => {
+    expect(
+      resolvePageViewPayload(
+        { name: 'about', params: {} } as never,
+        'ja'
+      )
+    ).toEqual({ lang: 'ja' })
+  })
+
   it('ignores routes without supported languages', () => {
     expect(
       resolvePageViewPayload({
@@ -56,5 +68,30 @@ describe('page view tracking', () => {
     await Promise.resolve()
 
     expect(mockedRecordPageView).toHaveBeenCalledWith({ lang: 'ja' })
+  })
+
+  it('does not record canonical slug replacement twice', () => {
+    mockedRecordPageView.mockResolvedValue(undefined as never)
+    let hook:
+      | ((to: unknown, from: unknown) => void)
+      | undefined
+    installPageViewTracking({
+      afterEach: vi.fn(callback => {
+        hook = callback as (to: unknown, from: unknown) => void
+      })
+    } as never)
+    const initial = {
+      name: 'article-detail',
+      params: { lang: 'zh', id: '42' }
+    }
+    const canonical = {
+      name: 'article-detail',
+      params: { lang: 'zh', id: '42', slug: 'canonical' }
+    }
+
+    hook?.(initial, { name: 'home', params: { lang: 'zh' } })
+    hook?.(canonical, initial)
+
+    expect(mockedRecordPageView).toHaveBeenCalledTimes(1)
   })
 })
