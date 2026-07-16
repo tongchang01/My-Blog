@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { loadSession } from "./session-storage";
+import { articleDraftKey } from "@/features/articles/editor/draftStorage";
 import type { CurrentUser, TokenPair } from "./model";
 import { createSessionService, type SessionUserStore } from "./session";
 
@@ -97,10 +98,14 @@ describe("admin session service", () => {
     };
     const service = createSessionService({ userStore, api });
     await service.signIn(credentials);
+    localStorage.setItem(articleDraftKey(currentUser.id, "create"), "draft");
 
     await expect(service.signOut()).rejects.toThrow("logout failed");
     expect(api.logout).toHaveBeenCalledWith();
     expect(loadSession()).toBeNull();
+    expect(
+      localStorage.getItem(articleDraftKey(currentUser.id, "create"))
+    ).toBeNull();
     expect(userStore.currentUser).toBeNull();
   });
 });

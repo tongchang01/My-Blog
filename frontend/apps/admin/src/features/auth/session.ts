@@ -9,6 +9,7 @@ import type {
   TokenPair
 } from "./model";
 import { clearSession, loadSession, saveSession } from "./session-storage";
+import { clearArticleDrafts } from "@/features/articles/editor/draftStorage";
 
 export interface SessionUserStore {
   currentUser: CurrentUser | null;
@@ -46,6 +47,7 @@ export function createSessionService({
   now = Date.now
 }: SessionServiceDependencies) {
   const expire = () => {
+    clearArticleDrafts(userStore.currentUser?.id);
     clearSession();
     userStore.CLEAR_USER();
     userStore.SET_INITIALIZED(true);

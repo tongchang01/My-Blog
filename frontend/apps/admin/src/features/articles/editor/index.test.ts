@@ -12,6 +12,7 @@ const routerState = vi.hoisted(() => ({
   leaveGuard: undefined as undefined | ((...args: any[]) => void)
 }));
 const showMessage = vi.hoisted(() => vi.fn());
+const testUser = vi.hoisted(() => ({ id: "1001" }));
 
 vi.mock("vue-router", () => ({
   onBeforeRouteLeave: (guard: (...args: any[]) => void) => {
@@ -21,6 +22,9 @@ vi.mock("vue-router", () => ({
   useRouter: () => ({ push: routerState.push })
 }));
 vi.mock("@/utils/message", () => ({ message: showMessage }));
+vi.mock("@/store/modules/user", () => ({
+  useUserStoreHook: () => ({ currentUser: testUser })
+}));
 
 const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
@@ -249,7 +253,7 @@ describe("article editor page", () => {
     });
     await nextTick();
 
-    const raw = localStorage.getItem(articleDraftKey("create"));
+    const raw = localStorage.getItem(articleDraftKey(testUser.id, "create"));
     expect(raw).toBeTruthy();
     expect(JSON.parse(raw as string).form.titleZh).toBe("本地草稿");
   });
@@ -257,7 +261,7 @@ describe("article editor page", () => {
   it("restores an existing local draft", async () => {
     dictionaries();
     localStorage.setItem(
-      articleDraftKey("create"),
+      articleDraftKey(testUser.id, "create"),
       JSON.stringify({
         savedAt: "2026-06-26T10:00:00.000Z",
         form: {
@@ -295,7 +299,7 @@ describe("article editor page", () => {
   it("clears the local draft after a successful save", async () => {
     dictionaries();
     localStorage.setItem(
-      articleDraftKey("create"),
+      articleDraftKey(testUser.id, "create"),
       JSON.stringify({
         savedAt: "2026-06-26T10:00:00.000Z",
         form: {
@@ -334,7 +338,9 @@ describe("article editor page", () => {
     await wrapper.get('[data-testid="article-save"]').trigger("click");
     await flushPromises();
 
-    expect(localStorage.getItem(articleDraftKey("create"))).toBeNull();
+    expect(
+      localStorage.getItem(articleDraftKey(testUser.id, "create"))
+    ).toBeNull();
   });
 
   it("does not block browser unload before the form changes", async () => {
