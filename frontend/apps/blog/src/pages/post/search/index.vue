@@ -136,7 +136,7 @@ const pageChangeHandler = (page = 1) => {
 }
 
 watch(
-  () => route.query,
+  () => route.fullPath,
   () => {
     pageChangeHandler()
   }

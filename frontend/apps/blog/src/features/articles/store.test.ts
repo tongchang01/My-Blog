@@ -97,6 +97,54 @@ describe('article store', () => {
     expect(store.status).toBe('empty')
   })
 
+  it('ignores a stale page response that completes after the latest request', async () => {
+    let resolveFirst!: (value: ReturnType<typeof page>) => void
+    mockedLoad
+      .mockImplementationOnce(
+        () =>
+          new Promise(resolve => {
+            resolveFirst = resolve
+          })
+      )
+      .mockResolvedValueOnce(
+        page([
+          {
+            id: '2',
+            title: 'Latest',
+            summary: null,
+            categoryId: null,
+            categoryName: null,
+            slug: 'latest',
+            publishAt: '2026-06-15T10:00:00',
+            coverUrl: null,
+            commentCount: 0,
+            tags: [],
+            createdAt: '2026-06-15T10:00:00',
+            locked: false
+          }
+        ])
+      )
+    const store = useArticleStore()
+
+    const stale = store.load({
+      page: 1,
+      size: 12,
+      lang: 'zh',
+      categorySlug: 'old'
+    })
+    await store.load({
+      page: 1,
+      size: 12,
+      lang: 'en',
+      categorySlug: 'latest'
+    })
+    resolveFirst(page([]))
+    await stale
+
+    expect(store.page.records[0]?.title).toBe('Latest')
+    expect(store.status).toBe('ready')
+  })
+
   it('loads homepage slots independently from paged articles', async () => {
     mockedLoadHome.mockResolvedValueOnce({
       pinnedArticle: null,
