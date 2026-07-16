@@ -38,6 +38,15 @@
           AND deleted = 0
     </select>
 
+    <select id="selectActiveByIdForUpdate"
+            resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity">
+        SELECT <include refid="commentColumns"/>
+        FROM t_comment
+        WHERE id = #{id}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
     <!-- 公开评论分页只统计根评论，回复跟随根评论展示，避免回复数量影响分页边界。 -->
     <select id="selectPublicRoots"
             resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.projection.CommentPageRow">

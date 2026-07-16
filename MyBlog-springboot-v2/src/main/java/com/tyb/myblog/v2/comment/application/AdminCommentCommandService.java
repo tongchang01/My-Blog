@@ -158,7 +158,7 @@ public class AdminCommentCommandService {
     }
 
     private Comment requireActive(long id) {
-        return repository.findActiveById(id)
+        return repository.findActiveByIdForUpdate(id)
                 .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND));
     }
 

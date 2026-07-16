@@ -16,6 +16,8 @@ public interface CommentMapper extends BaseMapper<CommentEntity> {
 
     CommentEntity selectActiveById(@Param("id") long id);
 
+    CommentEntity selectActiveByIdForUpdate(@Param("id") long id);
+
     List<CommentPageRow> selectPublicRoots(
             @Param("targetType") int targetType,
             @Param("targetId") long targetId,

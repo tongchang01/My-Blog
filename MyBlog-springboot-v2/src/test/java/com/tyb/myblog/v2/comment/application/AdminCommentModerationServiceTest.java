@@ -52,7 +52,7 @@ class AdminCommentModerationServiceTest {
 
     @Test
     void approvesPendingArticleCommentAndIncrementsCount() {
-        when(repository.findActiveById(10L))
+        when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.PENDING, false)));
         when(repository.updateAuditStatus(
                 10L,
@@ -68,7 +68,7 @@ class AdminCommentModerationServiceTest {
 
     @Test
     void hidesPassedArticleCommentAndDecrementsCount() {
-        when(repository.findActiveById(10L))
+        when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, false)));
         when(repository.updateAuditStatus(
                 10L,
@@ -84,7 +84,7 @@ class AdminCommentModerationServiceTest {
 
     @Test
     void softDeletesPassedArticleCommentAndDecrementsCount() {
-        when(repository.findActiveById(10L))
+        when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, false)));
         when(repository.softDelete(
                 10L,
@@ -122,7 +122,7 @@ class AdminCommentModerationServiceTest {
 
     @Test
     void adminCanReplyToPassedArticleComment() {
-        when(repository.findActiveById(10L))
+        when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, false)));
         when(markdownRenderer.render("谢谢反馈"))
                 .thenReturn("<p>谢谢反馈</p>");
@@ -175,7 +175,7 @@ class AdminCommentModerationServiceTest {
 
     @Test
     void rejectsReplyToHiddenComment() {
-        when(repository.findActiveById(10L))
+        when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.HIDDEN, false)));
 
         assertThatThrownBy(() -> service.reply(

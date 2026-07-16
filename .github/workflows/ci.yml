@@ -21,7 +21,7 @@ permissions:
 jobs:
   # ==========================================================================
   # 后端主 job：v2 后端的 H2 + 单元测试，快速反馈用。
-  # 排除三个 MySql*Test（需要真 MySQL 容器），交给下面的 backend-mysql-test。
+  # 排除四个 MySql*Test（需要真 MySQL 容器），交给下面的 backend-mysql-test。
   # ==========================================================================
   backend-test:
     name: Backend tests
@@ -44,13 +44,13 @@ jobs:
           # 缓存 Maven 依赖，加速后续 job；缓存 key 由 setup-java 内部按 pom.xml 生成。
           cache: maven
 
-      # -Dtest=!... 排除三个真实 MySQL 集成测试，避免主 job 依赖 Docker。
+      # -Dtest=!... 排除四个真实 MySQL 集成测试，避免主 job 依赖 Docker。
       # 用双引号包住整个参数是为了防止 shell 把 ! 当历史扩展。
       - name: Run backend tests
-        run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=!MySqlFlywayMigrationTest,!MySqlChangePasswordConcurrencyTest,!MySqlLoginFailureConcurrencyTest"
+        run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=!MySqlFlywayMigrationTest,!MySqlChangePasswordConcurrencyTest,!MySqlLoginFailureConcurrencyTest,!MySqlCommentModerationConcurrencyTest"
 
   # ==========================================================================
-  # 后端 MySQL 集成 job：跑三个基于 Testcontainers MySQL 8.4 的专项测试。
+  # 后端 MySQL 集成 job：跑四个基于 Testcontainers MySQL 8.4 的专项测试。
   # 覆盖真实 MySQL 方言、行锁、并发条件更新等只在真 MySQL 上暴露的问题。
   # 当前边界见 docs/handbook/ops/ci-cd.md。
   # ==========================================================================
@@ -80,7 +80,7 @@ jobs:
         run: docker pull mysql:8.4
 
       - name: Run MySQL integration tests
-        run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=MySqlFlywayMigrationTest,MySqlChangePasswordConcurrencyTest,MySqlLoginFailureConcurrencyTest"
+        run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=MySqlFlywayMigrationTest,MySqlChangePasswordConcurrencyTest,MySqlLoginFailureConcurrencyTest,MySqlCommentModerationConcurrencyTest"
 
   # ===========================================================================
   # Linux PowerShell 合约 job：验证本地 MySQL 初始化脚本能在 Ubuntu 的 pwsh 下运行。
