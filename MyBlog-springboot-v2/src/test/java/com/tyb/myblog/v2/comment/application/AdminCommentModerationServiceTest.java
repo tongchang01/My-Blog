@@ -42,6 +42,7 @@ class AdminCommentModerationServiceTest {
     private final AdminCommentCommandService service =
             new AdminCommentCommandService(
                     repository,
+                    new CommentThreadLock(repository),
                     countService,
                     new CommentAuthorization(),
                     markdownRenderer,
@@ -52,6 +53,8 @@ class AdminCommentModerationServiceTest {
 
     @Test
     void approvesPendingArticleCommentAndIncrementsCount() {
+        when(repository.findActiveById(10L))
+                .thenReturn(Optional.of(comment(CommentAuditStatus.PENDING, false)));
         when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.PENDING, false)));
         when(repository.updateAuditStatus(
@@ -68,8 +71,11 @@ class AdminCommentModerationServiceTest {
 
     @Test
     void hidesPassedArticleCommentAndDecrementsCount() {
+        when(repository.findActiveById(10L))
+                .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, false)));
         when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, false)));
+        when(repository.countPublicRepliesForUpdate(10L)).thenReturn(2);
         when(repository.updateAuditStatus(
                 10L,
                 CommentAuditStatus.HIDDEN,
@@ -79,13 +85,16 @@ class AdminCommentModerationServiceTest {
 
         service.hide(admin(), 10L);
 
-        verify(countService).increment(100L, -1);
+        verify(countService).increment(100L, -3);
     }
 
     @Test
     void softDeletesPassedArticleCommentAndDecrementsCount() {
+        when(repository.findActiveById(10L))
+                .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, false)));
         when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, false)));
+        when(repository.countPublicRepliesForUpdate(10L)).thenReturn(2);
         when(repository.softDelete(
                 10L,
                 LocalDateTime.of(2026, 6, 17, 19, 50),
@@ -94,11 +103,13 @@ class AdminCommentModerationServiceTest {
 
         service.delete(admin(), 10L);
 
-        verify(countService).increment(100L, -1);
+        verify(countService).increment(100L, -3);
     }
 
     @Test
     void restoresHiddenCommentWithoutChangingCount() {
+        when(repository.findById(10L))
+                .thenReturn(Optional.of(comment(CommentAuditStatus.HIDDEN, true)));
         when(repository.findDeletedByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.HIDDEN, true)));
         when(repository.restore(
@@ -115,6 +126,44 @@ class AdminCommentModerationServiceTest {
     }
 
     @Test
+    void restoresPassedRootAndItsPublicReplies() {
+        when(repository.findById(10L))
+                .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, true)));
+        when(repository.findDeletedByIdForUpdate(10L))
+                .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, true)));
+        when(repository.countPublicRepliesForUpdate(10L)).thenReturn(2);
+        when(repository.restore(
+                10L,
+                LocalDateTime.of(2026, 6, 17, 19, 50),
+                1001L))
+                .thenReturn(true);
+
+        service.restore(admin(), 10L);
+
+        verify(countService).increment(100L, 3);
+    }
+
+    @Test
+    void hidesReplyWithoutChangingCountWhenRootIsHidden() {
+        Comment reply = comment(11L, 10L, CommentAuditStatus.PASS, false);
+        when(repository.findActiveById(11L)).thenReturn(Optional.of(reply));
+        when(repository.findByIdForUpdate(10L))
+                .thenReturn(Optional.of(comment(CommentAuditStatus.HIDDEN, false)));
+        when(repository.findActiveByIdForUpdate(11L))
+                .thenReturn(Optional.of(reply));
+        when(repository.updateAuditStatus(
+                11L,
+                CommentAuditStatus.HIDDEN,
+                LocalDateTime.of(2026, 6, 17, 19, 50),
+                1001L))
+                .thenReturn(true);
+
+        service.hide(admin(), 11L);
+
+        verify(countService, never()).increment(100L, -1);
+    }
+
+    @Test
     void demoCanNotModerateComments() {
         assertThatThrownBy(() -> service.approve(demo(), 10L))
                 .isInstanceOf(ApiException.class);
@@ -122,6 +171,8 @@ class AdminCommentModerationServiceTest {
 
     @Test
     void adminCanReplyToPassedArticleComment() {
+        when(repository.findActiveById(10L))
+                .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, false)));
         when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.PASS, false)));
         when(markdownRenderer.render("谢谢反馈"))
@@ -175,6 +226,8 @@ class AdminCommentModerationServiceTest {
 
     @Test
     void rejectsReplyToHiddenComment() {
+        when(repository.findActiveById(10L))
+                .thenReturn(Optional.of(comment(CommentAuditStatus.HIDDEN, false)));
         when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(comment(CommentAuditStatus.HIDDEN, false)));
 
@@ -191,14 +244,22 @@ class AdminCommentModerationServiceTest {
     private static Comment comment(
             CommentAuditStatus status,
             boolean deleted) {
+        return comment(10L, null, status, deleted);
+    }
+
+    private static Comment comment(
+            long id,
+            Long parentId,
+            CommentAuditStatus status,
+            boolean deleted) {
         LocalDateTime now = LocalDateTime.of(2026, 6, 17, 19, 30);
         return Comment.reconstitute(
-                10L,
+                id,
                 CommentTarget.article(100L),
+                parentId,
+                parentId,
                 null,
-                null,
-                null,
-                null,
+                parentId == null ? null : "Root",
                 new CommentAuthor(
                         null,
                         "TYB",

@@ -9,9 +9,15 @@ public interface CommentRepository {
 
     Optional<Comment> findActiveById(long id);
 
+    Optional<Comment> findById(long id);
+
     Optional<Comment> findActiveByIdForUpdate(long id);
 
+    Optional<Comment> findByIdForUpdate(long id);
+
     Optional<Comment> findDeletedByIdForUpdate(long id);
+
+    int countPublicRepliesForUpdate(long rootId);
 
     boolean updateAuditStatus(
             long id,

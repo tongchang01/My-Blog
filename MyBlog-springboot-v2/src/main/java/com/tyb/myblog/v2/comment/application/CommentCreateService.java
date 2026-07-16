@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 public class CommentCreateService {
 
     private final CommentRepository repository;
+    private final CommentThreadLock threadLock;
     private final ArticleCommentPolicyService articlePolicyService;
     private final ArticleCommentCountService articleCountService;
     private final CommentRateLimitService rateLimitService;
@@ -119,10 +120,13 @@ public class CommentCreateService {
         if (replyToCommentId == null) {
             return ReplySnapshot.none();
         }
-        Comment replyTo = repository.findActiveById(replyToCommentId)
-                .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND));
+        CommentThreadLock.LockedComment locked = threadLock.active(
+                replyToCommentId);
+        Comment replyTo = locked.comment();
         if (!replyTo.target().equals(target)
-                || !replyTo.auditStatus().publiclyVisible()) {
+                || !replyTo.auditStatus().publiclyVisible()
+                || locked.root().deleted()
+                || !locked.root().auditStatus().publiclyVisible()) {
             throw new ApiException(ApiErrorCode.CONFLICT, "不能回复该评论");
         }
         long parentId = replyTo.parentId() == null

@@ -64,6 +64,10 @@ class DatabaseCommentRepositoryTest {
         assertThat(loaded.parentId()).isEqualTo(root.id());
         assertThat(loaded.replyToCommentId()).isEqualTo(root.id());
         assertThat(loaded.replyToNickname()).isEqualTo("TYB");
+        assertThat(repository.findById(root.id())).isPresent();
+        assertThat(repository.findByIdForUpdate(root.id())).isPresent();
+        assertThat(repository.countPublicRepliesForUpdate(root.id()))
+                .isEqualTo(1);
     }
 
     @Test

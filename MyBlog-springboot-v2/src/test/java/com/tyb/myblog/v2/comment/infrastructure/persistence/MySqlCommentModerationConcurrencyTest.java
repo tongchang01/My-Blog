@@ -33,6 +33,7 @@ class MySqlCommentModerationConcurrencyTest {
 
     private static final long ARTICLE_ID = 8401L;
     private static final long COMMENT_ID = 8402L;
+    private static final long REPLY_ID = 8403L;
 
     @Container
     private static final MySQLContainer<?> MYSQL =
@@ -77,6 +78,36 @@ class MySqlCommentModerationConcurrencyTest {
                     () -> service.delete(admin(), COMMENT_ID),
                     true);
             assertCountMatchesVisibility();
+        }
+    }
+
+    @Test
+    void keepsCountConsistentWhenRootHideCompetesWithReplyApproval()
+            throws Exception {
+        for (int attempt = 0; attempt < 10; attempt++) {
+            prepareComment(1, 1);
+            jdbcTemplate.update("""
+                    INSERT INTO t_comment (
+                        id, target_type, target_id, parent_id,
+                        reply_to_comment_id, reply_to_nickname,
+                        author_nickname, author_email, content_md,
+                        content_html, audit_status,
+                        created_at, updated_at, deleted
+                    ) VALUES (?, 1, ?, ?, ?, 'TYB', 'Reader',
+                        'reader@example.com', 'reply', '<p>reply</p>', 2,
+                        '2026-07-16 10:00:00', '2026-07-16 10:00:00', 0)
+                    """, REPLY_ID, ARTICLE_ID, COMMENT_ID, COMMENT_ID);
+
+            runConcurrently(
+                    () -> service.hide(admin(), COMMENT_ID),
+                    () -> service.approve(admin(), REPLY_ID),
+                    false);
+
+            assertThat(jdbcTemplate.queryForObject("""
+                    SELECT comment_count
+                    FROM t_article
+                    WHERE id = ?
+                    """, Integer.class, ARTICLE_ID)).isZero();
         }
     }
 

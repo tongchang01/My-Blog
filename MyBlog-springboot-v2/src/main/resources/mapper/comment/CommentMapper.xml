@@ -38,11 +38,35 @@
           AND deleted = 0
     </select>
 
+    <select id="selectByIdIgnoringDeleted"
+            resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity">
+        SELECT <include refid="commentColumns"/>
+        FROM t_comment
+        WHERE id = #{id}
+    </select>
+
     <select id="selectActiveByIdForUpdate"
             resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity">
         SELECT <include refid="commentColumns"/>
         FROM t_comment
         WHERE id = #{id}
+          AND deleted = 0
+        FOR UPDATE
+    </select>
+
+    <select id="selectByIdForUpdate"
+            resultType="com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity">
+        SELECT <include refid="commentColumns"/>
+        FROM t_comment
+        WHERE id = #{id}
+        FOR UPDATE
+    </select>
+
+    <select id="selectPublicReplyIdsForUpdate" resultType="long">
+        SELECT id
+        FROM t_comment
+        WHERE parent_id = #{rootId}
+          AND audit_status = 1
           AND deleted = 0
         FOR UPDATE
     </select>
