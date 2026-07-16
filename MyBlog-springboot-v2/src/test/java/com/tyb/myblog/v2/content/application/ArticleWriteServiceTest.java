@@ -37,6 +37,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -300,6 +301,7 @@ class ArticleWriteServiceTest {
                                 HomepageSlot.PINNED)),
                 ApiErrorCode.CONFLICT);
 
+        verify(articleRepository).lockHomepageSlot(HomepageSlot.PINNED);
         verify(articleRepository, never()).insert(any());
     }
 
@@ -361,6 +363,9 @@ class ArticleWriteServiceTest {
                                 HomepageSlot.FEATURED)),
                 ApiErrorCode.CONFLICT);
 
+        var order = inOrder(articleRepository);
+        order.verify(articleRepository).lockHomepageSlot(HomepageSlot.FEATURED);
+        order.verify(articleRepository).findActiveByIdForUpdate(100L);
         verify(articleRepository, never()).update(any(), any(), any());
     }
 

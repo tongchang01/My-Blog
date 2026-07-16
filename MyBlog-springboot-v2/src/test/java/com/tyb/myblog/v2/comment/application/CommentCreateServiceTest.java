@@ -50,6 +50,7 @@ class CommentCreateServiceTest {
             mock(ApplicationEventPublisher.class);
     private final CommentCreateService service = new CommentCreateService(
             repository,
+            new CommentThreadLock(repository),
             policyService,
             countService,
             rateLimitService,
@@ -148,6 +149,8 @@ class CommentCreateServiceTest {
         when(policyService.requirePublicCommentable(100L))
                 .thenReturn(new ArticleCommentPolicy(100L, 0));
         when(repository.findActiveById(10L)).thenReturn(Optional.of(existing));
+        when(repository.findActiveByIdForUpdate(10L))
+                .thenReturn(Optional.of(existing));
 
         assertThatThrownBy(() -> service.createArticleComment(command(100L, 10L, "reply")))
                 .isInstanceOf(RuntimeException.class);
@@ -176,6 +179,8 @@ class CommentCreateServiceTest {
         when(policyService.requirePublicCommentable(100L))
                 .thenReturn(new ArticleCommentPolicy(100L, 0));
         when(repository.findActiveById(10L)).thenReturn(Optional.of(existing));
+        when(repository.findActiveByIdForUpdate(10L))
+                .thenReturn(Optional.of(existing));
         when(repository.insert(any()))
                 .thenAnswer(invocation -> stored(invocation.getArgument(0), 202L));
 

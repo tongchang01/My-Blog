@@ -500,6 +500,13 @@
         </if>
     </select>
 
+    <select id="selectHomepageSlotGuardForUpdate" resultType="string">
+        SELECT slot
+        FROM t_homepage_slot_guard
+        WHERE slot = #{slot}
+        FOR UPDATE
+    </select>
+
     <!-- 显式软删除文章，保留 t_article_tag 供回收站恢复。 -->
     <update id="softDelete">
         UPDATE t_article

@@ -76,11 +76,15 @@ class FlywayMigrationTest {
         Integer profileCount = jdbcTemplate.queryForObject(
                 "select count(*) from t_user_info",
                 Integer.class);
+        Integer homepageSlotGuardCount = jdbcTemplate.queryForObject(
+                "select count(*) from t_homepage_slot_guard",
+                Integer.class);
 
-        assertThat(migrationCount).isEqualTo(4);
-        assertThat(latestVersion).isEqualTo("4");
+        assertThat(migrationCount).isEqualTo(5);
+        assertThat(latestVersion).isEqualTo("5");
         assertThat(userCount).isZero();
         assertThat(profileCount).isZero();
+        assertThat(homepageSlotGuardCount).isEqualTo(2);
     }
 
     @Test

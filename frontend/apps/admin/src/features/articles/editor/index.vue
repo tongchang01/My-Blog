@@ -3,6 +3,7 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { message } from "@/utils/message";
+import { useUserStoreHook } from "@/store/modules/user";
 import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
 import type { AttachmentItem } from "@/features/attachments/model";
 import type {
@@ -30,6 +31,7 @@ defineOptions({ name: "ArticleEditor" });
 
 const route = useRoute();
 const router = useRouter();
+const userStore = useUserStoreHook();
 const mode = route.name === "ArticleEdit" ? "edit" : "create";
 const articleId = typeof route.params.id === "string" ? route.params.id : undefined;
 const state = useArticleEditor(mode, articleId);
@@ -110,7 +112,9 @@ function restoreDraft(): void {
 }
 
 function clearDraft(): void {
-  clearArticleDraft(mode, articleId);
+  if (userStore.currentUser) {
+    clearArticleDraft(userStore.currentUser.id, mode, articleId);
+  }
   draft.value = null;
 }
 
@@ -132,7 +136,9 @@ watch(
   form,
   () => {
     if (!autosaveReady.value) return;
-    saveArticleDraft(mode, articleId, form);
+    if (userStore.currentUser) {
+      saveArticleDraft(userStore.currentUser.id, mode, articleId, form);
+    }
   },
   { deep: true }
 );
@@ -153,7 +159,9 @@ onMounted(async () => {
   try {
     await initialize();
     baselineSnapshot.value = snapshotForm();
-    draft.value = loadArticleDraft(mode, articleId);
+    draft.value = userStore.currentUser
+      ? loadArticleDraft(userStore.currentUser.id, mode, articleId)
+      : null;
   } catch {
     // 请求错误由页面中的 alert 展示，表单数据保持不变。
   } finally {

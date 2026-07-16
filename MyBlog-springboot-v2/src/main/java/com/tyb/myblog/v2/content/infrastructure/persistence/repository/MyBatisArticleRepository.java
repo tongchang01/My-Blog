@@ -69,6 +69,13 @@ public class MyBatisArticleRepository implements ArticleRepository {
     }
 
     @Override
+    public void lockHomepageSlot(HomepageSlot slot) {
+        if (!slot.name().equals(mapper.selectHomepageSlotGuardForUpdate(slot))) {
+            throw new IllegalStateException("首页槽位锁不存在");
+        }
+    }
+
+    @Override
     public boolean softDelete(
             long id,
             LocalDateTime deletedAt,

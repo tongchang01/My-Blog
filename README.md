@@ -15,7 +15,7 @@ MyBlog V2 是一个模块化单体个人博客系统，由 Spring Boot API、公
 - 首页编排：1 篇置顶、最多 2 篇精选和普通文章列表。
 - 管理后台：文章、分类标签、评论、友链、附件、站点配置、作者资料和统计仪表盘。
 - 身份与权限：ADMIN/DEMO、JWT access token、数据库 refresh token、轮换、退出和改密撤销。
-- 内容与数据：Markdown、评论 HTML 清洗、Flyway V1–V4、14 张表、软删除和审计字段。
+- 内容与数据：Markdown、评论 HTML 清洗、Flyway V1–V5、15 张表、软删除和审计字段。
 - 运维基础：local/test/prod profile、LOCAL/S3 存储、health endpoint，以及 GitHub Actions CI/CD、GHCR 与 Docker Compose 部署。
 
 当前尚未实现 PASSWORD 文章解锁。`main` 发布会构建带提交 SHA 标签的 GHCR 镜像，并自动部署至 AWS EC2；部署后会对公开 HTTPS 健康端点执行冒烟测试。未解决事项见[开放问题](docs/handbook/start-here/open-issues.md)。

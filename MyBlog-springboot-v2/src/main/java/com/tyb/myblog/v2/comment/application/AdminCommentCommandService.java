@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 public class AdminCommentCommandService {
 
     private final CommentRepository repository;
+    private final CommentThreadLock threadLock;
     private final ArticleCommentCountService articleCommentCountService;
     private final CommentAuthorization authorization;
     private final CommentMarkdownRenderer markdownRenderer;
@@ -32,21 +33,22 @@ public class AdminCommentCommandService {
     @Transactional
     public void approve(AuthenticatedPrincipal principal, long id) {
         long operatorId = authorization.requireAdmin(principal);
-        Comment comment = requireActive(id);
-        updateStatus(comment, CommentAuditStatus.PASS, operatorId);
+        CommentThreadLock.LockedComment locked = threadLock.active(id);
+        updateStatus(locked, CommentAuditStatus.PASS, operatorId);
     }
 
     @Transactional
     public void hide(AuthenticatedPrincipal principal, long id) {
         long operatorId = authorization.requireAdmin(principal);
-        Comment comment = requireActive(id);
-        updateStatus(comment, CommentAuditStatus.HIDDEN, operatorId);
+        CommentThreadLock.LockedComment locked = threadLock.active(id);
+        updateStatus(locked, CommentAuditStatus.HIDDEN, operatorId);
     }
 
     @Transactional
     public void delete(AuthenticatedPrincipal principal, long id) {
         long operatorId = authorization.requireAdmin(principal);
-        Comment comment = requireActive(id);
+        CommentThreadLock.LockedComment locked = threadLock.active(id);
+        Comment comment = locked.comment();
         boolean updated = repository.softDelete(
                 id,
                 LocalDateTime.now(clock),
@@ -54,16 +56,19 @@ public class AdminCommentCommandService {
         if (!updated) {
             throw new ApiException(ApiErrorCode.CONFLICT);
         }
-        if (isPublicArticleComment(comment)) {
-            articleCommentCountService.increment(comment.target().targetId(), -1);
+        int visibleCount = visibleCount(locked);
+        if (visibleCount != 0) {
+            articleCommentCountService.increment(
+                    comment.target().targetId(),
+                    -visibleCount);
         }
     }
 
     @Transactional
     public void restore(AuthenticatedPrincipal principal, long id) {
         long operatorId = authorization.requireAdmin(principal);
-        Comment comment = repository.findDeletedByIdForUpdate(id)
-                .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND));
+        CommentThreadLock.LockedComment locked = threadLock.deleted(id);
+        Comment comment = locked.comment();
         boolean updated = repository.restore(
                 id,
                 LocalDateTime.now(clock),
@@ -71,8 +76,11 @@ public class AdminCommentCommandService {
         if (!updated) {
             throw new ApiException(ApiErrorCode.CONFLICT);
         }
-        if (isPublicArticleComment(comment)) {
-            articleCommentCountService.increment(comment.target().targetId(), 1);
+        int visibleCount = restoredVisibleCount(locked);
+        if (visibleCount != 0) {
+            articleCommentCountService.increment(
+                    comment.target().targetId(),
+                    visibleCount);
         }
     }
 
@@ -82,8 +90,11 @@ public class AdminCommentCommandService {
             long replyToCommentId,
             AdminCommentReplyCommand command) {
         long operatorId = authorization.requireAdmin(principal);
-        Comment replyTo = requireActive(replyToCommentId);
-        if (!replyTo.auditStatus().publiclyVisible()) {
+        CommentThreadLock.LockedComment locked = threadLock.active(
+                replyToCommentId);
+        Comment replyTo = locked.comment();
+        if (!isPublic(locked.root())
+                || !replyTo.auditStatus().publiclyVisible()) {
             throw new ApiException(ApiErrorCode.CONFLICT, "不能回复该评论");
         }
         long parentId = replyTo.parentId() == null
@@ -121,9 +132,10 @@ public class AdminCommentCommandService {
     }
 
     private void updateStatus(
-            Comment comment,
+            CommentThreadLock.LockedComment locked,
             CommentAuditStatus next,
             long operatorId) {
+        Comment comment = locked.comment();
         CommentAuditStatus previous = comment.auditStatus();
         if (previous == next) {
             return;
@@ -136,30 +148,61 @@ public class AdminCommentCommandService {
         if (!updated) {
             throw new ApiException(ApiErrorCode.CONFLICT);
         }
-        adjustArticleCount(comment, previous, next);
+        adjustArticleCount(locked, previous, next);
     }
 
     private void adjustArticleCount(
-            Comment comment,
+            CommentThreadLock.LockedComment locked,
             CommentAuditStatus previous,
             CommentAuditStatus next) {
+        Comment comment = locked.comment();
         if (comment.target().targetType() != CommentTargetType.ARTICLE) {
+            return;
+        }
+        if (comment.parentId() != null && !isPublic(locked.root())) {
             return;
         }
         int delta = 0;
         if (!previous.publiclyVisible() && next.publiclyVisible()) {
-            delta = 1;
+            delta = visibleThreadSize(comment);
         } else if (previous.publiclyVisible() && !next.publiclyVisible()) {
-            delta = -1;
+            delta = -visibleThreadSize(comment);
         }
         if (delta != 0) {
             articleCommentCountService.increment(comment.target().targetId(), delta);
         }
     }
 
-    private Comment requireActive(long id) {
-        return repository.findActiveById(id)
-                .orElseThrow(() -> new ApiException(ApiErrorCode.NOT_FOUND));
+    private int visibleCount(CommentThreadLock.LockedComment locked) {
+        Comment comment = locked.comment();
+        if (!isPublicArticleComment(comment) || !isPublic(locked.root())) {
+            return 0;
+        }
+        return visibleThreadSize(comment);
+    }
+
+    private int restoredVisibleCount(
+            CommentThreadLock.LockedComment locked) {
+        Comment comment = locked.comment();
+        if (comment.target().targetType() != CommentTargetType.ARTICLE
+                || !comment.auditStatus().publiclyVisible()) {
+            return 0;
+        }
+        if (comment.parentId() != null && !isPublic(locked.root())) {
+            return 0;
+        }
+        return visibleThreadSize(comment);
+    }
+
+    private int visibleThreadSize(Comment comment) {
+        return comment.parentId() == null
+                ? 1 + repository.countPublicRepliesForUpdate(comment.id())
+                : 1;
+    }
+
+    private static boolean isPublic(Comment comment) {
+        return !comment.deleted()
+                && comment.auditStatus().publiclyVisible();
     }
 
     private static boolean isPublicArticleComment(Comment comment) {

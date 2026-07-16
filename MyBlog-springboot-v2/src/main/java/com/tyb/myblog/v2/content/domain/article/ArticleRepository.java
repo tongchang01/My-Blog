@@ -26,6 +26,8 @@ public interface ArticleRepository {
             HomepageSlot slot,
             Long excludeArticleId);
 
+    void lockHomepageSlot(HomepageSlot slot);
+
     boolean softDelete(
             long id,
             LocalDateTime deletedAt,

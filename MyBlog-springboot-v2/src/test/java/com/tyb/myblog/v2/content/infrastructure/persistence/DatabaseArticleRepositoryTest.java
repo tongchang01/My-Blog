@@ -3,6 +3,7 @@ package com.tyb.myblog.v2.content.infrastructure.persistence;
 import com.tyb.myblog.v2.content.domain.article.Article;
 import com.tyb.myblog.v2.content.domain.article.ArticleRepository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import com.tyb.myblog.v2.content.domain.article.NewArticle;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +55,11 @@ class DatabaseArticleRepositoryTest {
         assertThat(loaded.createdBy()).isEqualTo(1001L);
         assertThat(loaded.updatedAt()).isNotNull();
         assertThat(loaded.updatedBy()).isEqualTo(1001L);
+    }
+
+    @Test
+    void locksConfiguredHomepageSlot() {
+        repository.lockHomepageSlot(HomepageSlot.PINNED);
     }
 
     @Test

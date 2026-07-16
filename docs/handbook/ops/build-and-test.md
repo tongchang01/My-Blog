@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 本地验证与发布前构建
-> 最后校准：2026-07-10
+> 最后校准：2026-07-16
 > 对应代码：`MyBlog-springboot-v2/pom.xml`、`frontend/apps/blog/package.json`、`frontend/apps/admin/package.json`
 > 权威程度：运行手册
 
@@ -24,9 +24,10 @@ mvn package
 mvn test -Dtest=ArchitectureRulesTest
 mvn test -Dtest=FlywayMigrationTest
 mvn test -Dtest=MySqlFlywayMigrationTest
+mvn test -Dtest=RunningApiContractTest
 ```
 
-常规 test profile 使用 H2 并执行 Flyway；MySQL 专项使用 Testcontainers。Docker 不可用时条件测试可以跳过，但发布前必须在真实 MySQL 方言上补跑。`mvn package -DskipTests` 只用于临时产物，不能作为完成证据。
+常规 test profile 使用 H2 并执行 Flyway；`RunningApiContractTest` 额外启动随机端口 Tomcat，验证关键真实 HTTP 请求；MySQL 专项使用 Testcontainers。Docker 不可用时条件测试可以跳过，但发布前必须在真实 MySQL 方言上补跑。`mvn package -DskipTests` 只用于临时产物，不能作为完成证据。
 
 ## 博客端与管理端
 

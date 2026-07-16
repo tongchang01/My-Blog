@@ -22,6 +22,7 @@
 - ADMIN 可以读写；DEMO 只读，写按钮禁用且后端再次授权。
 - DEMO 的非公开文章正文、评论邮箱/IP/User-Agent 和附件内部存储字段由后端裁剪。
 - access token 与 refresh token 当前保存在 `myblog-admin-session` localStorage 记录中；刷新失败或结构非法时清理会话。
+- 文章编辑草稿按当前用户隔离保存，PASSWORD 口令不进入草稿；退出、会话失效和改密会清理该用户草稿。
 - Axios base URL 由 `VITE_API_BASE_URL` 控制；本地留空并通过 `/api` 代理到后端。
 
 本地默认端口为 8848，路由使用 hash 模式。运行与验证命令见 `../../ops/local-development.md`。

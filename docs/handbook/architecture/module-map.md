@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后端
-> 最后校准：2026-07-10
+> 最后校准：2026-07-16
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`、`MyBlog-springboot-v2/src/test/java/com/tyb/myblog/v2/ArchitectureRulesTest.java`
 > 权威程度：架构权威说明
 
@@ -13,7 +13,7 @@
 | 包 | 职责 | 主要数据 |
 | --- | --- | --- |
 | `identity` | 后台账号、登录会话、当前用户资料、公开作者资料 | `t_user_auth`、`t_user_info`、`t_refresh_token` |
-| `content` | 文章、分类、标签、首页槽位、定时发布 | `t_article`、`t_category`、`t_tag`、`t_article_tag` |
+| `content` | 文章、分类、标签、首页槽位、定时发布 | `t_article`、`t_category`、`t_tag`、`t_article_tag`、`t_homepage_slot_guard` |
 | `comment` | 文章评论、留言板、审核、回复通知 | `t_comment` |
 | `system` | 站点配置、附件、友链 | `t_site_config`、`t_attachment`、`t_friend_link` |
 | `stats` | 公开打点、PV/UV 日聚合、统计看板 | `t_page_view`、`t_page_view_daily` |

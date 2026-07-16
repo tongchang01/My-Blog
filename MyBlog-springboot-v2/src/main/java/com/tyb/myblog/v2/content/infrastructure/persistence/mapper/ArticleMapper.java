@@ -108,6 +108,9 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
             @Param("slot") HomepageSlot slot,
             @Param("excludeArticleId") Long excludeArticleId);
 
+    String selectHomepageSlotGuardForUpdate(
+            @Param("slot") HomepageSlot slot);
+
     int softDelete(
             @Param("id") long id,
             @Param("deletedAt") LocalDateTime deletedAt,

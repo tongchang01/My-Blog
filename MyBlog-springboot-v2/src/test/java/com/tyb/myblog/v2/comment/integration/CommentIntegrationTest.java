@@ -154,6 +154,56 @@ class CommentIntegrationTest {
         assertThat(commentCount(100L)).isEqualTo(1);
     }
 
+    @Test
+    void rootVisibilityControlsRepliesAndArticleCount()
+            throws Exception {
+        String admin = token(1001L, "admin", 1, "ADMIN");
+        insertArticle(100L, 2);
+        long rootId = response(post("/api/public/articles/100/comments")
+                .with(request -> {
+                    request.setRemoteAddr("127.0.0.2");
+                    return request;
+                })
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(commentBody(
+                        "Root", "root@example.com", "root", null)))
+                .at("/data/id").asLong();
+        response(post("/api/public/articles/100/comments")
+                .with(request -> {
+                    request.setRemoteAddr("127.0.0.2");
+                    return request;
+                })
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(commentBody(
+                        "Reply", "reply@example.com", "reply", rootId)));
+        assertThat(commentCount(100L)).isEqualTo(2);
+
+        mockMvc.perform(post("/api/admin/comments/{id}/hide", rootId)
+                        .header("Authorization", bearer(admin)))
+                .andExpect(status().isOk());
+        assertThat(commentCount(100L)).isZero();
+        mockMvc.perform(get("/api/public/articles/100/comments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.total").value(0));
+
+        mockMvc.perform(post("/api/admin/comments/{id}/approve", rootId)
+                        .header("Authorization", bearer(admin)))
+                .andExpect(status().isOk());
+        assertThat(commentCount(100L)).isEqualTo(2);
+        mockMvc.perform(get("/api/public/articles/100/comments"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.records[0].replies").isNotEmpty());
+
+        mockMvc.perform(delete("/api/admin/comments/{id}", rootId)
+                        .header("Authorization", bearer(admin)))
+                .andExpect(status().isOk());
+        assertThat(commentCount(100L)).isZero();
+        mockMvc.perform(post("/api/admin/comments/{id}/restore", rootId)
+                        .header("Authorization", bearer(admin)))
+                .andExpect(status().isOk());
+        assertThat(commentCount(100L)).isEqualTo(2);
+    }
+
     private JsonNode response(
             org.springframework.test.web.servlet.request
                     .MockHttpServletRequestBuilder request)

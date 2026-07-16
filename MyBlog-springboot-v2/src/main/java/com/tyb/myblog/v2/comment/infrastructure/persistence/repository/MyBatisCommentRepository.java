@@ -37,8 +37,28 @@ public class MyBatisCommentRepository implements CommentRepository {
     }
 
     @Override
+    public Optional<Comment> findById(long id) {
+        return toDomain(mapper.selectByIdIgnoringDeleted(id));
+    }
+
+    @Override
+    public Optional<Comment> findActiveByIdForUpdate(long id) {
+        return toDomain(mapper.selectActiveByIdForUpdate(id));
+    }
+
+    @Override
+    public Optional<Comment> findByIdForUpdate(long id) {
+        return toDomain(mapper.selectByIdForUpdate(id));
+    }
+
+    @Override
     public Optional<Comment> findDeletedByIdForUpdate(long id) {
         return toDomain(mapper.selectDeletedByIdForUpdate(id));
+    }
+
+    @Override
+    public int countPublicRepliesForUpdate(long rootId) {
+        return mapper.selectPublicReplyIdsForUpdate(rootId).size();
     }
 
     @Override

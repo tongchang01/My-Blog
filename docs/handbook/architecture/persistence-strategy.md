@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后端持久化
-> 最后校准：2026-07-10
+> 最后校准：2026-07-16
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`、`MyBlog-springboot-v2/src/main/resources/mapper/`、`MyBlog-springboot-v2/src/main/resources/db/migration/`
 > 权威程度：架构权威说明
 
@@ -12,7 +12,7 @@
 | --- | --- |
 | 单表 CRUD | MyBatis-Plus 3.5.12 `BaseMapper` 与 Wrapper |
 | 复杂查询 | 模块化 MyBatis XML |
-| 数据库演进 | Flyway V1–V4 |
+| 数据库演进 | Flyway V1–V5 |
 | 事务 | Spring `@Transactional`，边界位于 application |
 | 审计与软删除 | `BaseEntity`、`AuditOnlyBase`、`AuditFieldHandler`、`@TableLogic` |
 | 迁移验证 | H2 常规测试 + Testcontainers MySQL 条件测试 |

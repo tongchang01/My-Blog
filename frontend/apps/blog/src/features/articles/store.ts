@@ -83,10 +83,12 @@ export const useArticleStore = defineStore('public-articles', () => {
     error.value = null
 
     try {
-      page.value = mapArticlePage(
-        await loadPublicArticles({ ...query, signal: request.signal }),
-        query.lang
-      )
+      const response = await loadPublicArticles({
+        ...query,
+        signal: request.signal
+      })
+      if (request.signal.aborted) return
+      page.value = mapArticlePage(response, query.lang)
       status.value = page.value.records.length === 0 ? 'empty' : 'ready'
     } catch (cause) {
       if (request.signal.aborted) return

@@ -37,7 +37,7 @@
 - PUBLISHED、PASSWORD 和 SCHEDULED 必须有发布时间。
 - PASSWORD 必须保存 BCrypt 哈希，其他状态不得保留文章密码。
 - 当前没有 PASSWORD 解锁接口或文章访问 token；详情、评论查询和评论提交返回 `403 + 10003`。
-- 只有 PUBLISHED 文章可以进入首页槽位；PINNED 最多 1 篇，FEATURED 最多 2 篇。
+- 只有 PUBLISHED 文章可以进入首页槽位；PINNED 最多 1 篇，FEATURED 最多 2 篇，写入前通过持久化槽位 guard 串行校验。
 - 文章公开路径以 ID 定位，slug 可省略并由详情页规范化；分类和标签 slug 唯一且创建后不可修改。
 - 公开评论数只统计未删除且审核状态为 PASS 的文章评论。
 

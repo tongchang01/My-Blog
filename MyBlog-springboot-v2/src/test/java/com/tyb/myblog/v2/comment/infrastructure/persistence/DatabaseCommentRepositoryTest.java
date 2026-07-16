@@ -42,12 +42,15 @@ class DatabaseCommentRepositoryTest {
 
         Comment loaded = repository.findActiveById(inserted.id())
                 .orElseThrow();
+        Comment locked = repository.findActiveByIdForUpdate(inserted.id())
+                .orElseThrow();
 
         assertThat(inserted.id()).isPositive();
         assertThat(loaded.target()).isEqualTo(CommentTarget.article(100L));
         assertThat(loaded.author().email()).isEqualTo("tyb@example.com");
         assertThat(loaded.auditStatus()).isEqualTo(CommentAuditStatus.PASS);
         assertThat(loaded.createdAt()).isNotNull();
+        assertThat(locked.id()).isEqualTo(inserted.id());
     }
 
     @Test
@@ -61,6 +64,10 @@ class DatabaseCommentRepositoryTest {
         assertThat(loaded.parentId()).isEqualTo(root.id());
         assertThat(loaded.replyToCommentId()).isEqualTo(root.id());
         assertThat(loaded.replyToNickname()).isEqualTo("TYB");
+        assertThat(repository.findById(root.id())).isPresent();
+        assertThat(repository.findByIdForUpdate(root.id())).isPresent();
+        assertThat(repository.countPublicRepliesForUpdate(root.id()))
+                .isEqualTo(1);
     }
 
     @Test
