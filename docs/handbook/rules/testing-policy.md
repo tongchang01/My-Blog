@@ -32,9 +32,10 @@ mvn package
 mvn test -Dtest=ArchitectureRulesTest
 mvn test -Dtest=FlywayMigrationTest
 mvn test -Dtest=MySqlFlywayMigrationTest
+mvn test -Dtest=RunningApiContractTest
 ```
 
-`mvn package -DskipTests` 不能作为验证通过的证据。测试 profile 使用 H2 和 Flyway；MySQL Testcontainers 负责真实方言差异。
+`RunningApiContractTest` 会在随机端口启动真实 Tomcat，并通过标准 HTTP 客户端覆盖认证轮换、DEMO 权限、文章完整写入、multipart 附件和站点配置完整 PUT。`mvn package -DskipTests` 不能作为验证通过的证据。测试 profile 使用 H2 和 Flyway；MySQL Testcontainers 负责真实方言差异。
 
 ## 博客端与管理端
 
