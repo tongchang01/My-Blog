@@ -35,6 +35,12 @@ public class ArticleUpdateService {
             long id,
             UpdateArticleCommand command) {
         long actorId = authorization.requireAdmin(principal);
+        HomepageSlot requestedSlot = HomepageSlot.normalize(
+                command.homepageSlot());
+        if (command.status() == ArticleStatus.PUBLISHED
+                && requestedSlot != HomepageSlot.NONE) {
+            repository.lockHomepageSlot(requestedSlot);
+        }
         Article current = repository.findActiveByIdForUpdate(id)
                 .orElseThrow(() -> new ApiException(
                         ApiErrorCode.NOT_FOUND,
@@ -44,7 +50,7 @@ public class ArticleUpdateService {
         LocalDateTime publishAt = resolvePublishAt(current, command, now);
         HomepageSlot homepageSlot = resolveHomepageSlot(
                 command.status(),
-                command.homepageSlot(),
+                requestedSlot,
                 id);
         referenceValidator.lockAndValidate(
                 command.status(),

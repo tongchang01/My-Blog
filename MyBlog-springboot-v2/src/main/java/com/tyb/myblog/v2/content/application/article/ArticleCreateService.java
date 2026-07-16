@@ -89,6 +89,7 @@ public class ArticleCreateService {
                     ApiErrorCode.VALIDATION_ERROR,
                     "只有已发布文章可设置首页槽位");
         }
+        repository.lockHomepageSlot(homepageSlot);
         if (repository.countActiveHomepageSlot(
                 homepageSlot,
                 excludeArticleId) >= homepageSlot.limit()) {

@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 后端、博客端和管理端
-> 最后校准：2026-07-14
+> 最后校准：2026-07-16
 > 对应代码：`MyBlog-springboot-v2/src/main/java/`、`frontend/apps/blog/src/`、`frontend/apps/admin/src/`
 > 权威程度：实现状态摘要
 
@@ -44,7 +44,7 @@
 
 | 能力 | 状态 | 当前行为 |
 | --- | --- | --- |
-| Flyway schema | 完整 | V1–V4，共 14 张表 |
+| Flyway schema | 完整 | V1–V5，共 15 张表 |
 | JWT 会话撤销 | 完整 | token version、refresh token 轮换、退出和改密失效 |
 | 定时发布 | 完整 | SCHEDULED 文章按 JST 定时转为 PUBLISHED |
 | 附件存储 | 完整 | 本地与 S3 适配，SHA-256 去重 |
