@@ -2,7 +2,9 @@
     root * /srv/blog
     encode gzip
 
-    respond /healthz 200
+    handle /healthz {
+        respond "ok" 200
+    }
 
     handle /api/* {
         reverse_proxy api:8080
@@ -18,7 +20,9 @@
     root * /srv/admin
     encode gzip
 
-    respond /healthz 200
+    handle /healthz {
+        respond "ok" 200
+    }
 
     handle /api/* {
         reverse_proxy api:8080

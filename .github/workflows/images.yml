@@ -120,7 +120,7 @@ jobs:
             https://tong-yibin.com/healthz \
             https://www.tong-yibin.com/healthz \
             https://admin.tong-yibin.com/healthz; do
-            curl --fail --silent --show-error --max-time 20 --output /dev/null "$url"
+            test "$(curl --fail --silent --show-error --max-time 20 "$url")" = ok
           done
 
       - name: Revoke temporary SSH ingress
