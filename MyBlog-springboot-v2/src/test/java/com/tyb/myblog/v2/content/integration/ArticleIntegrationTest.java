@@ -182,6 +182,27 @@ class ArticleIntegrationTest {
                         .header("Authorization", bearer(admin))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(writeBody(
+                                "密码文",
+                                null,
+                                "PASSWORD",
+                                "new-secret",
+                                null)))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/public/articles/{id}", passwordId)
+                        .header("X-Article-Access-Token", articleAccessToken))
+                .andExpect(status().isForbidden());
+        String renewedArticleAccessToken = response(post(
+                "/api/public/articles/{id}/unlock", passwordId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"password\":\"new-secret\"}"))
+                .at("/data/token").asText();
+        mockMvc.perform(get("/api/public/articles/{id}", passwordId)
+                        .header("X-Article-Access-Token", renewedArticleAccessToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/admin/articles/{id}", passwordId)
+                        .header("Authorization", bearer(admin))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(writeBody(
                                 "公开文",
                                 null,
                                 "PUBLISHED",
