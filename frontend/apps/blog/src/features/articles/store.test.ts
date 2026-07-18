@@ -4,21 +4,32 @@ import {
   loadPublicArticle,
   loadPublicArchives,
   loadPublicHomeArticles,
-  loadPublicArticles
+  loadPublicArticles,
+  unlockPublicArticle
 } from './api'
 import { useArticleStore } from './store'
 import { ApiError } from '@/shared/http/error'
+import { loadArticleAccessToken, saveArticleAccessToken } from './access'
 
 vi.mock('./api', () => ({
   loadPublicArticles: vi.fn(),
   loadPublicHomeArticles: vi.fn(),
   loadPublicArchives: vi.fn(),
-  loadPublicArticle: vi.fn()
+  loadPublicArticle: vi.fn(),
+  unlockPublicArticle: vi.fn()
+}))
+vi.mock('./access', () => ({
+  loadArticleAccessToken: vi.fn(),
+  saveArticleAccessToken: vi.fn(),
+  clearArticleAccessToken: vi.fn()
 }))
 const mockedLoad = vi.mocked(loadPublicArticles)
 const mockedLoadHome = vi.mocked(loadPublicHomeArticles)
 const mockedLoadArchives = vi.mocked(loadPublicArchives)
 const mockedDetail = vi.mocked(loadPublicArticle)
+const mockedUnlock = vi.mocked(unlockPublicArticle)
+const mockedAccessToken = vi.mocked(loadArticleAccessToken)
+const mockedSaveAccessToken = vi.mocked(saveArticleAccessToken)
 
 const page = (
   records: Awaited<ReturnType<typeof loadPublicArticles>>['records']
@@ -36,6 +47,10 @@ describe('article store', () => {
     mockedLoadHome.mockReset()
     mockedLoadArchives.mockReset()
     mockedDetail.mockReset()
+    mockedUnlock.mockReset()
+    mockedAccessToken.mockReset()
+    mockedSaveAccessToken.mockReset()
+    mockedAccessToken.mockReturnValue(null)
   })
 
   it('distinguishes ready and empty pages', async () => {
@@ -281,5 +296,44 @@ describe('article store', () => {
     expect(store.detailStatus).toBe('ready')
     expect(store.detail?.bodyHtml).toContain('<h1 id="body">Body</h1>')
     expect(store.detail?.toc).toContain('href="#body"')
+  })
+
+  it('stores the unlock token before reloading protected detail', async () => {
+    mockedUnlock.mockResolvedValueOnce({
+      token: 'article-token',
+      expiresAt: '2026-07-19T10:00:00'
+    })
+    mockedAccessToken.mockReturnValue('article-token')
+    mockedDetail.mockResolvedValueOnce({
+      id: '1',
+      title: 'Article',
+      summary: null,
+      body: '# Body',
+      categoryId: null,
+      categoryName: null,
+      slug: 'article',
+      publishAt: '2026-06-15T10:00:00',
+      coverUrl: null,
+      commentCount: 0,
+      tags: [],
+      createdAt: '2026-06-15T09:00:00',
+      updatedAt: '2026-06-15T11:00:00',
+      locked: false
+    })
+    const store = useArticleStore()
+
+    await store.unlockDetail('1', 'en', 'secret')
+
+    expect(mockedUnlock).toHaveBeenCalledWith('1', 'secret')
+    expect(mockedSaveAccessToken).toHaveBeenCalledWith('1', {
+      token: 'article-token',
+      expiresAt: '2026-07-19T10:00:00'
+    })
+    expect(mockedDetail).toHaveBeenCalledWith(
+      '1',
+      'en',
+      expect.any(AbortSignal),
+      'article-token'
+    )
   })
 })

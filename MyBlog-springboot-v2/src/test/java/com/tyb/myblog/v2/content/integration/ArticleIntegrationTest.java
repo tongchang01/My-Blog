@@ -52,6 +52,7 @@ class ArticleIntegrationTest {
 
     @BeforeEach
     void resetState() {
+        jdbcTemplate.update("DELETE FROM t_article_access_token");
         jdbcTemplate.update("DELETE FROM t_article_tag");
         jdbcTemplate.update("DELETE FROM t_article");
         jdbcTemplate.update("DELETE FROM t_attachment");
@@ -149,6 +150,18 @@ class ArticleIntegrationTest {
                 .andExpect(jsonPath("$.data.body").value("正文"));
         mockMvc.perform(get("/api/public/articles/{id}", passwordId))
                 .andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/public/articles/{id}/unlock", passwordId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"password\":\"wrong\"}"))
+                .andExpect(status().isForbidden());
+        String articleAccessToken = response(post("/api/public/articles/{id}/unlock", passwordId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"password\":\"open-sesame\"}"))
+                .at("/data/token").asText();
+        mockMvc.perform(get("/api/public/articles/{id}", passwordId)
+                        .header("X-Article-Access-Token", articleAccessToken))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.body").value("正文"));
 
         String retainedHash = hash(passwordId);
         mockMvc.perform(put("/api/admin/articles/{id}", passwordId)
@@ -162,6 +175,30 @@ class ArticleIntegrationTest {
                                 null)))
                 .andExpect(status().isOk());
         assertThat(hash(passwordId)).isEqualTo(retainedHash);
+        mockMvc.perform(get("/api/public/articles/{id}", passwordId)
+                        .header("X-Article-Access-Token", articleAccessToken))
+                .andExpect(status().isOk());
+        mockMvc.perform(put("/api/admin/articles/{id}", passwordId)
+                        .header("Authorization", bearer(admin))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(writeBody(
+                                "密码文",
+                                null,
+                                "PASSWORD",
+                                "new-secret",
+                                null)))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/public/articles/{id}", passwordId)
+                        .header("X-Article-Access-Token", articleAccessToken))
+                .andExpect(status().isForbidden());
+        String renewedArticleAccessToken = response(post(
+                "/api/public/articles/{id}/unlock", passwordId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"password\":\"new-secret\"}"))
+                .at("/data/token").asText();
+        mockMvc.perform(get("/api/public/articles/{id}", passwordId)
+                        .header("X-Article-Access-Token", renewedArticleAccessToken))
+                .andExpect(status().isOk());
         mockMvc.perform(put("/api/admin/articles/{id}", passwordId)
                         .header("Authorization", bearer(admin))
                         .contentType(MediaType.APPLICATION_JSON)

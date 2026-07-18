@@ -41,6 +41,15 @@ public class CommentCreateService {
     }
 
     @Transactional
+    public CommentCreateResult createArticleComment(
+            CommentCreateCommand command,
+            String articleAccessToken) {
+        articlePolicyService.requirePublicCommentable(
+                command.targetId(), articleAccessToken);
+        return create(CommentTarget.article(command.targetId()), command, true);
+    }
+
+    @Transactional
     public CommentCreateResult createGuestbookComment(
             CommentCreateCommand command) {
         return create(CommentTarget.guestbook(), command, false);

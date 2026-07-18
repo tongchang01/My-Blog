@@ -34,6 +34,7 @@ public class PublicArticleQueryService {
     private static final int MAX_HOME_SIZE = 50;
 
     private final PublicArticleQueryRepository repository;
+    private final PublicArticleAccessService accessService;
     private final AttachmentReferenceService attachmentService;
     private final Clock clock;
 
@@ -120,6 +121,13 @@ public class PublicArticleQueryService {
     }
 
     public PublicArticleDetailResult detail(long id, String lang) {
+        return detail(id, lang, null);
+    }
+
+    public PublicArticleDetailResult detail(
+            long id,
+            String lang,
+            String articleAccessToken) {
         if (id <= 0) {
             throw new ApiException(
                     ApiErrorCode.VALIDATION_ERROR,
@@ -131,11 +139,7 @@ public class PublicArticleQueryService {
                 .orElseThrow(() -> new ApiException(
                         ApiErrorCode.NOT_FOUND,
                         "文章不存在"));
-        if (access.status() == ArticleStatus.PASSWORD) {
-            throw new ApiException(
-                    ApiErrorCode.FORBIDDEN,
-                    "密码文章暂不开放正文访问");
-        }
+        accessService.requireAccess(access, articleAccessToken, now);
         PublicArticleDetail detail = repository.findPublicDetail(id, now)
                 .orElseThrow(() -> new ApiException(
                         ApiErrorCode.NOT_FOUND,

@@ -7,6 +7,7 @@ import com.tyb.myblog.v2.content.application.article.ArticleDeleteService;
 import com.tyb.myblog.v2.content.application.article.ArticleReferenceValidator;
 import com.tyb.myblog.v2.content.application.article.ArticleRestoreService;
 import com.tyb.myblog.v2.content.application.article.DeletedArticleQueryService;
+import com.tyb.myblog.v2.content.application.article.PublicArticleAccessService;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
 import com.tyb.myblog.v2.content.domain.article.Article;
 import com.tyb.myblog.v2.content.domain.article.ArticleRepository;
@@ -52,6 +53,9 @@ class ArticleDeleteRestoreServiceTest {
     @Mock
     private ArticleReferenceValidator referenceValidator;
 
+    @Mock
+    private PublicArticleAccessService accessService;
+
     private ArticleDeleteService deleteService;
     private ArticleRestoreService restoreService;
     private DeletedArticleQueryService queryService;
@@ -60,7 +64,7 @@ class ArticleDeleteRestoreServiceTest {
     void setUp() {
         ContentAuthorization authorization = new ContentAuthorization();
         deleteService = new ArticleDeleteService(
-                repository, authorization, CLOCK);
+                repository, authorization, accessService, CLOCK);
         restoreService = new ArticleRestoreService(
                 repository, referenceValidator, authorization, CLOCK);
         queryService = new DeletedArticleQueryService(
@@ -75,6 +79,7 @@ class ArticleDeleteRestoreServiceTest {
         deleteService.delete(principal("ADMIN"), 10L);
 
         verify(repository).softDelete(10L, NOW, 1001L);
+        verify(accessService).revokeAll(10L);
         assertError(
                 () -> deleteService.delete(principal("DEMO"), 10L),
                 ApiErrorCode.FORBIDDEN);

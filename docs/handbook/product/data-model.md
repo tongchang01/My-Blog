@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 领域概念和模块归属
-> 最后校准：2026-07-10
+> 最后校准：2026-07-18
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`
 > 权威程度：领域模型摘要
 
@@ -31,8 +31,9 @@ UserAccount 与 UserProfile 逻辑上一对一，数据库分别落在 `t_user_a
 - **Category**：三语名称、唯一 slug 和排序值，结构平铺。
 - **Tag**：三语名称和唯一 slug，由后台维护。
 - **HomepageSlot**：`NONE / PINNED / FEATURED`，只有 PUBLISHED 文章可占用。
+- **ArticleAccessToken**：PASSWORD 文章的短期访问授权；保存文章 ID、令牌 SHA-256 hash、过期时间和撤销状态，不保存令牌明文。
 
-文章密码目前只是 Article 的持久化属性和公开访问阻断条件，系统不存在 ArticleAccessToken 领域对象。
+ArticleAccessToken 不属于 identity 登录会话，不能访问后台接口。密码改动、状态离开 PASSWORD 或文章软删除会撤销该文章全部授权。
 
 ## comment
 

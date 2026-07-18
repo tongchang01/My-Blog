@@ -7,6 +7,7 @@ import com.tyb.myblog.v2.content.application.article.ArticleCreateService;
 import com.tyb.myblog.v2.content.application.article.ArticleReferenceValidator;
 import com.tyb.myblog.v2.content.application.article.ArticleResult;
 import com.tyb.myblog.v2.content.application.article.ArticleUpdateService;
+import com.tyb.myblog.v2.content.application.article.PublicArticleAccessService;
 import com.tyb.myblog.v2.content.application.article.CreateArticleCommand;
 import com.tyb.myblog.v2.content.application.article.UpdateArticleCommand;
 import com.tyb.myblog.v2.content.domain.article.Article;
@@ -69,6 +70,9 @@ class ArticleWriteServiceTest {
     @Mock
     private ArticlePasswordHasher passwordHasher;
 
+    @Mock
+    private PublicArticleAccessService accessService;
+
     private ArticleCreateService createService;
     private ArticleUpdateService updateService;
 
@@ -95,6 +99,7 @@ class ArticleWriteServiceTest {
                 authorization,
                 validator,
                 passwordHasher,
+                accessService,
                 clock);
     }
 
@@ -422,7 +427,9 @@ class ArticleWriteServiceTest {
                 .update(replaceCaptor.capture(), any(), any());
         assertThat(replaceCaptor.getValue().accessPassword())
                 .isEqualTo("new-hash");
+        verify(accessService).revokeAll(100L);
         org.mockito.Mockito.clearInvocations(articleRepository);
+        org.mockito.Mockito.clearInvocations(accessService);
 
         when(articleRepository.findActiveByIdForUpdate(100L))
                 .thenReturn(Optional.of(current));
@@ -440,6 +447,7 @@ class ArticleWriteServiceTest {
                 .update(clearCaptor.capture(), any(), any());
         assertThat(clearCaptor.getValue().accessPassword())
                 .isNull();
+        verify(accessService).revokeAll(100L);
     }
 
     @Test

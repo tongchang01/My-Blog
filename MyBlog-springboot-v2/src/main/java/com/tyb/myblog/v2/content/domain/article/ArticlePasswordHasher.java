@@ -6,4 +6,6 @@ package com.tyb.myblog.v2.content.domain.article;
 public interface ArticlePasswordHasher {
 
     String hash(String rawPassword);
+
+    boolean matches(String rawPassword, String passwordHash);
 }

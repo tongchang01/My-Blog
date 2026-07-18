@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 content 模块、前台 blog、后台 admin
-> 最后校准：2026-07-10
+> 最后校准：2026-07-18
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/`
 > 权威程度：API 契约
 
@@ -18,6 +18,7 @@
 | GET | `/api/public/articles/home` | 允许 | 允许 | 允许 |
 | GET | `/api/public/archives` | 允许 | 允许 | 允许 |
 | GET | `/api/public/articles/{id}` | 允许 | 允许 | 允许 |
+| POST | `/api/public/articles/{id}/unlock` | 允许 | 允许 | 允许 |
 | GET | `/api/admin/articles` | 401 | 允许 | 允许 |
 | GET | `/api/admin/articles/{id}` | 401 | 允许 | 允许 |
 | GET | `/api/admin/articles/recycle-bin` | 401 | 允许 | 允许 |
@@ -32,6 +33,7 @@
 - DEMO 可读后台文章，但后台详情正文按文章状态裁剪。
 - 文章密码只在写入接口接收明文。
 - 查询响应不得返回密码明文或密码 hash。
+- PASSWORD 解锁响应只返回一次文章访问令牌；后续请求通过 `X-Article-Access-Token` 发送，不能替代后台登录 token。
 - 时间字段为 Asia/Tokyo 语义的本地时间字符串，不带 offset。
 - 文章软删除后进入回收站，不做物理删除。
 
@@ -234,6 +236,7 @@ PASSWORD 密码规则：
 - 更新为 `PASSWORD` 且 `password` 非空：重新生成密码 hash。
 - 更新为 `PASSWORD` 且 `password` 为 `null`：保留原密码 hash。
 - 更新为非 `PASSWORD` 状态：清空密码 hash。
+- 传入非空新密码、切换离开 `PASSWORD` 状态或软删除文章时，撤销该文章所有已签发的访问令牌；恢复文章不恢复令牌。
 
 成功响应：HTTP 200，`data` 为更新后的 `AdminArticleDetailVO`。
 
@@ -446,20 +449,50 @@ GET /api/public/articles/{id}?lang=zh
 当前行为：
 
 - `PUBLISHED`：返回正文。
-- `PASSWORD`：当前固定返回 `403 + 10003`，没有解锁接口。
+- `PASSWORD`：请求须携带有效的 `X-Article-Access-Token`，否则返回 `403 + 10003`；令牌由下节解锁接口获取。
 - `DRAFT`、`PRIVATE`、`SCHEDULED`、不存在或已删除：返回 `404 + 90003`。
 
-## 14. 状态规则摘要
+## 14. 解锁 PASSWORD 文章
+
+```http
+POST /api/public/articles/{id}/unlock
+Content-Type: application/json
+```
+
+鉴权：匿名，不接受后台 `Authorization` 代替文章密码。
+
+请求体：
+
+```json
+{ "password": "article-password" }
+```
+
+成功响应：HTTP 200，令牌默认 24 小时有效。
+
+```json
+{
+  "code": "00000",
+  "msg": "success",
+  "data": {
+    "token": "base64url-random-token",
+    "expiresAt": "2026-07-19T12:00:00"
+  }
+}
+```
+
+同一客户端 IP 与文章组合一分钟最多尝试 5 次。令牌只可通过 `X-Article-Access-Token` 访问对应 PASSWORD 文章的详情和文章评论；过期、撤销、跨文章或缺失令牌均返回 `403 + 10003`。密码改动、状态离开 PASSWORD 或软删除文章会撤销全部令牌。
+
+## 15. 状态规则摘要
 
 | 状态 | 公开列表 | 公开详情 | 后台读 | 后台写 |
 |------|----------|----------|--------|--------|
 | `DRAFT` | 不可见 | 404 | 可读 | ADMIN |
 | `PUBLISHED` | 可见 | 返回正文 | 可读 | ADMIN |
 | `PRIVATE` | 不可见 | 404 | 可读 | ADMIN |
-| `PASSWORD` | 可见，`locked=true` | 403 | 可读 | ADMIN |
+| `PASSWORD` | 可见，`locked=true` | 有效文章令牌时返回正文，否则 403 | 可读 | ADMIN |
 | `SCHEDULED` | 到期前不可见 | 到期前 404 | 可读 | ADMIN |
 
-## 15. 错误码
+## 16. 错误码
 
 | 场景 | HTTP | code |
 |------|------|------|
@@ -468,4 +501,5 @@ GET /api/public/articles/{id}?lang=zh
 | DEMO 执行写操作、PASSWORD 公开详情未解锁 | 403 | `10003` |
 | 文章不存在、不可见或已删除 | 404 | `90003` |
 | 首页槽位超限、引用失效、恢复冲突 | 409 | `90004` |
+| PASSWORD 解锁尝试过于频繁 | 429 | `90002` |
 | 持久化或内部异常 | 500 | `99999` |

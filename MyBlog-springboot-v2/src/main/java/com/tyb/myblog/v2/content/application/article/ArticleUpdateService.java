@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * 后台文章完整编辑用例。
@@ -27,6 +28,7 @@ public class ArticleUpdateService {
     private final ContentAuthorization authorization;
     private final ArticleReferenceValidator referenceValidator;
     private final ArticlePasswordHasher hasher;
+    private final PublicArticleAccessService accessService;
     private final Clock clock;
 
     @Transactional
@@ -86,6 +88,11 @@ public class ArticleUpdateService {
             throw new ApiException(ApiErrorCode.CONFLICT);
         }
         repository.replaceTags(id, replacement.tagIds());
+        if (current.status() == ArticleStatus.PASSWORD
+                && (replacement.status() != ArticleStatus.PASSWORD
+                || !Objects.equals(current.accessPassword(), replacement.accessPassword()))) {
+            accessService.revokeAll(id);
+        }
         return ArticleResult.from(replacement);
     }
 

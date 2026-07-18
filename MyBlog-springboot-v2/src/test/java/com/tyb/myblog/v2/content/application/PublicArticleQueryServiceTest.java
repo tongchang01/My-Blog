@@ -6,6 +6,7 @@ import com.tyb.myblog.v2.content.application.article.PublicArchivePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleHomeResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQuery;
+import com.tyb.myblog.v2.content.application.article.PublicArticleAccessService;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQueryService;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.ArticleTagView;
@@ -34,6 +35,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -52,12 +54,16 @@ class PublicArticleQueryServiceTest {
     @Mock
     private AttachmentReferenceService attachmentService;
 
+    @Mock
+    private PublicArticleAccessService accessService;
+
     private PublicArticleQueryService service;
 
     @BeforeEach
     void setUp() {
         service = new PublicArticleQueryService(
                 repository,
+                accessService,
                 attachmentService,
                 CLOCK);
     }
@@ -205,11 +211,13 @@ class PublicArticleQueryServiceTest {
         when(repository.findPublicAccessMetadata(100L, NOW))
                 .thenReturn(Optional.of(new PublicArticleAccessMetadata(
                         100L,
-                        ArticleStatus.PUBLISHED)));
+                        ArticleStatus.PUBLISHED,
+                        null)));
         when(repository.findPublicAccessMetadata(101L, NOW))
                 .thenReturn(Optional.of(new PublicArticleAccessMetadata(
                         101L,
-                        ArticleStatus.PASSWORD)));
+                        ArticleStatus.PASSWORD,
+                        "hash")));
         when(repository.findPublicDetail(100L, NOW))
                 .thenReturn(Optional.of(detail(
                         100L, ArticleStatus.PUBLISHED)));
@@ -218,6 +226,11 @@ class PublicArticleQueryServiceTest {
         assertThat(result.body()).isEqualTo("正文");
         assertThat(result.locked()).isFalse();
 
+        doThrow(new ApiException(ApiErrorCode.FORBIDDEN))
+                .when(accessService)
+                .requireAccess(org.mockito.ArgumentMatchers.any(),
+                        org.mockito.ArgumentMatchers.isNull(),
+                        org.mockito.ArgumentMatchers.eq(NOW));
         assertError(
                 () -> service.detail(101L, "zh"),
                 ApiErrorCode.FORBIDDEN);

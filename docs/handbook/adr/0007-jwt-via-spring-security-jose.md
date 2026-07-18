@@ -20,6 +20,6 @@
 
 ## 结果
 
-认证不依赖 Redis 或内存黑名单。当前 JWT 只用于后台身份认证；PASSWORD 文章解锁尚未实现，不属于本 ADR 的当前能力。
+认证不依赖 Redis 或内存黑名单。JWT 只用于后台身份认证；PASSWORD 文章使用独立随机访问令牌，见 `0019-password-article-access.md`。
 
 流程见 `../architecture/auth-flow.md`。

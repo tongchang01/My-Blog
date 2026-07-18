@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 认证、授权、匿名入口、上传和前端会话
-> 最后校准：2026-07-16
+> 最后校准：2026-07-18
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/`、`frontend/apps/admin/src/features/auth/`
 > 权威程度：规则
 
@@ -22,7 +22,9 @@
 - ADMIN 可以执行后台读写；DEMO 只能访问列出的后台 GET，并由 application 层裁剪敏感字段。
 - DEMO 写入必须由后端拒绝，前端禁用按钮不构成授权。
 - 未匹配白名单或角色规则的接口默认要求认证。
-- PASSWORD 文章当前没有解锁凭证；不得把登录 access token 当作文章访问授权。
+- PASSWORD 文章使用 32 字节随机访问令牌，默认 24 小时；令牌明文仅在解锁响应返回一次，服务端只保存 SHA-256 hash。
+- 文章访问令牌只允许 `X-Article-Access-Token` 用于对应文章的正文和评论；不得把登录 access token 当作文章访问授权，也不得跨文章使用。
+- 改密码、离开 PASSWORD 状态或软删除必须撤销该文章全部访问令牌；过期令牌无效。
 
 ## 网络与浏览器
 
@@ -30,12 +32,13 @@
 - CORS origins 必须显式配置，不使用 `*`；生产反向代理需验证同源转发。
 - 只有远端地址命中 `myblog.web.trusted-proxies` 时才读取 `X-Forwarded-For` 或 `X-Real-IP`。
 - 管理端当前把 access/refresh token 放在专用 localStorage session 中；不得写入 URL、console、第三方 SDK 或其他任意 key。
+- 博客端文章访问令牌只存当前标签页的 `sessionStorage`，不得写入 URL、Cookie、localStorage、console 或第三方 SDK。
 - 编辑器草稿不得持久化密码、token 等认证秘密；包含未发布内容的草稿必须按当前用户隔离，并在退出、会话失效和改密时清理该用户草稿。
 - 未清洗 HTML 不得进入管理端和博客端 DOM，降低 localStorage token 被 XSS 窃取的风险。
 
 ## 匿名入口与上传
 
-- 评论、留言和访问打点必须校验目标、限制频率，并使用统一客户端 IP 解析。
+- 评论、留言、访问打点和 PASSWORD 解锁必须校验目标、限制频率，并使用统一客户端 IP 解析；文章密码尝试按“IP + 文章”一分钟最多 5 次。
 - 评论保存 Markdown 原文，但公开端只渲染后端清洗后的 HTML；重复内容需短期拦截。
 - 访客哈希使用每日轮换 HMAC，不把原始 IP/User-Agent 当作公开标识。
 - 附件上传仅 ADMIN 可用，最大 10 MiB，只接受通过真实内容识别的 JPEG、PNG、WebP、GIF，并限制尺寸、像素和 GIF 帧数。

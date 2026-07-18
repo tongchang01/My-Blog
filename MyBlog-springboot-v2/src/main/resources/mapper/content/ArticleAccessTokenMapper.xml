@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tyb.myblog.v2.content.infrastructure.persistence.mapper.ArticleAccessTokenMapper">
+
+    <select id="countActive" resultType="int">
+        SELECT COUNT(*)
+        FROM t_article_access_token
+        WHERE article_id = #{articleId}
+          AND token_hash = #{tokenHash}
+          AND revoked = 0
+          AND expires_at <![CDATA[>]]> #{now}
+    </select>
+
+    <update id="revokeActiveByArticleId">
+        UPDATE t_article_access_token
+        SET revoked = 1,
+            updated_at = CURRENT_TIMESTAMP
+        WHERE article_id = #{articleId}
+          AND revoked = 0
+    </update>
+</mapper>

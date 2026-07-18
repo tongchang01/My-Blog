@@ -16,10 +16,16 @@ import {
   loadPublicArchives,
   loadPublicHomeArticles,
   loadPublicArticles,
+  unlockPublicArticle,
   type LoadPublicArchivesParams,
   type LoadPublicHomeArticlesParams,
   type LoadPublicArticlesParams
 } from './api'
+import {
+  clearArticleAccessToken,
+  loadArticleAccessToken,
+  saveArticleAccessToken
+} from './access'
 import {
   mapArchivePage,
   mapArticleDetail,
@@ -67,8 +73,7 @@ export const useArticleStore = defineStore('public-articles', () => {
   let activeArchiveRequest: AbortController | null = null
   let activeDetailRequest: AbortController | null = null
   let lastQuery: Omit<LoadPublicArticlesParams, 'signal'> | null = null
-  let lastHomeQuery: Omit<LoadPublicHomeArticlesParams, 'signal'> | null =
-    null
+  let lastHomeQuery: Omit<LoadPublicHomeArticlesParams, 'signal'> | null = null
   let lastArchiveQuery: Omit<LoadPublicArchivesParams, 'signal'> | null = null
   let lastDetailQuery: { id: string; lang: SupportedLocale } | null = null
 
@@ -178,10 +183,12 @@ export const useArticleStore = defineStore('public-articles', () => {
     detail.value = null
     detailStatus.value = 'loading'
     detailError.value = null
+    let accessToken: string | null = null
 
     try {
+      accessToken = loadArticleAccessToken(id)
       detail.value = mapArticleDetail(
-        await loadPublicArticle(id, lang, request.signal),
+        await loadPublicArticle(id, lang, request.signal, accessToken),
         lang
       )
       detailStatus.value = 'ready'
@@ -189,6 +196,7 @@ export const useArticleStore = defineStore('public-articles', () => {
     } catch (cause) {
       if (request.signal.aborted) return null
       const normalized = normalizeApiError(cause)
+      if (accessToken && normalized.status === 403) clearArticleAccessToken(id)
       detailError.value = normalized
       if (normalized.status === 403 && normalized.code === '10003') {
         detailStatus.value = 'locked'
@@ -207,6 +215,18 @@ export const useArticleStore = defineStore('public-articles', () => {
     lastDetailQuery
       ? loadDetail(lastDetailQuery.id, lastDetailQuery.lang)
       : null
+
+  const unlockDetail = async (
+    id: string,
+    lang: SupportedLocale,
+    password: string
+  ): Promise<string | null> => {
+    saveArticleAccessToken(id, await unlockPublicArticle(id, password))
+    return loadDetail(id, lang)
+  }
+
+  const articleAccessToken = (id: string): string | null =>
+    loadArticleAccessToken(id)
 
   return {
     page,
@@ -228,6 +248,8 @@ export const useArticleStore = defineStore('public-articles', () => {
     loadArchives,
     retryArchives,
     loadDetail,
-    retryDetail
+    retryDetail,
+    unlockDetail,
+    articleAccessToken
   }
 })

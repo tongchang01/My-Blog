@@ -69,7 +69,8 @@ export const useCommentStore = defineStore('public-comments', () => {
               articleId: query.articleId,
               page: query.page,
               size: query.size,
-              signal: request.signal
+              signal: request.signal,
+              articleAccessToken: query.articleAccessToken
             })),
         query.locale
       )
@@ -114,7 +115,13 @@ export const useCommentStore = defineStore('public-comments', () => {
       }
       const result = lastQuery?.guestbook
         ? await createGuestbookComment(payload)
-        : await createArticleComment(articleId ?? '', payload)
+        : lastQuery?.articleAccessToken
+          ? await createArticleComment(
+              articleId ?? '',
+              payload,
+              lastQuery.articleAccessToken
+            )
+          : await createArticleComment(articleId ?? '', payload)
       replyTarget.value = null
 
       if (result.auditStatus === 'PASS') {
@@ -124,7 +131,8 @@ export const useCommentStore = defineStore('public-comments', () => {
           page: 1,
           size: lastQuery?.size ?? page.value.size,
           locale: lastQuery?.locale ?? 'zh',
-          guestbook: lastQuery?.guestbook
+          guestbook: lastQuery?.guestbook,
+          articleAccessToken: lastQuery?.articleAccessToken
         })
       } else {
         notice.value = '评论已提交，等待审核'

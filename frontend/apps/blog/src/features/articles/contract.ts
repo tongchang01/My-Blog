@@ -24,6 +24,11 @@ export interface PublicArticleDetailDto extends PublicArticleListItemDto {
   updatedAt: string
 }
 
+export interface PublicArticleUnlockDto {
+  token: string
+  expiresAt: string
+}
+
 export interface PublicArticleHomeDto {
   pinnedArticle: PublicArticleListItemDto | null
   featuredArticles: PublicArticleListItemDto[]

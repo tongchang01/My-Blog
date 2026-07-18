@@ -6,6 +6,7 @@ import com.tyb.myblog.v2.content.application.article.ArticleCommentGateway;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicy;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicySnapshot;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicyService;
+import com.tyb.myblog.v2.content.application.article.PublicArticleAccessService;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,8 +23,10 @@ class ArticleCommentPolicyServiceTest {
 
     private final ArticleCommentGateway gateway =
             mock(ArticleCommentGateway.class);
+    private final PublicArticleAccessService accessService =
+            mock(PublicArticleAccessService.class);
     private final ArticleCommentPolicyService policyService =
-            new ArticleCommentPolicyService(gateway);
+            new ArticleCommentPolicyService(gateway, accessService);
     private final ArticleCommentCountService countService =
             new ArticleCommentCountService(gateway);
 
@@ -44,6 +48,9 @@ class ArticleCommentPolicyServiceTest {
                 .thenReturn(Optional.of(row(ArticleStatus.PASSWORD, 0)));
         when(gateway.findCommentPolicy(102L))
                 .thenReturn(Optional.of(row(ArticleStatus.DRAFT, 0)));
+        doThrow(new ApiException(com.tyb.myblog.v2.common.error.ApiErrorCode.FORBIDDEN))
+                .when(accessService)
+                .requirePasswordAccess(101L, null);
 
         assertThatThrownBy(() -> policyService.requirePublicCommentable(101L))
                 .isInstanceOf(ApiException.class)

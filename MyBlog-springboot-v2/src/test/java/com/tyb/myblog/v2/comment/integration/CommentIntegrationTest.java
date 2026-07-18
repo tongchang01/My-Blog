@@ -47,6 +47,7 @@ class CommentIntegrationTest {
     void resetState() {
         jdbcTemplate.update("DELETE FROM t_mail_log");
         jdbcTemplate.update("DELETE FROM t_comment");
+        jdbcTemplate.update("DELETE FROM t_article_access_token");
         jdbcTemplate.update("DELETE FROM t_article_tag");
         jdbcTemplate.update("DELETE FROM t_article");
         jdbcTemplate.update("DELETE FROM t_refresh_token");
@@ -152,6 +153,36 @@ class CommentIntegrationTest {
                         .header("Authorization", bearer(admin)))
                 .andExpect(status().isOk());
         assertThat(commentCount(100L)).isEqualTo(1);
+    }
+
+    @Test
+    void passwordArticleAccessTokenAllowsCommentReadAndSubmission()
+            throws Exception {
+        insertArticle(101L, 4);
+        jdbcTemplate.update("""
+                UPDATE t_article
+                SET access_password = ?
+                WHERE id = ?
+                """, passwordEncoder.encode("open-sesame"), 101L);
+
+        String articleAccessToken = response(post("/api/public/articles/101/unlock")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"password\":\"open-sesame\"}"))
+                .at("/data/token")
+                .asText();
+
+        mockMvc.perform(get("/api/public/articles/101/comments")
+                        .header("X-Article-Access-Token", articleAccessToken))
+                .andExpect(status().isOk());
+        response(post("/api/public/articles/101/comments")
+                .header("X-Article-Access-Token", articleAccessToken)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(commentBody(
+                        "Reader",
+                        "reader@example.com",
+                        "password article",
+                        null)));
+        assertThat(commentCount(101L)).isEqualTo(1);
     }
 
     @Test

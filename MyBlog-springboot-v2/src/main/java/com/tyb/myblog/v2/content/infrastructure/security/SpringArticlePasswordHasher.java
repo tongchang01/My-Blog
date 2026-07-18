@@ -18,11 +18,22 @@ public class SpringArticlePasswordHasher implements ArticlePasswordHasher {
 
     @Override
     public String hash(String rawPassword) {
-        if (rawPassword == null
-                || rawPassword.isBlank()
-                || rawPassword.length() > MAX_RAW_PASSWORD_LENGTH) {
+        if (!valid(rawPassword)) {
             throw new IllegalArgumentException("文章密码格式非法");
         }
         return passwordEncoder.encode(rawPassword);
+    }
+
+    @Override
+    public boolean matches(String rawPassword, String passwordHash) {
+        return valid(rawPassword)
+                && passwordHash != null
+                && passwordEncoder.matches(rawPassword, passwordHash);
+    }
+
+    private static boolean valid(String rawPassword) {
+        return rawPassword != null
+                && !rawPassword.isBlank()
+                && rawPassword.length() <= MAX_RAW_PASSWORD_LENGTH;
     }
 }

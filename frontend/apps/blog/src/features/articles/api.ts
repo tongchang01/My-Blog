@@ -6,7 +6,8 @@ import type {
   PublicArchiveGroupDto,
   PublicArticleDetailDto,
   PublicArticleHomeDto,
-  PublicArticleListItemDto
+  PublicArticleListItemDto,
+  PublicArticleUnlockDto
 } from './contract'
 
 export interface LoadPublicArticlesParams {
@@ -73,9 +74,7 @@ export const loadPublicArchives = async ({
   size,
   lang,
   signal
-}: LoadPublicArchivesParams): Promise<
-  PageResponse<PublicArchiveGroupDto>
-> => {
+}: LoadPublicArchivesParams): Promise<PageResponse<PublicArchiveGroupDto>> => {
   const data = await requestApi<PageResponse<PublicArchiveGroupDto>>({
     method: 'GET',
     url: '/public/archives',
@@ -89,14 +88,31 @@ export const loadPublicArchives = async ({
 export const loadPublicArticle = async (
   id: string,
   lang: SupportedLocale,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  articleAccessToken?: string | null
 ): Promise<PublicArticleDetailDto> => {
   const data = await requestApi<PublicArticleDetailDto>({
     method: 'GET',
     url: `/public/articles/${encodeURIComponent(id)}`,
     params: { lang },
-    signal
+    signal,
+    headers: articleAccessToken
+      ? { 'X-Article-Access-Token': articleAccessToken }
+      : undefined
   })
   if (data === null) throw new ApiError('Article detail response is empty')
+  return data
+}
+
+export const unlockPublicArticle = async (
+  id: string,
+  password: string
+): Promise<PublicArticleUnlockDto> => {
+  const data = await requestApi<PublicArticleUnlockDto>({
+    method: 'POST',
+    url: `/public/articles/${encodeURIComponent(id)}/unlock`,
+    data: { password }
+  })
+  if (data === null) throw new ApiError('Article unlock response is empty')
   return data
 }

@@ -8,7 +8,9 @@ import com.tyb.myblog.v2.content.application.article.PublicArticleHomeResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQuery;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQueryService;
+import com.tyb.myblog.v2.content.application.article.PublicArticleAccessService;
 import com.tyb.myblog.v2.content.application.article.PublicArticleTagResult;
+import com.tyb.myblog.v2.common.web.ClientIpResolver;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -43,6 +45,12 @@ class PublicArticleControllerTest {
 
     @MockitoBean
     private PublicArticleQueryService queryService;
+
+    @MockitoBean
+    private PublicArticleAccessService accessService;
+
+    @MockitoBean
+    private ClientIpResolver clientIpResolver;
 
     @Test
     void returnsPublicPageWithoutBodyAndWithLockedFlag()

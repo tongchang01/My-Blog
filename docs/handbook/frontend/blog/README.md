@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 公开读者端
-> 最后校准：2026-07-14
+> 最后校准：2026-07-18
 > 对应代码：`frontend/apps/blog/`
 > 权威程度：前端实现摘要
 
@@ -19,10 +19,10 @@
 - 作者资料、站点配置、建站日期、公开统计和路由访问打点。
 - 公开静态页按当前界面语言打点；文章 canonical slug 规范化不重复增加 PV。
 - loading、empty、404、locked、error 与 retry 状态。
+- PASSWORD 文章密码解锁；令牌仅保存在当前标签页的 sessionStorage，并用于正文与文章评论请求。
 
 ## 当前边界
 
-- PASSWORD 文章只显示锁定元数据，详情与评论没有解锁流程。
 - SEO、RSS/Atom、sitemap、Open Graph 和结构化数据尚未形成完整发布能力。
 - 文章上一篇/下一篇导航尚未补齐，见[开放问题](../../start-here/open-issues.md)的 ISSUE-008。
 - Gitalk、Valine、Twikoo、Waline 和旧静态 JSON 已从当前文章主链路清理；后续留言板继续使用 V2 自研评论接口。

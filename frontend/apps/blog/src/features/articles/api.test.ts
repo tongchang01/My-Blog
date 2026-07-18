@@ -1,7 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { requestApi } from '@/shared/http/client'
 import { ApiError } from '@/shared/http/error'
-import { loadPublicArchives, loadPublicArticles } from './api'
+import {
+  loadPublicArticle,
+  loadPublicArchives,
+  loadPublicArticles,
+  unlockPublicArticle
+} from './api'
 
 vi.mock('@/shared/http/client', () => ({
   requestApi: vi.fn()
@@ -73,6 +78,35 @@ describe('article api', () => {
         keyword: 'Spring'
       },
       signal: undefined
+    })
+  })
+
+  it('sends an article access token only for protected detail reads', async () => {
+    mockedRequestApi.mockResolvedValueOnce({ id: '1' })
+
+    await loadPublicArticle('1', 'zh', undefined, 'article-token')
+
+    expect(mockedRequestApi).toHaveBeenCalledWith({
+      method: 'GET',
+      url: '/public/articles/1',
+      params: { lang: 'zh' },
+      signal: undefined,
+      headers: { 'X-Article-Access-Token': 'article-token' }
+    })
+  })
+
+  it('submits a password to unlock an article', async () => {
+    mockedRequestApi.mockResolvedValueOnce({
+      token: 'article-token',
+      expiresAt: '2026-07-19T10:00:00'
+    })
+
+    await unlockPublicArticle('1', 'secret')
+
+    expect(mockedRequestApi).toHaveBeenCalledWith({
+      method: 'POST',
+      url: '/public/articles/1/unlock',
+      data: { password: 'secret' }
     })
   })
 })

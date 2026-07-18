@@ -5,11 +5,18 @@ import com.tyb.myblog.v2.common.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQuery;
 import com.tyb.myblog.v2.content.application.article.PublicArticleQueryService;
+import com.tyb.myblog.v2.content.application.article.PublicArticleAccessService;
+import com.tyb.myblog.v2.common.web.ClientIpResolver;
 import lombok.RequiredArgsConstructor;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -21,7 +28,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class PublicArticleController {
 
     private final PublicArticleQueryService queryService;
+    private final PublicArticleAccessService accessService;
     private final ArticleWebMapping mapping;
+    private final ClientIpResolver clientIpResolver;
 
     @Operation(summary = "分页查询公开文章")
     @GetMapping
@@ -61,8 +70,24 @@ public class PublicArticleController {
     @GetMapping("/{id:\\d+}")
     public ApiResponse<PublicArticleDetailVO> detail(
             @PathVariable long id,
-            @RequestParam(defaultValue = "zh") String lang) {
+            @RequestParam(defaultValue = "zh") String lang,
+            @RequestHeader(name = "X-Article-Access-Token", required = false)
+            String articleAccessToken) {
         return ApiResponse.ok(mapping.toPublicDetail(
-                queryService.detail(id, lang)));
+                articleAccessToken == null
+                        ? queryService.detail(id, lang)
+                        : queryService.detail(id, lang, articleAccessToken)));
+    }
+
+    @Operation(summary = "解锁 PASSWORD 文章")
+    @PostMapping("/{id:\\d+}/unlock")
+    public ApiResponse<PublicArticleUnlockVO> unlock(
+            @PathVariable long id,
+            @Valid @RequestBody PublicArticleUnlockRequest request,
+            HttpServletRequest servletRequest) {
+        return ApiResponse.ok(PublicArticleUnlockVO.from(accessService.unlock(
+                id,
+                request.password(),
+                clientIpResolver.resolve(servletRequest))));
     }
 }
