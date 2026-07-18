@@ -137,7 +137,7 @@ sudo docker exec myblog-v2-api-1 curl --fail --silent http://127.0.0.1:8080/actu
 
 ## 公网 HTTPS 冒烟
 
-部署工作流的公网冒烟增强合入后，`Deploy same SHA` 成功后会由 GitHub Hosted Runner 依次请求主站、www 和管理端的 `/healthz`。每次请求最多 20 秒，不重试；任一请求失败会让 deploy job 失败。临时 SSH 规则撤销仍使用 `if: always()`，因此公网不可达不会遗留 Runner 的 `/32`。
+`Deploy same SHA` 成功后，GitHub Hosted Runner 会依次请求主站、www 和管理端的 `/healthz`。Caddy 使用独立 `handle` 返回固定正文 `ok`，工作流同时校验 HTTP 成功和正文，避免 SPA fallback 返回 `index.html` 时形成假阳性。每次请求最多 20 秒，不重试；任一请求失败会让 deploy job 失败。临时 SSH 规则撤销仍使用 `if: always()`，因此公网不可达不会遗留 Runner 的 `/32`。
 
 ## 失败与手工撤销
 

@@ -26,7 +26,7 @@
 ## 当前生产基线
 
 - V2 运行在现有 AWS EC2，Docker Compose 管理 MySQL、API 和 Caddy；S3 由 EC2 IAM Role 访问。
-- 正常 `main` 发布由 GitHub Actions 构建 GHCR 镜像，并以同一完整提交 SHA 自动部署；工作流会从公网检查主站、`www` 和管理端的 `/healthz`。
+- 正常 `main` 发布由 GitHub Actions 构建 GHCR 镜像，并以同一完整提交 SHA 自动部署；工作流会从公网检查主站、`www` 和管理端的 `/healthz` 均返回固定正文 `ok`。
 - 首次 GitHub OIDC SSH CD 演练和后续 `main` 自动发布均已成功。运行编号、实际 SHA 与敏感资源标识以私有生产台账和 GitHub Actions 为准。
 
 ## 执行原则
