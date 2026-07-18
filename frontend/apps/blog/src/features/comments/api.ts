@@ -12,19 +12,24 @@ export interface LoadArticleCommentsParams {
   page: number
   size: number
   signal?: AbortSignal
+  articleAccessToken?: string | null
 }
 
 export const loadArticleComments = async ({
   articleId,
   page,
   size,
-  signal
+  signal,
+  articleAccessToken
 }: LoadArticleCommentsParams): Promise<PageResponse<PublicCommentDto>> => {
   const data = await requestApi<PageResponse<PublicCommentDto>>({
     method: 'GET',
     url: `/public/articles/${encodeURIComponent(articleId)}/comments`,
     params: { page, size },
-    signal
+    signal,
+    headers: articleAccessToken
+      ? { 'X-Article-Access-Token': articleAccessToken }
+      : undefined
   })
   if (data === null) throw new ApiError('Comment page response is empty')
   return data
@@ -32,12 +37,16 @@ export const loadArticleComments = async ({
 
 export const createArticleComment = async (
   articleId: string,
-  payload: CreateCommentPayload
+  payload: CreateCommentPayload,
+  articleAccessToken?: string | null
 ): Promise<CreateCommentResultDto> => {
   const data = await requestApi<CreateCommentResultDto>({
     method: 'POST',
     url: `/public/articles/${encodeURIComponent(articleId)}/comments`,
-    data: payload
+    data: payload,
+    headers: articleAccessToken
+      ? { 'X-Article-Access-Token': articleAccessToken }
+      : undefined
   })
   if (data === null) throw new ApiError('Comment create response is empty')
   return data

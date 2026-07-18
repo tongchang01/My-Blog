@@ -43,7 +43,8 @@ describe('comments api', () => {
       method: 'GET',
       url: '/public/articles/9007199254740993/comments',
       params: { page: 1, size: 20 },
-      signal: undefined
+      signal: undefined,
+      headers: undefined
     })
   })
 
@@ -86,7 +87,52 @@ describe('comments api', () => {
         site: null,
         contentMd: 'hello',
         replyToCommentId: '9007199254740994'
-      }
+      },
+      headers: undefined
+    })
+  })
+
+  it('sends the article access token for protected comments', async () => {
+    mockedRequestApi
+      .mockResolvedValueOnce({ records: [], total: 0, page: 1, size: 20 })
+      .mockResolvedValueOnce({ id: '1', auditStatus: 'PENDING' })
+
+    await loadArticleComments({
+      articleId: '1',
+      page: 1,
+      size: 20,
+      articleAccessToken: 'article-token'
+    })
+    await createArticleComment(
+      '1',
+      {
+        nickname: 'TYB',
+        email: 'tyb@example.com',
+        site: null,
+        contentMd: 'hello',
+        replyToCommentId: null
+      },
+      'article-token'
+    )
+
+    expect(mockedRequestApi).toHaveBeenNthCalledWith(1, {
+      method: 'GET',
+      url: '/public/articles/1/comments',
+      params: { page: 1, size: 20 },
+      signal: undefined,
+      headers: { 'X-Article-Access-Token': 'article-token' }
+    })
+    expect(mockedRequestApi).toHaveBeenNthCalledWith(2, {
+      method: 'POST',
+      url: '/public/articles/1/comments',
+      data: {
+        nickname: 'TYB',
+        email: 'tyb@example.com',
+        site: null,
+        contentMd: 'hello',
+        replyToCommentId: null
+      },
+      headers: { 'X-Article-Access-Token': 'article-token' }
     })
   })
 

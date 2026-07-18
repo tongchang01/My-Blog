@@ -15,5 +15,7 @@ describe('post detail page comments', () => {
     expect(source).toContain('id="comments"')
     expect(source).toContain(':article-id="article.id"')
     expect(source).toContain(':enabled="!article.locked"')
+    expect(source).toContain(':article-access-token=')
+    expect(source).toContain('articleStore.articleAccessToken(article.id)')
   })
 })

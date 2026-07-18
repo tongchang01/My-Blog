@@ -188,12 +188,14 @@ const props = withDefaults(
     title?: string
     body?: string
     uid?: string
+    articleAccessToken?: string | null
   }>(),
   {
     articleId: '',
     enabled: true,
     guestbook: false,
-    title: 'titles.comment'
+    title: 'titles.comment',
+    articleAccessToken: null
   }
 )
 
@@ -221,7 +223,8 @@ const loadPage = (page: number): void => {
     page,
     size: commentStore.page.size,
     locale: appStore.locale,
-    guestbook: props.guestbook
+    guestbook: props.guestbook,
+    articleAccessToken: props.articleAccessToken
   })
 }
 
@@ -242,15 +245,16 @@ const flattenReplies = (comment: CommentViewModel): CommentViewModel[] =>
   comment.replies.flatMap(reply => [reply, ...flattenReplies(reply)])
 
 watch(
-  () => [props.articleId, props.enabled] as const,
-  ([articleId, enabled]) => {
+  () => [props.articleId, props.enabled, props.articleAccessToken] as const,
+  ([articleId, enabled, articleAccessToken]) => {
     if (enabled && (props.guestbook || articleId)) {
       void commentStore.load({
         articleId,
         page: 1,
         size: commentStore.page.size,
         locale: appStore.locale,
-        guestbook: props.guestbook
+        guestbook: props.guestbook,
+        articleAccessToken
       })
     }
   },

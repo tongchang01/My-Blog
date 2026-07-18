@@ -59,7 +59,13 @@
             v-scroll-spy="{ sectionSelector: 'h1, h2, h3, h4, h5, h6' }"
           />
           <div id="comments">
-            <Comment :article-id="article.id" :enabled="!article.locked" />
+            <Comment
+              :article-id="article.id"
+              :enabled="!article.locked"
+              :article-access-token="
+                articleStore.articleAccessToken(article.id)
+              "
+            />
           </div>
         </div>
         <div class="col-span-1">
@@ -70,6 +76,31 @@
         </div>
       </div>
     </article>
+
+    <form
+      v-else-if="state === 'locked'"
+      class="mx-auto flex w-full max-w-md flex-col gap-4 py-32 text-center text-ob-dim"
+      @submit.prevent="unlock"
+    >
+      <h1 class="text-3xl text-ob-bright">🔒</h1>
+      <p>{{ stateMessage }}</p>
+      <input
+        v-model="password"
+        class="rounded-lg bg-ob-deep-800 px-4 py-3 text-ob-normal outline-none"
+        type="password"
+        required
+        autocomplete="current-password"
+        :placeholder="passwordPlaceholder"
+      />
+      <p v-if="unlockError" class="text-sm text-red-300">{{ unlockError }}</p>
+      <button
+        class="rounded-lg px-4 py-3 text-white"
+        :disabled="unlocking"
+        type="submit"
+      >
+        {{ unlocking ? unlockSubmitting : unlockAction }}
+      </button>
+    </form>
 
     <div v-else class="py-32 text-center text-ob-dim">
       <h1 class="text-3xl text-ob-bright">{{ stateTitle }}</h1>
@@ -102,6 +133,9 @@ const metaStore = useMetaStore()
 const { t } = useI18n()
 const invalidRoute = ref(false)
 const postHtml = ref<HTMLElement | null>(null)
+const password = ref('')
+const unlocking = ref(false)
+const unlockError = ref<string | null>(null)
 const { initializeLightBox } = useLightBox()
 
 const article = computed(() => articleStore.detail)
@@ -119,7 +153,7 @@ const stateMessage = computed(() => {
   const lang = locale.value ?? appStore.locale
   if (state.value === 'locked') {
     return lang === 'zh'
-      ? '该文章需要密码，首版暂不支持解锁'
+      ? '该文章需要密码才能阅读'
       : lang === 'ja'
         ? 'この記事はパスワードで保護されています'
         : 'This article is password protected'
@@ -132,6 +166,26 @@ const stateMessage = computed(() => {
         : 'Article not found'
   }
   return ''
+})
+const passwordPlaceholder = computed(() => {
+  const lang = locale.value ?? appStore.locale
+  return lang === 'zh'
+    ? '输入文章密码'
+    : lang === 'ja'
+      ? 'パスワード'
+      : 'Password'
+})
+const unlockAction = computed(() => {
+  const lang = locale.value ?? appStore.locale
+  return lang === 'zh'
+    ? '解锁文章'
+    : lang === 'ja'
+      ? 'ロックを解除'
+      : 'Unlock article'
+})
+const unlockSubmitting = computed(() => {
+  const lang = locale.value ?? appStore.locale
+  return lang === 'zh' ? '解锁中…' : lang === 'ja' ? '解除中…' : 'Unlocking…'
 })
 
 const replaceCanonicalSlug = async (slug: string | null) => {
@@ -161,6 +215,27 @@ const load = async () => {
     commonStore.setHeaderImage(article.value.coverUrl ?? '')
   }
   await replaceCanonicalSlug(slug)
+}
+
+const unlock = async (): Promise<void> => {
+  const id = typeof route.params.id === 'string' ? route.params.id : null
+  if (!id || !locale.value) return
+  unlocking.value = true
+  unlockError.value = null
+  try {
+    await articleStore.unlockDetail(id, locale.value, password.value)
+    password.value = ''
+  } catch {
+    const lang = locale.value ?? appStore.locale
+    unlockError.value =
+      lang === 'zh'
+        ? '密码错误或尝试过于频繁，请稍后再试'
+        : lang === 'ja'
+          ? 'パスワードが違うか、試行回数が多すぎます'
+          : 'Incorrect password or too many attempts. Try again later.'
+  } finally {
+    unlocking.value = false
+  }
 }
 
 onMounted(load)
@@ -197,3 +272,14 @@ watch(
 )
 onBeforeUnmount(() => commonStore.resetHeaderImage())
 </script>
+
+<style scoped>
+form button {
+  background: var(--main-gradient);
+}
+
+form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+</style>
