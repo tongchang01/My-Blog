@@ -10,4 +10,5 @@ public class PublicArticleAccessMetadataRow {
 
     private Long id;
     private Integer status;
+    private String accessPassword;
 }

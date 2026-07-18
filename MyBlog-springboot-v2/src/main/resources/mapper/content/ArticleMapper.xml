@@ -340,10 +340,10 @@
         LIMIT #{size}
     </select>
 
-    <!-- 公开详情预检只读取 ID 和状态，PASSWORD 正文不会进入应用内存。 -->
+    <!-- 公开详情预检不读取正文；PASSWORD 哈希仅在解锁应用服务中校验。 -->
     <select id="selectPublicAccessMetadata"
             resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticleAccessMetadataRow">
-        SELECT id, status
+        SELECT id, status, access_password
         FROM t_article
         WHERE id = #{id}
           AND deleted = 0
@@ -351,7 +351,7 @@
           AND publish_at <![CDATA[<=]]> #{now}
     </select>
 
-    <!-- 预检通过后只读取已发布文章正文。 -->
+    <!-- 预检完成公开状态与 PASSWORD 授权后读取正文。 -->
     <select id="selectPublicDetail"
             resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.PublicArticleDetailRow">
         SELECT
@@ -380,7 +380,7 @@
            AND c.deleted = 0
         WHERE a.id = #{id}
           AND a.deleted = 0
-          AND a.status = 2
+          AND a.status IN (2, 4)
           AND a.publish_at <![CDATA[<=]]> #{now}
     </select>
 

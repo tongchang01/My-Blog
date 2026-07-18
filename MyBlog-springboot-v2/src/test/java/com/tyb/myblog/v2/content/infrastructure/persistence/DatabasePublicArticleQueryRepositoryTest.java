@@ -93,7 +93,7 @@ class DatabasePublicArticleQueryRepositoryTest {
     }
 
     @Test
-    void readsPasswordMetadataWithoutExposingPasswordDetail() {
+    void readsPasswordMetadataAndDetailAfterAccessCheck() {
         insertCategory(10L, "后端");
         insertTag(20L, "Java");
         insertArticle(100L, "Published", 2, 10L,
@@ -122,7 +122,13 @@ class DatabasePublicArticleQueryRepositoryTest {
                 .get()
                 .extracting(metadata -> metadata.status().name())
                 .isEqualTo("PASSWORD");
-        assertThat(repository.findPublicDetail(101L, NOW)).isEmpty();
+        assertThat(repository.findPublicDetail(101L, NOW))
+                .get()
+                .satisfies(detail -> {
+                    assertThat(detail.body()).isEqualTo("正文 101");
+                    assertThat(detail.status().name())
+                            .isEqualTo("PASSWORD");
+                });
         assertThat(repository.findPublicAccessMetadata(102L, NOW)).isEmpty();
         assertThat(repository.findPublicDetail(102L, NOW)).isEmpty();
     }

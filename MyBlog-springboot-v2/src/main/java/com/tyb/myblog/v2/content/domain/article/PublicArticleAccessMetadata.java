@@ -5,5 +5,6 @@ package com.tyb.myblog.v2.content.domain.article;
  */
 public record PublicArticleAccessMetadata(
         long id,
-        ArticleStatus status) {
+        ArticleStatus status,
+        String accessPassword) {
 }

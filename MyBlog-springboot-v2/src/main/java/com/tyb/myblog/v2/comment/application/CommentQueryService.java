@@ -24,6 +24,16 @@ public class CommentQueryService {
                 CommentTarget.article(articleId), page, size));
     }
 
+    public CommentPageResult articleComments(
+            long articleId,
+            int page,
+            int size,
+            String articleAccessToken) {
+        articlePolicyService.requirePublicCommentable(articleId, articleAccessToken);
+        return toResult(repository.page(
+                CommentTarget.article(articleId), page, size));
+    }
+
     public CommentPageResult guestbookComments(int page, int size) {
         return toResult(repository.page(
                 CommentTarget.guestbook(), page, size));

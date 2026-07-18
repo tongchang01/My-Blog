@@ -40,6 +40,7 @@ class BackendPropertiesTest {
                         tuple("GET", "/api/public/tags"),
                         tuple("GET", "/api/public/articles"),
                         tuple("GET", "/api/public/articles/**"),
+                        tuple("POST", "/api/public/articles/*/unlock"),
                         tuple("GET", "/api/public/archives"),
                         tuple("POST", "/api/public/articles/*/comments"),
                         tuple("GET", "/api/public/guestbook/comments"),

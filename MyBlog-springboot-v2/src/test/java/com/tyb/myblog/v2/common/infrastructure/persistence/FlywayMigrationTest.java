@@ -30,6 +30,7 @@ class FlywayMigrationTest {
                               'T_REFRESH_TOKEN',
                               'T_ARTICLE',
                               'T_ARTICLE_TAG',
+                              'T_ARTICLE_ACCESS_TOKEN',
                               'T_CATEGORY',
                               'T_TAG',
                               'T_COMMENT',
@@ -38,12 +39,13 @@ class FlywayMigrationTest {
                               'T_FRIEND_LINK',
                               'T_PAGE_VIEW',
                               'T_PAGE_VIEW_DAILY',
-                              'T_MAIL_LOG'
+                              'T_MAIL_LOG',
+                              'T_HOMEPAGE_SLOT_GUARD'
                           )
                         """,
                 Integer.class);
 
-        assertThat(tableCount).isEqualTo(14);
+        assertThat(tableCount).isEqualTo(16);
     }
 
     @Test
@@ -80,8 +82,8 @@ class FlywayMigrationTest {
                 "select count(*) from t_homepage_slot_guard",
                 Integer.class);
 
-        assertThat(migrationCount).isEqualTo(5);
-        assertThat(latestVersion).isEqualTo("5");
+        assertThat(migrationCount).isEqualTo(6);
+        assertThat(latestVersion).isEqualTo("6");
         assertThat(userCount).isZero();
         assertThat(profileCount).isZero();
         assertThat(homepageSlotGuardCount).isEqualTo(2);

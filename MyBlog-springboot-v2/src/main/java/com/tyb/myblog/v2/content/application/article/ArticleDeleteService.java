@@ -18,6 +18,7 @@ public class ArticleDeleteService {
 
     private final ArticleRepository repository;
     private final ContentAuthorization authorization;
+    private final PublicArticleAccessService accessService;
     private final Clock clock;
 
     @Transactional
@@ -34,5 +35,6 @@ public class ArticleDeleteService {
                     ApiErrorCode.NOT_FOUND,
                     "文章不存在");
         }
+        accessService.revokeAll(id);
     }
 }

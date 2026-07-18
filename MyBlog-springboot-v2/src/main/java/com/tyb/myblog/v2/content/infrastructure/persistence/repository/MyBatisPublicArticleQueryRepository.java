@@ -102,7 +102,8 @@ public class MyBatisPublicArticleQueryRepository
                         mapper.selectPublicAccessMetadata(id, now))
                 .map(row -> new PublicArticleAccessMetadata(
                         row.getId(),
-                        ArticleStatus.fromDatabase(row.getStatus())));
+                        ArticleStatus.fromDatabase(row.getStatus()),
+                        row.getAccessPassword()));
     }
 
     @Override
