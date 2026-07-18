@@ -19,4 +19,11 @@ describe('build optimization', () => {
     expect(appSource).toContain("() => import('vue-easy-lightbox')")
     expect(appSource).toContain('<VueEasyLightbox\n    v-if="lightBoxVisible"')
   })
+
+  it('keeps the initial bundle split from stable framework dependencies', () => {
+    const config = source('../vite.config.mjs')
+    expect(config).toContain("return 'vendor-vue'")
+    expect(config).toContain("return 'vendor-markdown'")
+    expect(config).toContain('chunkSizeWarningLimit: 700')
+  })
 })

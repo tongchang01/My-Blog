@@ -66,7 +66,7 @@
 
 ## P-009：GitHub Actions 警告不能替代失败诊断
 
-- 现象：`aws-actions/configure-aws-credentials@v5` 提示其 Node 20 运行时已弃用，但 deploy job 仍在 GitHub Hosted Runner 的 Node 24 兼容层成功完成。
+- 历史现象：`aws-actions/configure-aws-credentials@v5` 曾提示 Node 20 运行时弃用，但 deploy job 仍在 GitHub Hosted Runner 的 Node 24 兼容层成功完成；当前官方 Action 已升级并通过真实 CD，不再产生该告警。
 - 根因：action 运行时迁移提示与当前工作流失败是两件事；把 warning 当作失败原因会掩盖真正的 OIDC、SSH、镜像或公网冒烟问题。
 - 处理：先查看失败 job 的完整日志和失败步骤；action 大版本升级单独提交并重新验证 OIDC、临时 SSH 放行/撤销和公网冒烟，不设置不安全的 Node 20 回退开关。
 - 相关：`../ops/ci-cd.md`、`../ops/github-ssh-cd.md`。
