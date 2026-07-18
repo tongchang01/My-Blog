@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 comment 模块、前台 blog、后台 admin
-> 最后校准：2026-07-10
+> 最后校准：2026-07-18
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/comment/web/`
 > 权威程度：API 契约
 
@@ -18,7 +18,7 @@
 - 公开接口不返回 `contentMd`、邮箱、IP、User-Agent。
 - 评论 Markdown 原文由后端保存到 `content_md`，清洗后 HTML 保存到 `content_html`。
 - 前台只能渲染 `contentHtml`。
-- PASSWORD 文章评论在文章解锁能力落地前不可用。
+- PASSWORD 文章评论须带解锁后得到的 `X-Article-Access-Token`；令牌规则见 `article.md`。
 
 ## 2. 评论状态
 
@@ -32,6 +32,7 @@
 
 ```http
 GET /api/public/articles/{articleId}/comments?page=1&size=20
+X-Article-Access-Token: <password-article-token>
 ```
 
 鉴权：匿名。
@@ -72,7 +73,7 @@ GET /api/public/articles/{articleId}/comments?page=1&size=20
 | 场景 | HTTP | code |
 |------|------|------|
 | 文章不存在、未发布、私密、定时或已删除 | 404 | `90003` |
-| PASSWORD 文章评论未开放 | 403 | `10003` |
+| PASSWORD 文章令牌缺失、过期或已撤销 | 403 | `10003` |
 | page/size 非法 | 400 | `90001` |
 
 ## 4. 提交公开文章评论
@@ -80,6 +81,7 @@ GET /api/public/articles/{articleId}/comments?page=1&size=20
 ```http
 POST /api/public/articles/{articleId}/comments
 Content-Type: application/json
+X-Article-Access-Token: <password-article-token>
 ```
 
 鉴权：匿名。
@@ -122,7 +124,7 @@ Content-Type: application/json
 | 场景 | HTTP | code |
 |------|------|------|
 | 昵称、邮箱、站点、正文或回复关系非法 | 400 | `90001` |
-| PASSWORD 文章评论未开放 | 403 | `10003` |
+| PASSWORD 文章令牌缺失、过期或已撤销 | 403 | `10003` |
 | 文章或被回复评论不存在 | 404 | `90003` |
 | 跨目标回复、重复提交等冲突 | 409 | `90004` |
 | 提交过于频繁 | 429 | `90002` |
@@ -280,7 +282,7 @@ Content-Type: application/json
 |------|------|------|
 | 参数、正文、邮箱、站点或回复关系非法 | 400 | `90001` |
 | access token 缺失或失效 | 401 | `10002` |
-| DEMO 写操作、PASSWORD 评论未开放 | 403 | `10003` |
+| DEMO 写操作、PASSWORD 文章令牌无效 | 403 | `10003` |
 | 文章、评论或目标不存在 | 404 | `90003` |
 | 跨目标回复、重复提交、状态冲突 | 409 | `90004` |
 | 评论或留言提交过于频繁 | 429 | `90002` |

@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：identity 与 common 安全组件
-> 最后校准：2026-07-10
+> 最后校准：2026-07-18
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/`
 > 权威程度：架构权威说明
 
@@ -72,9 +72,15 @@ Refresh token 是高熵随机字符串，默认有效期 7 天。明文只返回
 
 ## PASSWORD 文章边界
 
-当前代码只支持 PASSWORD 状态、密码哈希保存和公开列表锁定标识。公开正文、文章评论读取和评论提交对 PASSWORD 文章返回 `403 + 10003`；当前没有解锁接口、article access token 或 `X-Article-Token` 处理链。
+PASSWORD 文章使用独立于后台登录的短期随机访问令牌：
 
-完整解锁属于遗留事项，见 `../start-here/open-issues.md`。
+1. 匿名用户向 `POST /api/public/articles/{id}/unlock` 提交文章密码；同一“客户端 IP + 文章”一分钟最多尝试 5 次。
+2. 密码正确后服务端生成 32 字节随机值，仅本次响应返回明文；`t_article_access_token` 只保存其 SHA-256 hash、过期时间和撤销状态，默认有效 24 小时。
+3. 前台只把 `{ token, expiresAt }` 放在当前标签页的 `sessionStorage`，详情和文章评论请求使用 `X-Article-Access-Token`；不写 URL、Cookie、localStorage、日志或登录会话。
+4. PASSWORD 文章的正文、评论查询和评论提交都必须有未过期且未撤销的令牌。`PUBLISHED` 文章不需要该令牌。
+5. 修改 PASSWORD 密码、离开 PASSWORD 状态或软删除文章时，服务端撤销该文章所有访问令牌；恢复文章不会恢复旧令牌。
+
+文章访问令牌不是 JWT、不是账号凭证，也不能用于任何后台接口。决策与取舍见 `../adr/0019-password-article-access.md`。
 
 ## 客户端 IP
 

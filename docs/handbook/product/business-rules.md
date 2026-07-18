@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 产品行为
-> 最后校准：2026-07-10
+> 最后校准：2026-07-18
 > 对应代码：`MyBlog-springboot-v2/src/main/java/`、`frontend/apps/`
 > 权威程度：业务规则
 
@@ -30,13 +30,15 @@
 | DRAFT | 不公开 |
 | PUBLISHED | 列表和正文公开 |
 | PRIVATE | 不公开 |
-| PASSWORD | 列表仅公开锁定元数据，正文和评论拒绝访问 |
+| PASSWORD | 列表公开锁定元数据；解锁后的当前浏览器标签可读正文和使用文章评论 |
 | SCHEDULED | 到达发布时间后由定时任务发布 |
 
 - 非 DRAFT 文章必须有中文标题、正文和分类。
 - PUBLISHED、PASSWORD 和 SCHEDULED 必须有发布时间。
 - PASSWORD 必须保存 BCrypt 哈希，其他状态不得保留文章密码。
-- 当前没有 PASSWORD 解锁接口或文章访问 token；详情、评论查询和评论提交返回 `403 + 10003`。
+- PASSWORD 解锁令牌与登录会话隔离，正确密码会签发 24 小时的随机令牌；数据库只保存 SHA-256 hash。
+- 前台仅把令牌存入当前标签页的 `sessionStorage`，并在详情、文章评论查询和提交中通过 `X-Article-Access-Token` 发送。
+- 密码改动、状态离开 PASSWORD 或软删除文章会撤销该文章的全部访问令牌；过期、撤销或缺失令牌访问正文和文章评论返回 `403 + 10003`。
 - 只有 PUBLISHED 文章可以进入首页槽位；PINNED 最多 1 篇，FEATURED 最多 2 篇，写入前通过持久化槽位 guard 串行校验。
 - 文章公开路径以 ID 定位，slug 可省略并由详情页规范化；分类和标签 slug 唯一且创建后不可修改。
 - 公开评论数只统计未删除且审核状态为 PASS 的文章评论。

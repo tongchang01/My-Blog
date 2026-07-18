@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 生产发布与回滚
-> 最后校准：2026-07-14
+> 最后校准：2026-07-18
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：发布门槛
 
@@ -32,7 +32,7 @@
 - [ ] 跨域部署只允许实际 origin，OPTIONS 预检成功，未知 origin 被拒绝。
 - [ ] trusted proxies 只包含实际代理 IP/CIDR，代理覆盖外部伪造转发头。
 - [ ] 直连后端时不信任 `X-Forwarded-For` 和 `X-Real-IP`。
-- [ ] ADMIN/DEMO 权限、token refresh/退出、PASSWORD 内容阻断通过冒烟。
+- [ ] ADMIN/DEMO 权限、token refresh/退出、PASSWORD 密码解锁、令牌过期/撤销后的内容阻断通过冒烟。
 - [ ] 首个管理员初始化成功后，已通过管理端修改初始密码；旧会话失效，初始化专用环境变量已从服务器删除。
 
 ## 产品冒烟
