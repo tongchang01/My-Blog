@@ -19,6 +19,8 @@ export default ({ mode }) => {
     },
     build: {
       assetsDir: 'static',
+      // Mermaid 图表按需加载；其最重的单图表 chunk 压缩后约 155 kB。
+      chunkSizeWarningLimit: 700,
       rollupOptions: {
         output: {
           assetFileNames: assetInfo => {
@@ -27,6 +29,23 @@ export default ({ mode }) => {
               extType = 'img'
             }
             return `static/${extType}/[hash][extname]`
+          },
+          manualChunks: id => {
+            if (
+              id.includes('/node_modules/vue/') ||
+              id.includes('/node_modules/@vue/') ||
+              id.includes('/node_modules/pinia/') ||
+              id.includes('/node_modules/vue-router/') ||
+              id.includes('/node_modules/vue-i18n/')
+            ) {
+              return 'vendor-vue'
+            }
+            if (
+              id.includes('/node_modules/markdown-it/') ||
+              id.includes('/node_modules/@mdit/')
+            ) {
+              return 'vendor-markdown'
+            }
           },
           chunkFileNames: 'static/js/[hash].js',
           entryFileNames: 'static/js/[hash].js'

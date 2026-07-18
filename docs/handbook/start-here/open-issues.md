@@ -30,8 +30,8 @@
 ## ISSUE-007：前端构建债务
 
 - 优先级：P3，非发布阻塞。
-- 现状：博客已消除 Sass legacy API 与 `@import` 弃用提示；2026-07-14 的生产构建仍报告多个压缩前超过 500 kB 的 JavaScript chunk。管理端 bundle 较大，Browserslist 与 baseline 数据提示过期。
-- 完成条件：评估代码分包、依赖数据更新和性能预算，避免与业务功能提交混合。
+- 现状：博客已消除 Sass legacy API 与 `@import` 弃用提示，并将 Vue、Markdown 稳定依赖拆出，入口 chunk 由约 748 kB 降至约 360 kB（gzip 约 127 kB）。Mermaid 继续按图表类型加载，最重的动态 chunk 约 691 kB（gzip 约 155 kB），构建阈值按该边界设为 700 kB。管理端 Browserslist 与 Baseline 数据已在 2026-07-18 更新，生产构建不再报告数据过期；管理端 bundle 仍较大。
+- 完成条件：为管理端评估代码分包并建立可执行的性能预算，避免与业务功能提交混合；浏览器兼容数据后续作为锁文件维护事项定期更新。
 
 ## ISSUE-008：博客端非阻塞体验补齐
 
