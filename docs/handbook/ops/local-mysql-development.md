@@ -2,7 +2,7 @@
 
 > 状态：PowerShell 7+ 自动化入口已验证
 > 适用范围：本机 `myblog_v2_dev`
-> 最后校准：2026-07-11
+> 最后校准：2026-07-19
 > 对应代码：`MyBlog-springboot-v2/scripts/dev/mysql/`
 > 权威程度：运行手册
 
@@ -40,7 +40,7 @@ pwsh -NoProfile -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract
 
 1. 用 MySQL 管理工具创建空库 `myblog_v2_dev`，字符集 `utf8mb4`、排序规则 `utf8mb4_0900_ai_ci`。
 2. 按 `environment.md` 设置 local 数据库、JWT 和统计密钥。
-3. 启动 local 后端；Flyway 自动应用 V1–V5。
+3. 启动 local 后端；Flyway 自动应用 V1–V6。
 4. 需要固定演示数据时，在 `mysql` 交互终端连接 `myblog_v2_dev`，再执行：
 
 ```sql
