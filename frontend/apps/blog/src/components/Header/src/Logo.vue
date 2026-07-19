@@ -5,9 +5,9 @@
   >
     <span class="flex mr-3">
       <img
-        v-if="themeConfig.site.logo || themeConfig.site.avatar"
+        v-if="logoImage"
         :class="avatarClass"
-        :src="themeConfig.site.logo || themeConfig.site.avatar"
+        :src="logoImage"
         alt="site-logo"
       />
       <ob-skeleton v-else width="2rem" height="2rem" circle />
@@ -37,10 +37,12 @@
 
 <script setup lang="ts">
 import { useAppStore } from '@/stores/app'
+import { useAuthorProfileStore } from '@/features/author-profile/store'
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 const appStore = useAppStore()
+const authorProfileStore = useAuthorProfileStore()
 const router = useRouter()
 
 const handleLogoClick = () => {
@@ -54,6 +56,9 @@ const avatarClass = computed(() => {
   }
 })
 const themeConfig = computed(() => appStore.themeConfig)
+const logoImage = computed(
+  () => themeConfig.value.site.logo || authorProfileStore.profile.avatar
+)
 </script>
 
 <style lang="scss">

@@ -31,14 +31,20 @@ describe('footer avatar', () => {
     const footerAvatarStyle = source.match(/\.footer-avatar\s*\{[^}]*\}/s)?.[0]
     expect(footerAvatarStyle).toBeDefined()
     expect(footerAvatarStyle).not.toContain('opacity-40')
+    expect(footerSource).toContain('authorProfileStore.profile.avatar')
+    expect(footerSource).not.toContain('themeConfig.site.avatar')
   })
 
   it('labels the daily visitor metric accurately in every locale', () => {
     expect(messages('zh').settings['page-views-value']).toBe('累计浏览：')
     expect(messages('ja').settings['page-views-value']).toBe('累計閲覧数：')
-    expect(messages('en').settings['page-views-value']).toBe('Total Page Views: ')
+    expect(messages('en').settings['page-views-value']).toBe(
+      'Total Page Views: '
+    )
     expect(messages('zh').settings['unique_visitor-value']).toBe('今日访客：')
-    expect(messages('ja').settings['unique_visitor-value']).toBe('本日の訪問者：')
+    expect(messages('ja').settings['unique_visitor-value']).toBe(
+      '本日の訪問者：'
+    )
     expect(messages('en').settings['unique_visitor-value']).toBe(
       "Today's Visitors: "
     )

@@ -13,9 +13,11 @@ describe('Logo.vue', () => {
     expect(source).not.toContain('{{ themeConfig.site.author }}')
   })
 
-  it('does not render an image when the backend has not supplied a logo or avatar', () => {
+  it('uses the site logo first and the author profile avatar as fallback', () => {
+    expect(source).toContain('v-if="logoImage"')
     expect(source).toContain(
-      'v-if="themeConfig.site.logo || themeConfig.site.avatar"'
+      'themeConfig.value.site.logo || authorProfileStore.profile.avatar'
     )
+    expect(source).not.toContain('themeConfig.site.avatar')
   })
 })

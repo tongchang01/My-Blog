@@ -154,7 +154,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
@@ -217,17 +217,6 @@ watch(
     }
   }
 )
-
-watch(
-  () => appStore.locale,
-  locale => {
-    void authorProfileStore.load(locale)
-  }
-)
-
-onMounted(() => {
-  void authorProfileStore.load(appStore.locale)
-})
 
 const authorData = computed(() => ({
   avatar: authorProfileStore.profile.avatar,

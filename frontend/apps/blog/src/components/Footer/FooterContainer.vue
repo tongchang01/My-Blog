@@ -6,7 +6,10 @@
       >
         <div class="flex flex-col items-center gap-4 lg:items-start">
           <ul class="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-6">
-            <li v-if="siteStats" class="flex min-w-[10rem] items-center justify-between gap-3">
+            <li
+              v-if="siteStats"
+              class="flex min-w-[10rem] items-center justify-between gap-3"
+            >
               <span>
                 <SvgIcon
                   icon-class="hot"
@@ -19,7 +22,10 @@
                 {{ siteStats.totalPv }}
               </span>
             </li>
-            <li v-if="siteStats" class="flex min-w-[10rem] items-center justify-between gap-3">
+            <li
+              v-if="siteStats"
+              class="flex min-w-[10rem] items-center justify-between gap-3"
+            >
               <span>
                 <SvgIcon
                   icon-class="friends"
@@ -32,7 +38,10 @@
                 {{ siteStats.todayUv }}
               </span>
             </li>
-            <li v-if="runningDays" class="flex min-w-[10rem] items-center justify-between gap-3">
+            <li
+              v-if="runningDays"
+              class="flex min-w-[10rem] items-center justify-between gap-3"
+            >
               <span>
                 <SvgIcon
                   icon-class="date"
@@ -75,9 +84,9 @@
         </div>
         <div class="hidden shrink-0 lg:flex">
           <img
-            v-show="themeConfig.site.avatar"
+            v-show="authorAvatar"
             :class="avatarClass"
-            :src="themeConfig.site.avatar"
+            :src="authorAvatar"
             alt="avatar"
           />
         </div>
@@ -89,6 +98,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { useAppStore } from '@/stores/app'
+import { useAuthorProfileStore } from '@/features/author-profile/store'
 import { useI18n } from 'vue-i18n'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import beianImg from '@/assets/gongan-beian-40-40.png'
@@ -99,6 +109,7 @@ import {
 } from '@/features/stats/api'
 
 const appStore = useAppStore()
+const authorProfileStore = useAuthorProfileStore()
 const { t } = useI18n()
 const siteStats = ref<SiteStatsSummaryDto | null>(null)
 
@@ -120,6 +131,7 @@ const gradientBackground = computed(() => {
   return { background: appStore.themeConfig.theme.header_gradient_css }
 })
 const themeConfig = computed(() => appStore.themeConfig)
+const authorAvatar = computed(() => authorProfileStore.profile.avatar)
 const runningDays = computed(() => {
   if (appStore.themeConfig.site.started_date === '') return undefined
   return getDaysTillNow(`${appStore.themeConfig.site.started_date}`)
