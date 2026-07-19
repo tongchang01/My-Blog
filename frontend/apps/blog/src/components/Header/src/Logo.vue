@@ -46,7 +46,7 @@ const authorProfileStore = useAuthorProfileStore()
 const router = useRouter()
 
 const handleLogoClick = () => {
-  router.push('/')
+  router.push({ name: 'home', params: { lang: appStore.locale } })
 }
 
 const avatarClass = computed(() => {

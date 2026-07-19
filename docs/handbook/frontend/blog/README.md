@@ -10,7 +10,9 @@
 
 ## 当前能力
 
+- 所有公开页面统一使用 `/:lang` 语言前缀；旧的无语言静态地址按已保存语言、浏览器语言、中文默认值依次重定向。
 - `/:lang` 三语首页，包含 PINNED、FEATURED 和普通文章区域。
+- `/:lang/about`、`/:lang/archives`、`/:lang/tags`、`/:lang/categories`、`/:lang/links`、`/:lang/message-board` 静态入口。
 - `/:lang/posts/:id/:slug?` 文章详情；ID 是查询依据，加载后规范化 slug。
 - 分类、标签、归档、标题摘要搜索、关于页、友链页和留言板。
 - 分类与标签复用页面会随完整 URL 刷新查询，并忽略已取消请求的迟到结果。

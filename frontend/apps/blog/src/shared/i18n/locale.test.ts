@@ -14,7 +14,8 @@ describe('locale selection', () => {
     ['zh-CN', 'zh'],
     ['zh-TW', 'zh'],
     ['ja-JP', 'ja'],
-    ['fr-FR', 'en']
+    ['en-US', 'en'],
+    ['fr-FR', 'zh']
   ])('maps %s to %s', (system, expected) => {
     expect(resolveInitialLocale(null, system)).toBe(expected)
   })

@@ -116,17 +116,12 @@ const ballProgress = toRefs(props).scrollProgress
 const handleClick = async (name: string): Promise<void> => {
   if (!isSupportedLocale(name)) return
 
-  if (route.params.lang) {
-    await router.push({
-      name: route.name ?? 'home',
-      params: { ...route.params, lang: name },
-      query: route.query,
-      hash: route.hash
-    })
-  } else {
-    appStore.changeLocale(name)
-    await appStore.fetchConfig()
-  }
+  await router.push({
+    name: route.name ?? 'home',
+    params: { ...route.params, lang: name },
+    query: route.query,
+    hash: route.hash
+  })
 }
 
 const handleOpenMenu = () => {

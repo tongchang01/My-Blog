@@ -163,6 +163,8 @@ import { useNavigatorStore } from '@/stores/navigator'
 import Social from '@/components/Social.vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useAuthorProfileStore } from '@/features/author-profile/store'
+import { localizedPath } from '@/router/localePath'
+import { isExternal } from '@/utils/validate'
 
 const appStore = useAppStore()
 const authorProfileStore = useAuthorProfileStore()
@@ -174,12 +176,10 @@ const blurScreen = ref()
 const pushPage = (path: string): void => {
   if (!path) return
   navigatorStore.toggleMobileMenu()
-  if (path.match(/(http:\/\/|https:\/\/)((\w|=|\?|\.|\/|&|-)+)/g)) {
+  if (isExternal(path)) {
     window.location.href = path
   } else {
-    router.push({
-      path: path
-    })
+    router.push(localizedPath(path, appStore.locale))
   }
 }
 

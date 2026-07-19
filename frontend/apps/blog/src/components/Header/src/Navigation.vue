@@ -51,6 +51,7 @@ import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
 import { isExternal } from '@/utils/validate'
+import { localizedPath } from '@/router/localePath'
 
 const router = useRouter()
 const appStore = useAppStore()
@@ -60,9 +61,7 @@ const pushPage = (path: string): void => {
   if (isExternal(path)) {
     window.location.href = path
   } else {
-    router.push({
-      path: path
-    })
+    router.push(localizedPath(path, appStore.locale))
   }
 }
 

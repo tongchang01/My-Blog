@@ -10,7 +10,8 @@ export const systemLocale = (language: string): SupportedLocale => {
   const normalized = language.toLowerCase()
   if (normalized.startsWith('zh')) return 'zh'
   if (normalized.startsWith('ja')) return 'ja'
-  return 'en'
+  if (normalized.startsWith('en')) return 'en'
+  return 'zh'
 }
 
 export const resolveInitialLocale = (

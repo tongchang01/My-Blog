@@ -56,7 +56,7 @@ Content-Type: application/json
 - `PUBLISHED` 和 `PASSWORD` 文章可以打点。
 - `PRIVATE`、`DRAFT`、`SCHEDULED`、已删除和不存在的文章不写入明细。
 - 非文章页面保存 `articleId = null`，日聚合中统一为非文章口径。
-- about、archives、categories、tags、links 和 message-board 使用当前界面语言打点；重定向与 404 不打点。
+- `/:lang` 下的 about、archives、categories、tags、links 和 message-board 使用路由语言打点；旧地址重定向与 404 不打点。
 - 同一文章 ID 与语言的 canonical slug 规范化不重复增加 PV。
 - 同一 IP 超过进程内限流阈值时返回 `90002 + 429`。
 

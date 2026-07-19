@@ -16,8 +16,7 @@
     "types": [
       "vite/client",
       "node",
-      "vite-plugin-svg-icons/client",
-      "vite-plugin-pages/client"
+      "vite-plugin-svg-icons/client"
     ],
     "paths": {
       "@/*": ["src/*"]

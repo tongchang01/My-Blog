@@ -29,7 +29,7 @@
           <ul class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             <template v-if="isLoading || articles.length === 0">
               <li v-for="n in 12" :key="n">
-                <ArticleCard :data="{}" />
+                <ArticleCard :data="null" />
               </li>
             </template>
             <template v-else>
