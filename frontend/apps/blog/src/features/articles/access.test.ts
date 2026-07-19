@@ -12,7 +12,7 @@ describe('article access session storage', () => {
   it('keeps a valid token only for the current browser session', () => {
     saveArticleAccessToken('1', {
       token: 'article-token',
-      expiresAt: '2026-07-19T10:00:00Z'
+      expiresAt: new Date(Date.now() + 60_000).toISOString()
     })
 
     expect(loadArticleAccessToken('1')).toBe('article-token')
