@@ -24,11 +24,7 @@ export const createDefaultSiteSettings = (): SiteSettingsViewModel => {
     }
   })
   themeConfig.site.subtitle = '代码与生活'
-  themeConfig.site.author = 'TYB'
   themeConfig.site.nick = 'BLOG'
-  themeConfig.site.description = '一个写代码的人，偶尔记下一些想说的话。'
-  // Author avatar is supplied by /api/public/author-profile.
-  themeConfig.site.avatar = ''
   themeConfig.site.language = 'zh'
   themeConfig.site.multi_language = true
   themeConfig.site_meta.favicon = '/favicon.ico'

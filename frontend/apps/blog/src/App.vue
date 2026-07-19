@@ -54,6 +54,7 @@ import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
 import { useLightBoxStore } from '@/stores/lightbox'
 import { useMetaStore } from '@/stores/meta'
+import { useAuthorProfileStore } from '@/features/author-profile/store'
 import { useRoute } from 'vue-router'
 import HeaderMain from '@/components/Header/src/Header.vue'
 import FooterContainer from '@/components/Footer/FooterContainer.vue'
@@ -63,15 +64,14 @@ import defaultCover from '@/assets/default-cover.jpg'
 const SearchModal = defineAsyncComponent(
   () => import('@/components/SearchModal.vue')
 )
-const VueEasyLightbox = defineAsyncComponent(
-  () => import('vue-easy-lightbox')
-)
+const VueEasyLightbox = defineAsyncComponent(() => import('vue-easy-lightbox'))
 
 const appStore = useAppStore()
 const route = useRoute()
 const lightBoxStore = useLightBoxStore()
 const commonStore = useCommonStore()
 const metaStore = useMetaStore()
+const authorProfileStore = useAuthorProfileStore()
 const MOBILE_WITH = 1024 // Using the mobile width by Bootstrap design.
 
 const appWrapperClass = 'app-wrapper'
@@ -88,7 +88,10 @@ const copyLabelDefaults = {
 /** Initializing App config and other setups */
 const initialApp = async () => {
   initResizeEvent()
-  await appStore.fetchConfig().then(() => {
+  await Promise.all([
+    appStore.fetchConfig(),
+    authorProfileStore.load(appStore.locale)
+  ]).then(() => {
     metaStore.addScripts(...appStore.themeConfig.site_meta.cdn.prismjs)
     // Change the favicon dynamically.
     if (
@@ -113,7 +116,7 @@ const copyAttribution = () => {
   const authorLabel = configuredLabels.author[configLocale] || labels.author
   const linkLabel = configuredLabels.link[configLocale] || labels.link
 
-  return `\n\n---------------------------------\n${authorLabel}: ${appStore.themeConfig.site.author}\n${linkLabel}: ${document.location.href}`
+  return `\n\n---------------------------------\n${authorLabel}: ${authorProfileStore.profile.name}\n${linkLabel}: ${document.location.href}`
 }
 
 const copyEventHandler = (event: ClipboardEvent) => {
@@ -177,6 +180,13 @@ watch(
   () => appStore.appLoading,
   newState => {
     loadingBarClass.value['nprogress-custom-parent'] = newState
+  }
+)
+
+watch(
+  () => appStore.locale,
+  locale => {
+    void authorProfileStore.load(locale)
   }
 )
 

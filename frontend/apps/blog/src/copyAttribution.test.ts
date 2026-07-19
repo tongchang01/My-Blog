@@ -12,6 +12,8 @@ describe('copy attribution', () => {
     expect(appSource).toContain("zh: { author: '作者', link: '原文链接' }")
     expect(appSource).toContain("ja: { author: '著者', link: '元リンク' }")
     expect(appSource).toContain("en: { author: 'Author', link: 'Source' }")
+    expect(appSource).toContain('authorProfileStore.profile.name')
+    expect(appSource).not.toContain('themeConfig.site.author')
     expect(appSource).not.toContain('licensePlaceholder')
   })
 })

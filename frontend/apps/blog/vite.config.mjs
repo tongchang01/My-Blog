@@ -1,7 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
-import Pages from 'vite-plugin-pages'
 import path from 'path'
 
 // https://vitejs.dev/config/
@@ -59,8 +58,7 @@ export default ({ mode }) => {
         symbolId: 'icon-[dir]-[name]',
         customDomId: '__svg__icons__dom__'
       }),
-      vue(),
-      Pages({})
+      vue()
     ],
     resolve: {
       alias: {

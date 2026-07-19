@@ -12,9 +12,10 @@ const appSource = readFileSync(
 )
 
 describe('language switching', () => {
-  it('keeps static pages in place while changing their locale', () => {
-    expect(controlsSource).toContain('appStore.changeLocale(name)')
-    expect(controlsSource).toContain('await appStore.fetchConfig()')
+  it('changes every page through its localized route', () => {
+    expect(controlsSource).toContain('params: { ...route.params, lang: name }')
+    expect(controlsSource).not.toContain('appStore.changeLocale(name)')
+    expect(controlsSource).not.toContain('await appStore.fetchConfig()')
     expect(controlsSource).not.toContain(
       "await router.push({ name: 'home', params: { lang: name } })"
     )

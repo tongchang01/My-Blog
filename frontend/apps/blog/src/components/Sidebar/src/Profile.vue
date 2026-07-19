@@ -84,7 +84,7 @@
 
 <script setup lang="ts">
 import { useAppStore } from '@/stores/app'
-import { computed, onMounted, watch } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import Social from '@/components/Social.vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
@@ -102,17 +102,6 @@ defineProps({
 const appStore = useAppStore()
 const authorProfileStore = useAuthorProfileStore()
 const { t } = useI18n()
-
-watch(
-  () => appStore.locale,
-  locale => {
-    void authorProfileStore.load(locale)
-  }
-)
-
-onMounted(() => {
-  void authorProfileStore.load(appStore.locale)
-})
 
 const authorData = computed(() => ({
   avatar: authorProfileStore.profile.avatar,

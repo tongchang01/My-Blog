@@ -64,15 +64,12 @@ import { useRoute, useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import type { ArticleCardViewModel } from '@/features/articles/model'
-import type { Post } from '@/models/Post.class'
 
-type LegacyPost = Partial<Post>
-type CompatibleArticle = ArticleCardViewModel & { legacy: boolean }
 type HomepageBadge = 'pinned' | 'featured'
 
 const props = defineProps({
   data: {
-    type: Object as PropType<ArticleCardViewModel | LegacyPost | null>,
+    type: Object as PropType<ArticleCardViewModel | null>,
     default: null
   },
   badge: {
@@ -85,40 +82,10 @@ const router = useRouter()
 const route = useRoute()
 const appStore = useAppStore()
 const { t } = useI18n()
-const article = computed<CompatibleArticle | null>(() => {
-  if (!props.data) return null
-  if ('id' in props.data) return { ...props.data, legacy: false }
-
-  const category = props.data.categories?.[0]
-  return {
-    id: props.data.uid ?? props.data.slug ?? '',
-    slug: props.data.slug ?? '',
-    title: props.data.title ?? '',
-    summary: props.data.text ?? '',
-    coverUrl: props.data.cover || null,
-    category: category ? { id: category.slug, name: category.name } : null,
-    tags: (props.data.tags ?? []).map(tag => ({
-      id: tag.slug,
-      name: tag.name,
-      slug: tag.slug
-    })),
-    publishedAt: props.data.date
-      ? `${props.data.date.year}-${props.data.date.day}`
-      : '',
-    locked: false,
-    commentCount: 0,
-    legacy: true
-  }
-})
+const article = computed(() => props.data)
 
 const navigateToArticle = () => {
   if (!article.value) return
-  if (article.value.legacy) {
-    if (article.value.slug) {
-      router.push({ name: 'post-slug', params: { slug: article.value.slug } })
-    }
-    return
-  }
   router.push({
     name: 'article-detail',
     params: {

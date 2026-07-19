@@ -8,9 +8,6 @@ import {
 vi.mock('@/features/stats/api', () => ({
   recordPageView: vi.fn()
 }))
-vi.mock('@/stores/app', () => ({
-  useAppStore: () => ({ locale: 'ja' })
-}))
 
 const mockedRecordPageView = vi.mocked(recordPageView)
 
@@ -37,13 +34,13 @@ describe('page view tracking', () => {
     ).toEqual({ lang: 'zh' })
   })
 
-  it('uses the active locale for public static pages', () => {
+  it('requires public static pages to carry their locale', () => {
     expect(
-      resolvePageViewPayload(
-        { name: 'about', params: {} } as never,
-        'ja'
-      )
+      resolvePageViewPayload({ name: 'about', params: { lang: 'ja' } } as never)
     ).toEqual({ lang: 'ja' })
+    expect(
+      resolvePageViewPayload({ name: 'about', params: {} } as never)
+    ).toBeNull()
   })
 
   it('ignores routes without supported languages', () => {
@@ -51,6 +48,12 @@ describe('page view tracking', () => {
       resolvePageViewPayload({
         name: 'legacy',
         params: {}
+      } as never)
+    ).toBeNull()
+    expect(
+      resolvePageViewPayload({
+        name: 'not-found',
+        params: { lang: 'zh', pathMatch: ['missing'] }
       } as never)
     ).toBeNull()
   })
@@ -72,9 +75,7 @@ describe('page view tracking', () => {
 
   it('does not record canonical slug replacement twice', () => {
     mockedRecordPageView.mockResolvedValue(undefined as never)
-    let hook:
-      | ((to: unknown, from: unknown) => void)
-      | undefined
+    let hook: ((to: unknown, from: unknown) => void) | undefined
     installPageViewTracking({
       afterEach: vi.fn(callback => {
         hook = callback as (to: unknown, from: unknown) => void

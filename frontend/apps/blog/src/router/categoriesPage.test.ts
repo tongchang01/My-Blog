@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url'
 const currentDir = dirname(fileURLToPath(import.meta.url))
 
 describe('categories page', () => {
-  it('provides a generated /categories page backed by the taxonomy store', () => {
+  it('provides a localized categories page backed by the taxonomy store', () => {
     const page = resolve(currentDir, '../pages/categories.vue')
 
     expect(existsSync(page)).toBe(true)

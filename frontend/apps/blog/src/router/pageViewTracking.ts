@@ -1,37 +1,23 @@
 import type { Router, RouteLocationNormalizedLoaded } from 'vue-router'
 import { recordPageView } from '@/features/stats/api'
 import type { SupportedLocale } from '@/shared/i18n/locale'
-import { useAppStore } from '@/stores/app'
 
 const supportedLocales = new Set(['zh', 'ja', 'en'])
-const publicStaticPages = new Set([
-  'about',
-  'archives',
-  'categories',
-  'links',
-  'message-board',
-  'tags'
-])
 
 export const resolvePageViewPayload = (
-  route: Pick<RouteLocationNormalizedLoaded, 'name' | 'params'>,
-  fallbackLang?: unknown
+  route: Pick<RouteLocationNormalizedLoaded, 'name' | 'params'>
 ) => {
+  if (route.name === 'not-found') return null
   const routeLang = String(route.params.lang ?? '')
-  const lang = supportedLocales.has(routeLang)
-    ? routeLang
-    : publicStaticPages.has(String(route.name))
-      ? String(fallbackLang ?? '')
-      : ''
-  if (!supportedLocales.has(lang)) return null
+  if (!supportedLocales.has(routeLang)) return null
 
   if (route.name === 'article-detail') {
     const articleId = Number(route.params.id)
     if (!Number.isSafeInteger(articleId) || articleId <= 0) return null
-    return { articleId, lang: lang as SupportedLocale }
+    return { articleId, lang: routeLang as SupportedLocale }
   }
 
-  return { lang: lang as SupportedLocale }
+  return { lang: routeLang as SupportedLocale }
 }
 
 export const installPageViewTracking = (router: Router): void => {
@@ -44,7 +30,7 @@ export const installPageViewTracking = (router: Router): void => {
     ) {
       return
     }
-    const payload = resolvePageViewPayload(to, useAppStore().locale)
+    const payload = resolvePageViewPayload(to)
     if (!payload) return
     void recordPageView(payload).catch(() => undefined)
   })
