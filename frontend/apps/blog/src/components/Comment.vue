@@ -8,14 +8,20 @@
     />
 
     <div v-if="!effectiveEnabled" class="comment-state">
-      当前文章暂不开放评论
+      {{ t('comments.disabled') }}
     </div>
     <template v-else>
       <form class="comment-form" @submit.prevent="handleSubmit">
         <div v-if="commentStore.replyTarget" class="comment-reply-target">
-          <span>回复 {{ commentStore.replyTarget.authorNickname }}</span>
+          <span>
+            {{
+              t('comments.replying-to', {
+                name: commentStore.replyTarget.authorNickname
+              })
+            }}
+          </span>
           <button type="button" @click="commentStore.clearReplyTarget()">
-            取消
+            {{ t('comments.cancel') }}
           </button>
         </div>
 
@@ -24,38 +30,38 @@
           class="comment-editor"
           rows="5"
           required
-          placeholder="写下你的评论"
+          :placeholder="t('comments.content-placeholder')"
         />
         <div class="comment-meta-inputs">
           <input
             v-model="form.nickname"
             class="comment-input"
             required
-            placeholder="昵称"
+            :placeholder="t('comments.nickname')"
           />
           <input
             v-model="form.email"
             class="comment-input"
             required
             type="email"
-            placeholder="邮箱"
+            :placeholder="t('comments.email')"
           />
           <input
             v-model="form.site"
             class="comment-input"
             type="url"
-            placeholder="网站，可选"
+            :placeholder="t('comments.website')"
           />
         </div>
         <div class="comment-form-footer">
           <p v-if="commentStore.notice" class="comment-notice">
-            {{ commentStore.notice }}
+            {{ t(commentStore.notice) }}
           </p>
           <p v-else-if="commentStore.error" class="comment-error">
-            {{ commentStore.error.message }}
+            {{ t('comments.error') }}
           </p>
           <button class="comment-submit" :disabled="submitting">
-            {{ submitting ? '提交中...' : '提交评论' }}
+            {{ submitting ? t('comments.submitting') : t('comments.submit') }}
           </button>
         </div>
       </form>
@@ -69,7 +75,7 @@
         <ob-skeleton tag="div" :count="4" height="16px" width="100%" />
       </div>
       <div v-else-if="commentStore.status === 'empty'" class="comment-state">
-        暂无评论
+        {{ t('comments.empty') }}
       </div>
       <div v-else class="comment-list">
         <article
@@ -100,7 +106,7 @@
                 type="button"
                 @click="replyTo(comment.id, comment.authorNickname)"
               >
-                回复
+                {{ t('comments.reply') }}
               </button>
             </div>
           </div>
@@ -131,7 +137,11 @@
                   <time>{{ reply.createdAt }}</time>
                 </div>
                 <p v-if="reply.replyToNickname" class="comment-reply-to">
-                  回复 {{ reply.replyToNickname }}
+                  {{
+                    t('comments.reply-to', {
+                      name: reply.replyToNickname
+                    })
+                  }}
                 </p>
                 <div class="comment-content" v-html="reply.contentHtml"></div>
                 <button
@@ -139,7 +149,7 @@
                   type="button"
                   @click="replyTo(reply.id, reply.authorNickname)"
                 >
-                  回复
+                  {{ t('comments.reply') }}
                 </button>
               </div>
             </article>
@@ -153,7 +163,7 @@
           :disabled="commentStore.page.page <= 1"
           @click="loadPage(commentStore.page.page - 1)"
         >
-          上一页
+          {{ t('comments.previous') }}
         </button>
         <span
           >{{ commentStore.page.page }} / {{ commentStore.page.pages }}</span
@@ -163,7 +173,7 @@
           :disabled="commentStore.page.page >= commentStore.page.pages"
           @click="loadPage(commentStore.page.page + 1)"
         >
-          下一页
+          {{ t('comments.next') }}
         </button>
       </div>
     </template>
@@ -172,6 +182,7 @@
 
 <script setup lang="ts">
 import { computed, reactive, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { MainTitle } from '@/components/Title'
 import { useAppStore } from '@/stores/app'
 import { useCommentStore } from '@/features/comments/store'
@@ -201,6 +212,7 @@ const props = withDefaults(
 
 const appStore = useAppStore()
 const commentStore = useCommentStore()
+const { t } = useI18n()
 const form = reactive<CommentFormState>({
   nickname: '',
   email: '',
@@ -245,14 +257,20 @@ const flattenReplies = (comment: CommentViewModel): CommentViewModel[] =>
   comment.replies.flatMap(reply => [reply, ...flattenReplies(reply)])
 
 watch(
-  () => [props.articleId, props.enabled, props.articleAccessToken] as const,
-  ([articleId, enabled, articleAccessToken]) => {
+  () =>
+    [
+      props.articleId,
+      props.enabled,
+      props.articleAccessToken,
+      appStore.locale
+    ] as const,
+  ([articleId, enabled, articleAccessToken, locale]) => {
     if (enabled && (props.guestbook || articleId)) {
       void commentStore.load({
         articleId,
         page: 1,
         size: commentStore.page.size,
-        locale: appStore.locale,
+        locale,
         guestbook: props.guestbook,
         articleAccessToken
       })

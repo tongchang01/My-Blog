@@ -22,6 +22,25 @@
     "comment": "评论区",
     "recent_comment": "最近评论"
   },
+  "comments": {
+    "disabled": "当前文章暂不开放评论",
+    "replying-to": "回复 {name}",
+    "cancel": "取消",
+    "content-placeholder": "写下你的评论",
+    "nickname": "昵称",
+    "email": "邮箱",
+    "website": "网站，可选",
+    "submitting": "提交中...",
+    "submit": "提交评论",
+    "error": "操作失败，请稍后重试",
+    "empty": "暂无评论",
+    "reply-to": "回复 {name}",
+    "reply": "回复",
+    "previous": "上一页",
+    "next": "下一页",
+    "published": "评论已发布",
+    "pending": "评论已提交，等待审核"
+  },
   "settings": {
     "months": [
       "一月",

@@ -1,9 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import {
-  createArticleComment,
-  loadArticleComments
-} from './api'
+import { createArticleComment, loadArticleComments } from './api'
 import { useCommentStore } from './store'
 
 vi.mock('./api', () => ({
@@ -125,7 +122,7 @@ describe('comment store', () => {
       contentMd: 'reply',
       replyToCommentId: '9007199254740993'
     })
-    expect(store.notice).toBe('评论已发布')
+    expect(store.notice).toBe('comments.published')
     expect(store.replyTarget).toBeNull()
     expect(mockedLoad).toHaveBeenCalledWith({
       articleId: '9007199254740993',
@@ -149,7 +146,7 @@ describe('comment store', () => {
       contentMd: 'pending'
     })
 
-    expect(store.notice).toBe('评论已提交，等待审核')
+    expect(store.notice).toBe('comments.pending')
     expect(mockedLoad).not.toHaveBeenCalled()
   })
 })

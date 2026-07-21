@@ -22,6 +22,25 @@
     "comment": "Comments",
     "recent_comment": "Recent Comments"
   },
+  "comments": {
+    "disabled": "Comments are closed for this article.",
+    "replying-to": "Replying to {name}",
+    "cancel": "Cancel",
+    "content-placeholder": "Write a comment",
+    "nickname": "Nickname",
+    "email": "Email",
+    "website": "Website (optional)",
+    "submitting": "Submitting...",
+    "submit": "Post comment",
+    "error": "Something went wrong. Please try again.",
+    "empty": "No comments yet.",
+    "reply-to": "Replying to {name}",
+    "reply": "Reply",
+    "previous": "Previous",
+    "next": "Next",
+    "published": "Comment published.",
+    "pending": "Comment submitted for review."
+  },
   "settings": {
     "months": [
       "Jan",
