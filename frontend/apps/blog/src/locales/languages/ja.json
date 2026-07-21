@@ -22,6 +22,25 @@
     "comment": "コメント",
     "recent_comment": "最近のコメント"
   },
+  "comments": {
+    "disabled": "この記事ではコメントを受け付けていません",
+    "replying-to": "{name} さんに返信",
+    "cancel": "キャンセル",
+    "content-placeholder": "コメントを書く",
+    "nickname": "ニックネーム",
+    "email": "メールアドレス",
+    "website": "ウェブサイト（任意）",
+    "submitting": "送信中...",
+    "submit": "コメントを送信",
+    "error": "操作に失敗しました。しばらくしてからもう一度お試しください。",
+    "empty": "コメントはまだありません",
+    "reply-to": "{name} さんに返信",
+    "reply": "返信",
+    "previous": "前へ",
+    "next": "次へ",
+    "published": "コメントを公開しました",
+    "pending": "コメントを送信しました。承認をお待ちください"
+  },
   "settings": {
     "months": [
       "1月",

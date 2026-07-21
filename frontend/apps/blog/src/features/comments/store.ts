@@ -27,6 +27,8 @@ interface CommentQuery extends Omit<LoadArticleCommentsParams, 'signal'> {
   guestbook?: boolean
 }
 
+type CommentNoticeKey = 'comments.published' | 'comments.pending'
+
 const DEFAULT_SIZE = 20
 
 const emptyPage = (): CommentPageViewModel => ({
@@ -47,7 +49,7 @@ export const useCommentStore = defineStore('public-comments', () => {
   const status = ref<CommentListStatus>('idle')
   const error = ref<ApiError | null>(null)
   const replyTarget = ref<ReplyTarget | null>(null)
-  const notice = ref<string | null>(null)
+  const notice = ref<CommentNoticeKey | null>(null)
   let activeRequest: AbortController | null = null
   let lastQuery: CommentQuery | null = null
 
@@ -125,7 +127,7 @@ export const useCommentStore = defineStore('public-comments', () => {
       replyTarget.value = null
 
       if (result.auditStatus === 'PASS') {
-        notice.value = '评论已发布'
+        notice.value = 'comments.published'
         await load({
           articleId: articleId ?? '',
           page: 1,
@@ -135,7 +137,7 @@ export const useCommentStore = defineStore('public-comments', () => {
           articleAccessToken: lastQuery?.articleAccessToken
         })
       } else {
-        notice.value = '评论已提交，等待审核'
+        notice.value = 'comments.pending'
         status.value = comments.value.length === 0 ? 'empty' : 'ready'
       }
     } catch (cause) {
