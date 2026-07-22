@@ -1,5 +1,11 @@
 <template>
-  <div class="toggler" @click="changeStatus">
+  <button
+    type="button"
+    class="toggler"
+    :aria-label="label"
+    :aria-pressed="toggleStatus"
+    @click="changeStatus"
+  >
     <div class="toggle-track"></div>
     <div
       class="slider"
@@ -10,14 +16,15 @@
     >
       <slot />
     </div>
-  </div>
+  </button>
 </template>
 
 <script setup lang="ts">
-import { onMounted, reactive, toRefs } from 'vue'
+import { onMounted, reactive, ref, toRefs } from 'vue'
 
 const props = defineProps<{
   status?: boolean
+  label: string
 }>()
 
 const emit = defineEmits<{
@@ -34,25 +41,25 @@ const toggleStyle = reactive({
   transform: '',
   background: '#6e40c9'
 })
-let toggleStatus = status.value
+const toggleStatus = ref(Boolean(status.value))
 
 const changeStatus = () => {
-  toggleStatus = !toggleStatus
+  toggleStatus.value = !toggleStatus.value
   changeTransform()
-  emit('changeStatus', toggleStatus)
+  emit('changeStatus', toggleStatus.value)
 }
 
 const changeTransform = () => {
-  const transform = toggleStatus ? '18px' : '0'
+  const transform = toggleStatus.value ? '18px' : '0'
   toggleStyle.transform = `translateX(${transform})`
-  const backgroundColor = toggleStatus ? '#6e40c9' : '#100E16'
+  const backgroundColor = toggleStatus.value ? '#6e40c9' : '#100E16'
   toggleStyle.background = backgroundColor
 }
 </script>
 
 <style lang="scss" scoped>
 .toggler {
-  @apply relative;
+  @apply appearance-none relative p-0 cursor-pointer;
   width: 40px;
   height: 22px;
   background-color: var(--background-primary);

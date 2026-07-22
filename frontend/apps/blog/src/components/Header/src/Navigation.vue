@@ -6,37 +6,52 @@
         v-for="route in routes"
         :key="route.path"
       >
-        <div
+        <a
+          v-if="
+            route.children &&
+            route.children.length === 0 &&
+            isExternal(route.path)
+          "
           class="nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase cursor-pointer"
-          @click="pushPage(route.path)"
-          v-if="route.children && route.children.length === 0"
+          :href="route.path"
           :data-menu="route.name"
         >
-          <span class="relative z-50" v-if="locale">
-            {{ route.i18n[locale] }}
+          <span class="relative z-50">
+            {{ locale ? route.i18n[locale] : route.name }}
           </span>
-          <span class="relative z-50" v-else>{{ route.name }}</span>
-        </div>
+        </a>
+        <RouterLink
+          v-else-if="route.children && route.children.length === 0"
+          class="nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase cursor-pointer"
+          :to="localizedPath(route.path, appStore.locale)"
+          :data-menu="route.name"
+        >
+          <span class="relative z-50">
+            {{ locale ? route.i18n[locale] : route.name }}
+          </span>
+        </RouterLink>
         <Dropdown
-          @command="pushPage"
           hover
           v-else
           class="nav-link text-sm block px-1.5 py-0.5 rounded-md relative uppercase"
         >
-          <span class="relative z-50" v-if="locale">
-            {{ route.i18n[locale] }}
-          </span>
-          <span class="relative z-50" v-else>{{ route.name }}</span>
+          <button type="button" class="nav-trigger relative z-50">
+            {{ locale ? route.i18n[locale] : route.name }}
+          </button>
           <DropdownMenu>
             <DropdownItem
               v-for="sub in route.children"
               :key="sub.path"
-              :name="sub.path"
+              :href="isExternal(sub.path) ? sub.path : undefined"
+              :to="
+                isExternal(sub.path)
+                  ? undefined
+                  : localizedPath(sub.path, appStore.locale)
+              "
             >
-              <span class="relative z-50" v-if="locale">
-                {{ sub.i18n[locale] }}
+              <span class="relative z-50">
+                {{ locale ? sub.i18n[locale] : sub.name }}
               </span>
-              <span class="relative z-50" v-else>{{ sub.name }}</span>
             </DropdownItem>
           </DropdownMenu>
         </Dropdown>
@@ -47,23 +62,12 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
 import { isExternal } from '@/utils/validate'
 import { localizedPath } from '@/router/localePath'
 
-const router = useRouter()
 const appStore = useAppStore()
-
-const pushPage = (path: string): void => {
-  if (!path) return
-  if (isExternal(path)) {
-    window.location.href = path
-  } else {
-    router.push(localizedPath(path, appStore.locale))
-  }
-}
 
 const locale = computed(() => appStore.locale)
 const routes = computed(() => appStore.themeConfig.menu.menus)
@@ -71,7 +75,7 @@ const routes = computed(() => appStore.themeConfig.menu.menus)
 
 <style lang="scss">
 .nav-link {
-  @apply hover:text-white font-extrabold;
+  @apply hover:text-white hover:opacity-100 font-extrabold;
   &:hover {
     &:before {
       @apply opacity-60 bg-gray-800;
@@ -85,6 +89,11 @@ const routes = computed(() => appStore.themeConfig.menu.menus)
     width: calc(100% + 8px);
     height: calc(100% + 8px);
   }
+}
+
+.nav-trigger {
+  @apply appearance-none border-0 bg-transparent p-0 text-inherit cursor-pointer;
+  font: inherit;
 }
 
 .header-active {

@@ -1,7 +1,8 @@
 <template>
-  <div
-    class="header-logo flex items-center self-stretch relative cursor-pointer hover:scale-110 transition-transform transform-gpu duration-500"
-    @click="handleLogoClick"
+  <RouterLink
+    :to="{ name: 'home', params: { lang: appStore.locale } }"
+    class="header-logo flex items-center self-stretch relative cursor-pointer hover:scale-110 hover:opacity-100 transition-transform transform-gpu duration-500"
+    :aria-label="t('settings.tips-back-to-home')"
   >
     <span class="flex mr-3">
       <img
@@ -32,22 +33,18 @@
         {{ appStore.siteSubtitle || 'BLOG' }}
       </span>
     </div>
-  </div>
+  </RouterLink>
 </template>
 
 <script setup lang="ts">
 import { useAppStore } from '@/stores/app'
 import { useAuthorProfileStore } from '@/features/author-profile/store'
 import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 
 const appStore = useAppStore()
 const authorProfileStore = useAuthorProfileStore()
-const router = useRouter()
-
-const handleLogoClick = () => {
-  router.push({ name: 'home', params: { lang: appStore.locale } })
-}
+const { t } = useI18n()
 
 const avatarClass = computed(() => {
   return {

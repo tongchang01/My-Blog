@@ -1,7 +1,6 @@
 <template>
   <div
     class="header-controls ml-auto top-0 right-0 flex flex-row items-center text-white"
-    tabindex="0"
   >
     <div :class="leftControlClasses">
       <Dropdown
@@ -9,9 +8,11 @@
         @command="handleClick"
         :value="currentLocale"
       >
-        <span
-          class="icon-control flex items-center text-invert"
+        <button
+          type="button"
+          class="control-button icon-control flex items-center text-invert"
           data-dia="language"
+          :aria-label="t('settings.tips-change-language')"
         >
           <SvgIcon
             icon-class="translate"
@@ -23,7 +24,7 @@
           <span v-if="$i18n.locale == 'zh'">CN</span>
           <span v-if="$i18n.locale == 'ja'">JP</span>
           <span v-if="$i18n.locale == 'en'">En</span>
-        </span>
+        </button>
         <DropdownMenu>
           <DropdownItem name="en" :active="currentLocale === 'en'">
             English
@@ -39,7 +40,14 @@
     </div>
 
     <div class="right-control">
-      <div :class="progressBallClasses" @click="handleBackToTop">
+      <button
+        type="button"
+        :class="progressBallClasses"
+        :tabindex="ballProgress > 0 ? 0 : -1"
+        :aria-hidden="ballProgress === 0"
+        :aria-label="t('settings.tips-back-to-top')"
+        @click="handleBackToTop"
+      >
         <span>
           <SvgIcon
             icon-class="back-to-top"
@@ -49,11 +57,13 @@
           />
         </span>
         {{ scrollProgress }}
-      </div>
+      </button>
 
-      <span
-        class="icon-control flex items-center text-invert"
+      <button
+        type="button"
+        class="control-button icon-control flex items-center text-invert"
         data-dia="search"
+        :aria-label="t('settings.tips-open-search')"
         @click="handleSearchOpen"
       >
         <SvgIcon
@@ -63,7 +73,7 @@
           width="1.2rem"
           height="1.2rem"
         />
-      </span>
+      </button>
 
       <span
         no-hover-effect
@@ -73,9 +83,11 @@
         <ThemeToggle />
       </span>
 
-      <span
-        class="icon-control flex lg:hidden items-center"
+      <button
+        type="button"
+        class="control-button icon-control flex lg:hidden items-center"
         data-dia="menu"
+        :aria-label="t('settings.tips-open-menu')"
         @click="handleOpenMenu()"
       >
         <SvgIcon
@@ -85,7 +97,7 @@
           width="1.2rem"
           height="1.2rem"
         />
-      </span>
+      </button>
     </div>
   </div>
 </template>
@@ -99,6 +111,7 @@ import SvgIcon from '@/components/SvgIcon/index.vue'
 import { useNavigatorStore } from '@/stores/navigator'
 import { useRoute, useRouter } from 'vue-router'
 import { isSupportedLocale } from '@/shared/i18n/locale'
+import { useI18n } from 'vue-i18n'
 
 const props = defineProps({
   scrollProgress: {
@@ -111,6 +124,7 @@ const appStore = useAppStore()
 const navigatorStore = useNavigatorStore()
 const route = useRoute()
 const router = useRouter()
+const { t } = useI18n()
 const ballProgress = toRefs(props).scrollProgress
 
 const handleClick = async (name: string): Promise<void> => {
@@ -156,8 +170,18 @@ const enableMultiLanguage = computed(
 
 <style lang="scss" scoped>
 .header-controls {
+  .control-button {
+    @apply appearance-none border-0 bg-transparent text-inherit cursor-pointer;
+    font: inherit;
+    padding: 0 0.5rem 0 0;
+
+    .svg-icon {
+      margin-right: 0.5rem;
+    }
+  }
+
   .progress-ball {
-    @apply flex flex-col justify-center items-center bg-ob-bright text-ob-invert h-6 w-6 rounded-full mr-4 scale-0 transform-gpu text-xs cursor-pointer overflow-hidden;
+    @apply appearance-none border-0 flex flex-col justify-center items-center bg-ob-bright text-ob-invert h-6 w-6 rounded-full mr-4 scale-0 transform-gpu text-xs cursor-pointer overflow-hidden;
     transition: 0.3s transform ease;
     &:hover span {
       @apply mt-6 opacity-100;

@@ -234,7 +234,12 @@ body {
   background: var(--background-primary-alt);
 }
 
-*:focus {
+*:focus-visible {
+  outline: 2px solid var(--text-accent);
+  outline-offset: 3px;
+}
+
+#App-Container:focus-visible {
   outline: none;
 }
 

@@ -9,6 +9,9 @@
     @keydown.enter.stop.prevent="handleEnterDown"
     @click.self="handleStatusChange(false)"
     tabindex="-1"
+    role="dialog"
+    aria-modal="true"
+    :aria-label="t('settings.tips-open-search')"
   >
     <transition name="fade-bounce-pure-y" mode="out-in">
       <div
@@ -55,6 +58,7 @@
               ref="searchInput"
               class="search-input"
               autocomplete="off"
+              :aria-label="t('settings.tips-open-search')"
               v-model="keyword"
               @input="searchKeyword"
             />
@@ -62,7 +66,8 @@
               v-show="keyword.length > 0"
               class="search-btn"
               type="reset"
-              title="Clear the query"
+              :title="t('settings.clear-search')"
+              :aria-label="t('settings.clear-search')"
               @click="handleResetInput"
             >
               <svg width="20" height="20" viewBox="0 0 20 20">
@@ -100,7 +105,10 @@
                   }"
                   :id="'search-hit-item-' + index"
                 >
-                  <a href="javascript:void(0)" @click="handleLinkClick(result)">
+                  <RouterLink
+                    :to="articleTarget(result)"
+                    @click="rememberSearchResult(result)"
+                  >
                     <div class="search-hit-container">
                       <div class="search-hit-icon">
                         <svg width="20" height="20" viewBox="0 0 20 20">
@@ -139,7 +147,7 @@
                         </svg>
                       </div>
                     </div>
-                  </a>
+                  </RouterLink>
                 </li>
               </ul>
             </section>
@@ -157,7 +165,10 @@
                   }"
                   :id="'search-hit-item-' + index"
                 >
-                  <a href="javascript:void(0)" @click="handleLinkClick(result)">
+                  <RouterLink
+                    :to="articleTarget(result)"
+                    @click="rememberSearchResult(result)"
+                  >
                     <div class="search-hit-container">
                       <div class="search-hit-icon">
                         <svg width="20" height="20" viewBox="0 0 20 20">
@@ -196,7 +207,7 @@
                         </svg>
                       </div>
                     </div>
-                  </a>
+                  </RouterLink>
                 </li>
               </ul>
             </section>
@@ -333,19 +344,26 @@ const handleStatusChange = (status: boolean) => {
 }
 
 const handleLinkClick = (result: SearchResultType) => {
+  rememberSearchResult(result)
+  if (!result.id) return
+  router.push(articleTarget(result))
+}
+
+const rememberSearchResult = (result: SearchResultType) => {
   handleStatusChange(false)
   if (!result.id) return
   searchStore.addRecentSearch(result)
   reloadRecentResult()
-  router.push({
-    name: 'article-detail',
-    params: {
-      lang: appStore.locale,
-      id: result.id,
-      slug: result.slug
-    }
-  })
 }
+
+const articleTarget = (result: SearchResultType) => ({
+  name: 'article-detail',
+  params: {
+    lang: appStore.locale,
+    id: result.id,
+    slug: result.slug
+  }
+})
 
 const handleResetInput = () => {
   keyword.value = ''
