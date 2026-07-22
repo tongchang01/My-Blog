@@ -234,8 +234,9 @@ body {
   background: var(--background-primary-alt);
 }
 
-*:focus {
-  outline: none;
+*:focus-visible {
+  outline: 2px solid var(--text-accent);
+  outline-offset: 3px;
 }
 
 #app {

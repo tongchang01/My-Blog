@@ -1,5 +1,9 @@
 <template>
-  <div class="article-container" @click="navigateToArticle">
+  <component
+    :is="article ? RouterLink : 'div'"
+    :to="articleTarget"
+    class="article-container"
+  >
     <div class="article">
       <div class="article-thumbnail">
         <img v-if="article?.coverUrl" v-lazy="article.coverUrl" alt="" />
@@ -54,13 +58,13 @@
         </div>
       </div>
     </div>
-  </div>
+  </component>
 </template>
 
 <script setup lang="ts">
 import { computed, type PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import SvgIcon from '@/components/SvgIcon/index.vue'
 import type { ArticleCardViewModel } from '@/features/articles/model'
@@ -78,23 +82,23 @@ const props = defineProps({
   }
 })
 
-const router = useRouter()
 const route = useRoute()
 const appStore = useAppStore()
 const { t } = useI18n()
 const article = computed(() => props.data)
 
-const navigateToArticle = () => {
-  if (!article.value) return
-  router.push({
-    name: 'article-detail',
-    params: {
-      lang: route.params.lang ?? appStore.locale,
-      id: article.value.id,
-      slug: article.value.slug
-    }
-  })
-}
+const articleTarget = computed(() =>
+  article.value
+    ? {
+        name: 'article-detail',
+        params: {
+          lang: route.params.lang ?? appStore.locale,
+          id: article.value.id,
+          slug: article.value.slug
+        }
+      }
+    : undefined
+)
 
 const gradientBackground = computed(() => ({
   background: appStore.themeConfig.theme.header_gradient_css

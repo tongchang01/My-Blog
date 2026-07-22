@@ -1,5 +1,9 @@
 <template>
-  <div class="article-container" @click="navigateToArticle">
+  <component
+    :is="article ? RouterLink : 'div'"
+    :to="articleTarget"
+    class="article-container"
+  >
     <div class="feature-article">
       <div class="feature-thumbnail">
         <img
@@ -55,13 +59,13 @@
         </div>
       </div>
     </div>
-  </div>
+  </component>
 </template>
 
 <script setup lang="ts">
 import { computed, type PropType } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useRoute, useRouter } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
 import SvgIcon from '@/components/SvgIcon/index.vue'
@@ -80,7 +84,6 @@ const props = defineProps({
   }
 })
 
-const router = useRouter()
 const route = useRoute()
 const appStore = useAppStore()
 const commonStore = useCommonStore()
@@ -90,17 +93,18 @@ const visibleTags = computed(
   () => article.value?.tags.slice(0, commonStore.isMobile ? 2 : 5) ?? []
 )
 
-const navigateToArticle = () => {
-  if (!article.value) return
-  router.push({
-    name: 'article-detail',
-    params: {
-      lang: route.params.lang ?? appStore.locale,
-      id: article.value.id,
-      slug: article.value.slug
-    }
-  })
-}
+const articleTarget = computed(() =>
+  article.value
+    ? {
+        name: 'article-detail',
+        params: {
+          lang: route.params.lang ?? appStore.locale,
+          id: article.value.id,
+          slug: article.value.slug
+        }
+      }
+    : undefined
+)
 
 const bannerHoverGradient = computed(() => ({
   background: appStore.themeConfig.theme.header_gradient_css

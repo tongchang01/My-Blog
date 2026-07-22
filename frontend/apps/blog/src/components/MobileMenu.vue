@@ -69,80 +69,52 @@
           v-for="route in routes"
           :key="route.path"
         >
-          <div
+          <a
+            v-if="
+              route.children &&
+              route.children.length === 0 &&
+              isExternal(route.path)
+            "
             class="text-sm block px-1.5 py-0.5 rounded-md relative uppercase"
-            @click="pushPage(route.path)"
-            v-if="route.children && route.children.length === 0"
+            :href="route.path"
+            @click="closeMenu"
           >
-            <span
-              class="relative z-50"
-              v-if="$i18n.locale === 'zh' && route.i18n.zh"
-            >
-              {{ route.i18n.zh }}
+            <span class="relative z-50">
+              {{ route.i18n[appStore.locale] || route.name }}
             </span>
-            <span
-              class="relative z-50"
-              v-if="$i18n.locale === 'ja' && route.i18n['ja']"
-            >
-              {{ route.i18n['ja'] }}
+          </a>
+          <RouterLink
+            v-else-if="route.children && route.children.length === 0"
+            class="text-sm block px-1.5 py-0.5 rounded-md relative uppercase"
+            :to="localizedPath(route.path, appStore.locale)"
+            @click="closeMenu"
+          >
+            <span class="relative z-50">
+              {{ route.i18n[appStore.locale] || route.name }}
             </span>
-            <span
-              class="relative z-50"
-              v-else-if="$i18n.locale === 'en' && route.i18n.en"
-            >
-              {{ route.i18n.en }}
-            </span>
-            <span class="relative z-50" v-else>{{ route.name }}</span>
-          </div>
+          </RouterLink>
           <Dropdown
-            @command="pushPage"
             v-else
             class="flex flex-col justify-center items-center nav-link text-sm px-1.5 py-0.5 rounded-md relative uppercase"
           >
-            <span
-              class="relative z-50"
-              v-if="$i18n.locale === 'zh' && route.i18n.zh"
-            >
-              {{ route.i18n.zh }}
-            </span>
-            <span
-              class="relative z-50"
-              v-if="$i18n.locale === 'ja' && route.i18n['ja']"
-            >
-              {{ route.i18n['ja'] }}
-            </span>
-            <span
-              class="relative z-50"
-              v-else-if="$i18n.locale === 'en' && route.i18n.en"
-            >
-              {{ route.i18n.en }}
-            </span>
-            <span class="relative z-50" v-else>{{ route.name }}</span>
+            <button type="button" class="mobile-nav-trigger relative z-50">
+              {{ route.i18n[appStore.locale] || route.name }}
+            </button>
             <DropdownMenu expand>
               <DropdownItem
                 v-for="sub in route.children"
                 :key="sub.path"
-                :name="sub.path"
+                :href="isExternal(sub.path) ? sub.path : undefined"
+                :to="
+                  isExternal(sub.path)
+                    ? undefined
+                    : localizedPath(sub.path, appStore.locale)
+                "
+                @select="closeMenu"
               >
-                <span
-                  class="relative z-50"
-                  v-if="$i18n.locale === 'zh' && sub.i18n.zh"
-                >
-                  {{ sub.i18n.zh }}
+                <span class="relative z-50">
+                  {{ sub.i18n[appStore.locale] || sub.name }}
                 </span>
-                <span
-                  class="relative z-50"
-                  v-if="$i18n.locale === 'ja' && sub.i18n.ja"
-                >
-                  {{ sub.i18n.ja }}
-                </span>
-                <span
-                  class="relative z-50"
-                  v-else-if="$i18n.locale === 'en' && sub.i18n.en"
-                >
-                  {{ sub.i18n.en }}
-                </span>
-                <span class="relative z-50" v-else>{{ sub.name }}</span>
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -158,7 +130,6 @@ import { computed, ref, watch } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { useI18n } from 'vue-i18n'
 import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
-import { useRouter } from 'vue-router'
 import { useNavigatorStore } from '@/stores/navigator'
 import Social from '@/components/Social.vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
@@ -168,19 +139,12 @@ import { isExternal } from '@/utils/validate'
 
 const appStore = useAppStore()
 const authorProfileStore = useAuthorProfileStore()
-const router = useRouter()
 const navigatorStore = useNavigatorStore()
 const { t } = useI18n()
 const blurScreen = ref()
 
-const pushPage = (path: string): void => {
-  if (!path) return
+const closeMenu = (): void => {
   navigatorStore.toggleMobileMenu()
-  if (isExternal(path)) {
-    window.location.href = path
-  } else {
-    router.push(localizedPath(path, appStore.locale))
-  }
 }
 
 const onClickHandler = (e: MouseEvent) => {
@@ -254,6 +218,10 @@ const wrapperClasses = computed(() => ({
 <style lang="scss">
 .App-Mobile-sidebar {
   z-index: 9999;
+}
+.mobile-nav-trigger {
+  @apply appearance-none border-0 bg-transparent p-0 text-inherit cursor-pointer;
+  font: inherit;
 }
 .App-Mobile-blur {
   @apply fixed hidden h-full w-full backdrop-blur-xl top-0 left-0;

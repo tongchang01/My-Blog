@@ -2,6 +2,7 @@
   <div
     class="ob-dropdown relative z-50"
     @click="toggle"
+    @keydown.esc="close"
     @mouseover="hoverHandler"
     @mouseleave="leaveHandler"
     v-click-away="onClickAway"
@@ -46,14 +47,22 @@ const sharedState: { active: boolean } = reactive({
 })
 
 const toggle = () => {
-  if (!sharedState.active) eventId.value = dropdownStore.setUid()
-  if (!mouseHover.value) sharedState.active = !sharedState.active
+  if (sharedState.active) {
+    close()
+    return
+  }
+  eventId.value = dropdownStore.setUid()
+  sharedState.active = true
+}
+
+const close = () => {
+  sharedState.active = false
+  eventId.value = 0
 }
 
 const onClickAway = () => {
   if (!mouseHover.value && !commonStore.isMobile) {
-    sharedState.active = false
-    eventId.value = 0
+    close()
   }
 }
 
@@ -64,8 +73,7 @@ const hoverHandler = () => {
 
 const leaveHandler = () => {
   if (mouseHover.value) {
-    sharedState.active = false
-    eventId.value = 0
+    close()
   }
 }
 

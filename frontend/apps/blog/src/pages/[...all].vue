@@ -7,9 +7,13 @@
       <div class="left-section">
         <div class="inner-content">
           <h1 class="heading">404</h1>
-          <p class="subheading">
-            Looks like the page you were looking for is no longer here.
-          </p>
+          <p class="subheading">{{ t('menu.not-found') }}</p>
+          <RouterLink
+            class="home-link"
+            :to="{ name: 'home', params: { lang: appStore.locale } }"
+          >
+            {{ t('settings.tips-back-to-home') }}
+          </RouterLink>
         </div>
       </div>
       <div class="right-section">
@@ -101,7 +105,13 @@
   </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { useI18n } from 'vue-i18n'
+import { useAppStore } from '@/stores/app'
+
+const appStore = useAppStore()
+const { t } = useI18n()
+</script>
 
 <style lang="css" scoped>
 @import url('https://fonts.googleapis.com/css?family=Fira+Sans');
@@ -210,6 +220,15 @@
   line-height: 1.15em;
   padding: 0 1rem;
   margin: 0 auto;
+}
+
+.home-link {
+  display: block;
+  width: fit-content;
+  margin: 1.5rem auto 0;
+  color: var(--text-accent);
+  font-size: 1.125rem;
+  font-weight: 700;
 }
 @media (max-width: 770px) {
   .subheading {

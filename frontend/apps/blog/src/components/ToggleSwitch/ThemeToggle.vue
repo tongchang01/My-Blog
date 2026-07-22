@@ -1,5 +1,9 @@
 <template>
-  <Toggle :status="defaultStatus" @changeStatus="handleChange">
+  <Toggle
+    :status="defaultStatus"
+    :label="t('settings.tips-toggle-theme')"
+    @changeStatus="handleChange"
+  >
     <svg
       :style="{ fill: svg.fill, margin: svg.margin }"
       aria-hidden="true"
@@ -21,8 +25,10 @@
 import { computed, reactive } from 'vue'
 import Toggle from './Toggle.vue'
 import { useAppStore } from '@/stores/app'
+import { useI18n } from 'vue-i18n'
 
 const appStore = useAppStore()
+const { t } = useI18n()
 const defaultStatus = appStore.theme === 'theme-dark' ? true : false
 
 const svgStyle = reactive({
