@@ -171,8 +171,13 @@ const enableMultiLanguage = computed(
 <style lang="scss" scoped>
 .header-controls {
   .control-button {
-    @apply appearance-none border-0 bg-transparent p-0 text-inherit cursor-pointer;
+    @apply appearance-none border-0 bg-transparent text-inherit cursor-pointer;
     font: inherit;
+    padding: 0 0.5rem 0 0;
+
+    .svg-icon {
+      margin-right: 0.5rem;
+    }
   }
 
   .progress-ball {

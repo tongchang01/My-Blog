@@ -239,6 +239,10 @@ body {
   outline-offset: 3px;
 }
 
+#App-Container:focus-visible {
+  outline: none;
+}
+
 #app {
   @apply relative min-w-full min-h-screen h-full;
   .app-wrapper {

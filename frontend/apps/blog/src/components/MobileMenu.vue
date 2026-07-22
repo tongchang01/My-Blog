@@ -75,7 +75,7 @@
               route.children.length === 0 &&
               isExternal(route.path)
             "
-            class="text-sm block px-1.5 py-0.5 rounded-md relative uppercase"
+            class="text-sm block px-1.5 py-0.5 rounded-md relative uppercase hover:opacity-100"
             :href="route.path"
             @click="closeMenu"
           >
@@ -85,7 +85,7 @@
           </a>
           <RouterLink
             v-else-if="route.children && route.children.length === 0"
-            class="text-sm block px-1.5 py-0.5 rounded-md relative uppercase"
+            class="text-sm block px-1.5 py-0.5 rounded-md relative uppercase hover:opacity-100"
             :to="localizedPath(route.path, appStore.locale)"
             @click="closeMenu"
           >

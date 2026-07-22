@@ -75,7 +75,7 @@ const routes = computed(() => appStore.themeConfig.menu.menus)
 
 <style lang="scss">
 .nav-link {
-  @apply hover:text-white font-extrabold;
+  @apply hover:text-white hover:opacity-100 font-extrabold;
   &:hover {
     &:before {
       @apply opacity-60 bg-gray-800;

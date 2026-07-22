@@ -1,7 +1,7 @@
 <template>
   <RouterLink
     :to="{ name: 'home', params: { lang: appStore.locale } }"
-    class="header-logo flex items-center self-stretch relative cursor-pointer hover:scale-110 transition-transform transform-gpu duration-500"
+    class="header-logo flex items-center self-stretch relative cursor-pointer hover:scale-110 hover:opacity-100 transition-transform transform-gpu duration-500"
     :aria-label="t('settings.tips-back-to-home')"
   >
     <span class="flex mr-3">

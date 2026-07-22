@@ -36,7 +36,7 @@ const select = () => emit('select')
 
 const itemClasses = computed(() => {
   return {
-    'text-ob-bright block w-full border-0 bg-transparent cursor-pointer hover:bg-ob-trans my-1 px-4 py-1 font-medium text-left text-invert hover:text-ob-bright': true,
+    'text-ob-bright block w-full border-0 bg-transparent cursor-pointer hover:bg-ob-trans hover:opacity-100 my-1 px-4 py-1 font-medium text-left text-invert hover:text-ob-bright': true,
     active: !!props.active
   }
 })

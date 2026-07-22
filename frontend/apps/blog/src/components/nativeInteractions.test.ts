@@ -54,6 +54,7 @@ describe('native public interactions', () => {
 
   it('keeps a visible keyboard focus indicator', () => {
     expect(appSource).toContain('*:focus-visible')
+    expect(appSource).toContain('#App-Container:focus-visible')
     expect(appSource).not.toMatch(/\*:focus\s*{\s*outline:\s*none/)
   })
 })
