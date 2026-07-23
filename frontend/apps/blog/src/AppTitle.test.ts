@@ -19,6 +19,8 @@ describe('document title', () => {
   })
 
   it('keeps the document language aligned with the active locale', () => {
-    expect(appSource).toContain('document.documentElement.lang = appStore.locale')
+    expect(appSource).toContain(
+      'document.documentElement.lang = appStore.locale'
+    )
   })
 })

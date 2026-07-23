@@ -12,15 +12,14 @@ export interface RecordPageViewPayload {
   lang: SupportedLocale
 }
 
-export const loadSiteStatsSummary =
-  async (): Promise<SiteStatsSummaryDto> => {
-    const data = await requestApi<SiteStatsSummaryDto>({
-      method: 'GET',
-      url: '/public/stats/site-summary'
-    })
-    if (data === null) throw new ApiError('Site stats summary is empty')
-    return data
-  }
+export const loadSiteStatsSummary = async (): Promise<SiteStatsSummaryDto> => {
+  const data = await requestApi<SiteStatsSummaryDto>({
+    method: 'GET',
+    url: '/public/stats/site-summary'
+  })
+  if (data === null) throw new ApiError('Site stats summary is empty')
+  return data
+}
 
 export const recordPageView = async (
   payload: RecordPageViewPayload

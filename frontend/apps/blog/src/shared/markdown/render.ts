@@ -77,7 +77,7 @@ const createMarkdown = (headings?: Heading[]): MarkdownIt => {
         : self.renderToken(tokens, index, options)
     }</div>`
 
-  markdown.renderer.rules.fence = (tokens, index, options, env, self) => {
+  markdown.renderer.rules.fence = (tokens, index) => {
     const token = tokens[index]
     const language = token.info.trim().split(/\s+/)[0]?.toLowerCase() ?? 'text'
 
