@@ -5,7 +5,10 @@ import { dirname, resolve } from 'node:path'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const routerSource = readFileSync(resolve(currentDir, 'index.ts'), 'utf8')
-const homeSource = readFileSync(resolve(currentDir, '../pages/index.vue'), 'utf8')
+const homeSource = readFileSync(
+  resolve(currentDir, '../pages/index.vue'),
+  'utf8'
+)
 
 describe('locale switching scroll behavior', () => {
   it('preserves the current position when only the locale changes', () => {

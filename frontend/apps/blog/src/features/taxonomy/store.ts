@@ -23,8 +23,7 @@ export const useTaxonomyStore = defineStore('taxonomy', () => {
       categories.value = mapCategories(
         await loadPublicCategories(locale, request.signal)
       )
-      categoryStatus.value =
-        categories.value.length > 0 ? 'ready' : 'empty'
+      categoryStatus.value = categories.value.length > 0 ? 'ready' : 'empty'
     } catch {
       if (request.signal.aborted) return
       categories.value = []

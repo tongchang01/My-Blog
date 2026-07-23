@@ -137,7 +137,7 @@ jobs:
         run: pnpm --dir frontend/apps/admin build
 
   # ==========================================================================
-  # 前台 blog 前端 job：TypeScript 类型检查 + Vitest + production build。
+  # 前台 blog 前端 job：ESLint + TypeScript 类型检查 + Vitest + production build。
   # 结构和 admin 对称。
   # ==========================================================================
   blog-frontend-test:
@@ -162,6 +162,9 @@ jobs:
 
       - name: Install blog dependencies
         run: pnpm --dir frontend/apps/blog install --frozen-lockfile
+
+      - name: Lint blog
+        run: pnpm --dir frontend/apps/blog lint
 
       - name: Typecheck blog
         run: pnpm --dir frontend/apps/blog typecheck

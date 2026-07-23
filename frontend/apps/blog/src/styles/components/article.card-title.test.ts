@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-const articleStyles = readFileSync(new URL('./article.scss', import.meta.url), 'utf8')
+const articleStyles = readFileSync(
+  new URL('./article.scss', import.meta.url),
+  'utf8'
+)
 
 describe('feature article title layout', () => {
   it('uses a font-metric-safe title line-height before applying the two-line clamp', () => {

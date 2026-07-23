@@ -1,7 +1,9 @@
 import type { PanzoomObject } from '@panzoom/panzoom'
 
 let mermaidModule: Promise<typeof import('mermaid')> | undefined
-let highlighterModule: Promise<typeof import('highlight.js/lib/common')> | undefined
+let highlighterModule:
+  | Promise<typeof import('highlight.js/lib/common')>
+  | undefined
 let panzoomModule: Promise<typeof import('@panzoom/panzoom')> | undefined
 let diagramSequence = 0
 const mermaidViewerCleanup = new WeakMap<HTMLElement, () => void>()
@@ -127,7 +129,9 @@ const mountMermaidViewer = async (
 
   mermaidViewerCleanup.get(block)?.()
   const viewer = getViewer(block)
-  viewer.querySelectorAll('[data-mermaid-controls]').forEach(node => node.remove())
+  viewer
+    .querySelectorAll('[data-mermaid-controls]')
+    .forEach(node => node.remove())
 
   const { default: Panzoom } = await loadPanzoom()
   const panzoom: PanzoomObject = Panzoom(svg, {

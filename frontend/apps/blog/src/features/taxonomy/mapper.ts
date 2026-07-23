@@ -14,8 +14,7 @@ const mapTaxonomy = (
 
 export const mapCategories = (
   dto: PublicTaxonomyDto[]
-): TaxonomyItemViewModel[] =>
-  dto.map(item => mapTaxonomy(item, 'categories'))
+): TaxonomyItemViewModel[] => dto.map(item => mapTaxonomy(item, 'categories'))
 
 export const mapTags = (dto: PublicTaxonomyDto[]): TaxonomyItemViewModel[] =>
   dto.map(item => mapTaxonomy(item, 'tags'))

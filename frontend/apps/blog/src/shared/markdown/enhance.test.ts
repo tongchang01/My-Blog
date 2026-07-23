@@ -32,7 +32,10 @@ describe('Markdown enhancement', () => {
 
   it('highlights a known code language once', async () => {
     const writeText = vi.fn().mockResolvedValue(undefined)
-    const originalClipboard = Object.getOwnPropertyDescriptor(navigator, 'clipboard')
+    const originalClipboard = Object.getOwnPropertyDescriptor(
+      navigator,
+      'clipboard'
+    )
     Object.defineProperty(navigator, 'clipboard', {
       configurable: true,
       value: { writeText }
@@ -46,7 +49,9 @@ describe('Markdown enhancement', () => {
 
       const block = root.querySelector<HTMLElement>('pre.code-block')
       const code = root.querySelector<HTMLElement>('code')
-      const copyButton = root.querySelector<HTMLButtonElement>('[data-code-action="copy"]')
+      const copyButton = root.querySelector<HTMLButtonElement>(
+        '[data-code-action="copy"]'
+      )
       expect(block?.dataset.highlighted).toBe('true')
       expect(code?.classList.contains('hljs')).toBe(true)
       expect(code?.innerHTML).toContain('hljs-title')
@@ -56,7 +61,8 @@ describe('Markdown enhancement', () => {
       await Promise.resolve()
       expect(writeText).toHaveBeenCalledWith('class App {}')
     } finally {
-      if (originalClipboard) Object.defineProperty(navigator, 'clipboard', originalClipboard)
+      if (originalClipboard)
+        Object.defineProperty(navigator, 'clipboard', originalClipboard)
       else delete (navigator as { clipboard?: unknown }).clipboard
     }
   })
@@ -162,9 +168,9 @@ describe('Markdown enhancement', () => {
         ?.querySelector<HTMLButtonElement>('[data-mermaid-action="fullscreen"]')
         ?.click()
       await Promise.resolve()
-      expect(viewer?.querySelector('.mermaid-fullscreen-hint')?.textContent).toBe(
-        'Esc キーで全画面表示を終了'
-      )
+      expect(
+        viewer?.querySelector('.mermaid-fullscreen-hint')?.textContent
+      ).toBe('Esc キーで全画面表示を終了')
 
       vi.advanceTimersByTime(2500)
       expect(viewer?.querySelector('.mermaid-fullscreen-hint')).toBeNull()
