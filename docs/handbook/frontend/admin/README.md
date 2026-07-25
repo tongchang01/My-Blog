@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后台管理应用
-> 最后校准：2026-07-13
+> 最后校准：2026-07-25
 > 对应代码：`frontend/apps/admin/`
 > 权威程度：前端实现摘要
 
@@ -26,6 +26,12 @@
 - Axios base URL 由 `VITE_API_BASE_URL` 控制；本地留空并通过 `/api` 代理到后端。
 
 本地默认端口为 8848，路由使用 hash 模式。运行与验证命令见 `../../ops/local-development.md`。
+
+## 构建边界
+
+- 业务页面、文章编辑器 Mermaid 和代码高亮按需加载，KaTeX 样式仅随文章编辑器加载。
+- Element Plus 只全局注册当前模板实际使用的组件与 `v-loading` 指令；消息和确认框由调用点直接导入。
+- `pnpm check:bundle-budget` 检查 `dist/index.html` 引用的首屏 JS/CSS gzip 体积，CI 在 production build 后执行；预算与完整命令见 [`../../ops/build-and-test.md`](../../ops/build-and-test.md)。
 
 文章预览支持的语法和历史文章恢复步骤见 [`../../content/markdown-authoring.md`](../../content/markdown-authoring.md)。
 
