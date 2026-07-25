@@ -140,6 +140,25 @@ describe("comment management page", () => {
     });
   });
 
+  it("shows safe website and reply target details to admins", async () => {
+    useUserStoreHook().SET_CURRENT_USER({
+      id: "1001",
+      username: "admin",
+      type: "ADMIN",
+      profile: null
+    });
+    tableRow = replyRow;
+    replyPage([replyRow]);
+
+    const wrapper = mount(CommentManagement, { global: { stubs } });
+    await flushPromises();
+
+    const site = wrapper.get('a[href="https://example.com"]');
+    expect(site.attributes("target")).toBe("_blank");
+    expect(site.attributes("rel")).toBe("noopener noreferrer");
+    expect(wrapper.text()).toContain("9007199254740995");
+  });
+
   it("keeps DEMO users read-only", async () => {
     useUserStoreHook().SET_CURRENT_USER({
       id: "1002",

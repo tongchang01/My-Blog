@@ -4,12 +4,9 @@ import { setupStore } from "@/store";
 import { useI18n } from "@/plugins/i18n";
 import { getPlatformConfig } from "./config";
 import { MotionPlugin } from "@vueuse/motion";
-// import { useEcharts } from "@/plugins/echarts";
 import { createApp, type Directive } from "vue";
 import { useElementPlus } from "@/plugins/elementPlus";
 import { injectResponsiveStorage } from "@/utils/responsive";
-
-// import PureDescriptions from "@pureadmin/descriptions";
 
 // 引入重置样式
 import "./style/reset.scss";
@@ -52,7 +49,5 @@ getPlatformConfig(app).then(async config => {
   await router.isReady();
   injectResponsiveStorage(app, config);
   app.use(MotionPlugin).use(useI18n).use(useElementPlus);
-  // .use(PureDescriptions)
-  // .use(useEcharts);
   app.mount("#app");
 });

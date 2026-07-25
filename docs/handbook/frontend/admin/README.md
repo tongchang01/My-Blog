@@ -31,8 +31,9 @@
 
 - 业务页面、文章编辑器 Mermaid 和代码高亮按需加载，KaTeX 样式仅随文章编辑器加载。
 - Element Plus 只全局注册当前模板实际使用的组件与 `v-loading` 指令；消息和确认框由调用点直接导入。
+- 上游假通知和孤立 Welcome 页面已删除；403/404/500 路由保留但不进入业务菜单。仍在使用的布局、主题和菜单搜索能力继续复用上游实现。
 - `pnpm check:bundle-budget` 检查 `dist/index.html` 引用的首屏 JS/CSS gzip 体积，CI 在 production build 后执行；预算与完整命令见 [`../../ops/build-and-test.md`](../../ops/build-and-test.md)。
 
 文章预览支持的语法和历史文章恢复步骤见 [`../../content/markdown-authoring.md`](../../content/markdown-authoring.md)。
 
-后端已有能力、管理端消费状态、表单业务语义与后续纯前端补齐顺序见[管理端后端能力消费审查](backend-consumption-audit.md)。
+后端已有能力、管理端消费状态和表单业务语义见已完成的[管理端后端能力消费审查](backend-consumption-audit.md)。

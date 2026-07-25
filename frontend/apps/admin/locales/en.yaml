@@ -214,6 +214,7 @@ articles:
     status: Article status
     homepageSlot: Homepage slot
     homepageSlotHint: Pinned allows 1 article and Featured allows 2. Only published articles can use homepage slots.
+    homepageSlotConflict: The save conflicted. This homepage slot may be full; free the corresponding pinned or featured slot and retry. Your form has been preserved.
     slug: Article slug
     slugHint: Optional; it is lowercased and may contain only lowercase letters, numbers and hyphens.
     category: Category
@@ -320,6 +321,7 @@ comments:
     ip: IP address
     userAgent: User-Agent
     parent: Parent comment ID
+    replyTo: Reply target ID
   columns:
     content: Content
     author: Author
@@ -506,7 +508,7 @@ attachments:
     recycleBin: Recycle bin
     activeList: Attachment library
     confirmTitle: Attachment confirmation
-    deleteConfirm: The attachment will move to the recycle bin. Physical files are not deleted now. Continue?
+    deleteConfirm: The attachment will move to the recycle bin without deleting the physical file. Covers, logos, or avatars that reference it will fail on their next save. Continue?
   picker:
     title: Choose attachment
     description: Choose an image from the attachment library for this field

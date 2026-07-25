@@ -44,9 +44,7 @@ const auditStatuses: Array<CommentAuditStatus | "ALL"> = [
   "PENDING",
   "HIDDEN"
 ];
-const isGuestbookFilter = computed(
-  () => filters.targetType === "GUESTBOOK"
-);
+const isGuestbookFilter = computed(() => filters.targetType === "GUESTBOOK");
 
 function targetTypeKey(targetType: string): string {
   if (targetType === "ARTICLE") return "comments.target.article";
@@ -77,6 +75,16 @@ function targetLabel(item: CommentListItem): string {
     return transformI18n("comments.target.guestbook");
   }
   return `${transformI18n("comments.target.article")} #${item.targetId}`;
+}
+
+function isSafeExternalUrl(value: string | null): boolean {
+  if (!value) return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
 function canApprove(item: CommentListItem): boolean {
@@ -210,7 +218,11 @@ watch(
           {{ transformI18n("comments.filter.includeDeleted") }}
         </el-checkbox>
         <div class="filter-buttons">
-          <el-button data-testid="comment-search" type="primary" @click="search">
+          <el-button
+            data-testid="comment-search"
+            type="primary"
+            @click="search"
+          >
             {{ transformI18n("articles.actions.search") }}
           </el-button>
           <el-button data-testid="comment-reset" @click="reset">
@@ -231,7 +243,11 @@ watch(
             {{ transformI18n("comments.result.total") }}
             <span class="result-count">{{ total }}</span>
           </h2>
-          <el-button data-testid="comment-refresh" :loading="loading" @click="refresh">
+          <el-button
+            data-testid="comment-refresh"
+            :loading="loading"
+            @click="refresh"
+          >
             {{ transformI18n("articles.actions.refresh") }}
           </el-button>
         </div>
@@ -304,11 +320,40 @@ watch(
                   <strong>{{ row.authorNickname }}</strong>
                   <span>{{ row.authorEmail || "—" }}</span>
                   <details v-if="isAdmin" class="comment-audit-details">
-                    <summary>{{ transformI18n("comments.auditDetails.title") }}</summary>
-                    <span>{{ transformI18n("comments.auditDetails.site") }}：{{ row.authorSite || "—" }}</span>
-                    <span>{{ transformI18n("comments.auditDetails.ip") }}：{{ row.authorIp || "—" }}</span>
-                    <span>{{ transformI18n("comments.auditDetails.userAgent") }}：{{ row.authorUserAgent || "—" }}</span>
-                    <span>{{ transformI18n("comments.auditDetails.parent") }}：{{ row.parentId || "—" }}</span>
+                    <summary>
+                      {{ transformI18n("comments.auditDetails.title") }}
+                    </summary>
+                    <span>
+                      {{ transformI18n("comments.auditDetails.site") }}：
+                      <a
+                        v-if="isSafeExternalUrl(row.authorSite)"
+                        :href="row.authorSite!"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        >{{ row.authorSite }}</a
+                      >
+                      <template v-else>—</template>
+                    </span>
+                    <span
+                      >{{ transformI18n("comments.auditDetails.ip") }}：{{
+                        row.authorIp || "—"
+                      }}</span
+                    >
+                    <span
+                      >{{
+                        transformI18n("comments.auditDetails.userAgent")
+                      }}：{{ row.authorUserAgent || "—" }}</span
+                    >
+                    <span
+                      >{{ transformI18n("comments.auditDetails.parent") }}：{{
+                        row.parentId || "—"
+                      }}</span
+                    >
+                    <span
+                      >{{ transformI18n("comments.auditDetails.replyTo") }}：{{
+                        row.replyToCommentId || "—"
+                      }}</span
+                    >
                   </details>
                 </div>
               </template>
@@ -336,10 +381,15 @@ watch(
               width="100"
             >
               <template #default="{ row }">
-                <el-tag :type="row.deleted ? 'danger' : 'success'" effect="plain">
+                <el-tag
+                  :type="row.deleted ? 'danger' : 'success'"
+                  effect="plain"
+                >
                   {{
                     transformI18n(
-                      row.deleted ? "comments.deleted.yes" : "comments.deleted.no"
+                      row.deleted
+                        ? "comments.deleted.yes"
+                        : "comments.deleted.no"
                     )
                   }}
                 </el-tag>
@@ -382,7 +432,12 @@ watch(
                     :loading="operatingId === row.id"
                     :disabled="operatingId !== null"
                     @click="
-                      confirmAction(row, actionConfirmKey(row, 'approve'), 'comments.feedback.approved', state.approve)
+                      confirmAction(
+                        row,
+                        actionConfirmKey(row, 'approve'),
+                        'comments.feedback.approved',
+                        state.approve
+                      )
                     "
                   >
                     {{ transformI18n("comments.actions.approve") }}
@@ -395,7 +450,14 @@ watch(
                     type="warning"
                     :loading="operatingId === row.id"
                     :disabled="operatingId !== null"
-                    @click="confirmAction(row, actionConfirmKey(row, 'hide'), 'comments.feedback.hidden', state.hide)"
+                    @click="
+                      confirmAction(
+                        row,
+                        actionConfirmKey(row, 'hide'),
+                        'comments.feedback.hidden',
+                        state.hide
+                      )
+                    "
                   >
                     {{ transformI18n("comments.actions.hide") }}
                   </el-button>
@@ -408,7 +470,12 @@ watch(
                     :loading="operatingId === row.id"
                     :disabled="operatingId !== null"
                     @click="
-                      confirmAction(row, actionConfirmKey(row, 'delete'), 'comments.feedback.deleted', state.remove)
+                      confirmAction(
+                        row,
+                        actionConfirmKey(row, 'delete'),
+                        'comments.feedback.deleted',
+                        state.remove
+                      )
                     "
                   >
                     {{ transformI18n("articles.actions.delete") }}
@@ -422,7 +489,12 @@ watch(
                     :loading="operatingId === row.id"
                     :disabled="operatingId !== null"
                     @click="
-                      confirmAction(row, actionConfirmKey(row, 'restore'), 'comments.feedback.restored', state.restore)
+                      confirmAction(
+                        row,
+                        actionConfirmKey(row, 'restore'),
+                        'comments.feedback.restored',
+                        state.restore
+                      )
                     "
                   >
                     {{ transformI18n("articles.recycle.restore") }}
@@ -478,7 +550,10 @@ watch(
           data-testid="comment-reply-submit"
           type="primary"
           :loading="replySubmitting"
-          :disabled="!replyContent.trim() || replyContent.trim().length > MAX_COMMENT_REPLY_LENGTH"
+          :disabled="
+            !replyContent.trim() ||
+            replyContent.trim().length > MAX_COMMENT_REPLY_LENGTH
+          "
           @click="submitReplyAndNotify"
         >
           {{ transformI18n("comments.reply.submit") }}

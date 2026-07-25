@@ -214,6 +214,7 @@ articles:
     status: 記事ステータス
     homepageSlot: ホーム表示枠
     homepageSlotHint: 固定は最大 1 件、おすすめは最大 2 件です。公開済み記事だけがホーム枠を使えます。
+    homepageSlotConflict: 保存が競合しました。ホーム表示枠が上限に達している可能性があります。固定またはおすすめ枠を空けてから再試行してください。フォーム内容は保持されています。
     slug: 記事スラッグ
     slugHint: 空欄にできます。入力値は小文字化され、小文字・数字・ハイフンだけが使えます。
     category: カテゴリ
@@ -320,6 +321,7 @@ comments:
     ip: IP アドレス
     userAgent: User-Agent
     parent: 親コメント ID
+    replyTo: 返信先 ID
   columns:
     content: 内容
     author: 投稿者
@@ -506,7 +508,7 @@ attachments:
     recycleBin: 回収箱
     activeList: 添付ライブラリ
     confirmTitle: 添付ファイル操作の確認
-    deleteConfirm: 添付ファイルを回収箱に移動します。物理ファイルはまだ削除しません。続行しますか？
+    deleteConfirm: 添付ファイルを回収箱に移動し、物理ファイルはまだ削除しません。参照中のカバー、ロゴ、アバターは次回保存時に失敗します。続行しますか？
   picker:
     title: 添付ファイルを選択
     description: 添付ライブラリからこの項目に使う画像を選択します
