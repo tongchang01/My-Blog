@@ -17,9 +17,6 @@ importers:
       '@mdit/plugin-tasklist':
         specifier: 1.0.1
         version: 1.0.1(markdown-it@14.3.0)
-      '@pureadmin/descriptions':
-        specifier: ^1.2.1
-        version: 1.2.1(echarts@6.0.0)(element-plus@2.11.5(vue@3.5.22(typescript@5.9.3)))(typescript@5.9.3)
       '@pureadmin/utils':
         specifier: ^2.6.2
         version: 2.6.2(echarts@6.0.0)(vue@3.5.22(typescript@5.9.3))
@@ -111,9 +108,6 @@ importers:
       '@eslint/js':
         specifier: ^9.38.0
         version: 9.38.0
-      '@faker-js/faker':
-        specifier: ^10.1.0
-        version: 10.1.0
       '@iconify/json':
         specifier: ^2.2.400
         version: 2.2.400
@@ -718,10 +712,6 @@ packages:
     resolution: {integrity: sha512-sB5uyeq+dwCWyPi31B2gQlVlo+j5brPlWx4yZBrEaRo/nhdDE8Xke1gsGgtiBdaBTxuTkceLVuVt/pclrasb0A==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@faker-js/faker@10.1.0':
-    resolution: {integrity: sha512-C3mrr3b5dRVlKPJdfrAXS8+dq+rq8Qm5SNRazca0JKgw1HQERFmrVb0towvMmw5uu8hHKNiQasMaR/tydf3Zsg==}
-    engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
-
   '@floating-ui/core@1.7.3':
     resolution: {integrity: sha512-sGnvb5dmrJaKEZ+LDIpguvdX3bDlEllmv4/ClQ9awcmCZrlx5jQyyMWFM5kBI+EyNOCDDiKk8il0zeuX3Zlg/w==}
 
@@ -1015,11 +1005,6 @@ packages:
 
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
-
-  '@pureadmin/descriptions@1.2.1':
-    resolution: {integrity: sha512-7jDJuqz8xnhcmwXdWQnBzOYeX2WK27TRFaVgs9AdiRr+DnKb9W+krHByJwQtxo5lg4qyRh4/IWQGEMfhC2ljeQ==}
-    peerDependencies:
-      element-plus: ^2.0.0
 
   '@pureadmin/utils@2.6.2':
     resolution: {integrity: sha512-Dqk7R9Dm9YAzAvMlOO3uudu/eCb5B2eZSPexKlaedTngO/A+OtcFH0870T69nXsUqrwd3LJI6ETL19C9ihofIw==}
@@ -4831,8 +4816,6 @@ snapshots:
       '@eslint/core': 0.16.0
       levn: 0.4.1
 
-  '@faker-js/faker@10.1.0': {}
-
   '@floating-ui/core@1.7.3':
     dependencies:
       '@floating-ui/utils': 0.2.10
@@ -5126,16 +5109,6 @@ snapshots:
   '@pkgr/core@0.2.9': {}
 
   '@popperjs/core@2.11.8': {}
-
-  '@pureadmin/descriptions@1.2.1(echarts@6.0.0)(element-plus@2.11.5(vue@3.5.22(typescript@5.9.3)))(typescript@5.9.3)':
-    dependencies:
-      '@element-plus/icons-vue': 2.3.2(vue@3.5.22(typescript@5.9.3))
-      '@pureadmin/utils': 2.6.2(echarts@6.0.0)(vue@3.5.22(typescript@5.9.3))
-      element-plus: 2.11.5(vue@3.5.22(typescript@5.9.3))
-      vue: 3.5.22(typescript@5.9.3)
-    transitivePeerDependencies:
-      - echarts
-      - typescript
 
   '@pureadmin/utils@2.6.2(echarts@6.0.0)(vue@3.5.22(typescript@5.9.3))':
     optionalDependencies:

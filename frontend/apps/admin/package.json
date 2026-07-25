@@ -26,36 +26,29 @@
     "preinstall": "npx only-allow pnpm"
   },
   "keywords": [
-    "pure-admin-thin",
-    "vue-pure-admin",
+    "myblog",
+    "admin",
     "element-plus",
     "tailwindcss",
-    "pure-admin",
     "typescript",
     "pinia",
     "vue3",
     "vite",
     "esm"
   ],
-  "homepage": "https://github.com/pure-admin/pure-admin-thin/tree/i18n",
+  "homepage": "https://github.com/tongchang01/My-Blog",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/pure-admin/pure-admin-thin.git"
+    "url": "git+https://github.com/tongchang01/My-Blog.git"
   },
   "bugs": {
-    "url": "https://github.com/pure-admin/vue-pure-admin/issues"
+    "url": "https://github.com/tongchang01/My-Blog/issues"
   },
   "license": "MIT",
-  "author": {
-    "name": "xiaoxian521",
-    "email": "pureadmin@163.com",
-    "url": "https://github.com/xiaoxian521"
-  },
   "dependencies": {
     "@mdit/plugin-footnote": "1.0.1",
     "@mdit/plugin-katex": "1.0.1",
     "@mdit/plugin-tasklist": "1.0.1",
-    "@pureadmin/descriptions": "^1.2.1",
     "@pureadmin/utils": "^2.6.2",
     "@vueuse/core": "^14.0.0",
     "@vueuse/motion": "^3.0.3",
@@ -88,7 +81,6 @@
     "@commitlint/config-conventional": "^20.0.0",
     "@commitlint/types": "^20.0.0",
     "@eslint/js": "^9.38.0",
-    "@faker-js/faker": "^10.1.0",
     "@iconify/json": "^2.2.400",
     "@iconify/vue": "4.2.0",
     "@intlify/unplugin-vue-i18n": "^11.0.1",

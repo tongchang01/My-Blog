@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { localesConfigs } from "@/plugins/i18n";
+import { routerArrays } from "@/layout/types";
 import { constantMenus, resolveRouteDocumentTitle } from "./index";
 
 describe("static admin routes", () => {
@@ -12,6 +13,11 @@ describe("static admin routes", () => {
     expect(text).not.toContain("PermissionPage");
     expect(text).not.toContain("PermissionButton");
     expect(errorRoutes?.meta?.showLink).toBe(false);
+    expect(routerArrays[0]).toMatchObject({
+      path: "/dashboard",
+      name: "Dashboard",
+      meta: { title: "menus.dashboard" }
+    });
   });
 
   it("keeps the list readable and protects article write routes", () => {
