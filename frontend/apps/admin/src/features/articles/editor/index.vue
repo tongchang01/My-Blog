@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import "katex/dist/katex.min.css";
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
+import {
+  computed,
+  nextTick,
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  watch
+} from "vue";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { message } from "@/utils/message";
+import { ApiClientError } from "@/utils/http/error";
 import { useUserStoreHook } from "@/store/modules/user";
 import AttachmentPickerDialog from "@/features/attachments/AttachmentPickerDialog.vue";
 import type { AttachmentItem } from "@/features/attachments/model";
@@ -34,7 +42,8 @@ const route = useRoute();
 const router = useRouter();
 const userStore = useUserStoreHook();
 const mode = route.name === "ArticleEdit" ? "edit" : "create";
-const articleId = typeof route.params.id === "string" ? route.params.id : undefined;
+const articleId =
+  typeof route.params.id === "string" ? route.params.id : undefined;
 const state = useArticleEditor(mode, articleId);
 const {
   form,
@@ -57,7 +66,9 @@ const autosaveReady = ref(false);
 const baselineSnapshot = ref<string | null>(null);
 const pageTitle = computed(() =>
   transformI18n(
-    mode === "edit" ? "articles.editor.editTitle" : "articles.editor.createTitle"
+    mode === "edit"
+      ? "articles.editor.editTitle"
+      : "articles.editor.createTitle"
   )
 );
 const homepageSlotOptions: ArticleHomepageSlot[] = [
@@ -68,8 +79,16 @@ const homepageSlotOptions: ArticleHomepageSlot[] = [
 const previewHtml = computed(() => renderMarkdownPreview(form.body));
 const previewElement = ref<HTMLElement | null>(null);
 const hasDraft = computed(() => Boolean(draft.value));
+const requestErrorKey = computed(() =>
+  requestError.value instanceof ApiClientError &&
+  requestError.value.kind === "conflict" &&
+  form.homepageSlot !== "NONE"
+    ? "articles.editor.homepageSlotConflict"
+    : "articles.editor.requestError"
+);
 const isDirty = computed(
-  () => baselineSnapshot.value !== null && snapshotForm() !== baselineSnapshot.value
+  () =>
+    baselineSnapshot.value !== null && snapshotForm() !== baselineSnapshot.value
 );
 
 function snapshotForm(): string {
@@ -184,7 +203,10 @@ onBeforeUnmount(() => {
 });
 
 onBeforeRouteLeave((_to, _from, next) => {
-  if (!isDirty.value || window.confirm(transformI18n("articles.editor.leaveConfirm"))) {
+  if (
+    !isDirty.value ||
+    window.confirm(transformI18n("articles.editor.leaveConfirm"))
+  ) {
     next();
     return;
   }
@@ -219,7 +241,7 @@ onBeforeRouteLeave((_to, _from, next) => {
       data-testid="article-editor-error"
       type="error"
       :closable="false"
-      :title="transformI18n('articles.editor.requestError')"
+      :title="transformI18n(requestErrorKey)"
       show-icon
     />
 
@@ -231,7 +253,12 @@ onBeforeRouteLeave((_to, _from, next) => {
       :title="transformI18n('articles.editor.draftFound')"
       show-icon
     >
-      <el-button data-testid="article-draft-restore" type="primary" link @click="restoreDraft">
+      <el-button
+        data-testid="article-draft-restore"
+        type="primary"
+        link
+        @click="restoreDraft"
+      >
         {{ transformI18n("articles.editor.draftRestore") }}
       </el-button>
       <el-button data-testid="article-draft-clear" link @click="clearDraft">
@@ -253,23 +280,53 @@ onBeforeRouteLeave((_to, _from, next) => {
           >
             <el-input v-model="form.titleZh" maxlength="255" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.editor.titleJa')" :error="fieldError('titleJa')">
+          <el-form-item
+            :label="transformI18n('articles.editor.titleJa')"
+            :error="fieldError('titleJa')"
+          >
             <el-input v-model="form.titleJa" maxlength="255" show-word-limit />
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.editor.titleEn')" :error="fieldError('titleEn')">
+          <el-form-item
+            :label="transformI18n('articles.editor.titleEn')"
+            :error="fieldError('titleEn')"
+          >
             <el-input v-model="form.titleEn" maxlength="255" show-word-limit />
           </el-form-item>
           <el-form-item
             :label="transformI18n('articles.editor.summaryZh')"
             :error="fieldError('summaryZh')"
           >
-            <el-input v-model="form.summaryZh" type="textarea" :rows="3" maxlength="500" show-word-limit />
+            <el-input
+              v-model="form.summaryZh"
+              type="textarea"
+              :rows="3"
+              maxlength="500"
+              show-word-limit
+            />
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.editor.summaryJa')" :error="fieldError('summaryJa')">
-            <el-input v-model="form.summaryJa" type="textarea" :rows="3" maxlength="500" show-word-limit />
+          <el-form-item
+            :label="transformI18n('articles.editor.summaryJa')"
+            :error="fieldError('summaryJa')"
+          >
+            <el-input
+              v-model="form.summaryJa"
+              type="textarea"
+              :rows="3"
+              maxlength="500"
+              show-word-limit
+            />
           </el-form-item>
-          <el-form-item :label="transformI18n('articles.editor.summaryEn')" :error="fieldError('summaryEn')">
-            <el-input v-model="form.summaryEn" type="textarea" :rows="3" maxlength="500" show-word-limit />
+          <el-form-item
+            :label="transformI18n('articles.editor.summaryEn')"
+            :error="fieldError('summaryEn')"
+          >
+            <el-input
+              v-model="form.summaryEn"
+              type="textarea"
+              :rows="3"
+              maxlength="500"
+              show-word-limit
+            />
           </el-form-item>
         </div>
         <el-form-item
@@ -307,7 +364,13 @@ onBeforeRouteLeave((_to, _from, next) => {
         <el-form-item :label="transformI18n('articles.editor.status')">
           <el-select v-model="form.status" class="full-width">
             <el-option
-              v-for="status in (['DRAFT', 'PUBLISHED', 'PRIVATE', 'PASSWORD', 'SCHEDULED'] as ArticleStatus[])"
+              v-for="status in [
+                'DRAFT',
+                'PUBLISHED',
+                'PRIVATE',
+                'PASSWORD',
+                'SCHEDULED'
+              ] as ArticleStatus[]"
               :key="status"
               :label="transformI18n(statusTranslationKey(status))"
               :value="status"
@@ -393,7 +456,9 @@ onBeforeRouteLeave((_to, _from, next) => {
                 fit="cover"
               />
               <div class="cover-meta">
-                <strong>{{ transformI18n("articles.editor.coverSelected") }}</strong>
+                <strong>{{
+                  transformI18n("articles.editor.coverSelected")
+                }}</strong>
                 <span>#{{ form.coverAttachmentId }}</span>
                 <a
                   v-if="form.coverUrl"
@@ -465,10 +530,7 @@ onBeforeRouteLeave((_to, _from, next) => {
         </el-form-item>
       </el-card>
     </el-form>
-    <AttachmentPickerDialog
-      v-model="coverPickerOpen"
-      @select="selectCover"
-    />
+    <AttachmentPickerDialog v-model="coverPickerOpen" @select="selectCover" />
   </section>
 </template>
 

@@ -182,6 +182,7 @@ describe("attachment management page", () => {
     await flushPromises();
 
     expect(confirm).toHaveBeenCalledOnce();
+    expect(confirm.mock.calls[0][0]).toContain("Covers");
     expect(mock.history.delete[0].url).toBe(
       "/api/admin/attachments/9007199254743001"
     );

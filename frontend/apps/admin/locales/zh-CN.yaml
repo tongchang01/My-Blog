@@ -214,6 +214,7 @@ articles:
     status: 文章状态
     homepageSlot: 首页展示槽位
     homepageSlotHint: 置顶最多 1 篇，推荐最多 2 篇；只有已发布文章可以进入首页槽位。
+    homepageSlotConflict: 保存发生冲突；当前首页槽位可能已满，请先释放对应的置顶或推荐位置后重试。表单内容已保留。
     slug: 文章路径
     slugHint: 可留空；填写后会转为小写，只允许小写字母、数字和连字符。
     category: 分类
@@ -320,6 +321,7 @@ comments:
     ip: IP 地址
     userAgent: User-Agent
     parent: 父评论 ID
+    replyTo: 回复目标 ID
   columns:
     content: 内容
     author: 作者
@@ -506,7 +508,7 @@ attachments:
     recycleBin: 回收站
     activeList: 附件库
     confirmTitle: 附件操作确认
-    deleteConfirm: 删除后附件将进入回收站，不会立刻删除物理文件，确认继续吗
+    deleteConfirm: 删除后附件将进入回收站，不会立刻删除物理文件；引用它的封面、Logo 或头像在后续保存时会失败，确认继续吗
   picker:
     title: 选择附件
     description: 从附件库中选择一张图片作为当前字段的引用

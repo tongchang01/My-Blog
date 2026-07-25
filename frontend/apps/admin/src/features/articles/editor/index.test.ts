@@ -110,6 +110,33 @@ describe("article editor page", () => {
     expect(routerState.push).toHaveBeenCalledWith("/articles/list");
   });
 
+  it("keeps the form and explains a homepage slot conflict", async () => {
+    dictionaries();
+    mock.onPost("/api/admin/articles").reply(409, {
+      code: "90004",
+      msg: "conflict",
+      data: null
+    });
+    const wrapper = mountEditor();
+    await flushPromises();
+    Object.assign((wrapper.vm as any).form, {
+      categoryId: "10",
+      status: "PUBLISHED",
+      homepageSlot: "PINNED",
+      titleZh: "保留的标题",
+      body: "正文"
+    });
+
+    await wrapper.get('[data-testid="article-save"]').trigger("click");
+    await flushPromises();
+
+    expect(
+      wrapper.get('[data-testid="article-editor-error"]').attributes("title")
+    ).toContain("homepage slot");
+    expect((wrapper.vm as any).form.titleZh).toBe("保留的标题");
+    expect(routerState.push).not.toHaveBeenCalled();
+  });
+
   it("loads an existing article in edit mode", async () => {
     routerState.route = { name: "ArticleEdit", params: { id: "100" } };
     dictionaries();
@@ -149,7 +176,9 @@ describe("article editor page", () => {
     expect((wrapper.vm as any).form.titleZh).toBe("已有标题");
     expect(wrapper.text()).toContain("9007199254743001");
     expect(wrapper.text()).toContain("http://localhost/media/cover.png");
-    expect(mock.history.get.some(item => item.url?.endsWith("/100"))).toBe(true);
+    expect(mock.history.get.some(item => item.url?.endsWith("/100"))).toBe(
+      true
+    );
   });
 
   it("selects a cover attachment and includes it in the save payload", async () => {
@@ -185,7 +214,9 @@ describe("article editor page", () => {
 
     const wrapper = mountEditor();
     await flushPromises();
-    await wrapper.get('[data-testid="article-cover-open-picker"]').trigger("click");
+    await wrapper
+      .get('[data-testid="article-cover-open-picker"]')
+      .trigger("click");
     await flushPromises();
     await wrapper
       .get('[data-testid="attachment-picker-select-9007199254743001"]')
@@ -288,7 +319,9 @@ describe("article editor page", () => {
     const wrapper = mountEditor();
     await flushPromises();
 
-    expect(wrapper.find('[data-testid="article-draft-restore"]').exists()).toBe(true);
+    expect(wrapper.find('[data-testid="article-draft-restore"]').exists()).toBe(
+      true
+    );
     await wrapper.get('[data-testid="article-draft-restore"]').trigger("click");
     await nextTick();
 
