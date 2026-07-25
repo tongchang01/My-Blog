@@ -5,9 +5,13 @@ import { constantMenus, resolveRouteDocumentTitle } from "./index";
 describe("static admin routes", () => {
   it("contains dashboard without permission demo routes", () => {
     const text = JSON.stringify(constantMenus);
+    const errorRoutes = (constantMenus as any[]).find(
+      route => route.path === "/error"
+    );
     expect(text).toContain("Dashboard");
     expect(text).not.toContain("PermissionPage");
     expect(text).not.toContain("PermissionButton");
+    expect(errorRoutes?.meta?.showLink).toBe(false);
   });
 
   it("keeps the list readable and protects article write routes", () => {
@@ -38,9 +42,7 @@ describe("static admin routes", () => {
     const categoryList = articles?.children?.find(
       route => route.name === "CategoryList"
     );
-    const tagList = articles?.children?.find(
-      route => route.name === "TagList"
-    );
+    const tagList = articles?.children?.find(route => route.name === "TagList");
     const commentManagement = articles?.children?.find(
       route => route.name === "CommentManagement"
     );

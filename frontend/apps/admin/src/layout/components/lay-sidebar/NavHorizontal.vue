@@ -2,7 +2,6 @@
 import { emitter } from "@/utils/mitt";
 import { useNav } from "@/layout/hooks/useNav";
 import LaySearch from "../lay-search/index.vue";
-import LayNotice from "../lay-notice/index.vue";
 import { responsiveStorageNameSpace } from "@/config";
 import { ref, nextTick, computed, onMounted } from "vue";
 import { storageLocal, isAllEmpty } from "@pureadmin/utils";
@@ -121,8 +120,6 @@ onMounted(() => {
       </el-dropdown>
       <!-- 全屏 -->
       <LaySidebarFullScreen id="full-screen" />
-      <!-- 消息通知 -->
-      <LayNotice id="header-notice" />
       <!-- 退出登录 -->
       <el-dropdown trigger="click">
         <span class="el-dropdown-link navbar-bg-hover">
