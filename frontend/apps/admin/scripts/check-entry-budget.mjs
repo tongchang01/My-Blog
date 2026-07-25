@@ -32,9 +32,9 @@ const actual = {
   total: gzipBytes("js") + gzipBytes("css")
 };
 const budget = {
-  js: 480 * 1024,
-  css: 80 * 1024,
-  total: 560 * 1024
+  js: 350 * 1024,
+  css: 70 * 1024,
+  total: 420 * 1024
 };
 const kib = bytes => `${(bytes / 1024).toFixed(2)} KiB`;
 
