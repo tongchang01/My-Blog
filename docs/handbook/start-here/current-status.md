@@ -42,6 +42,7 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 - 2026-07-21 评论与留言板共用组件已补齐三语表单、回复、空状态、提交结果、失败提示和分页文案，语言切换会重新映射评论时间；博客端本地 139 项测试、typecheck 和 production build 通过。
 - 2026-07-22 博客端核心入口已收口为 `RouterLink`、真实 `a` 和原生 `button`，补齐控件名称、可见键盘焦点与 404 返回首页入口；本地 144 项测试、typecheck 和 production build 通过，最重 chunk 约 691 kB，未修改待确认的标题层级。
 - 2026-07-25 管理端删除未使用的 Element Plus 全局注册，并将 KaTeX 样式延迟到文章编辑器；首屏 JS gzip 由 448.51 KiB 降至 338.02 KiB，首屏 CSS gzip 由 72.01 KiB 降至 63.22 KiB。CI 在生产构建后执行首屏预算检查，当前上限为 JS 350 KiB、CSS 70 KiB、合计 420 KiB。
+- 2026-07-25 管理端能力对齐审查已收口：文章、评论、分类标签、友链、附件、站点配置、公开资料和改密语义均已对齐；上游假通知、错误页菜单、失效 Welcome 首页和确定无引用的模板依赖已清理，ISSUE-009 关闭。
 - 2026-07-16 管理端完整测试、typecheck 与 production build 通过；文章草稿口令脱敏、账号隔离和会话清理回归已纳入测试。
 - 本地 MySQL 合约脚本已在 Windows PowerShell 7 与 Ubuntu GitHub Actions `pwsh` 通过，覆盖凭据、数据库名、非空库和显式 `-Reset` 的安全边界。
 - [`CI`](https://github.com/tongchang01/My-Blog/actions/workflows/ci.yml) 在 `main` 的 PR 与 push 执行五项检查，包含真实 MySQL 8.4 并发与迁移测试；实时结论和提交 SHA 以工作流页面为准，不在文档中复制会随下一次提交过期的“最新运行号”。
