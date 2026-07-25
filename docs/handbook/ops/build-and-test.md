@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 本地验证与发布前构建
-> 最后校准：2026-07-16
+> 最后校准：2026-07-25
 > 对应代码：`MyBlog-springboot-v2/pom.xml`、`frontend/apps/blog/package.json`、`frontend/apps/admin/package.json`
 > 权威程度：运行手册
 
@@ -42,6 +42,14 @@ corepack pnpm build
 ```
 
 两端 test 均为一次性 Vitest run。管理端 lint 会自动修改文件，执行后必须检查 diff。
+
+管理端生产构建后还需执行首屏压缩体积预算：
+
+```powershell
+corepack pnpm --dir frontend/apps/admin check:bundle-budget
+```
+
+该命令读取 `dist/index.html` 实际引用的入口 JS/CSS 并现场计算 gzip 体积；当前预算为 JS 350 KiB、CSS 70 KiB、合计 420 KiB。CI 已在管理端 build 后执行同一命令，延迟加载的文章编辑器、Mermaid 图表等资源不计入首屏预算。
 
 ## 提交与阶段收口
 

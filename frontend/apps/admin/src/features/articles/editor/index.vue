@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import "katex/dist/katex.min.css";
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from "vue";
 import { onBeforeRouteLeave, useRoute, useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";

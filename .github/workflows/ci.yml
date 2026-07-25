@@ -136,6 +136,9 @@ jobs:
       - name: Build admin
         run: pnpm --dir frontend/apps/admin build
 
+      - name: Check admin entry bundle budget
+        run: pnpm --dir frontend/apps/admin check:bundle-budget
+
   # ==========================================================================
   # 前台 blog 前端 job：ESLint + TypeScript 类型检查 + Vitest + production build。
   # 结构和 admin 对称。
