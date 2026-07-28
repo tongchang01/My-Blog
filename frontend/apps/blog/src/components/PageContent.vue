@@ -112,10 +112,8 @@ const initializeContent = async () => {
   await nextTick()
   if (!postHtml.value) return
   initializeLightBox()
-  await enhanceMarkdown(
-    postHtml.value,
-    appStore.theme === 'theme-dark',
-    key => t(key)
+  await enhanceMarkdown(postHtml.value, appStore.theme === 'theme-dark', key =>
+    t(key)
   )
 }
 

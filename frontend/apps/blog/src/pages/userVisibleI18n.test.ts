@@ -5,7 +5,10 @@ import { fileURLToPath } from 'node:url'
 
 const currentDir = dirname(fileURLToPath(import.meta.url))
 const indexSource = readFileSync(resolve(currentDir, 'index.vue'), 'utf8')
-const detailSource = readFileSync(resolve(currentDir, 'post/[slug].vue'), 'utf8')
+const detailSource = readFileSync(
+  resolve(currentDir, 'post/[slug].vue'),
+  'utf8'
+)
 const messages = ['zh', 'ja', 'en'].map(locale =>
   JSON.parse(
     readFileSync(
