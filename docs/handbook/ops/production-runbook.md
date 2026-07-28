@@ -3,7 +3,7 @@
 > 状态：当前有效；V2 已上线，日常发布由 GitHub Actions 自动部署
 > 适用范围：生产运行核对、故障恢复与受控手工操作
 > 最后校准：2026-07-28
-> 对应文档：`deployment-direction.md`、`release-checklist.md`、`environment.md`
+> 对应代码：`compose.yaml`、`.github/workflows/images.yml`、`deploy/cd/`
 > 权威程度：生产操作顺序
 
 ## 私有信息说明

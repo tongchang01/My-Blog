@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 全项目
-> 最后校准：2026-07-19
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：项目总览
 
@@ -29,9 +29,10 @@ MyBlog 是包含公开博客、管理后台和 Spring Boot API 的个人博客�
 
 ## 开发入口
 
-- 本地启动：`../ops/local-development.md`
-- 环境变量：`../ops/environment.md`
-- 构建测试：`../ops/build-and-test.md`
-- 当前状态：`current-status.md`
-- 路线图：`roadmap.md`
-- 开放问题：`open-issues.md`
+- 本地启动：[本地三端启动](../ops/local-development.md)
+- 环境变量：[环境变量与 profile](../ops/environment.md)
+- 构建测试：[构建与测试](../ops/build-and-test.md)
+- 当前状态：[当前状态](current-status.md)
+- 路线图：[路线图](roadmap.md)
+- 开放问题：[开放问题](open-issues.md)
+- 术语：[术语表](glossary.md)
