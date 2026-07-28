@@ -78,7 +78,7 @@ class UserProfileTest {
         assertThatThrownBy(() -> profile(
                 1001L, "TYB", null, null, null, null, null, "ftp://example.com", null, null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("个人主页仅支持 HTTP 或 HTTPS");
+                .hasMessage("个人主页仅支持不含凭据的绝对 HTTP 或 HTTPS URL");
     }
 
     @Test
@@ -86,7 +86,16 @@ class UserProfileTest {
         assertThatThrownBy(() -> profile(
                 1001L, "TYB", null, null, null, null, null, "https:///profile", null, null))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("个人主页仅支持 HTTP 或 HTTPS");
+                .hasMessage("个人主页仅支持不含凭据的绝对 HTTP 或 HTTPS URL");
+    }
+
+    @Test
+    void shouldRejectPublicUrlWithCredentials() {
+        assertThatThrownBy(() -> profile(
+                1001L, "TYB", null, null, null, null, null,
+                "https://user:password@example.com", null, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("个人主页仅支持不含凭据的绝对 HTTP 或 HTTPS URL");
     }
 
     @Test
@@ -199,7 +208,7 @@ class UserProfileTest {
 
         assertThatThrownBy(() -> current.apply(patchWithWebsite("ftp://example.com")))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("个人主页仅支持 HTTP 或 HTTPS");
+                .hasMessage("个人主页仅支持不含凭据的绝对 HTTP 或 HTTPS URL");
         assertThatThrownBy(() -> current.apply(patchWithEmail("invalid-email")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("公开邮箱格式错误");

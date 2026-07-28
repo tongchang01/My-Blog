@@ -64,6 +64,13 @@ class CommentDomainTest {
                 NOW,
                 null))
                 .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> CommentAuthor.guest(
+                "TYB",
+                "tyb@example.com",
+                "https://user:password@example.com",
+                null,
+                null))
+                .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> NewComment.create(
                 CommentTarget.article(100L),
                 null,

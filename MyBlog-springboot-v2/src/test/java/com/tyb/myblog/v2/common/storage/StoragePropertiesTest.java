@@ -32,10 +32,17 @@ class StoragePropertiesTest {
     void rejectsIncompleteCurrentBackendAndUnsupportedOssUpload() {
         StorageProperties incomplete = bind(
                 "myblog.storage.type=LOCAL");
+        StorageProperties credentialsInPublicUrl = bind(
+                "myblog.storage.type=LOCAL",
+                "myblog.storage.local.root=build/uploads",
+                "myblog.storage.local.bucket-alias=local",
+                "myblog.storage.local.public-base-url=https://user:password@example.com/media");
         StorageProperties oss = bind(
                 "myblog.storage.type=OSS");
 
         assertThatThrownBy(incomplete::validate)
+                .isInstanceOf(IllegalStateException.class);
+        assertThatThrownBy(credentialsInPublicUrl::validate)
                 .isInstanceOf(IllegalStateException.class);
         assertThatThrownBy(oss::validate)
                 .isInstanceOf(IllegalStateException.class)

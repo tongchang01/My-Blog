@@ -1,5 +1,8 @@
 package com.tyb.myblog.v2.comment.domain;
 
+import com.tyb.myblog.v2.common.validation.PublicHttpUrl;
+
+import java.net.URI;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
@@ -25,10 +28,18 @@ public record CommentAuthor(
             throw new IllegalArgumentException("评论邮箱格式非法");
         }
         site = optional(site, "个人站点", 255);
-        if (site != null
-                && !site.startsWith("http://")
-                && !site.startsWith("https://")) {
-            throw new IllegalArgumentException("个人站点只允许 http/https");
+        if (site != null) {
+            URI uri;
+            try {
+                uri = URI.create(site);
+            } catch (IllegalArgumentException exception) {
+                throw new IllegalArgumentException(
+                        "个人站点格式错误", exception);
+            }
+            if (!PublicHttpUrl.isValid(uri)) {
+                throw new IllegalArgumentException(
+                        "个人站点只允许不含凭据的绝对 HTTP/HTTPS URL");
+            }
         }
         ip = optional(ip, "评论 IP", 45);
         userAgent = optional(userAgent, "评论 UA", 512);

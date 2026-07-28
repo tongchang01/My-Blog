@@ -1,5 +1,7 @@
 package com.tyb.myblog.v2.system.domain.friendlink;
 
+import com.tyb.myblog.v2.common.validation.PublicHttpUrl;
+
 import java.net.URI;
 
 /**
@@ -86,14 +88,7 @@ final class FriendLinkValidation {
         }
         try {
             URI uri = URI.create(normalized);
-            boolean supportedScheme =
-                    "http".equalsIgnoreCase(uri.getScheme())
-                            || "https".equalsIgnoreCase(
-                                    uri.getScheme());
-            if (!supportedScheme
-                    || uri.getHost() == null
-                    || uri.getHost().isBlank()
-                    || uri.getUserInfo() != null) {
+            if (!PublicHttpUrl.isValid(uri)) {
                 throw invalidUrl(fieldName, null);
             }
             return normalized;

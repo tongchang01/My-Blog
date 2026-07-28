@@ -92,6 +92,7 @@ class SiteConfigTest {
         for (String invalidUrl : new String[]{
                 "/logo.png",
                 "https:///logo.png",
+                "https://user:password@example.com/logo.png",
                 "javascript:alert(1)",
                 "data:text/plain,test"
         }) {
