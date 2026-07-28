@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.common.storage.config;
 
 import com.tyb.myblog.v2.common.storage.StorageType;
+import com.tyb.myblog.v2.common.validation.PublicHttpUrl;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -70,10 +71,7 @@ public class StorageProperties {
     }
 
     private boolean validHttpUrl(URI value) {
-        return value != null
-                && value.getHost() != null
-                && ("http".equalsIgnoreCase(value.getScheme())
-                || "https".equalsIgnoreCase(value.getScheme()));
+        return PublicHttpUrl.isValid(value);
     }
 
     private URI normalize(URI value) {

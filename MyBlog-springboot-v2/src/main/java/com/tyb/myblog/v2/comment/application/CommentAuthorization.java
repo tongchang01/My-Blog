@@ -12,16 +12,14 @@ public class CommentAuthorization {
         if (principal == null) {
             throw new ApiException(ApiErrorCode.INVALID_TOKEN);
         }
-        boolean readable = principal.roles().stream()
-                .anyMatch(role -> "ADMIN".equals(role) || "DEMO".equals(role));
-        if (!readable) {
+        if (!principal.canReadAdminResources()) {
             throw new ApiException(ApiErrorCode.FORBIDDEN);
         }
     }
 
     public long requireAdmin(AuthenticatedPrincipal principal) {
         requireReadable(principal);
-        if (!principal.roles().contains("ADMIN")) {
+        if (!principal.isAdmin()) {
             throw new ApiException(ApiErrorCode.FORBIDDEN);
         }
         try {

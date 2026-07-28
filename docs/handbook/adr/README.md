@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 关键架构决策
-> 最后校准：2026-07-18
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：导航与维护规则
 
@@ -15,7 +15,7 @@ ADR 记录仍影响当前实现的关键取舍。实现细节以代码、配置�
 | 0001 | [采用模块化单体](0001-modular-monolith.md) |
 | 0002 | [基础包使用 com.tyb.myblog.v2](0002-package-base-com-tyb-myblog-v2.md) |
 | 0003 | [业务模块采用四层架构](0003-four-layer-architecture.md) |
-| 0004 | [五个业务模块与 common 基础设施](0004-six-business-modules.md) |
+| 0004 | [五个业务模块与 common 基础设施](0004-five-business-modules.md) |
 | 0005 | [MyBatis-Plus 作为主要持久化框架](0005-mybatis-plus-as-primary-orm.md) |
 | 0006 | [使用 Spring Boot 3.5 与 Java 17](0006-upgrade-to-spring-boot-3.md) |
 | 0007 | [使用 Spring Security JOSE 与数据库会话撤销](0007-jwt-via-spring-security-jose.md) |

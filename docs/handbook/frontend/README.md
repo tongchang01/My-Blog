@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 博客端与管理端
-> 最后校准：2026-07-19
+> 最后校准：2026-07-28
 > 对应代码：`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：前端导航
 
@@ -12,3 +12,5 @@
 | admin | [管理端](admin/README.md) | 8848 | hash |
 
 接口字段以 `../api/` 为准，跨端功能状态以 `../product/feature-inventory.md` 为准，未完成事项只登记到 `../start-here/open-issues.md`。
+
+两端固定界面文案统一使用各自现有 i18n 语言包；组件不得按 locale 手写平行文案。复用与实现选择的完整约束见 [`../rules/implementation-style.md`](../rules/implementation-style.md)。

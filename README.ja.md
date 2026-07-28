@@ -39,7 +39,7 @@
 - **コンテンツ編成**：下書き、公開、非公開、パスワード保護、予約投稿の各状態に対応。ホーム画面は固定記事 1 件、注目記事最大 2 件、通常記事一覧で構成する。
 - **管理コンソール**：記事、ホーム枠、カテゴリとタグ、コメント、フレンドリンク、添付ファイル、サイト設定、著者プロフィール、パスワード変更、統計ダッシュボードを管理できる。
 - **認証とデータ**：ADMIN/DEMO 権限、JWT access token、DB 保存の refresh token のローテーションと失効。Flyway V1–V6 で 16 テーブルを管理し、論理削除、監査項目、`Asia/Tokyo` の時刻規則を統一する。
-- **デリバリー**：GitHub Actions でバックエンド、実 MySQL、Linux PowerShell、ブログ、管理画面の CI を実行する。`main` は同一コミット SHA の GHCR イメージを発行し、AWS EC2 へ自動デプロイする。
+- **デリバリー**：GitHub Actions でバックエンド、実 MySQL、Linux PowerShell、デプロイワークフロー契約、ブログ、管理画面の CI を実行する。`main` は同一コミット SHA の GHCR イメージを発行し、AWS EC2 へ自動デプロイする。
 
 ## 由来
 
@@ -203,20 +203,19 @@ MYBLOG_STATS_HASH_SECRET=<32 文字以上のランダム文字列>
 
 ### 3 つのアプリを起動する
 
+各グループを、リポジトリルートで開いた別々の PowerShell ウィンドウから実行する。
+
 ```powershell
 # バックエンド（local profile を明示）
-cd MyBlog-springboot-v2
-mvn spring-boot:run -Dspring-boot.run.profiles=local
+mvn -f MyBlog-springboot-v2/pom.xml spring-boot:run -Dspring-boot.run.profiles=local
 
 # ブログフロントエンド
-cd frontend/apps/blog
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+corepack pnpm --dir frontend/apps/blog install --frozen-lockfile
+corepack pnpm --dir frontend/apps/blog dev
 
 # 管理コンソール
-cd frontend/apps/admin
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+corepack pnpm --dir frontend/apps/admin install --frozen-lockfile
+corepack pnpm --dir frontend/apps/admin dev
 ```
 
 既定の待ち受けアドレス：
@@ -225,6 +224,8 @@ corepack pnpm dev
 ![Health](https://img.shields.io/badge/Health-%2Factuator%2Fhealth-6DB33F)
 ![Blog](https://img.shields.io/badge/Blog-localhost%3A5173-42b883)
 ![Admin](https://img.shields.io/badge/Admin-localhost%3A8848-409EFF)
+
+local profile で空の DB を初回起動すると、ローカル開発専用の `admin / 12345678` が作成される。既存の ADMIN パスワードは上書きしない。この認証情報を本番で使用してはならない。詳細は [`docs/handbook/ops/local-development.md`](docs/handbook/ops/local-development.md) を参照する。
 
 ## データベース
 
@@ -240,14 +241,16 @@ corepack pnpm dev
 
 | コマンド                                                                                                | 対象範囲                                                   |
 | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `mvn test`                                                                                              | バックエンド単体・統合テスト + ArchUnit アーキテクチャ制約 |
-| `mvn verify`                                                                                            | バックエンドのフルビルド + パッケージング                  |
-| `pwsh MyBlog-springboot-v2/scripts/initialize.contract-test.ps1`                                        | Linux PowerShell の MySQL 初期化契約                       |
+| `mvn -f MyBlog-springboot-v2/pom.xml test`                                                            | バックエンド単体・統合テスト + ArchUnit アーキテクチャ制約 |
+| `mvn -f MyBlog-springboot-v2/pom.xml verify`                                                          | バックエンドのフルビルド + パッケージング                  |
+| `pwsh -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract-test.ps1`                        | ローカル MySQL 初期化スクリプトの安全契約                  |
+| `bash deploy/cd/test/workflow-contract-test.sh .github/workflows/images.yml`                             | デプロイワークフローの静的契約                              |
 | `corepack pnpm --dir frontend/apps/blog test`                                                           | 公開ブログの単体・コンポーネントテスト（Vitest）           |
 | `corepack pnpm --dir frontend/apps/blog run typecheck`                                                  | 公開ブログの TypeScript + Vue TSC 型チェック               |
-| `corepack pnpm --dir frontend/apps/blog run build`                                                      | 公開ブログのプロダクションビルドと 700 kB chunk 予算       |
+| `corepack pnpm --dir frontend/apps/blog run build`                                                      | 公開ブログのプロダクションビルドと 700 kB chunk 警告しきい値 |
 | `corepack pnpm --dir frontend/apps/admin test && corepack pnpm --dir frontend/apps/admin run typecheck` | 管理コンソールの Vitest と型チェック                       |
 | `corepack pnpm --dir frontend/apps/admin run build`                                                     | 管理コンソールのプロダクションビルド                       |
+| `corepack pnpm --dir frontend/apps/admin check:bundle-budget`                                           | 管理コンソール初期 gzip サイズ予算                          |
 
 モジュール分割やモジュール間依存に触れる変更は、`mvn test` の ArchUnit 結果をゲートとする。
 

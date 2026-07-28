@@ -11,7 +11,36 @@
     "not-found": "ページが見つかりません"
   },
   "home": {
-    "recommended": "おすすめ記事"
+    "recommended": "おすすめ記事",
+    "empty-public-articles": "公開記事はまだありません"
+  },
+  "article": {
+    "password-protected": "この記事はパスワードで保護されています",
+    "not-found": "記事が見つかりません",
+    "password-placeholder": "パスワード",
+    "unlock": "ロックを解除",
+    "unlocking": "解除中…",
+    "unlock-error": "パスワードが違うか、試行回数が多すぎます"
+  },
+  "copy-protection": {
+    "author": "著者",
+    "link": "元リンク"
+  },
+  "markdown": {
+    "reading-time": "約 {minutes} 分",
+    "copy-code": "コードをコピー",
+    "mermaid": {
+      "copy": "Mermaid ソースをコピー",
+      "exit-fullscreen": "Esc キーで全画面表示を終了",
+      "fullscreen": "図を全画面で表示",
+      "pan-down": "図を下へ移動",
+      "pan-left": "図を左へ移動",
+      "pan-right": "図を右へ移動",
+      "pan-up": "図を上へ移動",
+      "reset": "図の表示をリセット",
+      "zoom-in": "拡大",
+      "zoom-out": "縮小"
+    }
   },
   "titles": {
     "articles": "記事一覧",
@@ -30,6 +59,7 @@
     "nickname": "ニックネーム",
     "email": "メールアドレス",
     "website": "ウェブサイト（任意）",
+    "website-invalid": "ユーザー名やパスワードを含まない HTTP/HTTPS URL を入力してください",
     "submitting": "送信中...",
     "submit": "コメントを送信",
     "error": "操作に失敗しました。しばらくしてからもう一度お試しください。",

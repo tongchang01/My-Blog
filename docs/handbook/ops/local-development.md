@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：Windows PowerShell 本地开发
-> 最后校准：2026-07-14
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/src/main/resources/application-local.yml`、`frontend/apps/blog/.env`、`frontend/apps/admin/.env.development`
 > 权威程度：运行手册
 
@@ -15,6 +15,8 @@
 
 ## 后端
 
+以下每个代码块均从仓库根目录开始执行。
+
 ```powershell
 $env:MYBLOG_DATASOURCE_USERNAME = "root"
 $env:MYBLOG_DATASOURCE_PASSWORD = "<local-password>"
@@ -26,6 +28,8 @@ mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
 
 `application.yml` 当前默认 profile 也是 local，但命令显式声明可避免 IDE 或环境覆盖。local 启动时 Flyway 会迁移到最新版本。后端地址为 `http://localhost:8080`，健康检查为 `/actuator/health`，本地 API 文档为 `/doc.html`。
+
+空库首次启动会创建仅供本地开发的 `admin / 12345678`，已有有效 ADMIN 时不会覆盖密码。该凭据不得用于共享或公网环境；需要导入完整固定种子时按 `local-mysql-development.md` 关闭这项默认初始化，避免与种子账号冲突。
 
 ## 博客端
 

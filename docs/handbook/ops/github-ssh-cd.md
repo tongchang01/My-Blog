@@ -1,7 +1,10 @@
 # GitHub SSH 自动部署
 
-> 状态：已启用；2026-07-12 首次真实演练通过
+> 状态：当前有效
 > 适用范围：当前唯一生产 EC2、GitHub Actions、GHCR、Docker Compose
+> 最后校准：2026-07-28
+> 对应代码：`.github/workflows/images.yml`、`deploy/cd/`
+> 权威程度：生产部署配置手册
 
 ## 机制与边界
 

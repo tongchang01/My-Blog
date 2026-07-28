@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.system.domain.attachment;
 
 import com.tyb.myblog.v2.common.storage.StorageType;
+import com.tyb.myblog.v2.common.validation.PublicHttpUrl;
 
 import java.net.URI;
 import java.util.Objects;
@@ -78,11 +79,9 @@ final class AttachmentValidation {
         } catch (IllegalArgumentException exception) {
             throw new IllegalArgumentException("附件公开地址格式错误", exception);
         }
-        if (uri.getHost() == null
-                || (!"http".equalsIgnoreCase(uri.getScheme())
-                && !"https".equalsIgnoreCase(uri.getScheme()))) {
+        if (!PublicHttpUrl.isValid(uri)) {
             throw new IllegalArgumentException(
-                    "附件公开地址仅支持绝对 HTTP 或 HTTPS URL");
+                    "附件公开地址仅支持不含凭据的绝对 HTTP 或 HTTPS URL");
         }
         return normalized;
     }

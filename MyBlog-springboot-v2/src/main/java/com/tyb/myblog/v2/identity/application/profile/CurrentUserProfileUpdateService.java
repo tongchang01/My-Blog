@@ -61,7 +61,7 @@ public class CurrentUserProfileUpdateService {
         if (principal == null) {
             throw new ApiException(ApiErrorCode.INVALID_TOKEN);
         }
-        if (!principal.roles().contains("ADMIN")) {
+        if (!principal.isAdmin()) {
             throw new ApiException(ApiErrorCode.FORBIDDEN);
         }
     }

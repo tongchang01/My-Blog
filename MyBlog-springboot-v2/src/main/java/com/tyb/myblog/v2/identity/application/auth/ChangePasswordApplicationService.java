@@ -81,7 +81,7 @@ public class ChangePasswordApplicationService {
     }
 
     private void requireAdmin(AuthenticatedPrincipal principal) {
-        if (principal == null || !principal.roles().contains("ADMIN")) {
+        if (principal == null || !principal.isAdmin()) {
             throw new ApiException(ApiErrorCode.FORBIDDEN);
         }
     }

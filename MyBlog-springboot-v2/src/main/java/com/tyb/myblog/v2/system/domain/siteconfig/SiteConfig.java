@@ -1,5 +1,7 @@
 package com.tyb.myblog.v2.system.domain.siteconfig;
 
+import com.tyb.myblog.v2.common.validation.PublicHttpUrl;
+
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -203,11 +205,9 @@ public record SiteConfig(
         } catch (IllegalArgumentException exception) {
             throw new IllegalArgumentException(field + "格式错误", exception);
         }
-        if (uri.getHost() == null
-                || (!"http".equalsIgnoreCase(uri.getScheme())
-                && !"https".equalsIgnoreCase(uri.getScheme()))) {
+        if (!PublicHttpUrl.isValid(uri)) {
             throw new IllegalArgumentException(
-                    field + "仅支持绝对 HTTP 或 HTTPS URL");
+                    field + "仅支持不含凭据的绝对 HTTP 或 HTTPS URL");
         }
         return normalized;
     }

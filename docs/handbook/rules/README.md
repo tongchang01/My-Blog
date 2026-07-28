@@ -2,13 +2,14 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2
-> 最后校准：2026-07-10
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：规则入口
 
 | 文档 | 约束范围 |
 | --- | --- |
 | [`documentation.md`](documentation.md) | 文档目录、权威源、生命周期、格式和更新触发器 |
+| [`implementation-style.md`](implementation-style.md) | 复用优先级、最小实现、前端国际化与避免重复手写 |
 | [`package-layout.md`](package-layout.md) | Java 模块、分层、依赖方向和 ArchUnit 边界 |
 | [`api-response.md`](api-response.md) | HTTP 响应、分页、ID、错误码和状态码 |
 | [`comment-style.md`](comment-style.md) | 代码注释与 Javadoc |

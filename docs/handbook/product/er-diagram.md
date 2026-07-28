@@ -1,8 +1,8 @@
 # 领域与数据关系图
 
 > 状态：当前有效
-> 适用范围：MyBlog V2 模块协作与 14 张业务表
-> 最后校准：2026-07-10
+> 适用范围：MyBlog V2 模块协作与 16 张表
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/src/main/java/`、`MyBlog-springboot-v2/src/main/resources/db/migration/`
 > 权威程度：关系视图
 
@@ -44,9 +44,11 @@ erDiagram
   T_TAG ||--o{ T_ARTICLE_TAG : "labels"
 
   T_ARTICLE ||--o{ T_COMMENT : "ARTICLE target"
+  T_ARTICLE ||--o{ T_ARTICLE_ACCESS_TOKEN : "PASSWORD access"
+  T_HOMEPAGE_SLOT_GUARD ||--o{ T_ARTICLE : "serializes homepage slot"
   T_COMMENT ||--o{ T_COMMENT : "parent and reply"
   T_ARTICLE ||--o{ T_PAGE_VIEW : "viewed"
   T_ARTICLE ||--o{ T_PAGE_VIEW_DAILY : "aggregated"
 ```
 
-`t_site_config`、`t_friend_link` 和 `t_mail_log` 是独立表。所有关系都是应用维护的逻辑引用，不是数据库 `FOREIGN KEY`；实际列、索引和例外规则见 `../architecture/schema-design.md`。
+`t_site_config`、`t_friend_link` 和 `t_mail_log` 是独立表。`t_homepage_slot_guard` 通过固定槽位名串行化文章首页槽位写入，不保存文章外键。图中关系均为应用维护的逻辑引用，不是数据库 `FOREIGN KEY`；实际列、索引和例外规则见 `../architecture/schema-design.md`。

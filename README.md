@@ -39,7 +39,7 @@
 - **内容编排**：支持草稿、公开、私密、密码和定时状态；首页提供 1 篇置顶、最多 2 篇精选和普通文章列表。
 - **管理后台**：覆盖文章、首页槽位、分类标签、评论、友链、附件、站点配置、作者资料、密码修改和统计仪表盘。
 - **身份与数据**：ADMIN/DEMO 权限、JWT access token、数据库 refresh token 轮换与撤销；Flyway V1–V6 管理 16 张表，并统一软删除、审计字段和 `Asia/Tokyo` 时间口径。
-- **交付运行**：GitHub Actions 对后端、真实 MySQL、Linux PowerShell、博客端和管理端执行 CI；`main` 使用同一提交 SHA 发布 GHCR 镜像并自动部署到 AWS EC2。
+- **交付运行**：GitHub Actions 对后端、真实 MySQL、Linux PowerShell、部署工作流合约、博客端和管理端执行 CI；`main` 使用同一提交 SHA 发布 GHCR 镜像并自动部署到 AWS EC2。
 
 ## 起源
 
@@ -209,24 +209,19 @@ MYBLOG_STATS_HASH_SECRET=<至少 32 字符的随机串>
 
 ### 启动三端
 
+以下三组命令分别在仓库根目录的新 PowerShell 窗口执行：
+
 ```powershell
 # 后端
-cd MyBlog-springboot-v2
-mvn spring-boot:run -Dspring-boot.run.profiles=local
-
-
+mvn -f MyBlog-springboot-v2/pom.xml spring-boot:run -Dspring-boot.run.profiles=local
 
 # 博客前台
-cd frontend/apps/blog
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
-
-
+corepack pnpm --dir frontend/apps/blog install --frozen-lockfile
+corepack pnpm --dir frontend/apps/blog dev
 
 # 管理后台
-cd frontend/apps/admin
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+corepack pnpm --dir frontend/apps/admin install --frozen-lockfile
+corepack pnpm --dir frontend/apps/admin dev
 ```
 
 默认监听地址：
@@ -235,6 +230,8 @@ corepack pnpm dev
 ![Health](https://img.shields.io/badge/Health-%2Factuator%2Fhealth-6DB33F)
 ![Blog](https://img.shields.io/badge/Blog-localhost%3A5173-42b883)
 ![Admin](https://img.shields.io/badge/Admin-localhost%3A8848-409EFF)
+
+local 空库首次启动会创建仅供本机开发的 `admin / 12345678`，已有 ADMIN 时不会覆盖密码；生产环境不得使用该凭据。完整本地流程见 [`docs/handbook/ops/local-development.md`](docs/handbook/ops/local-development.md)。
 
 ## 数据库
 
@@ -249,14 +246,16 @@ corepack pnpm dev
 
 | 命令                                                                             | 覆盖范围                              |
 | -------------------------------------------------------------------------------- | ------------------------------------- |
-| `mvn clean test`                                                                 | 后端单元/集成测试与 ArchUnit 架构约束 |
+| `mvn -f MyBlog-springboot-v2/pom.xml clean test`                                 | 后端单元/集成测试与 ArchUnit 架构约束 |
 | `pwsh -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract-test.ps1` | 本地 MySQL 初始化脚本安全契约         |
+| `bash deploy/cd/test/workflow-contract-test.sh .github/workflows/images.yml`      | 部署工作流静态合约                    |
 | `corepack pnpm --dir frontend/apps/blog test`                                    | 博客端 Vitest                         |
 | `corepack pnpm --dir frontend/apps/blog typecheck`                               | 博客端 TypeScript + Vue TSC           |
-| `corepack pnpm --dir frontend/apps/blog build`                                   | 博客端生产构建与 chunk 预算           |
+| `corepack pnpm --dir frontend/apps/blog build`                                   | 博客端生产构建与 700 kB chunk 警告阈值 |
 | `corepack pnpm --dir frontend/apps/admin test`                                   | 管理端 Vitest                         |
 | `corepack pnpm --dir frontend/apps/admin typecheck`                              | 管理端 TypeScript + Vue TSC           |
 | `corepack pnpm --dir frontend/apps/admin build`                                  | 管理端生产构建                        |
+| `corepack pnpm --dir frontend/apps/admin check:bundle-budget`                    | 管理端首屏 gzip 体积预算              |
 
 任何触碰模块划分或跨模块依赖的改动，都应以后端测试中的 ArchUnit 结果作为门禁。真实 MySQL 8.4 方言、迁移和并发行为由 CI 的独立 Testcontainers job 验证。
 

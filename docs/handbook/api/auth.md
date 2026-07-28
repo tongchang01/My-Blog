@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端认证接口、后台 admin 会话接入
-> 最后校准：2026-07-10
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/web/`
 > 权威程度：API 契约
 
@@ -275,6 +275,8 @@ Content-Type: application/json
 | `zhihuUrl` | string/null | 知乎 URL |
 | `qiitaUrl` | string/null | Qiita URL |
 | `juejinUrl` | string/null | 掘金 URL |
+
+所有非空 URL 字段 trim 后最长 255，只接受带主机名且不含用户名、密码的绝对 HTTP/HTTPS URL。
 
 成功响应：HTTP 200，`data` 为更新后的完整 `profile` 对象。
 

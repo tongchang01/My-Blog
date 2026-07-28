@@ -42,6 +42,11 @@ class AttachmentTest {
                 "/a.webp", "image/webp",
                 10L, 1, 1, null, HASH, LocalDateTime.now(), 1L))
                 .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> Attachment.reconstitute(
+                1L, StorageType.S3, "bucket", "a.webp",
+                "https://user:password@static.example.com/a.webp", "image/webp",
+                10L, 1, 1, null, HASH, LocalDateTime.now(), 1L))
+                .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

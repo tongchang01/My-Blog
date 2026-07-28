@@ -17,10 +17,21 @@ public record AuthenticatedPrincipal(
         String username,
         List<String> roles
 ) {
+    public static final String ADMIN_ROLE = "ADMIN";
+    public static final String DEMO_ROLE = "DEMO";
+
     /**
      * 复制角色列表，避免外部集合在认证后继续被修改。
      */
     public AuthenticatedPrincipal {
         roles = roles == null ? List.of() : List.copyOf(roles);
+    }
+
+    public boolean isAdmin() {
+        return roles.contains(ADMIN_ROLE);
+    }
+
+    public boolean canReadAdminResources() {
+        return isAdmin() || roles.contains(DEMO_ROLE);
     }
 }

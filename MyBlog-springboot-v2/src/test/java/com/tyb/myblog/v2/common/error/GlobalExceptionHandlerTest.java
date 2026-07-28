@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDate;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -70,6 +74,21 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    void returnsValidationEnvelopeWhenQueryParameterTypeIsInvalid() throws Exception {
+        for (String query : List.of(
+                "?page=abc&status=ACTIVE&date=2026-07-28",
+                "?page=1&status=unknown&date=2026-07-28",
+                "?page=1&status=ACTIVE&date=not-a-date")) {
+            mockMvc.perform(get(
+                            "/api/test/errors/typed-query-parameter"
+                                    + query))
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.code").value("90001"))
+                    .andExpect(jsonPath("$.data").isEmpty());
+        }
+    }
+
+    @Test
     void returnsNotFoundEnvelopeForUnknownApiRoute() throws Exception {
         mockMvc.perform(get("/api/test/errors/missing-route"))
                 .andExpect(status().isNotFound())
@@ -107,6 +126,15 @@ class GlobalExceptionHandlerTest {
         void queryParameter(@RequestParam String lang) {
         }
 
+        @GetMapping("/api/test/errors/typed-query-parameter")
+        void typedQueryParameter(
+                @RequestParam int page,
+                @RequestParam ProbeStatus status,
+                @RequestParam
+                @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                LocalDate date) {
+        }
+
         @PostMapping("/api/test/errors/business")
         void conflict() {
             throw new ApiException(ApiErrorCode.CONFLICT, "标题重复");
@@ -119,5 +147,9 @@ class GlobalExceptionHandlerTest {
     }
 
     record TitleRequest(@NotBlank(message = "title must not be blank") String title) {
+    }
+
+    enum ProbeStatus {
+        ACTIVE
     }
 }

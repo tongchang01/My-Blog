@@ -4,16 +4,21 @@ import com.tyb.myblog.v2.comment.domain.CommentPage;
 import com.tyb.myblog.v2.comment.domain.CommentPageItem;
 import com.tyb.myblog.v2.comment.domain.CommentQueryRepository;
 import com.tyb.myblog.v2.comment.domain.CommentTarget;
+import com.tyb.myblog.v2.common.error.ApiErrorCode;
+import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicy;
 import com.tyb.myblog.v2.content.application.article.ArticleCommentPolicyService;
+import org.assertj.core.api.ThrowableAssert;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class CommentQueryServiceTest {
@@ -47,6 +52,25 @@ class CommentQueryServiceTest {
 
         assertThat(result.records()).extracting(CommentPageResult.Item::id)
                 .containsExactly(2L);
+    }
+
+    @Test
+    void rejectsInvalidPaginationBeforeQueryingDependencies() {
+        assertValidationError(() -> service.articleComments(100L, 0, 20));
+        assertValidationError(() ->
+                service.articleComments(100L, 1, 101, "access-token"));
+        assertValidationError(() -> service.guestbookComments(1, 0));
+
+        verifyNoInteractions(repository, policyService);
+    }
+
+    private static void assertValidationError(
+            ThrowableAssert.ThrowingCallable callable) {
+        assertThatThrownBy(callable)
+                .isInstanceOfSatisfying(
+                        ApiException.class,
+                        exception -> assertThat(exception.code())
+                                .isEqualTo(ApiErrorCode.VALIDATION_ERROR));
     }
 
     private static CommentPageItem item(long id, Long parentId) {

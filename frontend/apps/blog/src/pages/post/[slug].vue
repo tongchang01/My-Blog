@@ -150,43 +150,17 @@ const stateTitle = computed(() => {
   return state.value === 'notFound' ? '404' : 'Error'
 })
 const stateMessage = computed(() => {
-  const lang = locale.value ?? appStore.locale
   if (state.value === 'locked') {
-    return lang === 'zh'
-      ? '该文章需要密码才能阅读'
-      : lang === 'ja'
-        ? 'この記事はパスワードで保護されています'
-        : 'This article is password protected'
+    return t('article.password-protected')
   }
   if (state.value === 'notFound') {
-    return lang === 'zh'
-      ? '文章不存在或尚未发布'
-      : lang === 'ja'
-        ? '記事が見つかりません'
-        : 'Article not found'
+    return t('article.not-found')
   }
   return ''
 })
-const passwordPlaceholder = computed(() => {
-  const lang = locale.value ?? appStore.locale
-  return lang === 'zh'
-    ? '输入文章密码'
-    : lang === 'ja'
-      ? 'パスワード'
-      : 'Password'
-})
-const unlockAction = computed(() => {
-  const lang = locale.value ?? appStore.locale
-  return lang === 'zh'
-    ? '解锁文章'
-    : lang === 'ja'
-      ? 'ロックを解除'
-      : 'Unlock article'
-})
-const unlockSubmitting = computed(() => {
-  const lang = locale.value ?? appStore.locale
-  return lang === 'zh' ? '解锁中…' : lang === 'ja' ? '解除中…' : 'Unlocking…'
-})
+const passwordPlaceholder = computed(() => t('article.password-placeholder'))
+const unlockAction = computed(() => t('article.unlock'))
+const unlockSubmitting = computed(() => t('article.unlocking'))
 
 const replaceCanonicalSlug = async (slug: string | null) => {
   if (!slug || !article.value || route.params.slug === slug) return
@@ -226,13 +200,7 @@ const unlock = async (): Promise<void> => {
     await articleStore.unlockDetail(id, locale.value, password.value)
     password.value = ''
   } catch {
-    const lang = locale.value ?? appStore.locale
-    unlockError.value =
-      lang === 'zh'
-        ? '密码错误或尝试过于频繁，请稍后再试'
-        : lang === 'ja'
-          ? 'パスワードが違うか、試行回数が多すぎます'
-          : 'Incorrect password or too many attempts. Try again later.'
+    unlockError.value = t('article.unlock-error')
   } finally {
     unlocking.value = false
   }
@@ -255,7 +223,7 @@ watch(
     await enhanceMarkdown(
       postHtml.value,
       appStore.theme === 'theme-dark',
-      locale.value ?? appStore.locale
+      key => t(key)
     )
   }
 )
@@ -266,7 +234,7 @@ watch(
       void enhanceMarkdown(
         postHtml.value,
         appStore.theme === 'theme-dark',
-        locale.value ?? appStore.locale
+        key => t(key)
       )
   }
 )

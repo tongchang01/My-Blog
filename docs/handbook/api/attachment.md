@@ -2,8 +2,8 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 system 模块、后台 admin 附件管理
-> 最后校准：2026-07-10
-> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/web/AdminAttachmentController.java`
+> 最后校准：2026-07-28
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/web/AdminAttachmentController.java`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/domain/attachment/`
 > 权威程度：API 契约
 
 ## 本文档回答什么问题
@@ -44,6 +44,7 @@
 字段规则：
 
 - `id` 为 string，避免 Snowflake ID 精度损失。
+- `publicUrl` 为带主机名且不含用户名、密码的绝对 HTTP/HTTPS URL。
 - `createdBy` 为 string 或 `null`。
 - ADMIN / DEMO 使用同一响应结构，只返回公开管理元数据。
 - 不返回 `storageType`、`bucket`、`objectKey`、`hashSha256`、本地磁盘路径、删除审计和更新审计字段。

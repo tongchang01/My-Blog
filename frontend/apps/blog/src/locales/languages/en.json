@@ -11,7 +11,36 @@
     "not-found": "Page not found"
   },
   "home": {
-    "recommended": "Feature Articles"
+    "recommended": "Feature Articles",
+    "empty-public-articles": "No public articles yet"
+  },
+  "article": {
+    "password-protected": "This article is password protected",
+    "not-found": "Article not found",
+    "password-placeholder": "Password",
+    "unlock": "Unlock article",
+    "unlocking": "Unlocking…",
+    "unlock-error": "Incorrect password or too many attempts. Try again later."
+  },
+  "copy-protection": {
+    "author": "Author",
+    "link": "Source"
+  },
+  "markdown": {
+    "reading-time": "{minutes} min",
+    "copy-code": "Copy code",
+    "mermaid": {
+      "copy": "Copy Mermaid source",
+      "exit-fullscreen": "Press Esc to exit fullscreen",
+      "fullscreen": "View diagram fullscreen",
+      "pan-down": "Pan diagram down",
+      "pan-left": "Pan diagram left",
+      "pan-right": "Pan diagram right",
+      "pan-up": "Pan diagram up",
+      "reset": "Reset diagram view",
+      "zoom-in": "Zoom in",
+      "zoom-out": "Zoom out"
+    }
   },
   "titles": {
     "articles": "Articles",
@@ -30,6 +59,7 @@
     "nickname": "Nickname",
     "email": "Email",
     "website": "Website (optional)",
+    "website-invalid": "Enter an HTTP/HTTPS URL without a username or password.",
     "submitting": "Submitting...",
     "submit": "Post comment",
     "error": "Something went wrong. Please try again.",

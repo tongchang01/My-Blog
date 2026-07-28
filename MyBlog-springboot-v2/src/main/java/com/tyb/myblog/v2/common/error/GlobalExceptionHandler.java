@@ -12,6 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
@@ -70,6 +71,18 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.fail(
                         ApiErrorCode.VALIDATION_ERROR.code(),
                         "缺少必填请求参数: " + exception.getParameterName()));
+    }
+
+    /**
+     * 处理查询参数类型转换失败。
+     */
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    ResponseEntity<ApiResponse<Void>> handleArgumentTypeMismatchException(
+            MethodArgumentTypeMismatchException exception) {
+        return ResponseEntity.badRequest()
+                .body(ApiResponse.fail(
+                        ApiErrorCode.VALIDATION_ERROR.code(),
+                        "请求参数格式错误: " + exception.getName()));
     }
 
     /**

@@ -70,7 +70,7 @@ public class ArticleQueryService {
                 : attachmentService.resolvePublicUrls(
                         Set.of(detail.coverAttachmentId()))
                 .get(detail.coverAttachmentId());
-        boolean includeBody = principal.roles().contains("ADMIN")
+        boolean includeBody = principal.isAdmin()
                 || detail.status() == ArticleStatus.PUBLISHED;
         return AdminArticleDetailResult.from(
                 detail,

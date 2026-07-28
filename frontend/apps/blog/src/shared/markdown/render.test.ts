@@ -57,7 +57,7 @@ class App {}
   it('renders article html, toc, and reading stats', () => {
     const article = renderArticleMarkdown(
       '# HTML解析\n\n## CSS 计算\n\n正文内容',
-      'zh'
+      minutes => `约 ${minutes} 分钟`
     )
 
     expect(article.html).toContain('<h1 id="html解析">HTML解析</h1>')

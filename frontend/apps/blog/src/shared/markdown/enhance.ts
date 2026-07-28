@@ -21,50 +21,7 @@ interface MermaidViewerLabels {
   zoomOut: string
 }
 
-const mermaidViewerLabels: Record<string, MermaidViewerLabels> = {
-  en: {
-    copy: 'Copy Mermaid source',
-    exitFullscreen: 'Press Esc to exit fullscreen',
-    fullscreen: 'View diagram fullscreen',
-    panDown: 'Pan diagram down',
-    panLeft: 'Pan diagram left',
-    panRight: 'Pan diagram right',
-    panUp: 'Pan diagram up',
-    reset: 'Reset diagram view',
-    zoomIn: 'Zoom in',
-    zoomOut: 'Zoom out'
-  },
-  ja: {
-    copy: 'Mermaid ソースをコピー',
-    exitFullscreen: 'Esc キーで全画面表示を終了',
-    fullscreen: '図を全画面で表示',
-    panDown: '図を下へ移動',
-    panLeft: '図を左へ移動',
-    panRight: '図を右へ移動',
-    panUp: '図を上へ移動',
-    reset: '図の表示をリセット',
-    zoomIn: '拡大',
-    zoomOut: '縮小'
-  },
-  zh: {
-    copy: '复制 Mermaid 源码',
-    exitFullscreen: '按 Esc 退出全屏',
-    fullscreen: '全屏查看图表',
-    panDown: '向下平移图表',
-    panLeft: '向左平移图表',
-    panRight: '向右平移图表',
-    panUp: '向上平移图表',
-    reset: '重置图表视图',
-    zoomIn: '放大图表',
-    zoomOut: '缩小图表'
-  }
-}
-
-const codeBlockCopyLabels: Record<string, string> = {
-  en: 'Copy code',
-  ja: 'コードをコピー',
-  zh: '复制代码'
-}
+type Translate = (key: string) => string
 
 const loadMermaid = () => {
   mermaidModule ??= import('mermaid')
@@ -85,11 +42,20 @@ const waitForDocumentFonts = async (): Promise<void> => {
   await document.fonts?.ready
 }
 
-const viewerLabelsFor = (locale: string): MermaidViewerLabels =>
-  mermaidViewerLabels[locale] ?? mermaidViewerLabels.zh
-
-const codeBlockCopyLabelFor = (locale: string): string =>
-  codeBlockCopyLabels[locale] ?? codeBlockCopyLabels.zh
+const resolveMermaidViewerLabels = (
+  translate: Translate
+): MermaidViewerLabels => ({
+  copy: translate('markdown.mermaid.copy'),
+  exitFullscreen: translate('markdown.mermaid.exit-fullscreen'),
+  fullscreen: translate('markdown.mermaid.fullscreen'),
+  panDown: translate('markdown.mermaid.pan-down'),
+  panLeft: translate('markdown.mermaid.pan-left'),
+  panRight: translate('markdown.mermaid.pan-right'),
+  panUp: translate('markdown.mermaid.pan-up'),
+  reset: translate('markdown.mermaid.reset'),
+  zoomIn: translate('markdown.mermaid.zoom-in'),
+  zoomOut: translate('markdown.mermaid.zoom-out')
+})
 
 const createViewerButton = (
   action: string,
@@ -205,7 +171,7 @@ const mountMermaidViewer = async (
 
 const highlightCodeBlocks = async (
   root: HTMLElement,
-  locale: string
+  translate: Translate
 ): Promise<void> => {
   const blocks = Array.from(
     root.querySelectorAll<HTMLElement>('pre.code-block:not([data-highlighted])')
@@ -221,7 +187,7 @@ const highlightCodeBlocks = async (
       code.innerHTML = highlighter.highlight(source, { language }).value
       code.classList.add('hljs')
     }
-    const copyLabel = codeBlockCopyLabelFor(locale)
+    const copyLabel = translate('markdown.copy-code')
     const copyButton = document.createElement('button')
     copyButton.type = 'button'
     copyButton.className = 'code-block-copy-button'
@@ -244,7 +210,7 @@ const highlightCodeBlocks = async (
 const renderMermaid = async (
   root: HTMLElement,
   isDarkTheme: boolean,
-  locale: string
+  translate: Translate
 ): Promise<void> => {
   const theme = isDarkTheme ? 'dark' : 'default'
   const blocks = Array.from(
@@ -269,7 +235,11 @@ const renderMermaid = async (
       block.dataset.mermaidTheme = theme
       block.innerHTML = svg
       bindFunctions?.(block)
-      await mountMermaidViewer(block, source, viewerLabelsFor(locale))
+      await mountMermaidViewer(
+        block,
+        source,
+        resolveMermaidViewerLabels(translate)
+      )
     } catch {
       // Preserve the source block so an article remains readable on syntax errors.
     }
@@ -279,10 +249,10 @@ const renderMermaid = async (
 export const enhanceMarkdown = async (
   root: HTMLElement,
   isDarkTheme: boolean,
-  locale = 'zh'
+  translate: Translate
 ): Promise<void> => {
   await Promise.all([
-    highlightCodeBlocks(root, locale),
-    renderMermaid(root, isDarkTheme, locale)
+    highlightCodeBlocks(root, translate),
+    renderMermaid(root, isDarkTheme, translate)
   ])
 }

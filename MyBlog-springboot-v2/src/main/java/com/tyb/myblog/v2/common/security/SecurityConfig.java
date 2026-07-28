@@ -27,6 +27,9 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+import static com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal.ADMIN_ROLE;
+import static com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal.DEMO_ROLE;
+
 /**
  * API 安全配置。
  *
@@ -66,46 +69,46 @@ public class SecurityConfig {
                             .requestMatchers(
                                     HttpMethod.PUT,
                                     "/api/auth/me/password")
-                            .hasRole("ADMIN")
+                            .hasRole(ADMIN_ROLE)
                             .requestMatchers(
                                     HttpMethod.PATCH,
                                     "/api/auth/me/profile")
-                            .hasRole("ADMIN")
+                            .hasRole(ADMIN_ROLE)
                             .requestMatchers(
                                     HttpMethod.GET,
                                     "/api/admin/site-config")
-                            .hasAnyRole("ADMIN", "DEMO")
+                            .hasAnyRole(ADMIN_ROLE, DEMO_ROLE)
                             .requestMatchers(
                                     HttpMethod.GET,
                                     "/api/admin/attachments",
                                     "/api/admin/attachments/*")
-                            .hasAnyRole("ADMIN", "DEMO")
+                            .hasAnyRole(ADMIN_ROLE, DEMO_ROLE)
                             .requestMatchers(
                                     HttpMethod.GET,
                                     "/api/admin/friend-links",
                                     "/api/admin/friend-links/*")
-                            .hasAnyRole("ADMIN", "DEMO")
+                            .hasAnyRole(ADMIN_ROLE, DEMO_ROLE)
                             .requestMatchers(
                                     HttpMethod.GET,
                                     "/api/admin/articles",
                                     "/api/admin/articles/*")
-                            .hasAnyRole("ADMIN", "DEMO")
+                            .hasAnyRole(ADMIN_ROLE, DEMO_ROLE)
                             .requestMatchers(
                                     HttpMethod.GET,
                                     "/api/admin/comments")
-                            .hasAnyRole("ADMIN", "DEMO")
+                            .hasAnyRole(ADMIN_ROLE, DEMO_ROLE)
                             .requestMatchers(
                                     HttpMethod.GET,
                                     "/api/admin/stats/dashboard")
-                            .hasAnyRole("ADMIN", "DEMO")
+                            .hasAnyRole(ADMIN_ROLE, DEMO_ROLE)
                             .requestMatchers(
                                     HttpMethod.GET,
                                     "/api/admin/categories",
                                     "/api/admin/categories/*",
                                     "/api/admin/tags",
                                     "/api/admin/tags/*")
-                            .hasAnyRole("ADMIN", "DEMO")
-                            .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                            .hasAnyRole(ADMIN_ROLE, DEMO_ROLE)
+                            .requestMatchers("/api/admin/**").hasRole(ADMIN_ROLE)
                             .anyRequest().authenticated();
                 })
                 .exceptionHandling(exceptions -> exceptions
