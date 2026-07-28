@@ -11,7 +11,20 @@
     "not-found": "ページが見つかりません"
   },
   "home": {
-    "recommended": "おすすめ記事"
+    "recommended": "おすすめ記事",
+    "empty-public-articles": "公開記事はまだありません"
+  },
+  "article": {
+    "password-protected": "この記事はパスワードで保護されています",
+    "not-found": "記事が見つかりません",
+    "password-placeholder": "パスワード",
+    "unlock": "ロックを解除",
+    "unlocking": "解除中…",
+    "unlock-error": "パスワードが違うか、試行回数が多すぎます"
+  },
+  "copy-protection": {
+    "author": "著者",
+    "link": "元リンク"
   },
   "titles": {
     "articles": "記事一覧",

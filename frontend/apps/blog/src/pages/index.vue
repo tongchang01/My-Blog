@@ -33,7 +33,7 @@
           v-else-if="articleStore.homeStatus === 'empty'"
           class="py-24 text-center text-ob-dim"
         >
-          {{ emptyMessage }}
+          {{ t('home.empty-public-articles') }}
         </div>
 
         <ul v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -51,6 +51,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { Feature, FeatureList } from '@/components/Feature'
 import { ArticleCard, HorizontalArticle } from '@/components/ArticleCard'
@@ -64,6 +65,7 @@ useMetaStore().setTitle('')
 const route = useRoute()
 const appStore = useAppStore()
 const articleStore = useArticleStore()
+const { t } = useI18n()
 const DEFAULT_PAGE_SIZE = 12
 
 const currentLocale = computed(() =>
@@ -98,13 +100,6 @@ const listArticles = computed(() => {
     ? [...articleStore.home.featuredArticles, ...articles.slice(consumed)]
     : articles.slice(consumed)
 })
-const emptyMessage = computed(() =>
-  currentLocale.value === 'zh'
-    ? '暂时没有公开文章'
-    : currentLocale.value === 'ja'
-      ? '公開記事はまだありません'
-      : 'No public articles yet'
-)
 const loadHome = async () => {
   await articleStore.loadHome({
     size: DEFAULT_PAGE_SIZE,

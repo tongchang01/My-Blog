@@ -11,7 +11,20 @@
     "not-found": "Page not found"
   },
   "home": {
-    "recommended": "Feature Articles"
+    "recommended": "Feature Articles",
+    "empty-public-articles": "No public articles yet"
+  },
+  "article": {
+    "password-protected": "This article is password protected",
+    "not-found": "Article not found",
+    "password-placeholder": "Password",
+    "unlock": "Unlock article",
+    "unlocking": "Unlocking…",
+    "unlock-error": "Incorrect password or too many attempts. Try again later."
+  },
+  "copy-protection": {
+    "author": "Author",
+    "link": "Source"
   },
   "titles": {
     "articles": "Articles",

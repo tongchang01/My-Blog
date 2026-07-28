@@ -11,7 +11,20 @@
     "not-found": "无法找到页面"
   },
   "home": {
-    "recommended": "推荐文章"
+    "recommended": "推荐文章",
+    "empty-public-articles": "暂时没有公开文章"
+  },
+  "article": {
+    "password-protected": "该文章需要密码才能阅读",
+    "not-found": "文章不存在或尚未发布",
+    "password-placeholder": "输入文章密码",
+    "unlock": "解锁文章",
+    "unlocking": "解锁中…",
+    "unlock-error": "密码错误或尝试过于频繁，请稍后再试"
+  },
+  "copy-protection": {
+    "author": "作者",
+    "link": "原文链接"
   },
   "titles": {
     "articles": "文章列表",

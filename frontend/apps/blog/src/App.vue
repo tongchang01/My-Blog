@@ -50,6 +50,7 @@ import {
   watch,
   watchEffect
 } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores/app'
 import { useCommonStore } from '@/stores/common'
 import { useLightBoxStore } from '@/stores/lightbox'
@@ -72,18 +73,13 @@ const lightBoxStore = useLightBoxStore()
 const commonStore = useCommonStore()
 const metaStore = useMetaStore()
 const authorProfileStore = useAuthorProfileStore()
+const { t } = useI18n()
 const MOBILE_WITH = 1024 // Using the mobile width by Bootstrap design.
 
 const appWrapperClass = 'app-wrapper'
 const loadingBarClass = ref({
   'nprogress-custom-parent': false
 })
-
-const copyLabelDefaults = {
-  zh: { author: '作者', link: '原文链接' },
-  ja: { author: '著者', link: '元リンク' },
-  en: { author: 'Author', link: 'Source' }
-} as const
 
 /** Initializing App config and other setups */
 const initialApp = async () => {
@@ -110,11 +106,12 @@ const initialApp = async () => {
 
 const copyAttribution = () => {
   const locale = appStore.locale
-  const labels = copyLabelDefaults[locale]
   const configuredLabels = appStore.themeConfig.plugins.copy_protection
   const configLocale = locale === 'zh' ? 'cn' : 'en'
-  const authorLabel = configuredLabels.author[configLocale] || labels.author
-  const linkLabel = configuredLabels.link[configLocale] || labels.link
+  const authorLabel =
+    configuredLabels.author[configLocale] || t('copy-protection.author')
+  const linkLabel =
+    configuredLabels.link[configLocale] || t('copy-protection.link')
 
   return `\n\n---------------------------------\n${authorLabel}: ${authorProfileStore.profile.name}\n${linkLabel}: ${document.location.href}`
 }
