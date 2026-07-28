@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后台管理应用
-> 最后校准：2026-07-25
+> 最后校准：2026-07-28
 > 对应代码：`frontend/apps/admin/`
 > 权威程度：前端实现摘要
 
@@ -31,6 +31,7 @@
 
 - 业务页面、文章编辑器 Mermaid 和代码高亮按需加载，KaTeX 样式仅随文章编辑器加载。
 - Element Plus 只全局注册当前模板实际使用的组件与 `v-loading` 指令；消息和确认框由调用点直接导入。
+- 用户可见的固定文案统一进入现有三套 locale，不在页面或表单逻辑中按语言手写文案分支。
 - 上游假通知和孤立 Welcome 页面已删除；403/404/500 路由保留但不进入业务菜单。仍在使用的布局、主题和菜单搜索能力继续复用上游实现。
 - `pnpm check:bundle-budget` 检查 `dist/index.html` 引用的首屏 JS/CSS gzip 体积，CI 在 production build 后执行；预算与完整命令见 [`../../ops/build-and-test.md`](../../ops/build-and-test.md)。
 
