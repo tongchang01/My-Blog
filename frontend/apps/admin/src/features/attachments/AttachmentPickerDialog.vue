@@ -3,6 +3,7 @@ import { watch } from "vue";
 import { transformI18n } from "@/plugins/i18n";
 import { formatJstDateTime } from "@/features/articles/presentation";
 import type { AttachmentItem } from "./model";
+import { formatFileSize } from "./presentation";
 import { useAttachmentManagement } from "./useAttachmentManagement";
 
 defineOptions({ name: "AttachmentPickerDialog" });
@@ -37,14 +38,6 @@ function close(): void {
 function select(item: AttachmentItem): void {
   emit("select", item);
   close();
-}
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  const kb = bytes / 1024;
-  if (kb < 1024) return `${Number(kb.toFixed(kb >= 10 ? 0 : 1))} KB`;
-  const mb = kb / 1024;
-  return `${Number(mb.toFixed(mb >= 10 ? 0 : 1))} MB`;
 }
 
 watch(
