@@ -26,6 +26,22 @@
     "author": "著者",
     "link": "元リンク"
   },
+  "markdown": {
+    "reading-time": "約 {minutes} 分",
+    "copy-code": "コードをコピー",
+    "mermaid": {
+      "copy": "Mermaid ソースをコピー",
+      "exit-fullscreen": "Esc キーで全画面表示を終了",
+      "fullscreen": "図を全画面で表示",
+      "pan-down": "図を下へ移動",
+      "pan-left": "図を左へ移動",
+      "pan-right": "図を右へ移動",
+      "pan-up": "図を上へ移動",
+      "reset": "図の表示をリセット",
+      "zoom-in": "拡大",
+      "zoom-out": "縮小"
+    }
+  },
   "titles": {
     "articles": "記事一覧",
     "about": "私について",

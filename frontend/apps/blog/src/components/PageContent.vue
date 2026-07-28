@@ -78,6 +78,7 @@ import {
   toRefs,
   watch
 } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Profile, Sidebar, Toc } from '@/components/Sidebar'
 import { useCommonStore } from '@/stores/common'
 import PostStats from './Post/PostStats.vue'
@@ -101,6 +102,7 @@ const props = defineProps({
 
 const commonStore = useCommonStore()
 const appStore = useAppStore()
+const { t } = useI18n()
 const post = toRefs(props).post
 const title = toRefs(props).title
 const postHtml = ref<HTMLElement | null>(null)
@@ -113,7 +115,7 @@ const initializeContent = async () => {
   await enhanceMarkdown(
     postHtml.value,
     appStore.theme === 'theme-dark',
-    appStore.locale
+    key => t(key)
   )
 }
 
@@ -138,7 +140,7 @@ watch(
       void enhanceMarkdown(
         postHtml.value,
         appStore.theme === 'theme-dark',
-        appStore.locale
+        key => t(key)
       )
   }
 )

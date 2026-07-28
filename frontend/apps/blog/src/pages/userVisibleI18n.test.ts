@@ -38,6 +38,9 @@ describe('user-visible page translations', () => {
       expect(Object.values(locale.article)).toHaveLength(6)
       expect(locale['copy-protection'].author).toBeTruthy()
       expect(locale['copy-protection'].link).toBeTruthy()
+      expect(locale.markdown['reading-time']).toContain('{minutes}')
+      expect(locale.markdown['copy-code']).toBeTruthy()
+      expect(Object.values(locale.markdown.mermaid)).toHaveLength(10)
     }
   })
 })

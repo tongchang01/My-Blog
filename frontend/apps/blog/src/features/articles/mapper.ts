@@ -2,6 +2,7 @@ import type { PageResponse } from '@/shared/http/contract'
 import type { SupportedLocale } from '@/shared/i18n/locale'
 import { formatJst } from '@/shared/time/jst'
 import { renderArticleMarkdown } from '@/shared/markdown/render'
+import i18n from '@/locales'
 import type {
   PublicArchiveGroupDto,
   PublicArticleDetailDto,
@@ -85,7 +86,9 @@ export const mapArticleDetail = (
   dto: PublicArticleDetailDto,
   locale: SupportedLocale
 ): ArticleDetailViewModel => {
-  const article = renderArticleMarkdown(dto.body, locale)
+  const article = renderArticleMarkdown(dto.body, minutes =>
+    i18n.global.t('markdown.reading-time', { minutes }, { locale })
+  )
   return {
     ...mapArticle(dto, locale),
     bodyHtml: article.html,

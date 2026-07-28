@@ -23,11 +23,28 @@ panzoom.create.mockReturnValue(panzoom)
 vi.mock('mermaid', () => ({ default: mermaid }))
 vi.mock('@panzoom/panzoom', () => ({ default: panzoom.create }))
 
+const labels: Record<string, string> = {
+  'markdown.copy-code': 'コードをコピー',
+  'markdown.mermaid.copy': 'Mermaid ソースをコピー',
+  'markdown.mermaid.exit-fullscreen': 'Esc キーで全画面表示を終了',
+  'markdown.mermaid.fullscreen': '図を全画面で表示',
+  'markdown.mermaid.pan-down': '図を下へ移動',
+  'markdown.mermaid.pan-left': '図を左へ移動',
+  'markdown.mermaid.pan-right': '図を右へ移動',
+  'markdown.mermaid.pan-up': '図を上へ移動',
+  'markdown.mermaid.reset': '図の表示をリセット',
+  'markdown.mermaid.zoom-in': '拡大',
+  'markdown.mermaid.zoom-out': '縮小'
+}
+const translate = (key: string): string => labels[key] ?? key
+
 describe('Markdown enhancement', () => {
   it('does nothing when the rendered article has no diagram or code block', async () => {
     const root = document.createElement('div')
 
-    await expect(enhanceMarkdown(root, false)).resolves.toBeUndefined()
+    await expect(
+      enhanceMarkdown(root, false, translate)
+    ).resolves.toBeUndefined()
   })
 
   it('highlights a known code language once', async () => {
@@ -45,7 +62,7 @@ describe('Markdown enhancement', () => {
       '<pre class="code-block" data-language="java"><code class="language-java">class App {}</code></pre>'
 
     try {
-      await enhanceMarkdown(root, false, 'ja')
+      await enhanceMarkdown(root, false, translate)
 
       const block = root.querySelector<HTMLElement>('pre.code-block')
       const code = root.querySelector<HTMLElement>('code')
@@ -74,7 +91,7 @@ describe('Markdown enhancement', () => {
     block.textContent = 'flowchart TD\nA --> B'
     root.append(block)
 
-    await enhanceMarkdown(root, false)
+    await enhanceMarkdown(root, false, translate)
 
     expect(mermaid.parse).toHaveBeenCalledWith('flowchart TD\nA --> B', {
       suppressErrors: true
@@ -100,7 +117,7 @@ describe('Markdown enhancement', () => {
     root.innerHTML = '<pre class="mermaid">flowchart TD\nA --> B</pre>'
 
     try {
-      const enhancement = enhanceMarkdown(root, false)
+      const enhancement = enhanceMarkdown(root, false, translate)
       await new Promise(resolve => setTimeout(resolve, 0))
       expect(mermaid.render).not.toHaveBeenCalled()
 
@@ -125,7 +142,7 @@ describe('Markdown enhancement', () => {
     block.textContent = 'flowchart TD\nA --> B'
     root.append(block)
 
-    await enhanceMarkdown(root, false, 'ja')
+    await enhanceMarkdown(root, false, translate)
 
     expect(root.querySelector('figure.mermaid-viewer')).not.toBeNull()
     expect(panzoom.create).toHaveBeenCalledTimes(1)
@@ -157,7 +174,7 @@ describe('Markdown enhancement', () => {
     root.append(block)
 
     try {
-      await enhanceMarkdown(root, false, 'ja')
+      await enhanceMarkdown(root, false, translate)
       const viewer = root.querySelector<HTMLElement>('figure.mermaid-viewer')
       Object.defineProperty(viewer, 'requestFullscreen', {
         configurable: true,

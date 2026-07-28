@@ -26,6 +26,22 @@
     "author": "Author",
     "link": "Source"
   },
+  "markdown": {
+    "reading-time": "{minutes} min",
+    "copy-code": "Copy code",
+    "mermaid": {
+      "copy": "Copy Mermaid source",
+      "exit-fullscreen": "Press Esc to exit fullscreen",
+      "fullscreen": "View diagram fullscreen",
+      "pan-down": "Pan diagram down",
+      "pan-left": "Pan diagram left",
+      "pan-right": "Pan diagram right",
+      "pan-up": "Pan diagram up",
+      "reset": "Reset diagram view",
+      "zoom-in": "Zoom in",
+      "zoom-out": "Zoom out"
+    }
+  },
   "titles": {
     "articles": "Articles",
     "about": "About Me",

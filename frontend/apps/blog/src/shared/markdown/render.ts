@@ -97,7 +97,7 @@ export const renderMarkdown = (source: string): string =>
 
 export const renderArticleMarkdown = (
   source: string,
-  locale: 'en' | 'ja' | 'zh'
+  formatReadingTime: (minutes: number) => string
 ): ArticleMarkdown => {
   const headings: Heading[] = []
   const html = createMarkdown(headings).render(source)
@@ -106,7 +106,7 @@ export const renderArticleMarkdown = (
     html,
     toc: renderToc(headings),
     wordCount,
-    readingTime: formatReadingTime(wordCount, locale)
+    readingTime: formatReadingTime(Math.max(1, Math.ceil(wordCount / 500)))
   }
 }
 
@@ -131,16 +131,6 @@ const countReadableCharacters = (source: string): number =>
     .replace(/\[([^\]]*)]\([^)]*\)/g, '$1')
     .replace(/[>#*_~`[\]()\-+.!|:]/g, ' ')
     .replace(/\s+/g, '').length
-
-const formatReadingTime = (
-  wordCount: number,
-  locale: 'en' | 'ja' | 'zh'
-): string => {
-  const minutes = Math.max(1, Math.ceil(wordCount / 500))
-  if (locale === 'en') return `${minutes} min`
-  if (locale === 'ja') return `約 ${minutes} 分`
-  return `约 ${minutes} 分钟`
-}
 
 const renderToc = (headings: Heading[]): string => {
   const root: TocNode = { level: 0, title: '', id: '', children: [] }

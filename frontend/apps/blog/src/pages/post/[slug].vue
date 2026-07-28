@@ -223,7 +223,7 @@ watch(
     await enhanceMarkdown(
       postHtml.value,
       appStore.theme === 'theme-dark',
-      locale.value ?? appStore.locale
+      key => t(key)
     )
   }
 )
@@ -234,7 +234,7 @@ watch(
       void enhanceMarkdown(
         postHtml.value,
         appStore.theme === 'theme-dark',
-        locale.value ?? appStore.locale
+        key => t(key)
       )
   }
 )
