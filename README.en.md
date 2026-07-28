@@ -39,7 +39,7 @@ A personal blog system built as a modular monolith. The backend runs on Spring B
 - **Content orchestration**: draft, published, private, password-protected, and scheduled states; the homepage supports one pinned article, up to two featured articles, and the regular list.
 - **Admin console**: articles, homepage slots, categories and tags, comments, friend links, attachments, site configuration, author profile, password changes, and the statistics dashboard.
 - **Identity and data**: ADMIN/DEMO permissions, JWT access tokens, database-backed refresh-token rotation and revocation; Flyway V1–V6 manages 16 tables with consistent soft-delete, audit, and `Asia/Tokyo` time rules.
-- **Delivery**: GitHub Actions runs backend, real-MySQL, Linux PowerShell, blog, and admin CI. `main` publishes GHCR images tagged with the same commit SHA and deploys them automatically to AWS EC2.
+- **Delivery**: GitHub Actions runs backend, real-MySQL, Linux PowerShell, deployment-workflow contract, blog, and admin CI. `main` publishes GHCR images tagged with the same commit SHA and deploys them automatically to AWS EC2.
 
 ## Origins
 
@@ -226,6 +226,8 @@ Default listening addresses:
 ![Blog](https://img.shields.io/badge/Blog-localhost%3A5173-42b883)
 ![Admin](https://img.shields.io/badge/Admin-localhost%3A8848-409EFF)
 
+On the first local-profile start against an empty database, the backend creates the development-only account `admin / 12345678`; it never overwrites an existing ADMIN. Never use this credential in production. See [`docs/handbook/ops/local-development.md`](docs/handbook/ops/local-development.md) for the full local workflow.
+
 ## Database
 
 - Migration scripts live under `MyBlog-springboot-v2/src/main/resources/db/migration/`. The current schema is Flyway V1–V6 with 16 tables, using the `V<version>__<description>.sql` naming convention.
@@ -241,12 +243,14 @@ Default listening addresses:
 | -------------------------------------------------------------------------------- | ------------------------------------------------------- |
 | `mvn clean test`                                                                 | Backend unit/integration tests and ArchUnit constraints |
 | `pwsh -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract-test.ps1` | Safety contract for the local MySQL initializer         |
+| `bash deploy/cd/test/workflow-contract-test.sh .github/workflows/images.yml`      | Deployment workflow static contract                     |
 | `corepack pnpm --dir frontend/apps/blog test`                                    | Blog Vitest suite                                       |
 | `corepack pnpm --dir frontend/apps/blog typecheck`                               | Blog TypeScript + Vue TSC                               |
-| `corepack pnpm --dir frontend/apps/blog build`                                   | Blog production build and chunk budget                  |
+| `corepack pnpm --dir frontend/apps/blog build`                                   | Blog production build and 700 kB chunk warning threshold |
 | `corepack pnpm --dir frontend/apps/admin test`                                   | Admin Vitest suite                                      |
 | `corepack pnpm --dir frontend/apps/admin typecheck`                              | Admin TypeScript + Vue TSC                              |
 | `corepack pnpm --dir frontend/apps/admin build`                                  | Admin production build                                  |
+| `corepack pnpm --dir frontend/apps/admin check:bundle-budget`                    | Admin entry gzip-size budget                            |
 
 Any change that touches module boundaries or cross-module dependencies must treat the backend ArchUnit result as a gate. A separate Testcontainers job in CI verifies MySQL 8.4 dialect, migrations, and concurrency behavior.
 
