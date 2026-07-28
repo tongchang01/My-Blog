@@ -64,13 +64,6 @@
 - 范围：只更新文章、写作规范、发布填写单和相关权威文档，不借此修改后台表单、API、数据库字段或前台渲染。分类、标签、slug、三语标题与摘要由发布填写单给出完整推荐，不把选择负担留给手工发布者。
 - 完成条件：先按当前主线逐篇核对已发布文章的代码事实和图表，再更新外部原稿与后台已发布内容；每篇保留明确的源码校准提交、三语发布字段和变更记录；至少先完成受 V6 直接影响的 Flyway、PASSWORD 解锁和文章详情链路文章，并复核前台正文、目录、代码块和 Mermaid 渲染。
 
-## ISSUE-024：部署工作流合约测试与实际配置漂移
-
-- 优先级：P2，发布保障。
-- 现状：`.github/workflows/images.yml` 使用 `aws-actions/configure-aws-credentials@v6`，`deploy/cd/test/workflow-contract-test.sh` 仍断言 `@v5`；当前 CI 没有执行该脚本。
-- 完成条件：合约脚本与实际 action 版本一致，并在 CI 中持续执行；若决定废弃该合约，则删除失效脚本及相关说明。
-- 审查证据：[`2026-07-28-full-code-review.md`](../../superpowers/reviews/2026-07-28-full-code-review.md) 的 R-05。
-
 ## ISSUE-025：已确认的低风险重复实现与未使用依赖
 
 - 优先级：P3，维护成本。

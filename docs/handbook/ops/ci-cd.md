@@ -2,8 +2,8 @@
 
 > 状态：当前有效；自动部署已于 2026-07-12 完成首次真实演练
 > 适用范围：`.github/workflows/ci.yml`、`.github/workflows/images.yml`
-> 最后校准：2026-07-23
-> 对应代码：`.github/workflows/`
+> 最后校准：2026-07-28
+> 对应代码：`.github/workflows/`、`deploy/cd/test/workflow-contract-test.sh`
 > 权威程度：CI 说明
 
 CI 在 main 的 pull request、push 和手动 workflow dispatch 时运行，仓库权限为 contents read。main 的 push 和版本 tag 还会触发 GHCR 镜像发布；main 镜像发布成功后，deploy job 使用 GitHub OIDC 与临时 SSH /32 部署同一 SHA 到生产 EC2。
@@ -13,6 +13,7 @@ CI 在 main 的 pull request、push 和手动 workflow dispatch 时运行，仓�
 | Backend tests | Java 17，JST 时区：H2 快测及随机端口运行中 API 契约；排除五个真实 MySQL 专项 |
 | Backend MySQL integration tests | MySQL 8.4 Testcontainers：Flyway、改密、登录失败、评论审核和首页槽位并发 |
 | Linux PowerShell initialization contract | Ubuntu `pwsh`：本地 MySQL 初始化脚本的凭据、数据库名和非空库安全边界 |
+| Deployment workflow contract | Ubuntu `bash`：镜像发布、OIDC、临时 SSH 放行、同 SHA 部署和公网冒烟工作流合约 |
 | Admin frontend tests | pnpm 9.15.9、Node 24：typecheck、test、build |
 | Blog frontend tests | pnpm 9.15.9、Node 24：lint、typecheck、test、build |
 | Publish container images | main/tag：使用提交 SHA 构建并推送 `myblog-api` 与 `myblog-web` 到 GHCR |

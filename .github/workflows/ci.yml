@@ -98,6 +98,20 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract-test.ps1
 
+  # ===========================================================================
+  # 部署工作流合约：防止镜像发布、OIDC、临时 SSH 放行和公网冒烟配置漂移。
+  # ===========================================================================
+  deployment-workflow-contract:
+    name: Deployment workflow contract
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Verify deployment workflow
+        run: bash deploy/cd/test/workflow-contract-test.sh .github/workflows/images.yml
+
   # 后台 admin 前端 job：TypeScript 类型检查 + Vitest。
   # admin 的 package.json 里 "test" 已配成 vitest run，CI 可直接用。
   # ==========================================================================
