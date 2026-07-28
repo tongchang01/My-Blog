@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 本地验证与发布前构建
-> 最后校准：2026-07-25
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/pom.xml`、`frontend/apps/blog/package.json`、`frontend/apps/admin/package.json`
 > 权威程度：运行手册
 
@@ -31,14 +31,22 @@ mvn test -Dtest=RunningApiContractTest
 
 ## 博客端与管理端
 
-在每个应用目录执行：
+回到仓库根目录，分别执行：
 
 ```powershell
-corepack pnpm install --frozen-lockfile
-corepack pnpm test
-corepack pnpm typecheck
-corepack pnpm lint
-corepack pnpm build
+# 博客端
+corepack pnpm --dir frontend/apps/blog install --frozen-lockfile
+corepack pnpm --dir frontend/apps/blog test
+corepack pnpm --dir frontend/apps/blog typecheck
+corepack pnpm --dir frontend/apps/blog lint
+corepack pnpm --dir frontend/apps/blog build
+
+# 管理端
+corepack pnpm --dir frontend/apps/admin install --frozen-lockfile
+corepack pnpm --dir frontend/apps/admin test
+corepack pnpm --dir frontend/apps/admin typecheck
+corepack pnpm --dir frontend/apps/admin lint
+corepack pnpm --dir frontend/apps/admin build
 ```
 
 两端 test 均为一次性 Vitest run。管理端 lint 会自动修改文件，执行后必须检查 diff。

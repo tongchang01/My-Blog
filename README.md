@@ -209,24 +209,19 @@ MYBLOG_STATS_HASH_SECRET=<至少 32 字符的随机串>
 
 ### 启动三端
 
+以下三组命令分别在仓库根目录的新 PowerShell 窗口执行：
+
 ```powershell
 # 后端
-cd MyBlog-springboot-v2
-mvn spring-boot:run -Dspring-boot.run.profiles=local
-
-
+mvn -f MyBlog-springboot-v2/pom.xml spring-boot:run -Dspring-boot.run.profiles=local
 
 # 博客前台
-cd frontend/apps/blog
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
-
-
+corepack pnpm --dir frontend/apps/blog install --frozen-lockfile
+corepack pnpm --dir frontend/apps/blog dev
 
 # 管理后台
-cd frontend/apps/admin
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+corepack pnpm --dir frontend/apps/admin install --frozen-lockfile
+corepack pnpm --dir frontend/apps/admin dev
 ```
 
 默认监听地址：
@@ -251,7 +246,7 @@ local 空库首次启动会创建仅供本机开发的 `admin / 12345678`，已�
 
 | 命令                                                                             | 覆盖范围                              |
 | -------------------------------------------------------------------------------- | ------------------------------------- |
-| `mvn clean test`                                                                 | 后端单元/集成测试与 ArchUnit 架构约束 |
+| `mvn -f MyBlog-springboot-v2/pom.xml clean test`                                 | 后端单元/集成测试与 ArchUnit 架构约束 |
 | `pwsh -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract-test.ps1` | 本地 MySQL 初始化脚本安全契约         |
 | `bash deploy/cd/test/workflow-contract-test.sh .github/workflows/images.yml`      | 部署工作流静态合约                    |
 | `corepack pnpm --dir frontend/apps/blog test`                                    | 博客端 Vitest                         |

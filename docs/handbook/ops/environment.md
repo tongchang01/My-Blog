@@ -47,6 +47,7 @@
 
 | 变量 | 用途 |
 | --- | --- |
+| `COMPOSE_PROJECT_NAME` | 可选 Compose 项目名，默认 `myblog-v2` |
 | `GHCR_OWNER` | GHCR 命名空间 |
 | `IMAGE_TAG` | 两个镜像共同使用的完整 Git 提交 SHA |
 | `BLOG_HOST`、`WWW_HOST`、`ADMIN_HOST` | Caddy 的三个域名 |
@@ -65,8 +66,29 @@ Spring Boot relaxed binding 还允许通过大写下划线变量覆盖 `myblog.r
 
 ## 前端变量
 
-博客端：`VITE_API_BASE_URL` 控制 Axios base，`VITE_API_PROXY_TARGET` 控制开发代理，`VITE_APP_PUBLIC_PATH` 控制部署 base。
+博客端当前生效的变量：
 
-管理端：`VITE_PORT` 控制开发端口；`VITE_API_BASE_URL` 控制 Axios base；`VITE_BACKEND_PROXY_TARGET` 控制开发代理；`VITE_PUBLIC_PATH` 控制部署 base。
+| 变量 | 用途 |
+| --- | --- |
+| `VITE_API_BASE_URL` | Axios base，默认 `/api` |
+| `VITE_API_PROXY_TARGET` | 开发环境 `/api` 代理目标 |
+| `VITE_APP_PROJECT_TITLE` | 前端设置中的项目标题 |
+| `VITE_APP_I18N_LOCALE` | i18n 初始语言，路由进入后仍按语言前缀同步 |
+| `VITE_APP_I18N_FALLBACK_LOCALE` | i18n 回退语言 |
+
+博客端当前按站点根路径构建；`.env` 中遗留的 `VITE_APP_PUBLIC_PATH`、`VITE_APP_BASE_API` 和 `VITE_MODE` 没有接入当前 Vite/API 主链路，不属于可依赖的部署契约。
+
+管理端当前生效的变量：
+
+| 变量 | 用途 |
+| --- | --- |
+| `VITE_PORT` | 开发端口 |
+| `VITE_API_BASE_URL` | Axios base |
+| `VITE_BACKEND_PROXY_TARGET` | 开发环境 `/api` 代理目标 |
+| `VITE_PUBLIC_PATH` | Vite 部署 base |
+| `VITE_ROUTER_HISTORY` | `hash`、`h5` 或带 base 的对应模式 |
+| `VITE_CDN` | production build 是否使用现有 CDN 插件，默认 false |
+| `VITE_COMPRESSION` | gzip/brotli 构建压缩模式，默认 none |
+| `VITE_HIDE_HOME` | 是否隐藏固定首页标签，默认 false |
 
 真实密钥、密码和云凭据不得写入 `.env`、YAML、脚本或文档示例。

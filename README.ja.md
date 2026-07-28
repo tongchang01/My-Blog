@@ -203,20 +203,19 @@ MYBLOG_STATS_HASH_SECRET=<32 文字以上のランダム文字列>
 
 ### 3 つのアプリを起動する
 
+各グループを、リポジトリルートで開いた別々の PowerShell ウィンドウから実行する。
+
 ```powershell
 # バックエンド（local profile を明示）
-cd MyBlog-springboot-v2
-mvn spring-boot:run -Dspring-boot.run.profiles=local
+mvn -f MyBlog-springboot-v2/pom.xml spring-boot:run -Dspring-boot.run.profiles=local
 
 # ブログフロントエンド
-cd frontend/apps/blog
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+corepack pnpm --dir frontend/apps/blog install --frozen-lockfile
+corepack pnpm --dir frontend/apps/blog dev
 
 # 管理コンソール
-cd frontend/apps/admin
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+corepack pnpm --dir frontend/apps/admin install --frozen-lockfile
+corepack pnpm --dir frontend/apps/admin dev
 ```
 
 既定の待ち受けアドレス：
@@ -242,8 +241,8 @@ local profile で空の DB を初回起動すると、ローカル開発専用�
 
 | コマンド                                                                                                | 対象範囲                                                   |
 | ------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
-| `mvn test`                                                                                              | バックエンド単体・統合テスト + ArchUnit アーキテクチャ制約 |
-| `mvn verify`                                                                                            | バックエンドのフルビルド + パッケージング                  |
+| `mvn -f MyBlog-springboot-v2/pom.xml test`                                                            | バックエンド単体・統合テスト + ArchUnit アーキテクチャ制約 |
+| `mvn -f MyBlog-springboot-v2/pom.xml verify`                                                          | バックエンドのフルビルド + パッケージング                  |
 | `pwsh -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract-test.ps1`                        | ローカル MySQL 初期化スクリプトの安全契約                  |
 | `bash deploy/cd/test/workflow-contract-test.sh .github/workflows/images.yml`                             | デプロイワークフローの静的契約                              |
 | `corepack pnpm --dir frontend/apps/blog test`                                                           | 公開ブログの単体・コンポーネントテスト（Vitest）           |

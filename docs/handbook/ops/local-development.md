@@ -15,6 +15,8 @@
 
 ## 后端
 
+以下每个代码块均从仓库根目录开始执行。
+
 ```powershell
 $env:MYBLOG_DATASOURCE_USERNAME = "root"
 $env:MYBLOG_DATASOURCE_PASSWORD = "<local-password>"

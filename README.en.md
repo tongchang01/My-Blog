@@ -203,20 +203,19 @@ Real secrets are injected via local environment variables or IDE run configurati
 
 ### Start all three
 
+Run each group in a separate PowerShell window opened at the repository root:
+
 ```powershell
 # Backend
-cd MyBlog-springboot-v2
-mvn spring-boot:run -Dspring-boot.run.profiles=local
+mvn -f MyBlog-springboot-v2/pom.xml spring-boot:run -Dspring-boot.run.profiles=local
 
 # Blog frontend
-cd frontend/apps/blog
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+corepack pnpm --dir frontend/apps/blog install --frozen-lockfile
+corepack pnpm --dir frontend/apps/blog dev
 
 # Admin console
-cd frontend/apps/admin
-corepack pnpm install --frozen-lockfile
-corepack pnpm dev
+corepack pnpm --dir frontend/apps/admin install --frozen-lockfile
+corepack pnpm --dir frontend/apps/admin dev
 ```
 
 Default listening addresses:
@@ -241,7 +240,7 @@ On the first local-profile start against an empty database, the backend creates 
 
 | Command                                                                          | Coverage                                                |
 | -------------------------------------------------------------------------------- | ------------------------------------------------------- |
-| `mvn clean test`                                                                 | Backend unit/integration tests and ArchUnit constraints |
+| `mvn -f MyBlog-springboot-v2/pom.xml clean test`                                 | Backend unit/integration tests and ArchUnit constraints |
 | `pwsh -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract-test.ps1` | Safety contract for the local MySQL initializer         |
 | `bash deploy/cd/test/workflow-contract-test.sh .github/workflows/images.yml`      | Deployment workflow static contract                     |
 | `corepack pnpm --dir frontend/apps/blog test`                                    | Blog Vitest suite                                       |
