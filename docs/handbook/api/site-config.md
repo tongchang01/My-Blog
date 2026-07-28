@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 system 模块、前台 blog、后台 admin
-> 最后校准：2026-07-10
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/web/`
 > 权威程度：API 契约
 
@@ -154,7 +154,7 @@ Content-Type: application/json
 | `siteTitleJa` / `siteTitleEn` | trim，可空，最长 128 |
 | `siteSubtitleZh` / `siteSubtitleJa` / `siteSubtitleEn` | trim，可空，最长 255 |
 | `aboutMdZh` / `aboutMdJa` / `aboutMdEn` | 可空，最长 50000，保留 Markdown 原文 |
-| `logoUrl` / `faviconUrl` | trim，可空，最长 255，只接受 HTTP/HTTPS 绝对 URL |
+| `logoUrl` / `faviconUrl` | trim，可空，最长 255，只接受带主机名且不含用户名、密码的绝对 HTTP/HTTPS URL |
 | `icpNo` | trim，可空，最长 64 |
 | `spotifyPlaylistId` | trim，可空，最长 64，只接受字母、数字、下划线、连字符 |
 | `startedDate` | 可空，格式 `yyyy-MM-dd`，用于前台本地计算建站天数 |

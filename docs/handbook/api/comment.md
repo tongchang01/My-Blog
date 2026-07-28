@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 comment 模块、前台 blog、后台 admin
-> 最后校准：2026-07-18
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/comment/web/`
 > 权威程度：API 契约
 
@@ -102,7 +102,7 @@ X-Article-Access-Token: <password-article-token>
 |------|------|------|------|
 | `nickname` | string | 是 | 非空，最长 64 字符 |
 | `email` | string | 是 | 非空、合法邮箱，最长 128 字符；不在公开响应返回 |
-| `site` | string/null | 否 | 最长 255 字符，只允许 HTTP/HTTPS |
+| `site` | string/null | 否 | trim 后最长 255 字符，只允许带主机名且不含用户名、密码的绝对 HTTP/HTTPS URL |
 | `contentMd` | string | 是 | 非空，最长 5000 字符的 Markdown 原文 |
 | `replyToCommentId` | string/null | 否 | 正整数；回复同一文章下已通过评论，公开 ID 按 string 传递，避免 Snowflake ID 精度损失 |
 

@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 system 模块、前台 blog、后台 admin
-> 最后校准：2026-07-10
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/web/`
 > 权威程度：API 契约
 
@@ -145,8 +145,8 @@ Content-Type: application/json
 | 字段 | 规则 |
 |------|------|
 | `name` | 必填，最长 64 |
-| `url` | 必填，只接受 HTTP/HTTPS 绝对 URL |
-| `avatarUrl` | 可空，只接受 HTTP/HTTPS 绝对 URL |
+| `url` | 必填，只接受带主机名且不含用户名、密码的绝对 HTTP/HTTPS URL |
+| `avatarUrl` | 可空，只接受带主机名且不含用户名、密码的绝对 HTTP/HTTPS URL |
 | `description` | 可空，最长 255 |
 | `sortOrder` | 0 到 1000000 |
 | `status` | `VISIBLE` 或 `HIDDEN` |

@@ -2,8 +2,8 @@
 
 > 状态：当前有效
 > 适用范围：V2 认证、授权、匿名入口、上传和前端会话
-> 最后校准：2026-07-18
-> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/`、`frontend/apps/admin/src/features/auth/`
+> 最后校准：2026-07-28
+> 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/security/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/common/validation/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/identity/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/comment/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/`、`frontend/apps/`
 > 权威程度：规则
 
 ## 认证与会话
@@ -35,6 +35,7 @@
 - 博客端文章访问令牌只存当前标签页的 `sessionStorage`，不得写入 URL、Cookie、localStorage、console 或第三方 SDK。
 - 编辑器草稿不得持久化密码、token 等认证秘密；包含未发布内容的草稿必须按当前用户隔离，并在退出、会话失效和改密时清理该用户草稿。
 - 未清洗 HTML 不得进入管理端和博客端 DOM，降低 localStorage token 被 XSS 窃取的风险。
+- 作者资料、评论者站点、站点图片、友链、附件地址和附件公开前缀等结构化公开 URL，只允许带主机名且不含 userinfo 的绝对 HTTP/HTTPS URL；后端负责最终校验，前端表单同步提前拒绝。
 
 ## 匿名入口与上传
 
