@@ -37,4 +37,4 @@
 
 文章预览支持的语法和历史文章恢复步骤见 [`../../content/markdown-authoring.md`](../../content/markdown-authoring.md)。
 
-后端已有能力、管理端消费状态和表单业务语义见已完成的[管理端后端能力消费审查](backend-consumption-audit.md)。
+后端已有能力、管理端消费状态和表单业务语义见[管理端后端能力映射](backend-capability-map.md)。
