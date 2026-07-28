@@ -20,7 +20,7 @@ public class AdminCommentQueryService {
             AdminCommentPageQuery query) {
         authorization.requireReadable(principal);
         AdminCommentPage page = repository.page(toCriteria(query));
-        boolean includeAuditFields = principal.roles().contains("ADMIN");
+        boolean includeAuditFields = principal.isAdmin();
         return new AdminCommentPageResult(
                 page.records().stream()
                         .map(item -> toItem(item, includeAuditFields))
