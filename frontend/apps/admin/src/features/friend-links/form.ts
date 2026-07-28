@@ -3,6 +3,7 @@ import type {
   FriendLinkStatus,
   FriendLinkWritePayload
 } from "./model";
+import { isPublicHttpUrl } from "@/utils/publicUrl";
 
 export type FriendLinkFormErrorCode =
   | "required"
@@ -54,13 +55,13 @@ export function validateFriendLinkForm(
   const url = form.url.trim();
   if (!url) {
     errors.url = "required";
-  } else if (url.length > 255 || !isHttpUrl(url)) {
+  } else if (url.length > 255 || !isPublicHttpUrl(url)) {
     errors.url = "url";
   }
   if (
     form.avatarUrl.trim() &&
     (form.avatarUrl.trim().length > 255 ||
-      !isHttpUrl(form.avatarUrl.trim()))
+      !isPublicHttpUrl(form.avatarUrl.trim()))
   ) {
     errors.avatarUrl = "url";
   }
@@ -91,18 +92,4 @@ export function friendLinkFormToPayload(
 function optional(value: string): string | null {
   const normalized = value.trim();
   return normalized || null;
-}
-
-function isHttpUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return (
-      (url.protocol === "http:" || url.protocol === "https:") &&
-      Boolean(url.hostname) &&
-      !url.username &&
-      !url.password
-    );
-  } catch {
-    return false;
-  }
 }

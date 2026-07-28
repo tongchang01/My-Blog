@@ -74,6 +74,15 @@ describe("site config form", () => {
     });
   });
 
+  it("rejects credentials in public URLs", () => {
+    expect(
+      validateSiteConfigForm({
+        ...siteConfigToForm(config),
+        logoUrl: "https://user:password@example.com/logo.png"
+      })
+    ).toEqual({ logoUrl: "url" });
+  });
+
   it("normalizes whitespace and emits a complete PUT payload", () => {
     expect(
       siteConfigFormToPayload({

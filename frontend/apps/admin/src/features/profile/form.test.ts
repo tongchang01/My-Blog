@@ -73,6 +73,15 @@ describe("user profile form", () => {
     });
   });
 
+  it("rejects credentials in public URLs", () => {
+    expect(
+      validateUserProfileForm({
+        ...userProfileToForm(profile),
+        website: "https://user:password@example.com"
+      })
+    ).toEqual({ website: "url" });
+  });
+
   it("normalizes whitespace and emits nullable optional fields", () => {
     expect(
       userProfileFormToPayload({

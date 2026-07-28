@@ -1,4 +1,5 @@
 import type { UserProfile } from "@/features/auth/model";
+import { isPublicHttpUrl } from "@/utils/publicUrl";
 
 export interface UserProfilePayload {
   nickname: string;
@@ -86,7 +87,7 @@ export function validateUserProfileForm(
   ];
   validateMaxLength(errors, form, urlFields, 255);
   urlFields.forEach(field => {
-    if (form[field].trim() && !isHttpUrl(form[field].trim())) {
+    if (form[field].trim() && !isPublicHttpUrl(form[field].trim())) {
       errors[field] = "url";
     }
   });
@@ -108,18 +109,6 @@ function validateMaxLength(
   fields.forEach(field => {
     if (form[field].trim().length > maxLength) errors[field] = "maxLength";
   });
-}
-
-function isHttpUrl(value: string): boolean {
-  try {
-    const url = new URL(value);
-    return (
-      (url.protocol === "http:" || url.protocol === "https:") &&
-      Boolean(url.hostname)
-    );
-  } catch {
-    return false;
-  }
 }
 
 export function userProfileFormToPayload(
