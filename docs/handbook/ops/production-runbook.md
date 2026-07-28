@@ -2,7 +2,7 @@
 
 > 状态：当前有效；V2 已上线，日常发布由 GitHub Actions 自动部署
 > 适用范围：生产运行核对、故障恢复与受控手工操作
-> 最后校准：2026-07-14
+> 最后校准：2026-07-28
 > 对应文档：`deployment-direction.md`、`release-checklist.md`、`environment.md`
 > 权威程度：生产操作顺序
 
@@ -95,12 +95,57 @@ sudo docker compose --env-file /etc/myblog-v2/runtime.env pull
 
 核对输出中的两个应用镜像都带目标提交 SHA，且 `config --images` 只出现 `mysql:8.4`、目标 API 镜像和目标 web 镜像。若出现 `latest`、标签不一致、认证失败或变量缺失，停止部署。
 
-### 3. 按依赖顺序启动
+### 3. 启动 MySQL
 
 ```bash
 cd /opt/myblog-v2
 set -euo pipefail
 sudo docker compose --env-file /etc/myblog-v2/runtime.env up -d --wait --wait-timeout 180 mysql
+```
+
+### 4. 仅为空数据库创建首个管理员
+
+已有有效 ADMIN 时跳过本节。空数据库完成 Flyway 后，使用与常驻 API 相同的镜像运行一次非 Web 初始化；它会创建 ADMIN 和空资料，已有 ADMIN 时只跳过，不重置密码或资料。
+
+先通过受控编辑器创建 root-only 临时文件：
+
+```bash
+sudo install -m 600 /dev/null /etc/myblog-v2/bootstrap.env
+sudoedit /etc/myblog-v2/bootstrap.env
+```
+
+文件只包含以下变量，真实密码从私有生产台账填写，不得出现在命令历史、日志或仓库中：
+
+```dotenv
+MYBLOG_BOOTSTRAP_ADMIN_ENABLED=true
+MYBLOG_BOOTSTRAP_ADMIN_USERNAME=admin
+MYBLOG_BOOTSTRAP_ADMIN_PASSWORD=<从私有生产台账填写>
+MYBLOG_BOOTSTRAP_ADMIN_EXIT_AFTER_RUN=true
+```
+
+运行一次初始化命令：
+
+```bash
+cd /opt/myblog-v2
+sudo docker compose \
+  --env-file /etc/myblog-v2/runtime.env \
+  --env-file /etc/myblog-v2/bootstrap.env \
+  run --rm --no-deps api \
+  --spring.main.web-application-type=none
+```
+
+命令必须以 0 退出，日志只能显示“初始化成功”或“已有管理员，跳过”，不能打印密码或摘要。失败时停止启动 API，检查数据库与非敏感日志后修正再试；不得删除已有账号或直接重置密码。成功后立即删除临时文件，并确认常驻环境没有启用初始化：
+
+```bash
+sudo rm -- /etc/myblog-v2/bootstrap.env
+test ! -e /etc/myblog-v2/bootstrap.env
+```
+
+### 5. 启动 API 与 Web
+
+```bash
+cd /opt/myblog-v2
+set -euo pipefail
 sudo docker compose --env-file /etc/myblog-v2/runtime.env up -d --wait --wait-timeout 180 api
 sudo docker compose --env-file /etc/myblog-v2/runtime.env logs --tail=200 api
 sudo docker compose --env-file /etc/myblog-v2/runtime.env up -d --wait --wait-timeout 180 web
@@ -109,8 +154,6 @@ sudo docker compose --env-file /etc/myblog-v2/runtime.env logs --tail=200 web
 ```
 
 `--wait` 依赖 Compose 中为服务定义有效健康检查。MySQL 未健康时不得启动 API；Flyway、S3 凭据、证书或代理出现错误时不得继续验收。
-
-空数据库首次初始化管理员时，按 [`environment.md`](environment.md) 创建临时 root-only `bootstrap.env`，单独执行初始化命令并在成功后删除该文件；已有数据库不得重复执行初始化流程。
 
 ## 生产验收
 
