@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端模块边界
-> 最后校准：2026-07-10
+> 最后校准：2026-07-28
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`
 > 权威程度：ADR
 
