@@ -30,6 +30,7 @@
     "nickname": "ニックネーム",
     "email": "メールアドレス",
     "website": "ウェブサイト（任意）",
+    "website-invalid": "ユーザー名やパスワードを含まない HTTP/HTTPS URL を入力してください",
     "submitting": "送信中...",
     "submit": "コメントを送信",
     "error": "操作に失敗しました。しばらくしてからもう一度お試しください。",

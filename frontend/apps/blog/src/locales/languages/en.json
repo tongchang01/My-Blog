@@ -30,6 +30,7 @@
     "nickname": "Nickname",
     "email": "Email",
     "website": "Website (optional)",
+    "website-invalid": "Enter an HTTP/HTTPS URL without a username or password.",
     "submitting": "Submitting...",
     "submit": "Post comment",
     "error": "Something went wrong. Please try again.",

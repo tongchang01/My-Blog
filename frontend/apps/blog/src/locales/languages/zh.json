@@ -30,6 +30,7 @@
     "nickname": "昵称",
     "email": "邮箱",
     "website": "网站，可选",
+    "website-invalid": "请输入不含用户名或密码的 HTTP/HTTPS 网址",
     "submitting": "提交中...",
     "submit": "提交评论",
     "error": "操作失败，请稍后重试",

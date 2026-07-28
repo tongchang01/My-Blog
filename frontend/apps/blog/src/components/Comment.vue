@@ -47,10 +47,12 @@
             :placeholder="t('comments.email')"
           />
           <input
+            ref="siteInput"
             v-model="form.site"
             class="comment-input"
             type="url"
             :placeholder="t('comments.website')"
+            @input="validateSite"
           />
         </div>
         <div class="comment-form-footer">
@@ -181,11 +183,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, watch } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { MainTitle } from '@/components/Title'
 import { useAppStore } from '@/stores/app'
 import { useCommentStore } from '@/features/comments/store'
+import { isPublicHttpUrl } from '@/shared/url/publicUrl'
 import type {
   CommentFormState,
   CommentViewModel
@@ -213,6 +216,7 @@ const props = withDefaults(
 const appStore = useAppStore()
 const commentStore = useCommentStore()
 const { t } = useI18n()
+const siteInput = ref<HTMLInputElement | null>(null)
 const form = reactive<CommentFormState>({
   nickname: '',
   email: '',
@@ -246,8 +250,19 @@ const replyTo = (id: string, authorNickname: string): void => {
 
 const handleSubmit = async (): Promise<void> => {
   if (!props.guestbook && !props.articleId) return
+  if (!validateSite()) {
+    siteInput.value?.reportValidity()
+    return
+  }
   await commentStore.submit(props.guestbook ? null : props.articleId, form)
   if (!commentStore.error) form.contentMd = ''
+}
+
+const validateSite = (): boolean => {
+  const site = form.site.trim()
+  const valid = site === '' || isPublicHttpUrl(site)
+  siteInput.value?.setCustomValidity(valid ? '' : t('comments.website-invalid'))
+  return valid
 }
 
 const avatarText = (nickname: string): string =>
