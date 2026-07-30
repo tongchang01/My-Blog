@@ -103,7 +103,12 @@ class AdminAttachmentControllerTest {
 
     @Test
     void returnsPagedAttachmentsWithDefaultParameters() throws Exception {
-        when(queryService.page(principal, 1, 20))
+        when(queryService.page(
+                principal,
+                1,
+                20,
+                "createdAt",
+                "desc"))
                 .thenReturn(new AttachmentPageResult(
                         List.of(result()), 1, 1, 20));
 
@@ -116,6 +121,34 @@ class AdminAttachmentControllerTest {
                 .andExpect(jsonPath("$.data.size").value(20))
                 .andExpect(jsonPath("$.data.records[0].deleted")
                         .doesNotExist());
+
+        verify(queryService).page(
+                principal,
+                1,
+                20,
+                "createdAt",
+                "desc");
+    }
+
+    @Test
+    void forwardsAttachmentSortParameters() throws Exception {
+        when(queryService.page(
+                principal,
+                2,
+                50,
+                "originalFilename",
+                "asc"))
+                .thenReturn(new AttachmentPageResult(
+                        List.of(), 0, 2, 50));
+
+        mockMvc.perform(get("/api/admin/attachments")
+                        .queryParam("page", "2")
+                        .queryParam("size", "50")
+                        .queryParam("sortBy", "originalFilename")
+                        .queryParam("sortDirection", "asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.page").value(2))
+                .andExpect(jsonPath("$.data.size").value(50));
     }
 
     @Test

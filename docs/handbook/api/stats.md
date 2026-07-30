@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 stats 模块、前台 blog、后台 admin
-> 最后校准：2026-07-10
+> 最后校准：2026-07-30
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/stats/web/`
 > 权威程度：API 契约
 
@@ -103,8 +103,10 @@ GET /api/public/stats/site-summary
 
 | 字段 | 含义 |
 |------|------|
-| `todayUv` | JST 今天全站、全语言、所有公开页面的日 UV 合计 |
+| `todayUv` | JST 今天所有公开页面、各语言分组的日 UV 合计 |
 | `totalPv` | 全站、全语言、所有公开页面累计 PV |
+
+`todayUv` 是页面日 UV 合计：同一访客当天访问不同页面或切换语言时会分别计数，不代表站点级独立访客数。
 
 当前接口直接读取 `t_page_view_daily` 聚合表，接受聚合任务延迟，不叠加尚未聚合的访问明细。
 
@@ -176,9 +178,9 @@ Query：
 |------|------|
 | `periodPv` | 查询区间总 PV |
 | `todayPv` | JST 今天 PV |
-| `todayUv` | JST 今天日 UV |
-| `averageDailyUv` | 区间内各日 UV 之和除以完整区间天数 |
-| `trend` | 从 `from` 到 `to` 的连续日期 PV/UV，缺失日期补零 |
+| `todayUv` | JST 今日页面日 UV 合计 |
+| `averageDailyUv` | 区间内各日页面日 UV 合计之和除以完整区间天数 |
+| `trend` | 从 `from` 到 `to` 的连续日期 PV/页面日 UV 合计，缺失日期补零 |
 | `topArticles` | TOP 10 文章访问数据 |
 | `languageDistribution` | 各语言 PV 及占区间 PV 比例 |
 

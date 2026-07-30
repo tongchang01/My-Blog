@@ -12,9 +12,17 @@ export interface AttachmentItem {
   createdBy: string | null;
 }
 
-export interface AttachmentListParams {
+export type AttachmentSortBy = "createdAt" | "fileSize" | "originalFilename";
+export type AttachmentSortDirection = "asc" | "desc";
+
+export interface AttachmentPageParams {
   page: number;
   size: number;
+}
+
+export interface AttachmentListParams extends AttachmentPageParams {
+  sortBy: AttachmentSortBy;
+  sortDirection: AttachmentSortDirection;
 }
 
 export type AttachmentPageResponse = PageResponse<AttachmentItem>;

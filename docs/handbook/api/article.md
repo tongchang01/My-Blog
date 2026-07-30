@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 content 模块、前台 blog、后台 admin
-> 最后校准：2026-07-18
+> 最后校准：2026-07-30
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/content/web/`
 > 权威程度：API 契约
 
@@ -60,8 +60,12 @@ Query：
 | `createdTo` | string | 无 | 创建时间上界，ISO 本地时间 |
 | `publishFrom` | string | 无 | 发布时间下界，ISO 本地时间 |
 | `publishTo` | string | 无 | 发布时间上界，ISO 本地时间 |
+| `sortBy` | string | `updatedAt` | `updatedAt`、`createdAt`、`publishAt`、`commentCount` |
+| `sortDirection` | string | `desc` | `asc` 或 `desc` |
 
 成功响应：HTTP 200，`data` 为 `PageResponse<AdminArticlePageItemVO>`。
+
+排序只接受上述字段白名单，不接收数据库列名。结果始终追加同方向的 `id` 次排序，保证跨页顺序稳定；按 `publishAt` 排序时，未设置发布时间的文章无论升序或降序都排在最后。非法排序字段或方向返回 `400 + 90001`。
 
 ```json
 {
@@ -136,13 +140,24 @@ Authorization: Bearer <access-token>
 ## 5. 文章回收站
 
 ```http
-GET /api/admin/articles/recycle-bin?page=1&size=20
+GET /api/admin/articles/recycle-bin?page=1&size=20&sortBy=deletedAt&sortDirection=desc
 Authorization: Bearer <access-token>
 ```
 
 鉴权：ADMIN / DEMO。
 
+Query：
+
+| 参数 | 默认 | 规则 |
+|------|------|------|
+| `page` | 1 | 大于 0 |
+| `size` | 20 | 1 到 100 |
+| `sortBy` | `deletedAt` | 首批只允许 `deletedAt` |
+| `sortDirection` | `desc` | `asc` 或 `desc` |
+
 成功响应：HTTP 200，`data` 为 `PageResponse<DeletedArticlePageItemVO>`。
+
+排序字段由服务端白名单校验；删除时间相同时按同方向 `id` 次排序，保证分页顺序稳定。非法排序参数返回 `400 + 90001`。
 
 回收站条目字段：
 

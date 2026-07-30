@@ -5,8 +5,10 @@ import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.common.storage.StorageType;
 import com.tyb.myblog.v2.system.domain.attachment.Attachment;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentAdminSort;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentPage;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentRepository;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentSortDirection;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -33,40 +35,96 @@ class AttachmentQueryServiceTest {
 
     @Test
     void allowsAdminAndDemoToPageActiveAttachments() {
-        when(repository.findActivePage(1, 20))
+        when(repository.findActivePage(
+                1,
+                20,
+                AttachmentAdminSort.CREATED_AT,
+                AttachmentSortDirection.DESC))
                 .thenReturn(new AttachmentPage(
                         List.of(attachment()), 1, 1, 20));
 
-        var adminResult = service.page(principal("ADMIN"), 1, 20);
-        var demoResult = service.page(principal("DEMO"), 1, 20);
+        var adminResult = service.page(
+                principal("ADMIN"), 1, 20, "createdAt", "desc");
+        var demoResult = service.page(
+                principal("DEMO"), 1, 20, "createdAt", "desc");
 
         assertThat(adminResult.records()).hasSize(1);
         assertThat(demoResult.records()).hasSize(1);
         assertThat(adminResult.total()).isEqualTo(1);
         verify(repository, org.mockito.Mockito.times(2))
-                .findActivePage(1, 20);
+                .findActivePage(
+                        1,
+                        20,
+                        AttachmentAdminSort.CREATED_AT,
+                        AttachmentSortDirection.DESC);
     }
 
     @Test
     void rejectsMissingOrUnreadablePrincipal() {
         assertError(
-                () -> service.page(null, 1, 20),
+                () -> service.page(null, 1, 20, "createdAt", "desc"),
                 ApiErrorCode.INVALID_TOKEN);
         assertError(
-                () -> service.page(principal("GUEST"), 1, 20),
+                () -> service.page(
+                        principal("GUEST"),
+                        1,
+                        20,
+                        "createdAt",
+                        "desc"),
                 ApiErrorCode.FORBIDDEN);
     }
 
     @Test
     void validatesPageBoundaries() {
         assertError(
-                () -> service.page(principal("ADMIN"), 0, 20),
+                () -> service.page(
+                        principal("ADMIN"),
+                        0,
+                        20,
+                        "createdAt",
+                        "desc"),
                 ApiErrorCode.VALIDATION_ERROR);
         assertError(
-                () -> service.page(principal("ADMIN"), 1, 0),
+                () -> service.page(
+                        principal("ADMIN"),
+                        1,
+                        0,
+                        "createdAt",
+                        "desc"),
                 ApiErrorCode.VALIDATION_ERROR);
         assertError(
-                () -> service.page(principal("ADMIN"), 1, 101),
+                () -> service.page(
+                        principal("ADMIN"),
+                        1,
+                        101,
+                        "createdAt",
+                        "desc"),
+                ApiErrorCode.VALIDATION_ERROR);
+    }
+
+    @Test
+    void validatesAndMapsAttachmentSortParameters() {
+        when(repository.findActivePage(
+                1,
+                20,
+                AttachmentAdminSort.FILE_SIZE,
+                AttachmentSortDirection.ASC))
+                .thenReturn(new AttachmentPage(List.of(), 0, 1, 20));
+
+        service.page(principal("ADMIN"), 1, 20, "fileSize", "asc");
+
+        verify(repository).findActivePage(
+                1,
+                20,
+                AttachmentAdminSort.FILE_SIZE,
+                AttachmentSortDirection.ASC);
+        assertError(
+                () -> service.page(
+                        principal("ADMIN"), 1, 20, "deletedAt", "desc"),
+                ApiErrorCode.VALIDATION_ERROR);
+        assertError(
+                () -> service.page(
+                        principal("ADMIN"), 1, 20, "createdAt", "sideways"),
                 ApiErrorCode.VALIDATION_ERROR);
     }
 

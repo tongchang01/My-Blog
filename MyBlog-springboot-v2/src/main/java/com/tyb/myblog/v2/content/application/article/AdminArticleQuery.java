@@ -17,5 +17,7 @@ public record AdminArticleQuery(
         LocalDateTime createdFrom,
         LocalDateTime createdTo,
         LocalDateTime publishFrom,
-        LocalDateTime publishTo) {
+        LocalDateTime publishTo,
+        String sortBy,
+        String sortDirection) {
 }

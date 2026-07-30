@@ -5,14 +5,18 @@ import com.tyb.myblog.v2.comment.domain.AdminCommentPageItem;
 import com.tyb.myblog.v2.comment.domain.AdminCommentQueryCriteria;
 import com.tyb.myblog.v2.comment.domain.AdminCommentQueryRepository;
 import com.tyb.myblog.v2.comment.domain.CommentAuditStatus;
+import com.tyb.myblog.v2.comment.domain.CommentSortDirection;
 import com.tyb.myblog.v2.comment.domain.CommentTargetType;
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
+import com.tyb.myblog.v2.common.error.ApiErrorCode;
+import com.tyb.myblog.v2.common.error.ApiException;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,7 +31,9 @@ class AdminCommentQueryServiceTest {
                     "hello",
                     false,
                     1,
-                    20);
+                    20,
+                    "createdAt",
+                    "desc");
 
     private static final AdminCommentQueryCriteria CRITERIA =
             new AdminCommentQueryCriteria(
@@ -37,7 +43,8 @@ class AdminCommentQueryServiceTest {
                     "hello",
                     false,
                     1,
-                    20);
+                    20,
+                    CommentSortDirection.DESC);
 
     private final AdminCommentQueryRepository repository =
             mock(AdminCommentQueryRepository.class);
@@ -72,6 +79,31 @@ class AdminCommentQueryServiceTest {
         assertThat(result.authorNickname()).isEqualTo("TYB");
         assertThat(result.contentMd()).isEqualTo("hello");
         verify(repository).page(CRITERIA);
+    }
+
+    @Test
+    void rejectsUnknownSortParameters() {
+        assertInvalidSort("updatedAt", "desc");
+        assertInvalidSort("createdAt", "sideways");
+    }
+
+    private void assertInvalidSort(String sortBy, String sortDirection) {
+        assertThatThrownBy(() -> service.page(
+                principal("ADMIN"),
+                new AdminCommentPageQuery(
+                        null,
+                        null,
+                        null,
+                        null,
+                        false,
+                        1,
+                        20,
+                        sortBy,
+                        sortDirection)))
+                .isInstanceOfSatisfying(
+                        ApiException.class,
+                        exception -> assertThat(exception.code())
+                                .isEqualTo(ApiErrorCode.VALIDATION_ERROR));
     }
 
     private static AuthenticatedPrincipal principal(String role) {

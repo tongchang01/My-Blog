@@ -131,9 +131,27 @@ describe("article list state", () => {
       createdTo: "",
       publishFrom: "",
       publishTo: "",
+      sortBy: "updatedAt",
+      sortDirection: "desc",
       page: 1,
       size: 20
     });
+  });
+
+  it("returns to page one when server-side sorting changes", async () => {
+    const source = api();
+    const state = useArticleList(source);
+    state.filters.page = 3;
+
+    await state.changeSort("commentCount", "asc");
+
+    expect(source.listArticles).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        page: 1,
+        sortBy: "commentCount",
+        sortDirection: "asc"
+      })
+    );
   });
 
   it("keeps the list usable when dictionaries fail", async () => {
@@ -211,9 +229,7 @@ describe("article list state", () => {
     const listArticles = vi
       .fn()
       .mockResolvedValueOnce(ok({ ...page("21", 2), total: 21 }))
-      .mockResolvedValueOnce(
-        ok({ records: [], total: 20, page: 2, size: 20 })
-      )
+      .mockResolvedValueOnce(ok({ records: [], total: 20, page: 2, size: 20 }))
       .mockResolvedValueOnce(ok({ ...page("20"), total: 20 }));
     const source = api({ listArticles });
     const state = useArticleList(source);

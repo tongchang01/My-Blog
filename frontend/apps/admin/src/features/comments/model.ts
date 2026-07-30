@@ -4,6 +4,8 @@ export type CommentTargetType = "ARTICLE" | "GUESTBOOK";
 export type CommentTargetTypeFilter = CommentTargetType | "ALL";
 export type CommentAuditStatus = "PASS" | "PENDING" | "HIDDEN";
 export type CommentAuditStatusFilter = CommentAuditStatus | "ALL";
+export type CommentSortBy = "createdAt";
+export type CommentSortDirection = "asc" | "desc";
 
 export interface CommentListFilters {
   targetType: CommentTargetTypeFilter;
@@ -11,6 +13,8 @@ export interface CommentListFilters {
   auditStatus: CommentAuditStatusFilter;
   keyword: string;
   includeDeleted: boolean;
+  sortBy: CommentSortBy;
+  sortDirection: CommentSortDirection;
   page: number;
   size: number;
 }
@@ -21,6 +25,8 @@ export interface CommentListParams {
   auditStatus?: CommentAuditStatus;
   keyword?: string;
   includeDeleted: boolean;
+  sortBy: CommentSortBy;
+  sortDirection: CommentSortDirection;
   page: number;
   size: number;
 }

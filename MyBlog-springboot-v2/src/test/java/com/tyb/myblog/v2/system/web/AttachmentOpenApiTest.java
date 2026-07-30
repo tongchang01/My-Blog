@@ -101,6 +101,25 @@ class AttachmentOpenApiTest {
                         "software.amazon.awssdk");
     }
 
+    @Test
+    void documentsAttachmentSortParameters() throws Exception {
+        JsonNode root = apiDocument();
+        String pointer =
+                "/paths/~1api~1admin~1attachments/get/parameters";
+
+        assertThat(queryParameter(root, pointer, "sortBy")
+                        .at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly(
+                        "createdAt",
+                        "fileSize",
+                        "originalFilename");
+        assertThat(queryParameter(root, pointer, "sortDirection")
+                        .at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly("asc", "desc");
+    }
+
     private JsonNode apiDocument() throws Exception {
         String content = mockMvc.perform(get("/v3/api-docs"))
                 .andExpect(status().isOk())
@@ -119,6 +138,18 @@ class AttachmentOpenApiTest {
         return root.path("components")
                 .path("schemas")
                 .path(ref.substring(ref.lastIndexOf('/') + 1));
+    }
+
+    private JsonNode queryParameter(
+            JsonNode root,
+            String pointer,
+            String name) {
+        for (JsonNode parameter : root.at(pointer)) {
+            if (name.equals(parameter.path("name").asText())) {
+                return parameter;
+            }
+        }
+        throw new AssertionError("缺少查询参数: " + name);
     }
 
     private void assertStringInt64(JsonNode schema) {

@@ -2,9 +2,11 @@ package com.tyb.myblog.v2.system.infrastructure.persistence;
 
 import com.tyb.myblog.v2.common.storage.StorageType;
 import com.tyb.myblog.v2.system.domain.attachment.Attachment;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentAdminSort;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentLookup;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentPage;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentRepository;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentSortDirection;
 import com.tyb.myblog.v2.system.domain.attachment.NewAttachment;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,11 +63,65 @@ class DatabaseAttachmentRepositoryTest {
         insert(103L, "3".repeat(64), false, "2026-06-14 11:00:00");
         insert(104L, "4".repeat(64), true, "2026-06-14 12:00:00");
 
-        AttachmentPage page = repository.findActivePage(1, 2);
+        AttachmentPage page = repository.findActivePage(
+                1,
+                2,
+                AttachmentAdminSort.CREATED_AT,
+                AttachmentSortDirection.DESC);
 
         assertThat(page.total()).isEqualTo(3);
         assertThat(page.records()).extracting(Attachment::id)
                 .containsExactly(103L, 102L);
+    }
+
+    @Test
+    void sortsActiveAttachmentsByWhitelistedFieldsAndStableId() {
+        insert(
+                101L,
+                "1".repeat(64),
+                false,
+                "2026-06-14 10:00:00",
+                300L,
+                "beta.png");
+        insert(
+                102L,
+                "2".repeat(64),
+                false,
+                "2026-06-14 11:00:00",
+                100L,
+                "charlie.png");
+        insert(
+                103L,
+                "3".repeat(64),
+                false,
+                "2026-06-14 11:00:00",
+                100L,
+                "alpha.png");
+
+        assertThat(repository.findActivePage(
+                        1,
+                        20,
+                        AttachmentAdminSort.CREATED_AT,
+                        AttachmentSortDirection.DESC)
+                .records())
+                .extracting(Attachment::id)
+                .containsExactly(103L, 102L, 101L);
+        assertThat(repository.findActivePage(
+                        1,
+                        20,
+                        AttachmentAdminSort.FILE_SIZE,
+                        AttachmentSortDirection.ASC)
+                .records())
+                .extracting(Attachment::id)
+                .containsExactly(102L, 103L, 101L);
+        assertThat(repository.findActivePage(
+                        1,
+                        20,
+                        AttachmentAdminSort.ORIGINAL_FILENAME,
+                        AttachmentSortDirection.DESC)
+                .records())
+                .extracting(Attachment::id)
+                .containsExactly(102L, 101L, 103L);
     }
 
     @Test
@@ -142,6 +198,16 @@ class DatabaseAttachmentRepositoryTest {
             String hash,
             boolean deleted,
             String createdAt) {
+        insert(id, hash, deleted, createdAt, 128L, "cover.png");
+    }
+
+    private void insert(
+            long id,
+            String hash,
+            boolean deleted,
+            String createdAt,
+            long fileSize,
+            String originalFilename) {
         jdbcTemplate.update("""
                 INSERT INTO t_attachment (
                     id, storage_type, bucket, object_key, public_url,
@@ -150,12 +216,14 @@ class DatabaseAttachmentRepositoryTest {
                     created_at, created_by, updated_at, updated_by,
                     deleted, deleted_at, deleted_by
                 ) VALUES (?, 'LOCAL', 'local', ?, ?, 'image/png',
-                    128, 10, 20, 'cover.png', ?,
+                    ?, 10, 20, ?, ?,
                     ?, 1001, ?, 1001, ?, ?, ?)
                 """,
                 id,
                 "attachments/2026/06/" + id + ".png",
                 "http://localhost/media/" + id + ".png",
+                fileSize,
+                originalFilename,
                 hash,
                 createdAt,
                 createdAt,

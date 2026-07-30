@@ -144,7 +144,33 @@
             ON c.id = a.category_id
            AND c.deleted = 0
         WHERE <include refid="adminArticleWhere"/>
-        ORDER BY a.updated_at DESC, a.id DESC
+        ORDER BY
+        <if test='query.sortBy.name() == "PUBLISH_AT"'>
+            CASE WHEN a.publish_at IS NULL THEN 1 ELSE 0 END ASC,
+        </if>
+        <choose>
+            <when test='query.sortBy.name() == "CREATED_AT"'>
+                a.created_at
+            </when>
+            <when test='query.sortBy.name() == "PUBLISH_AT"'>
+                a.publish_at
+            </when>
+            <when test='query.sortBy.name() == "COMMENT_COUNT"'>
+                a.comment_count
+            </when>
+            <otherwise>
+                a.updated_at
+            </otherwise>
+        </choose>
+        <choose>
+            <when test='query.sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>,
+        a.id
+        <choose>
+            <when test='query.sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
         LIMIT #{size} OFFSET #{offset}
     </select>
 
@@ -427,7 +453,7 @@
         ORDER BY at.article_id ASC, t.id ASC
     </select>
 
-    <!-- 回收站只读查询，固定按删除时间倒序保证分页稳定。 -->
+    <!-- 回收站只读查询，按删除时间与同方向 ID 次排序保证分页稳定。 -->
     <select id="selectDeletedPage"
             resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.DeletedArticlePageRow">
         SELECT
@@ -441,7 +467,16 @@
             deleted_by
         FROM t_article
         WHERE deleted = 1
-        ORDER BY deleted_at DESC, id DESC
+        ORDER BY deleted_at
+        <choose>
+            <when test='sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>,
+        id
+        <choose>
+            <when test='sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
         LIMIT #{size} OFFSET #{offset}
     </select>
 

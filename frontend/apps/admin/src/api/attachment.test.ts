@@ -17,7 +17,12 @@ afterEach(() => mock.reset());
 describe("attachment API", () => {
   it("requests paged attachments with stable string ids", async () => {
     mock.onGet("/api/admin/attachments").reply(config => {
-      expect(config.params).toEqual({ page: 2, size: 50 });
+      expect(config.params).toEqual({
+        page: 2,
+        size: 50,
+        sortBy: "fileSize",
+        sortDirection: "asc"
+      });
       return [
         200,
         {
@@ -45,13 +50,18 @@ describe("attachment API", () => {
       ];
     });
 
-    await expect(listAttachments({ page: 2, size: 50 })).resolves.toMatchObject(
-      {
-        data: {
-          records: [{ id: "9007199254743001", createdBy: "1001" }]
-        }
+    await expect(
+      listAttachments({
+        page: 2,
+        size: 50,
+        sortBy: "fileSize",
+        sortDirection: "asc"
+      })
+    ).resolves.toMatchObject({
+      data: {
+        records: [{ id: "9007199254743001", createdBy: "1001" }]
       }
-    );
+    });
   });
 
   it("requests attachment detail and multipart upload", async () => {

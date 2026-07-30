@@ -149,7 +149,16 @@
             deleted
         FROM t_comment
         <include refid="adminCommentWhere"/>
-        ORDER BY created_at DESC, id DESC
+        ORDER BY created_at
+        <choose>
+            <when test='sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>,
+        id
+        <choose>
+            <when test='sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
         LIMIT #{size} OFFSET #{offset}
     </select>
 

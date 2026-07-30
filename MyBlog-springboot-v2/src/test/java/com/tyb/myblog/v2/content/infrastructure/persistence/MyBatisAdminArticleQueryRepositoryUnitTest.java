@@ -2,6 +2,8 @@ package com.tyb.myblog.v2.content.infrastructure.persistence;
 
 import com.tyb.myblog.v2.content.domain.article.AdminArticleCriteria;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePage;
+import com.tyb.myblog.v2.content.domain.article.ArticleAdminSort;
+import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.infrastructure.persistence.mapper.ArticleMapper;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.AdminArticlePageRow;
 import com.tyb.myblog.v2.content.infrastructure.persistence.projection.ArticleTagIdRow;
@@ -27,7 +29,9 @@ class MyBatisAdminArticleQueryRepositoryUnitTest {
     void loadsPageTagIdsWithOneBatchQuery() {
         AdminArticleCriteria criteria = new AdminArticleCriteria(
                 1, 20, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                ArticleAdminSort.UPDATED_AT,
+                ArticleSortDirection.DESC);
         when(mapper.selectAdminPage(criteria, 0L, 20))
                 .thenReturn(List.of(row(101L), row(100L)));
         when(mapper.selectTagIdsBatch(List.of(101L, 100L)))
@@ -53,7 +57,9 @@ class MyBatisAdminArticleQueryRepositoryUnitTest {
     void skipsTagQueryForEmptyPage() {
         AdminArticleCriteria criteria = new AdminArticleCriteria(
                 1, 20, null, null, null, null,
-                null, null, null, null);
+                null, null, null, null,
+                ArticleAdminSort.UPDATED_AT,
+                ArticleSortDirection.DESC);
         when(mapper.selectAdminPage(criteria, 0L, 20))
                 .thenReturn(List.of());
         when(mapper.countAdminPage(criteria)).thenReturn(0L);

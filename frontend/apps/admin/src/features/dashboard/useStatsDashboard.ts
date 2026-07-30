@@ -1,9 +1,6 @@
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { getStatsDashboard } from "@/api/stats";
-import type {
-  StatsDashboard,
-  StatsDashboardFilters
-} from "./model";
+import type { StatsDashboard, StatsDashboardFilters } from "./model";
 import {
   type StatsDashboardFilterError,
   validateStatsDashboardFilters
@@ -15,19 +12,6 @@ export function useStatsDashboard(initialFilters: StatsDashboardFilters = {}) {
   const loading = ref(false);
   const error = ref(false);
   const filterError = ref<StatsDashboardFilterError | null>(null);
-
-  const isEmpty = computed(() => {
-    const current = dashboard.value;
-    if (!current) return false;
-    return (
-      current.periodPv === 0 &&
-      current.todayPv === 0 &&
-      current.todayUv === 0 &&
-      current.trend.length === 0 &&
-      current.topArticles.length === 0 &&
-      current.languageDistribution.length === 0
-    );
-  });
 
   async function load(): Promise<void> {
     filterError.value = validateStatsDashboardFilters(filters.value);
@@ -50,7 +34,6 @@ export function useStatsDashboard(initialFilters: StatsDashboardFilters = {}) {
     loading,
     error,
     filterError,
-    isEmpty,
     load,
     refresh: load
   };

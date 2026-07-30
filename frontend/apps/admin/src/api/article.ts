@@ -3,6 +3,7 @@ import type {
   ArticleListFilters,
   ArticleListItem,
   ArticleDetail,
+  ArticleSortDirection,
   ArticleWritePayload,
   DeletedArticleListItem,
   PageResponse
@@ -11,10 +12,9 @@ import { buildArticleListParams } from "@/features/articles/query";
 import { http } from "@/utils/http";
 
 export const listArticles = (filters: ArticleListFilters) =>
-  http.get<ApiResponse<PageResponse<ArticleListItem>>>(
-    "/api/admin/articles",
-    { params: buildArticleListParams(filters) }
-  );
+  http.get<ApiResponse<PageResponse<ArticleListItem>>>("/api/admin/articles", {
+    params: buildArticleListParams(filters)
+  });
 
 export { listCategories, listTags } from "./taxonomy";
 
@@ -27,22 +27,29 @@ export const createArticle = (payload: ArticleWritePayload) =>
   });
 
 export const updateArticle = (id: string, payload: ArticleWritePayload) =>
-  http.request<ApiResponse<ArticleDetail>>(
-    "put",
-    `/api/admin/articles/${id}`,
-    { data: payload }
-  );
+  http.request<ApiResponse<ArticleDetail>>("put", `/api/admin/articles/${id}`, {
+    data: payload
+  });
 
 export const deleteArticle = (id: string) =>
   http.request<ApiResponse<null>>("delete", `/api/admin/articles/${id}`);
 
-export const listDeletedArticles = (page: number, size: number) =>
+export const listDeletedArticles = (
+  page: number,
+  size: number,
+  sortDirection: ArticleSortDirection
+) =>
   http.get<ApiResponse<PageResponse<DeletedArticleListItem>>>(
     "/api/admin/articles/recycle-bin",
-    { params: { page, size } }
+    {
+      params: {
+        page,
+        size,
+        sortBy: "deletedAt",
+        sortDirection
+      }
+    }
   );
 
 export const restoreArticle = (id: string) =>
-  http.post<ApiResponse<ArticleDetail>>(
-    `/api/admin/articles/${id}/restore`
-  );
+  http.post<ApiResponse<ArticleDetail>>(`/api/admin/articles/${id}/restore`);

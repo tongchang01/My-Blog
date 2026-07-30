@@ -1,6 +1,8 @@
 package com.tyb.myblog.v2.system.infrastructure.persistence.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentAdminSort;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentSortDirection;
 import com.tyb.myblog.v2.system.infrastructure.persistence.entity.AttachmentEntity;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -25,7 +27,10 @@ public interface AttachmentMapper extends BaseMapper<AttachmentEntity> {
 
     List<AttachmentEntity> selectActivePage(
             @Param("offset") long offset,
-            @Param("size") int size);
+            @Param("size") int size,
+            @Param("sortBy") AttachmentAdminSort sortBy,
+            @Param("sortDirection")
+            AttachmentSortDirection sortDirection);
 
     long countActive();
 

@@ -7,5 +7,6 @@ public record AdminCommentQueryCriteria(
         String keyword,
         boolean includeDeleted,
         int page,
-        int size) {
+        int size,
+        CommentSortDirection sortDirection) {
 }

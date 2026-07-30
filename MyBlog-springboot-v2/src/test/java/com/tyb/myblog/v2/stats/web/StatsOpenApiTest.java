@@ -52,6 +52,12 @@ class StatsOpenApiTest {
                         "/components/schemas/SiteStatsSummaryVO/properties")
                 .fieldNames()).toIterable()
                 .containsExactlyInAnyOrder("todayUv", "totalPv");
+        assertDescription(root, "SiteStatsSummaryVO", "todayUv",
+                "JST 今日页面日 UV 合计");
+        assertDescription(root, "StatsDashboardVO", "todayUv",
+                "JST 今日页面日 UV 合计");
+        assertDescription(root, "TrendPoint", "uv",
+                "该 JST 日期的页面日 UV 合计");
         assertStringId(root, "TopArticle", "articleId");
         assertThat(root.toString()).doesNotContain(
                 "PageViewEntity",
@@ -82,6 +88,18 @@ class StatsOpenApiTest {
                         + "/properties/" + field);
         assertThat(property.path("type").asText()).isEqualTo("string");
         assertThat(property.path("format").asText()).isEqualTo("int64");
+    }
+
+    private void assertDescription(
+            JsonNode root,
+            String schema,
+            String field,
+            String description) {
+        assertThat(root.at(
+                        "/components/schemas/" + schema
+                                + "/properties/" + field
+                                + "/description")
+                .asText()).isEqualTo(description);
     }
 
     private JsonNode apiDocument() throws Exception {

@@ -101,11 +101,17 @@ dashboard:
   backendStatus: バックエンド接続
   connected: 接続済み
   loadError: 統計データの読み込みに失敗しました。再試行してください
-  empty: 統計データはまだありません
+  empty:
+    trend: この期間のアクセスはありません
+    topArticles: この期間の上位記事はありません
+    languageDistribution: この期間の言語分布はありません
   trend: アクセス推移
   topArticles: 上位記事
   languageDistribution: 言語分布
   dailyUvSum: 期間内の日別 UV 合計
+  sections:
+    period: 選択期間
+    today: 今日の概要
   filter:
     last7: 直近 7 日
     last30: 直近 30 日
@@ -117,7 +123,8 @@ dashboard:
   metrics:
     periodPv: 期間 PV
     todayPv: JST 今日の PV
-    todayUv: JST 今日の UV
+    todayUv: JST 今日のページ日次 UV 合計
+    pageDailyUvSum: ページ日次 UV 合計
     averageDailyUv: 平均日次 UV
   languages:
     zh: 中国語
@@ -500,6 +507,13 @@ attachments:
   result:
     total: 添付ファイル数
     deletedTotal: 回収済み添付ファイル数
+  sort:
+    label: 並び順
+    createdAt: アップロード日時
+    fileSize: ファイルサイズ
+    originalFilename: 元のファイル名
+    asc: 昇順
+    desc: 降順
   actions:
     copyUrl: URL をコピー
     open: 開く

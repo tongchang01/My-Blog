@@ -35,7 +35,8 @@ public class MyBatisAdminCommentQueryRepository
                                 normalizeKeyword(criteria.keyword()),
                                 criteria.includeDeleted(),
                                 offset,
-                                criteria.size())
+                                criteria.size(),
+                                criteria.sortDirection())
                         .stream()
                         .map(MyBatisAdminCommentQueryRepository::toItem)
                         .toList(),

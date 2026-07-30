@@ -25,7 +25,11 @@ const stubs = {
   "el-card": { template: "<div><slot name='header' /><slot /></div>" },
   "el-empty": true,
   "el-image": true,
+  "el-option": true,
   "el-pagination": true,
+  "el-select": {
+    template: "<button @click=\"$emit('change', 'fileSize')\"><slot /></button>"
+  },
   "el-skeleton": true,
   "el-tag": true
 };
@@ -106,6 +110,37 @@ describe("attachment management page", () => {
     expect(wrapper.text()).toContain("a.png");
     expect(wrapper.text()).toContain("800 × 450");
     expect(wrapper.text()).toContain("1 KB");
+    expect(mock.history.get[0].params).toEqual({
+      page: 1,
+      size: 20,
+      sortBy: "createdAt",
+      sortDirection: "desc"
+    });
+  });
+
+  it("changes server-side attachment sorting", async () => {
+    setUser("ADMIN");
+    mock.onGet("/api/admin/attachments").reply(200, ok(page()));
+    const wrapper = mount(AttachmentManagement, { global: { stubs } });
+    await flushPromises();
+
+    await wrapper.get('[data-testid="attachment-sort-by"]').trigger("click");
+    await flushPromises();
+    expect(mock.history.get.at(-1)?.params).toMatchObject({
+      page: 1,
+      sortBy: "fileSize",
+      sortDirection: "desc"
+    });
+
+    await wrapper
+      .get('[data-testid="attachment-sort-direction"]')
+      .trigger("click");
+    await flushPromises();
+    expect(mock.history.get.at(-1)?.params).toMatchObject({
+      page: 1,
+      sortBy: "fileSize",
+      sortDirection: "asc"
+    });
   });
 
   it("keeps demo users read-only", async () => {
@@ -207,6 +242,10 @@ describe("attachment management page", () => {
     await flushPromises();
 
     expect(mock.history.get[1].url).toBe("/api/admin/attachments/deleted");
+    expect(mock.history.get[1].params).toEqual({ page: 1, size: 20 });
+    expect(wrapper.find('[data-testid="attachment-sort-by"]').exists()).toBe(
+      false
+    );
     expect(
       wrapper
         .find('[data-testid="attachment-delete-9007199254743001"]')

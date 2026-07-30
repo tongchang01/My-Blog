@@ -33,6 +33,7 @@ const {
   reset,
   refresh,
   changePage,
+  changeSort,
   openReplyDialog,
   closeReplyDialog,
   submitReply
@@ -97,6 +98,17 @@ function canHide(item: CommentListItem): boolean {
 
 function canReply(item: CommentListItem): boolean {
   return isAdmin.value && !item.deleted && item.auditStatus === "PASS";
+}
+
+function handleSortChange({
+  prop,
+  order
+}: {
+  prop: string;
+  order: "ascending" | "descending" | null;
+}): void {
+  if (prop !== "createdAt" || order === null) return;
+  void changeSort("createdAt", order === "ascending" ? "asc" : "desc");
 }
 
 function actionConfirmKey(item: CommentListItem, action: string): string {
@@ -295,7 +307,18 @@ watch(
 
       <template v-else>
         <div class="table-scroll">
-          <el-table :data="items" row-key="id" class="comment-table">
+          <el-table
+            data-testid="comment-table"
+            :data="items"
+            row-key="id"
+            class="comment-table"
+            :default-sort="{
+              prop: filters.sortBy,
+              order:
+                filters.sortDirection === 'asc' ? 'ascending' : 'descending'
+            }"
+            @sort-change="handleSortChange"
+          >
             <el-table-column
               :label="transformI18n('comments.columns.content')"
               min-width="260"
@@ -396,8 +419,11 @@ watch(
               </template>
             </el-table-column>
             <el-table-column
+              prop="createdAt"
               :label="transformI18n('comments.columns.createdAt')"
               width="155"
+              sortable="custom"
+              :sort-orders="['descending', 'ascending']"
             >
               <template #default="{ row }">
                 {{ formatJstDateTime(row.createdAt) }}
@@ -647,9 +673,9 @@ watch(
   margin-top: 4px;
 
   summary {
-    cursor: pointer;
     font-size: 12px;
     color: var(--el-color-primary);
+    cursor: pointer;
   }
 }
 
@@ -684,8 +710,8 @@ watch(
   }
 
   .filter-actions {
-    align-items: flex-start;
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .comment-pagination {

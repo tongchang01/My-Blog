@@ -5,7 +5,7 @@ import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { message } from "@/utils/message";
 import { formatJstDateTime } from "@/features/articles/presentation";
-import type { AttachmentItem } from "./model";
+import type { AttachmentItem, AttachmentSortBy } from "./model";
 import { formatFileSize } from "./presentation";
 import { useAttachmentManagement } from "./useAttachmentManagement";
 
@@ -27,6 +27,7 @@ const {
   initialize,
   refresh,
   changePage,
+  changeSort,
   upload,
   showDeletedAttachments,
   showActiveAttachments,
@@ -36,6 +37,17 @@ const {
 
 function dimensions(item: AttachmentItem): string {
   return `${item.width} × ${item.height}`;
+}
+
+function handleSortByChange(sortBy: AttachmentSortBy): void {
+  void changeSort(sortBy, pagination.sortDirection);
+}
+
+function toggleSortDirection(): void {
+  void changeSort(
+    pagination.sortBy,
+    pagination.sortDirection === "asc" ? "desc" : "asc"
+  );
 }
 
 async function handleFileChange(event: Event): Promise<void> {
@@ -73,7 +85,9 @@ async function confirmRemove(item: AttachmentItem): Promise<void> {
 
 async function restoreAttachment(id: string): Promise<void> {
   if (await restore(id)) {
-    message(transformI18n("attachments.feedback.restored"), { type: "success" });
+    message(transformI18n("attachments.feedback.restored"), {
+      type: "success"
+    });
   }
 }
 
@@ -147,6 +161,39 @@ onMounted(initialize);
             <span class="result-count">{{ total }}</span>
           </h2>
           <div class="result-actions">
+            <div v-if="!showDeleted" class="sort-actions">
+              <el-select
+                data-testid="attachment-sort-by"
+                class="sort-select"
+                :aria-label="transformI18n('attachments.sort.label')"
+                :model-value="pagination.sortBy"
+                @change="handleSortByChange"
+              >
+                <el-option
+                  value="createdAt"
+                  :label="transformI18n('attachments.sort.createdAt')"
+                />
+                <el-option
+                  value="fileSize"
+                  :label="transformI18n('attachments.sort.fileSize')"
+                />
+                <el-option
+                  value="originalFilename"
+                  :label="transformI18n('attachments.sort.originalFilename')"
+                />
+              </el-select>
+              <el-button
+                data-testid="attachment-sort-direction"
+                :aria-label="
+                  transformI18n(`attachments.sort.${pagination.sortDirection}`)
+                "
+                @click="toggleSortDirection"
+              >
+                {{
+                  transformI18n(`attachments.sort.${pagination.sortDirection}`)
+                }}
+              </el-button>
+            </div>
             <el-button
               v-if="!showDeleted"
               data-testid="attachment-show-deleted"
@@ -348,6 +395,16 @@ onMounted(initialize);
   color: var(--el-color-primary);
 }
 
+.sort-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.sort-select {
+  width: 150px;
+}
+
 .attachment-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -356,9 +413,9 @@ onMounted(initialize);
 
 .attachment-card {
   overflow: hidden;
+  background: var(--el-bg-color);
   border: 1px solid var(--el-border-color-lighter);
   border-radius: 8px;
-  background: var(--el-bg-color);
 }
 
 .attachment-preview {
@@ -400,8 +457,8 @@ onMounted(initialize);
   }
 
   .result-heading {
-    align-items: flex-start;
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .attachment-pagination {

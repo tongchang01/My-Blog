@@ -1,10 +1,14 @@
 package com.tyb.myblog.v2.comment.infrastructure.persistence;
 
+import com.tyb.myblog.v2.comment.domain.AdminCommentPageItem;
+import com.tyb.myblog.v2.comment.domain.AdminCommentQueryCriteria;
+import com.tyb.myblog.v2.comment.domain.AdminCommentQueryRepository;
 import com.tyb.myblog.v2.comment.domain.Comment;
 import com.tyb.myblog.v2.comment.domain.CommentAuditStatus;
 import com.tyb.myblog.v2.comment.domain.CommentAuthor;
 import com.tyb.myblog.v2.comment.domain.CommentContent;
 import com.tyb.myblog.v2.comment.domain.CommentRepository;
+import com.tyb.myblog.v2.comment.domain.CommentSortDirection;
 import com.tyb.myblog.v2.comment.domain.CommentTarget;
 import com.tyb.myblog.v2.comment.domain.NewComment;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -27,6 +32,9 @@ class DatabaseCommentRepositoryTest {
 
     @Autowired
     private CommentRepository repository;
+
+    @Autowired
+    private AdminCommentQueryRepository adminQueryRepository;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -97,6 +105,44 @@ class DatabaseCommentRepositoryTest {
                 NOW.plusMinutes(3),
                 1001L)).isTrue();
         assertThat(repository.findActiveById(inserted.id())).isPresent();
+    }
+
+    @Test
+    void sortsAdminPagesByCreatedTimeAndStableId() {
+        Comment first = repository.insert(newComment(null, null));
+        Comment second = repository.insert(newComment(null, null));
+        Comment older = repository.insert(newComment(null, null));
+        jdbcTemplate.update(
+                "UPDATE t_comment SET created_at = ? WHERE id IN (?, ?)",
+                NOW,
+                first.id(),
+                second.id());
+        jdbcTemplate.update(
+                "UPDATE t_comment SET created_at = ? WHERE id = ?",
+                NOW.minusDays(1),
+                older.id());
+        long smallerId = Math.min(first.id(), second.id());
+        long largerId = Math.max(first.id(), second.id());
+
+        assertThat(adminPage(CommentSortDirection.ASC))
+                .extracting(AdminCommentPageItem::id)
+                .containsExactly(older.id(), smallerId, largerId);
+        assertThat(adminPage(CommentSortDirection.DESC))
+                .extracting(AdminCommentPageItem::id)
+                .containsExactly(largerId, smallerId, older.id());
+    }
+
+    private List<AdminCommentPageItem> adminPage(
+            CommentSortDirection sortDirection) {
+        return adminQueryRepository.page(new AdminCommentQueryCriteria(
+                null,
+                null,
+                null,
+                null,
+                false,
+                1,
+                20,
+                sortDirection)).records();
     }
 
     private NewComment newComment(Long parentId, Long replyToCommentId) {

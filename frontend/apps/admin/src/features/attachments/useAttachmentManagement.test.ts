@@ -57,7 +57,9 @@ describe("attachment management state", () => {
 
     expect(source.listAttachments).toHaveBeenCalledWith({
       page: 1,
-      size: 20
+      size: 20,
+      sortBy: "createdAt",
+      sortDirection: "desc"
     });
     expect(state.items.value[0].id).toBe("9007199254743001");
     expect(state.loading.value).toBe(false);
@@ -73,11 +75,15 @@ describe("attachment management state", () => {
 
     expect(source.listAttachments).toHaveBeenNthCalledWith(1, {
       page: 2,
-      size: 50
+      size: 50,
+      sortBy: "createdAt",
+      sortDirection: "desc"
     });
     expect(source.listAttachments).toHaveBeenNthCalledWith(2, {
       page: 2,
-      size: 50
+      size: 50,
+      sortBy: "createdAt",
+      sortDirection: "desc"
     });
   });
 
@@ -93,7 +99,9 @@ describe("attachment management state", () => {
     expect(state.pagination.page).toBe(1);
     expect(source.listAttachments).toHaveBeenCalledWith({
       page: 1,
-      size: 20
+      size: 20,
+      sortBy: "createdAt",
+      sortDirection: "desc"
     });
     expect(state.uploadError.value).toBeNull();
   });
@@ -112,7 +120,9 @@ describe("attachment management state", () => {
     });
     expect(source.listAttachments).toHaveBeenCalledWith({
       page: 1,
-      size: 20
+      size: 20,
+      sortBy: "createdAt",
+      sortDirection: "desc"
     });
   });
 
@@ -125,7 +135,9 @@ describe("attachment management state", () => {
     expect(source.deleteAttachment).toHaveBeenCalledWith("9007199254743001");
     expect(source.listAttachments).toHaveBeenCalledWith({
       page: 1,
-      size: 20
+      size: 20,
+      sortBy: "createdAt",
+      sortDirection: "desc"
     });
     expect(state.operationError.value).toBeNull();
   });
@@ -158,6 +170,22 @@ describe("attachment management state", () => {
 
     expect(state.items.value[0].id).toBe("9007199254743001");
     expect(state.uploadError.value?.message).toBe("invalid image");
+  });
+
+  it("returns to page one when server-side sorting changes", async () => {
+    const source = api();
+    const state = useAttachmentManagement(source);
+    state.pagination.page = 3;
+
+    await state.changeSort("fileSize", "asc");
+
+    expect(state.pagination.page).toBe(1);
+    expect(source.listAttachments).toHaveBeenCalledWith({
+      page: 1,
+      size: 20,
+      sortBy: "fileSize",
+      sortDirection: "asc"
+    });
   });
 
   it("rejects files over 10 MiB before uploading", async () => {

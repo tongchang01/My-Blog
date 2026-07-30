@@ -11,6 +11,8 @@ import com.tyb.myblog.v2.content.domain.article.AdminArticleDetail;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePage;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
+import com.tyb.myblog.v2.content.domain.article.ArticleAdminSort;
+import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentReferenceService;
 import org.junit.jupiter.api.BeforeEach;
@@ -185,7 +187,60 @@ class AdminArticleQueryServiceTest {
                                 NOW,
                                 NOW.minusDays(1),
                                 null,
-                                null)),
+                                null,
+                                "updatedAt",
+                                "desc")),
+                ApiErrorCode.VALIDATION_ERROR);
+        assertError(
+                () -> service.adminPage(
+                        principal("ADMIN"),
+                        new AdminArticleQuery(
+                                1,
+                                20,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                "desc")),
+                ApiErrorCode.VALIDATION_ERROR);
+        assertError(
+                () -> service.adminPage(
+                        principal("ADMIN"),
+                        new AdminArticleQuery(
+                                1,
+                                20,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                "title",
+                                "desc")),
+                ApiErrorCode.VALIDATION_ERROR);
+        assertError(
+                () -> service.adminPage(
+                        principal("ADMIN"),
+                        new AdminArticleQuery(
+                                1,
+                                20,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                "updatedAt",
+                                "sideways")),
                 ApiErrorCode.VALIDATION_ERROR);
     }
 
@@ -210,7 +265,9 @@ class AdminArticleQueryServiceTest {
                 null,
                 null,
                 null,
-                null);
+                null,
+                "updatedAt",
+                "desc");
     }
 
     private AdminArticleCriteria criteria(AdminArticleQuery query) {
@@ -224,7 +281,9 @@ class AdminArticleQueryServiceTest {
                 query.createdFrom(),
                 query.createdTo(),
                 query.publishFrom(),
-                query.publishTo());
+                query.publishTo(),
+                ArticleAdminSort.UPDATED_AT,
+                ArticleSortDirection.DESC);
     }
 
     private AdminArticlePageItem pageItem(long id, Long coverId) {

@@ -2,6 +2,7 @@ package com.tyb.myblog.v2.comment.infrastructure.persistence.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.tyb.myblog.v2.comment.domain.CommentAuditStatus;
+import com.tyb.myblog.v2.comment.domain.CommentSortDirection;
 import com.tyb.myblog.v2.comment.infrastructure.persistence.entity.CommentEntity;
 import com.tyb.myblog.v2.comment.infrastructure.persistence.projection.AdminCommentPageRow;
 import com.tyb.myblog.v2.comment.infrastructure.persistence.projection.CommentPageRow;
@@ -44,7 +45,8 @@ public interface CommentMapper extends BaseMapper<CommentEntity> {
             @Param("keyword") String keyword,
             @Param("includeDeleted") boolean includeDeleted,
             @Param("offset") long offset,
-            @Param("size") int size);
+            @Param("size") int size,
+            @Param("sortDirection") CommentSortDirection sortDirection);
 
     long countAdminPage(
             @Param("targetType") Integer targetType,

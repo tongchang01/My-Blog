@@ -101,11 +101,17 @@ dashboard:
   backendStatus: 后端连接
   connected: 已连接
   loadError: 统计数据加载失败，请重试
-  empty: 暂无统计数据
+  empty:
+    trend: 该区间暂无访问
+    topArticles: 该区间暂无热门文章
+    languageDistribution: 该区间暂无语言分布
   trend: 访问趋势
   topArticles: TOP 文章
   languageDistribution: 语言分布
   dailyUvSum: 区间内逐日 UV 合计
+  sections:
+    period: 查询区间
+    today: 今日概览
   filter:
     last7: 近 7 天
     last30: 近 30 天
@@ -117,7 +123,8 @@ dashboard:
   metrics:
     periodPv: 区间 PV
     todayPv: JST 今日 PV
-    todayUv: JST 今日 UV
+    todayUv: JST 今日页面日 UV 合计
+    pageDailyUvSum: 页面日 UV 合计
     averageDailyUv: 平均日 UV
   languages:
     zh: 中文
@@ -500,6 +507,13 @@ attachments:
   result:
     total: 附件总数
     deletedTotal: 回收站附件总数
+  sort:
+    label: 排序方式
+    createdAt: 上传时间
+    fileSize: 文件大小
+    originalFilename: 原始文件名
+    asc: 升序
+    desc: 降序
   actions:
     copyUrl: 复制 URL
     open: 打开

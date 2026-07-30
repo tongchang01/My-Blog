@@ -17,6 +17,7 @@ import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticleQueryService;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -71,7 +72,24 @@ public class AdminArticleController {
             LocalDateTime publishFrom,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime publishTo) {
+            LocalDateTime publishTo,
+            @Parameter(
+                    description = "主排序字段",
+                    schema = @Schema(
+                            defaultValue = "updatedAt",
+                            allowableValues = {
+                                "updatedAt",
+                                "createdAt",
+                                "publishAt",
+                                "commentCount"
+                            }))
+            @RequestParam(defaultValue = "updatedAt") String sortBy,
+            @Parameter(
+                    description = "排序方向",
+                    schema = @Schema(
+                            defaultValue = "desc",
+                            allowableValues = {"asc", "desc"}))
+            @RequestParam(defaultValue = "desc") String sortDirection) {
         AdminArticlePageResult result = queryService.adminPage(
                 principal,
                 new AdminArticleQuery(
@@ -84,7 +102,9 @@ public class AdminArticleController {
                         createdFrom,
                         createdTo,
                         publishFrom,
-                        publishTo));
+                        publishTo,
+                        sortBy,
+                        sortDirection));
         return ApiResponse.ok(mapping.toAdminPage(result));
     }
 
@@ -102,9 +122,26 @@ public class AdminArticleController {
     public ApiResponse<PageResponse<DeletedArticlePageItemVO>> recycleBin(
             @CurrentUser AuthenticatedPrincipal principal,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @Parameter(
+                    description = "主排序字段",
+                    schema = @Schema(
+                            defaultValue = "deletedAt",
+                            allowableValues = {"deletedAt"}))
+            @RequestParam(defaultValue = "deletedAt") String sortBy,
+            @Parameter(
+                    description = "排序方向",
+                    schema = @Schema(
+                            defaultValue = "desc",
+                            allowableValues = {"asc", "desc"}))
+            @RequestParam(defaultValue = "desc") String sortDirection) {
         DeletedArticlePageResult result =
-                deletedQueryService.page(principal, page, size);
+                deletedQueryService.page(
+                        principal,
+                        page,
+                        size,
+                        sortBy,
+                        sortDirection);
         return ApiResponse.ok(mapping.toDeletedPage(result));
     }
 

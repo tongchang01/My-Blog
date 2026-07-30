@@ -12,7 +12,9 @@ import type {
   CommentListFilters,
   CommentListItem,
   CommentPageResponse,
-  CommentReplyResponse
+  CommentReplyResponse,
+  CommentSortBy,
+  CommentSortDirection
 } from "./model";
 
 export interface CommentManagementApi {
@@ -44,6 +46,8 @@ const DEFAULT_FILTERS: CommentListFilters = {
   auditStatus: "ALL",
   keyword: "",
   includeDeleted: false,
+  sortBy: "createdAt",
+  sortDirection: "desc",
   page: 1,
   size: 20
 };
@@ -110,6 +114,16 @@ export function useCommentManagement(api: CommentManagementApi = defaultApi) {
     await loadComments();
   }
 
+  async function changeSort(
+    sortBy: CommentSortBy,
+    sortDirection: CommentSortDirection
+  ): Promise<void> {
+    filters.sortBy = sortBy;
+    filters.sortDirection = sortDirection;
+    filters.page = 1;
+    await loadComments();
+  }
+
   async function refreshAfterOperation(): Promise<void> {
     await loadComments();
     if (
@@ -167,10 +181,7 @@ export function useCommentManagement(api: CommentManagementApi = defaultApi) {
     operationError.value = null;
     replySubmitting.value = true;
     try {
-      await api.replyComment(
-        replyTarget.value.id,
-        content
-      );
+      await api.replyComment(replyTarget.value.id, content);
       replyDialogVisible.value = false;
       replyTarget.value = null;
       replyContent.value = "";
@@ -201,6 +212,7 @@ export function useCommentManagement(api: CommentManagementApi = defaultApi) {
     reset,
     refresh,
     changePage,
+    changeSort,
     approve: (id: string) => runOperation(id, api.approveComment),
     hide: (id: string) => runOperation(id, api.hideComment),
     remove: (id: string) => runOperation(id, api.deleteComment),

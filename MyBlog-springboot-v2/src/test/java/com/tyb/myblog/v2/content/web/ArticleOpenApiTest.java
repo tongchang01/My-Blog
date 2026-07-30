@@ -110,6 +110,44 @@ class ArticleOpenApiTest {
                 .asText()).isEqualTo("#/components/schemas/PublicArticleTagVO");
     }
 
+    @Test
+    void documentsAdminArticleSortParameters() throws Exception {
+        JsonNode root = apiDocument();
+        JsonNode sortBy = queryParameter(
+                root, "/paths/~1api~1admin~1articles/get/parameters", "sortBy");
+        JsonNode direction = queryParameter(
+                root,
+                "/paths/~1api~1admin~1articles/get/parameters",
+                "sortDirection");
+
+        assertThat(sortBy.at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly(
+                        "updatedAt",
+                        "createdAt",
+                        "publishAt",
+                        "commentCount");
+        assertThat(direction.at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly("asc", "desc");
+    }
+
+    @Test
+    void documentsRecycleBinSortParameters() throws Exception {
+        JsonNode root = apiDocument();
+        String pointer =
+                "/paths/~1api~1admin~1articles~1recycle-bin/get/parameters";
+
+        assertThat(queryParameter(root, pointer, "sortBy")
+                        .at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly("deletedAt");
+        assertThat(queryParameter(root, pointer, "sortDirection")
+                        .at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly("asc", "desc");
+    }
+
     private void assertMethods(
             JsonNode root,
             String pointer,
@@ -150,6 +188,18 @@ class ArticleOpenApiTest {
                         .fieldNames())
                 .toIterable()
                 .doesNotContain(fields);
+    }
+
+    private JsonNode queryParameter(
+            JsonNode root,
+            String pointer,
+            String name) {
+        for (JsonNode parameter : root.at(pointer)) {
+            if (name.equals(parameter.path("name").asText())) {
+                return parameter;
+            }
+        }
+        throw new AssertionError("缺少查询参数: " + name);
     }
 
     private JsonNode apiDocument() throws Exception {

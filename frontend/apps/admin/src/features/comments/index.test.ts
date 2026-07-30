@@ -125,6 +125,27 @@ describe("comment management page", () => {
       wrapper.find('[data-testid="comment-approve-9007199254740995"]').exists()
     ).toBe(true);
     expect(wrapper.text()).toContain("Audit details");
+    expect(
+      mock.history.get.find(item => item.url === "/api/admin/comments")?.params
+    ).toMatchObject({
+      sortBy: "createdAt",
+      sortDirection: "desc"
+    });
+
+    await wrapper.get('[data-testid="comment-table"]').trigger("sort-change", {
+      prop: "createdAt",
+      order: "ascending"
+    });
+    await flushPromises();
+
+    expect(
+      mock.history.get.filter(item => item.url === "/api/admin/comments").at(-1)
+        ?.params
+    ).toMatchObject({
+      page: 1,
+      sortBy: "createdAt",
+      sortDirection: "asc"
+    });
 
     await wrapper
       .get('[data-testid="comment-approve-9007199254740995"]')

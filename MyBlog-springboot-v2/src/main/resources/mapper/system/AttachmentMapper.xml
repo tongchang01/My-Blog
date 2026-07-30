@@ -70,13 +70,33 @@
         LIMIT 1
     </select>
 
-    <!-- 后台附件库只展示 active 记录，并使用稳定倒序。 -->
+    <!-- 后台附件库只展示 active 记录，并使用同方向 ID 次排序保证分页稳定。 -->
     <select id="selectActivePage"
             resultType="com.tyb.myblog.v2.system.infrastructure.persistence.entity.AttachmentEntity">
         SELECT <include refid="attachmentColumns"/>
         FROM t_attachment
         WHERE deleted = 0
-        ORDER BY created_at DESC, id DESC
+        ORDER BY
+        <choose>
+            <when test='sortBy.name() == "FILE_SIZE"'>
+                file_size
+            </when>
+            <when test='sortBy.name() == "ORIGINAL_FILENAME"'>
+                original_filename
+            </when>
+            <otherwise>
+                created_at
+            </otherwise>
+        </choose>
+        <choose>
+            <when test='sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>,
+        id
+        <choose>
+            <when test='sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
         LIMIT #{size} OFFSET #{offset}
     </select>
 

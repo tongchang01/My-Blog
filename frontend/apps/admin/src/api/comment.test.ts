@@ -23,6 +23,8 @@ describe("comment API", () => {
         auditStatus: "PENDING",
         keyword: "hello",
         includeDeleted: true,
+        sortBy: "createdAt",
+        sortDirection: "asc",
         page: 2,
         size: 50
       });
@@ -67,6 +69,8 @@ describe("comment API", () => {
         auditStatus: "PENDING",
         keyword: " hello ",
         includeDeleted: true,
+        sortBy: "createdAt",
+        sortDirection: "asc",
         page: 2,
         size: 50
       })

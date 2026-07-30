@@ -175,6 +175,27 @@ describe("article list page", () => {
     expect(wrapper.find('[data-testid="article-delete-100"]').exists()).toBe(
       true
     );
+    expect(
+      mock.history.get.find(item => item.url === "/api/admin/articles")?.params
+    ).toMatchObject({
+      sortBy: "updatedAt",
+      sortDirection: "desc"
+    });
+
+    await wrapper.get('[data-testid="article-table"]').trigger("sort-change", {
+      prop: "commentCount",
+      order: "ascending"
+    });
+    await flushPromises();
+
+    expect(
+      mock.history.get.filter(item => item.url === "/api/admin/articles").at(-1)
+        ?.params
+    ).toMatchObject({
+      page: 1,
+      sortBy: "commentCount",
+      sortDirection: "asc"
+    });
 
     mock.onDelete("/api/admin/articles/100").reply(200, {
       code: "00000",

@@ -10,7 +10,9 @@ public record AdminCommentPageQuery(
         String keyword,
         boolean includeDeleted,
         int page,
-        int size) {
+        int size,
+        String sortBy,
+        String sortDirection) {
 
     public AdminCommentPageQuery {
         page = Math.max(page, 1);

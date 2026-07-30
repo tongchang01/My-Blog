@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 system 模块、后台 admin 附件管理
-> 最后校准：2026-07-28
+> 最后校准：2026-07-30
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/web/AdminAttachmentController.java`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/system/domain/attachment/`
 > 权威程度：API 契约
 
@@ -14,7 +14,7 @@
 
 | Method | Path | ADMIN | DEMO | 匿名 |
 |--------|------|-------|------|------|
-| GET | `/api/admin/attachments?page=1&size=20` | 允许 | 允许 | 401 |
+| GET | `/api/admin/attachments?page=1&size=20&sortBy=createdAt&sortDirection=desc` | 允许 | 允许 | 401 |
 | GET | `/api/admin/attachments/deleted?page=1&size=20` | 允许 | 允许 | 401 |
 | GET | `/api/admin/attachments/{id}` | 允许 | 允许 | 401 |
 | POST | `/api/admin/attachments` | 允许 | 403 | 401 |
@@ -52,7 +52,7 @@
 ## 3. 分页查询 active 附件
 
 ```http
-GET /api/admin/attachments?page=1&size=20
+GET /api/admin/attachments?page=1&size=20&sortBy=createdAt&sortDirection=desc
 Authorization: Bearer <access-token>
 ```
 
@@ -64,6 +64,8 @@ Query：
 |------|------|------|
 | `page` | 1 | 大于 0 |
 | `size` | 20 | 1 到 100 |
+| `sortBy` | `createdAt` | `createdAt`、`fileSize` 或 `originalFilename` |
+| `sortDirection` | `desc` | `asc` 或 `desc` |
 
 成功响应：HTTP 200，`data` 为 `PageResponse<AttachmentVO>`。
 
@@ -80,7 +82,7 @@ Query：
 }
 ```
 
-列表只返回 active 附件。
+列表只返回 active 附件。排序字段由服务端白名单映射，主字段相同时按同方向 `id` 次排序，保证分页顺序稳定；非法排序参数返回 `400 + 90001`。
 
 ## 4. 分页查询已删除附件
 
@@ -91,7 +93,7 @@ Authorization: Bearer <access-token>
 
 鉴权：ADMIN / DEMO。
 
-成功响应与 active 列表结构一致，但 `records` 为已软删除附件。
+成功响应与 active 列表结构一致，但 `records` 为已软删除附件，并继续按删除时间、ID 倒序。当前回收站不接受 active 列表的排序参数。
 
 ## 5. 查询附件详情
 
