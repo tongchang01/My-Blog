@@ -140,13 +140,24 @@ Authorization: Bearer <access-token>
 ## 5. 文章回收站
 
 ```http
-GET /api/admin/articles/recycle-bin?page=1&size=20
+GET /api/admin/articles/recycle-bin?page=1&size=20&sortBy=deletedAt&sortDirection=desc
 Authorization: Bearer <access-token>
 ```
 
 鉴权：ADMIN / DEMO。
 
+Query：
+
+| 参数 | 默认 | 规则 |
+|------|------|------|
+| `page` | 1 | 大于 0 |
+| `size` | 20 | 1 到 100 |
+| `sortBy` | `deletedAt` | 首批只允许 `deletedAt` |
+| `sortDirection` | `desc` | `asc` 或 `desc` |
+
 成功响应：HTTP 200，`data` 为 `PageResponse<DeletedArticlePageItemVO>`。
+
+排序字段由服务端白名单校验；删除时间相同时按同方向 `id` 次排序，保证分页顺序稳定。非法排序参数返回 `400 + 90001`。
 
 回收站条目字段：
 
