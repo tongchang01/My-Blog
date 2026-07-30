@@ -152,7 +152,8 @@ try {
         FilePath = $mavenExecutable
         ArgumentList = @(
             "spring-boot:run",
-            "-Dspring-boot.run.profiles=local"
+            "-Dspring-boot.run.profiles=local",
+            "-Dspring-boot.run.jvmArguments=-Duser.timezone=Asia/Tokyo"
         )
         WorkingDirectory = $projectDirectory
         RedirectStandardOutput = $standardOutputLog

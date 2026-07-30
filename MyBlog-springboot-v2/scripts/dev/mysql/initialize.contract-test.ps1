@@ -215,6 +215,8 @@ exit 1
     $mavenInvocation = Get-Content -Raw $fakeMavenLog
     Assert-True ($mavenInvocation -match 'bootstrap=false') `
         "启动 Flyway 子进程时必须关闭默认管理员初始化"
+    Assert-True ($mavenInvocation -match 'spring-boot\.run\.jvmArguments=-Duser\.timezone=Asia/Tokyo') `
+        "启动 Flyway 子进程时必须固定 JVM 时区"
 
     if (Test-Path $fakeMysqlLog) {
         Remove-Item $fakeMysqlLog -Force
