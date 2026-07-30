@@ -11,6 +11,7 @@ $powerShellExecutable = (Get-Process -Id $PID).Path
 $temporaryDirectory = Join-Path ([System.IO.Path]::GetTempPath()) (
     "myblog-mysql-contract-" + [guid]::NewGuid().ToString("N"))
 $fakeMysqlLog = Join-Path $temporaryDirectory "mysql.log"
+$fakeMavenLog = Join-Path $temporaryDirectory "maven.log"
 
 function Assert-True {
     param(
@@ -33,8 +34,10 @@ function Invoke-Initialize {
         "MYBLOG_DATASOURCE_URL",
         "MYBLOG_DATASOURCE_USERNAME",
         "MYBLOG_DATASOURCE_PASSWORD",
+        "MYBLOG_BOOTSTRAP_ADMIN_ENABLED",
         "FAKE_MYSQL_LOG",
         "FAKE_MYSQL_ACTIVE_COUNT",
+        "FAKE_MAVEN_LOG",
         "PATH"
     )
     $original = @{}
@@ -122,6 +125,27 @@ exit 0
         & chmod +x $fakeMysqlExecutable
     }
 
+    $fakeMaven = @'
+param([Parameter(ValueFromRemainingArguments = $true)][string[]]$Arguments)
+Set-Content -Path $env:FAKE_MAVEN_LOG -Value @(
+    "bootstrap=$env:MYBLOG_BOOTSTRAP_ADMIN_ENABLED",
+    "arguments=$($Arguments -join ' ')"
+)
+exit 1
+'@
+    $fakeMavenScript = Join-Path $temporaryDirectory "maven.ps1"
+    Set-Content -Path $fakeMavenScript -Value $fakeMaven -Encoding utf8BOM
+    if ($IsWindows) {
+        Set-Content -Path (Join-Path $temporaryDirectory "mvn.cmd") `
+            -Value ('@"' + $powerShellExecutable + '" -NoProfile -File "' + $fakeMavenScript + '" %*') `
+            -Encoding ascii
+    } else {
+        $fakeMavenExecutable = Join-Path $temporaryDirectory "mvn"
+        Set-Content -Path $fakeMavenExecutable -Value (
+            "#!" + $powerShellExecutable + "`n& '" + $fakeMavenScript + "' @args") -Encoding utf8NoBOM
+        & chmod +x $fakeMavenExecutable
+    }
+
     $initializeSource = Get-Content -Raw -Encoding UTF8 $initializeScript
     Assert-True ($initializeSource -match '\$PSVersionTable\.PSVersion\.Major -lt 7') `
         "初始化脚本必须拒绝 PowerShell 7 以下版本"
@@ -169,20 +193,28 @@ exit 0
     Assert-True (-not (Test-Path $fakeMysqlLog)) `
         "错误数据库名传 Reset 时不得执行 DROP DATABASE"
 
+    if (Test-Path $fakeMavenLog) {
+        Remove-Item $fakeMavenLog -Force
+    }
     $resetDatabase = Invoke-Initialize -Environment @{
         MYBLOG_DATASOURCE_URL = "jdbc:mysql://localhost:3306/myblog_v2_dev"
         MYBLOG_DATASOURCE_USERNAME = "contract-user"
         MYBLOG_DATASOURCE_PASSWORD = "contract-password"
+        MYBLOG_BOOTSTRAP_ADMIN_ENABLED = "true"
         FAKE_MYSQL_LOG = $fakeMysqlLog
+        FAKE_MAVEN_LOG = $fakeMavenLog
         PATH = $temporaryDirectory
     } -Arguments @("-Reset")
     Assert-True ($resetDatabase.ExitCode -ne 0) `
-        "缺少 Maven 时 reset 初始化必须以非 0 退出"
+        "后端进程提前退出时 reset 初始化必须以非 0 退出"
     $resetCommands = Get-Content -Raw $fakeMysqlLog
     Assert-True ($resetCommands -match 'DROP DATABASE IF EXISTS `myblog_v2_dev`') `
         "Reset 必须只删除允许的数据库"
     Assert-True ($resetCommands -match 'CREATE DATABASE `myblog_v2_dev`') `
         "Reset 必须重建允许的数据库"
+    $mavenInvocation = Get-Content -Raw $fakeMavenLog
+    Assert-True ($mavenInvocation -match 'bootstrap=false') `
+        "启动 Flyway 子进程时必须关闭默认管理员初始化"
 
     if (Test-Path $fakeMysqlLog) {
         Remove-Item $fakeMysqlLog -Force

@@ -122,6 +122,9 @@ function Stop-ProcessTree {
 }
 
 $originalMysqlPassword = [Environment]::GetEnvironmentVariable("MYSQL_PWD", "Process")
+$originalBootstrapAdminEnabled = [Environment]::GetEnvironmentVariable(
+    "MYBLOG_BOOTSTRAP_ADMIN_ENABLED",
+    "Process")
 $backendProcess = $null
 $standardOutputLog = Join-Path ([System.IO.Path]::GetTempPath()) "myblog-v2-local-mysql.out.log"
 $standardErrorLog = Join-Path ([System.IO.Path]::GetTempPath()) "myblog-v2-local-mysql.err.log"
@@ -159,6 +162,10 @@ try {
     if ($IsWindows) {
         $startProcessParameters.WindowStyle = "Hidden"
     }
+    [Environment]::SetEnvironmentVariable(
+        "MYBLOG_BOOTSTRAP_ADMIN_ENABLED",
+        "false",
+        "Process")
     $backendProcess = Start-Process @startProcessParameters
 
     $deadline = [DateTime]::UtcNow.AddSeconds(120)
@@ -188,6 +195,10 @@ try {
     }
 } finally {
     Stop-ProcessTree $backendProcess
+    [Environment]::SetEnvironmentVariable(
+        "MYBLOG_BOOTSTRAP_ADMIN_ENABLED",
+        $originalBootstrapAdminEnabled,
+        "Process")
     [Environment]::SetEnvironmentVariable(
         "MYSQL_PWD",
         $originalMysqlPassword,

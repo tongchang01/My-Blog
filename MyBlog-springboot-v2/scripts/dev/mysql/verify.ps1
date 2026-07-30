@@ -81,8 +81,8 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "Database metadata verification failed: $($metadata -join [Environment]::NewLine)"
     }
-    if ($metadata.Count -lt 2 -or $metadata[0] -ne "+09:00" -or $metadata[1] -ne "4") {
-        throw "Expected session time zone +09:00 and Flyway version 4; actual: $($metadata -join ', ')"
+    if ($metadata.Count -lt 2 -or $metadata[0] -ne "+09:00" -or $metadata[1] -ne "6") {
+        throw "Expected session time zone +09:00 and Flyway version 6; actual: $($metadata -join ', ')"
     }
 
     Write-Host "Database time zone and Flyway version verified"

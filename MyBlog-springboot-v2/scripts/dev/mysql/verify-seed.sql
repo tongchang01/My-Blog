@@ -5,6 +5,13 @@ SELECT 't_user_auth active' AS check_name,
 FROM t_user_auth
 WHERE deleted = 0
 UNION ALL
+SELECT 'local seed credentials', 2, COUNT(*), COUNT(*) = 2
+FROM t_user_auth
+WHERE deleted = 0
+  AND password_hash = '$2a$10$Mqkpf6/Bcf5ZD2UfqZDxJOjrzLMDi.r6zHSEVX0FzHk1ZdXcZD6ky'
+  AND ((username = 'admin' AND type = 1)
+    OR (username = 'demo' AND type = 2))
+UNION ALL
 SELECT 't_user_info active', 2, COUNT(*), COUNT(*) = 2
 FROM t_user_info
 WHERE deleted = 0
