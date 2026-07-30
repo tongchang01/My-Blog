@@ -507,6 +507,13 @@ attachments:
   result:
     total: Total attachments
     deletedTotal: Deleted attachments
+  sort:
+    label: Sort by
+    createdAt: Upload time
+    fileSize: File size
+    originalFilename: Original filename
+    asc: Ascending
+    desc: Descending
   actions:
     copyUrl: Copy URL
     open: Open

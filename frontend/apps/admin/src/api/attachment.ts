@@ -2,6 +2,7 @@ import type { ApiResponse } from "./contract";
 import type {
   AttachmentItem,
   AttachmentListParams,
+  AttachmentPageParams,
   AttachmentPageResponse
 } from "@/features/attachments/model";
 import { http } from "@/utils/http";
@@ -11,7 +12,7 @@ export const listAttachments = (params: AttachmentListParams) =>
     params
   });
 
-export const listDeletedAttachments = (params: AttachmentListParams) =>
+export const listDeletedAttachments = (params: AttachmentPageParams) =>
   http.get<ApiResponse<AttachmentPageResponse>>(
     "/api/admin/attachments/deleted",
     { params }

@@ -51,10 +51,17 @@ describe("attachment picker dialog", () => {
     });
     await flushPromises();
 
-    expect(mock.history.get[0].params).toEqual({ page: 1, size: 20 });
+    expect(mock.history.get[0].params).toEqual({
+      page: 1,
+      size: 20,
+      sortBy: "createdAt",
+      sortDirection: "desc"
+    });
     expect(wrapper.text()).toContain("a.png");
 
-    await wrapper.get('[data-testid="attachment-picker-select-9007199254743001"]').trigger("click");
+    await wrapper
+      .get('[data-testid="attachment-picker-select-9007199254743001"]')
+      .trigger("click");
 
     expect(wrapper.emitted("select")?.[0]?.[0]).toMatchObject({
       id: "9007199254743001",
@@ -82,6 +89,11 @@ describe("attachment picker dialog", () => {
     await wrapper.get('[data-testid="next-page"]').trigger("click");
     await flushPromises();
 
-    expect(mock.history.get.at(-1)?.params).toEqual({ page: 2, size: 20 });
+    expect(mock.history.get.at(-1)?.params).toEqual({
+      page: 2,
+      size: 20,
+      sortBy: "createdAt",
+      sortDirection: "desc"
+    });
   });
 });

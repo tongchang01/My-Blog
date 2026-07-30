@@ -507,6 +507,13 @@ attachments:
   result:
     total: 添付ファイル数
     deletedTotal: 回収済み添付ファイル数
+  sort:
+    label: 並び順
+    createdAt: アップロード日時
+    fileSize: ファイルサイズ
+    originalFilename: 元のファイル名
+    asc: 昇順
+    desc: 降順
   actions:
     copyUrl: URL をコピー
     open: 開く

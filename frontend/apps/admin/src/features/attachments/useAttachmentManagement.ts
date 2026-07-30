@@ -10,7 +10,10 @@ import {
 import type {
   AttachmentItem,
   AttachmentListParams,
-  AttachmentPageResponse
+  AttachmentPageParams,
+  AttachmentPageResponse,
+  AttachmentSortBy,
+  AttachmentSortDirection
 } from "./model";
 
 export interface AttachmentManagementApi {
@@ -18,7 +21,7 @@ export interface AttachmentManagementApi {
     params: AttachmentListParams
   ): Promise<ApiResponse<AttachmentPageResponse>>;
   listDeletedAttachments(
-    params: AttachmentListParams
+    params: AttachmentPageParams
   ): Promise<ApiResponse<AttachmentPageResponse>>;
   uploadAttachment(file: File): Promise<ApiResponse<AttachmentItem>>;
   deleteAttachment(id: string): Promise<ApiResponse<null>>;
@@ -44,7 +47,9 @@ export function useAttachmentManagement(
 ) {
   const pagination = reactive<AttachmentListParams>({
     page: 1,
-    size: 20
+    size: 20,
+    sortBy: "createdAt",
+    sortDirection: "desc"
   });
   const items = ref<AttachmentItem[]>([]);
   const total = ref(0);
@@ -60,11 +65,13 @@ export function useAttachmentManagement(
     const version = ++requestVersion;
     loading.value = true;
     error.value = null;
-    const requestParams = { ...pagination };
     try {
       const response = showDeleted.value
-        ? await api.listDeletedAttachments(requestParams)
-        : await api.listAttachments(requestParams);
+        ? await api.listDeletedAttachments({
+            page: pagination.page,
+            size: pagination.size
+          })
+        : await api.listAttachments({ ...pagination });
       if (version !== requestVersion) return;
       items.value = response.data.records;
       total.value = response.data.total;
@@ -90,6 +97,16 @@ export function useAttachmentManagement(
   ): Promise<void> {
     pagination.page = page;
     pagination.size = size;
+    await loadAttachments();
+  }
+
+  async function changeSort(
+    sortBy: AttachmentSortBy,
+    sortDirection: AttachmentSortDirection
+  ): Promise<void> {
+    pagination.sortBy = sortBy;
+    pagination.sortDirection = sortDirection;
+    pagination.page = 1;
     await loadAttachments();
   }
 
@@ -163,6 +180,7 @@ export function useAttachmentManagement(
     initialize,
     refresh,
     changePage,
+    changeSort,
     upload,
     showDeletedAttachments,
     showActiveAttachments,

@@ -507,6 +507,13 @@ attachments:
   result:
     total: 附件总数
     deletedTotal: 回收站附件总数
+  sort:
+    label: 排序方式
+    createdAt: 上传时间
+    fileSize: 文件大小
+    originalFilename: 原始文件名
+    asc: 升序
+    desc: 降序
   actions:
     copyUrl: 复制 URL
     open: 打开
