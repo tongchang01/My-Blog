@@ -28,7 +28,7 @@ SELECT 't_article active', 5, COUNT(*), COUNT(*) >= 5
 FROM t_article
 WHERE deleted = 0
 UNION ALL
-SELECT 't_article_tag', 5, COUNT(*), COUNT(*) >= 5
+SELECT 't_article_tag', 6, COUNT(*), COUNT(*) = 6
 FROM t_article_tag
 UNION ALL
 SELECT 't_comment active', 2, COUNT(*), COUNT(*) >= 2
