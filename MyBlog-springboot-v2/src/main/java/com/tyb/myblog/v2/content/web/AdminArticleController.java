@@ -2,8 +2,6 @@ package com.tyb.myblog.v2.content.web;
 
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.auth.CurrentUser;
-import com.tyb.myblog.v2.common.error.ApiErrorCode;
-import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.common.web.PageResponse;
 import com.tyb.myblog.v2.content.application.article.AdminArticleDetailResult;
@@ -17,8 +15,6 @@ import com.tyb.myblog.v2.content.application.article.ArticleResult;
 import com.tyb.myblog.v2.content.application.article.ArticleUpdateService;
 import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticleQueryService;
-import com.tyb.myblog.v2.content.domain.article.ArticleAdminSort;
-import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -107,8 +103,8 @@ public class AdminArticleController {
                         createdTo,
                         publishFrom,
                         publishTo,
-                        parseSortBy(sortBy),
-                        parseSortDirection(sortDirection)));
+                        sortBy,
+                        sortDirection));
         return ApiResponse.ok(mapping.toAdminPage(result));
     }
 
@@ -191,29 +187,5 @@ public class AdminArticleController {
         AdminArticleDetailResult detail =
                 queryService.adminDetail(principal, restored.id());
         return ApiResponse.ok(mapping.toAdminDetail(detail));
-    }
-
-    private ArticleAdminSort parseSortBy(String value) {
-        return switch (value) {
-            case "updatedAt" -> ArticleAdminSort.UPDATED_AT;
-            case "createdAt" -> ArticleAdminSort.CREATED_AT;
-            case "publishAt" -> ArticleAdminSort.PUBLISH_AT;
-            case "commentCount" -> ArticleAdminSort.COMMENT_COUNT;
-            default -> throw invalidSort("sortBy");
-        };
-    }
-
-    private ArticleSortDirection parseSortDirection(String value) {
-        return switch (value) {
-            case "asc" -> ArticleSortDirection.ASC;
-            case "desc" -> ArticleSortDirection.DESC;
-            default -> throw invalidSort("sortDirection");
-        };
-    }
-
-    private ApiException invalidSort(String parameter) {
-        return new ApiException(
-                ApiErrorCode.VALIDATION_ERROR,
-                "排序参数非法: " + parameter);
     }
 }

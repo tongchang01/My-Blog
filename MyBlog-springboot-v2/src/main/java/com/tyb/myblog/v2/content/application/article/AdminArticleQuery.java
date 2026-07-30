@@ -1,7 +1,5 @@
 package com.tyb.myblog.v2.content.application.article;
 
-import com.tyb.myblog.v2.content.domain.article.ArticleAdminSort;
-import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 
 import java.time.LocalDateTime;
@@ -20,6 +18,6 @@ public record AdminArticleQuery(
         LocalDateTime createdTo,
         LocalDateTime publishFrom,
         LocalDateTime publishTo,
-        ArticleAdminSort sortBy,
-        ArticleSortDirection sortDirection) {
+        String sortBy,
+        String sortDirection) {
 }

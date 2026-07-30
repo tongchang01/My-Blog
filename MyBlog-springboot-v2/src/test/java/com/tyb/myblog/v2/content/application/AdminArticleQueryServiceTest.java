@@ -188,8 +188,8 @@ class AdminArticleQueryServiceTest {
                                 NOW.minusDays(1),
                                 null,
                                 null,
-                                ArticleAdminSort.UPDATED_AT,
-                                ArticleSortDirection.DESC)),
+                                "updatedAt",
+                                "desc")),
                 ApiErrorCode.VALIDATION_ERROR);
         assertError(
                 () -> service.adminPage(
@@ -206,7 +206,41 @@ class AdminArticleQueryServiceTest {
                                 null,
                                 null,
                                 null,
-                                ArticleSortDirection.DESC)),
+                                "desc")),
+                ApiErrorCode.VALIDATION_ERROR);
+        assertError(
+                () -> service.adminPage(
+                        principal("ADMIN"),
+                        new AdminArticleQuery(
+                                1,
+                                20,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                "title",
+                                "desc")),
+                ApiErrorCode.VALIDATION_ERROR);
+        assertError(
+                () -> service.adminPage(
+                        principal("ADMIN"),
+                        new AdminArticleQuery(
+                                1,
+                                20,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                null,
+                                "updatedAt",
+                                "sideways")),
                 ApiErrorCode.VALIDATION_ERROR);
     }
 
@@ -232,8 +266,8 @@ class AdminArticleQueryServiceTest {
                 null,
                 null,
                 null,
-                ArticleAdminSort.UPDATED_AT,
-                ArticleSortDirection.DESC);
+                "updatedAt",
+                "desc");
     }
 
     private AdminArticleCriteria criteria(AdminArticleQuery query) {
@@ -248,8 +282,8 @@ class AdminArticleQueryServiceTest {
                 query.createdTo(),
                 query.publishFrom(),
                 query.publishTo(),
-                query.sortBy(),
-                query.sortDirection());
+                ArticleAdminSort.UPDATED_AT,
+                ArticleSortDirection.DESC);
     }
 
     private AdminArticlePageItem pageItem(long id, Long coverId) {

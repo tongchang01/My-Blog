@@ -9,6 +9,8 @@ import com.tyb.myblog.v2.content.domain.article.AdminArticleCriteria;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePage;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
+import com.tyb.myblog.v2.content.domain.article.ArticleAdminSort;
+import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentReferenceService;
 import lombok.RequiredArgsConstructor;
@@ -89,11 +91,6 @@ public class ArticleQueryService {
                     ApiErrorCode.VALIDATION_ERROR,
                     "每页数量必须在 1 到 100 之间");
         }
-        if (query.sortBy() == null || query.sortDirection() == null) {
-            throw new ApiException(
-                    ApiErrorCode.VALIDATION_ERROR,
-                    "排序参数不能为空");
-        }
         validateRange(query.createdFrom(), query.createdTo());
         validateRange(query.publishFrom(), query.publishTo());
     }
@@ -110,8 +107,38 @@ public class ArticleQueryService {
                 query.createdTo(),
                 query.publishFrom(),
                 query.publishTo(),
-                query.sortBy(),
-                query.sortDirection());
+                parseSortBy(query.sortBy()),
+                parseSortDirection(query.sortDirection()));
+    }
+
+    private ArticleAdminSort parseSortBy(String value) {
+        if (value == null) {
+            throw invalidSort("sortBy");
+        }
+        return switch (value) {
+            case "updatedAt" -> ArticleAdminSort.UPDATED_AT;
+            case "createdAt" -> ArticleAdminSort.CREATED_AT;
+            case "publishAt" -> ArticleAdminSort.PUBLISH_AT;
+            case "commentCount" -> ArticleAdminSort.COMMENT_COUNT;
+            default -> throw invalidSort("sortBy");
+        };
+    }
+
+    private ArticleSortDirection parseSortDirection(String value) {
+        if (value == null) {
+            throw invalidSort("sortDirection");
+        }
+        return switch (value) {
+            case "asc" -> ArticleSortDirection.ASC;
+            case "desc" -> ArticleSortDirection.DESC;
+            default -> throw invalidSort("sortDirection");
+        };
+    }
+
+    private ApiException invalidSort(String parameter) {
+        return new ApiException(
+                ApiErrorCode.VALIDATION_ERROR,
+                "排序参数非法: " + parameter);
     }
 
     private void validateRange(

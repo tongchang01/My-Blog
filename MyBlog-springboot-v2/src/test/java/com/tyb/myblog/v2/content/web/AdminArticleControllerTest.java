@@ -18,8 +18,6 @@ import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticleQueryService;
 import com.tyb.myblog.v2.content.application.article.UpdateArticleCommand;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
-import com.tyb.myblog.v2.content.domain.article.ArticleAdminSort;
-import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -143,8 +141,8 @@ class AdminArticleControllerTest {
                         null,
                         null,
                         null,
-                        ArticleAdminSort.CREATED_AT,
-                        ArticleSortDirection.ASC));
+                        "createdAt",
+                        "asc"));
 
         mockMvc.perform(get("/api/admin/articles/100"))
                 .andExpect(status().isOk())
@@ -170,18 +168,6 @@ class AdminArticleControllerTest {
     }
 
     @Test
-    void rejectsUnknownArticleSortParameters() throws Exception {
-        mockMvc.perform(get("/api/admin/articles")
-                        .queryParam("sortBy", "title"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("90001"));
-        mockMvc.perform(get("/api/admin/articles")
-                        .queryParam("sortDirection", "sideways"))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.code").value("90001"));
-    }
-
-    @Test
     void usesDefaultArticleSortParameters() throws Exception {
         when(queryService.adminPage(any(), any()))
                 .thenReturn(new AdminArticlePageResult(
@@ -203,8 +189,8 @@ class AdminArticleControllerTest {
                         null,
                         null,
                         null,
-                        ArticleAdminSort.UPDATED_AT,
-                        ArticleSortDirection.DESC));
+                        "updatedAt",
+                        "desc"));
     }
 
     @Test
