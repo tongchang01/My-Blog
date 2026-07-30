@@ -125,7 +125,12 @@ describe("article API", () => {
       data: null
     });
     mock.onGet("/api/admin/articles/recycle-bin").reply(config => {
-      expect(config.params).toEqual({ page: 2, size: 10 });
+      expect(config.params).toEqual({
+        page: 2,
+        size: 10,
+        sortBy: "deletedAt",
+        sortDirection: "asc"
+      });
       return [
         200,
         {
@@ -160,7 +165,7 @@ describe("article API", () => {
     await expect(deleteArticle("9007199254740993")).resolves.toMatchObject({
       data: null
     });
-    await expect(listDeletedArticles(2, 10)).resolves.toMatchObject({
+    await expect(listDeletedArticles(2, 10, "asc")).resolves.toMatchObject({
       data: {
         records: [
           {

@@ -83,9 +83,28 @@ describe("article recycle bin page", () => {
     expect(wrapper.find('[data-testid="article-recycle-card"]').exists()).toBe(
       true
     );
-    expect(
-      wrapper.find('[data-testid="article-restore-100"]').exists()
-    ).toBe(true);
+    expect(wrapper.find('[data-testid="article-restore-100"]').exists()).toBe(
+      true
+    );
+    expect(mock.history.get[0].params).toEqual({
+      page: 1,
+      size: 20,
+      sortBy: "deletedAt",
+      sortDirection: "desc"
+    });
+
+    await wrapper
+      .get('[data-testid="article-recycle-table"]')
+      .trigger("sort-change", {
+        prop: "deletedAt",
+        order: "ascending"
+      });
+    await flushPromises();
+    expect(mock.history.get.at(-1)?.params).toMatchObject({
+      page: 1,
+      sortBy: "deletedAt",
+      sortDirection: "asc"
+    });
 
     await wrapper.get('[data-testid="article-restore-100"]').trigger("click");
     await flushPromises();

@@ -4,10 +4,7 @@ import { ElMessageBox } from "element-plus";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { message } from "@/utils/message";
-import type {
-  AdminLocale,
-  DeletedArticleListItem
-} from "../model";
+import type { AdminLocale, DeletedArticleListItem } from "../model";
 import {
   formatJstDateTime,
   localizedName,
@@ -28,6 +25,7 @@ const {
   categories,
   page,
   size,
+  sortDirection,
   total,
   loading,
   error,
@@ -36,8 +34,20 @@ const {
   initialize,
   retry,
   refresh,
-  changePage
+  changePage,
+  changeSort
 } = state;
+
+function handleSortChange({
+  prop,
+  order
+}: {
+  prop: string;
+  order: "ascending" | "descending" | null;
+}): void {
+  if (prop !== "deletedAt" || order === null) return;
+  void changeSort(order === "ascending" ? "asc" : "desc");
+}
 
 function articleTitle(item: DeletedArticleListItem): string {
   return localizedName(
@@ -148,7 +158,17 @@ onMounted(initialize);
       />
       <template v-else>
         <div class="table-scroll">
-          <el-table :data="items" row-key="id" class="recycle-table">
+          <el-table
+            data-testid="article-recycle-table"
+            :data="items"
+            row-key="id"
+            class="recycle-table"
+            :default-sort="{
+              prop: 'deletedAt',
+              order: sortDirection === 'asc' ? 'ascending' : 'descending'
+            }"
+            @sort-change="handleSortChange"
+          >
             <el-table-column
               :label="transformI18n('articles.columns.title')"
               min-width="300"
@@ -174,8 +194,11 @@ onMounted(initialize);
               <template #default="{ row }">{{ categoryName(row) }}</template>
             </el-table-column>
             <el-table-column
+              prop="deletedAt"
               :label="transformI18n('articles.recycle.deletedAt')"
               width="170"
+              sortable="custom"
+              :sort-orders="['descending', 'ascending']"
             >
               <template #default="{ row }">
                 {{ formatJstDateTime(row.deletedAt) }}

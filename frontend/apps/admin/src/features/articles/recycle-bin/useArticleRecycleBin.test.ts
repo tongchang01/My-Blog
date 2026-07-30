@@ -40,13 +40,13 @@ function deletedPage(
   };
 }
 
-function api(overrides: Partial<ArticleRecycleBinApi> = {}): ArticleRecycleBinApi {
+function api(
+  overrides: Partial<ArticleRecycleBinApi> = {}
+): ArticleRecycleBinApi {
   return {
     listDeletedArticles: vi.fn().mockResolvedValue(ok(deletedPage("1"))),
     listCategories: vi.fn().mockResolvedValue(ok([] as CategoryItem[])),
-    restoreArticle: vi.fn().mockResolvedValue(
-      ok({ id: "1" } as ArticleDetail)
-    ),
+    restoreArticle: vi.fn().mockResolvedValue(ok({ id: "1" } as ArticleDetail)),
     ...overrides
   };
 }
@@ -58,7 +58,7 @@ describe("article recycle bin state", () => {
 
     await state.initialize();
 
-    expect(source.listDeletedArticles).toHaveBeenCalledWith(1, 20);
+    expect(source.listDeletedArticles).toHaveBeenCalledWith(1, 20, "desc");
     expect(source.listCategories).toHaveBeenCalledOnce();
     expect(state.items.value[0].id).toBe("1");
   });
@@ -80,9 +80,20 @@ describe("article recycle bin state", () => {
     const state = useArticleRecycleBin(source);
 
     await state.changePage(2, 10);
-    expect(source.listDeletedArticles).toHaveBeenLastCalledWith(2, 10);
+    expect(source.listDeletedArticles).toHaveBeenLastCalledWith(2, 10, "desc");
     await state.refresh();
-    expect(source.listDeletedArticles).toHaveBeenLastCalledWith(2, 10);
+    expect(source.listDeletedArticles).toHaveBeenLastCalledWith(2, 10, "desc");
+  });
+
+  it("returns to page one when deleted-time sorting changes", async () => {
+    const source = api();
+    const state = useArticleRecycleBin(source);
+    state.page.value = 3;
+
+    await state.changeSort("asc");
+
+    expect(state.page.value).toBe(1);
+    expect(source.listDeletedArticles).toHaveBeenLastCalledWith(1, 20, "asc");
   });
 
   it("exposes a list failure and retries it", async () => {
@@ -104,9 +115,7 @@ describe("article recycle bin state", () => {
     const listDeletedArticles = vi
       .fn()
       .mockResolvedValueOnce(ok(deletedPage("21", 2, 21)))
-      .mockResolvedValueOnce(
-        ok({ records: [], total: 20, page: 2, size: 20 })
-      )
+      .mockResolvedValueOnce(ok({ records: [], total: 20, page: 2, size: 20 }))
       .mockResolvedValueOnce(ok(deletedPage("20", 1, 20)));
     const source = api({ listDeletedArticles });
     const state = useArticleRecycleBin(source);

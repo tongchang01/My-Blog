@@ -5,12 +5,10 @@ import {
   listDeletedArticles,
   restoreArticle
 } from "@/api/article";
-import {
-  ApiClientError,
-  type ApiErrorKind
-} from "@/utils/http/error";
+import { ApiClientError, type ApiErrorKind } from "@/utils/http/error";
 import type {
   ArticleDetail,
+  ArticleSortDirection,
   CategoryItem,
   DeletedArticleListItem,
   PageResponse
@@ -19,7 +17,8 @@ import type {
 export interface ArticleRecycleBinApi {
   listDeletedArticles(
     page: number,
-    size: number
+    size: number,
+    sortDirection: ArticleSortDirection
   ): Promise<ApiResponse<PageResponse<DeletedArticleListItem>>>;
   listCategories(): Promise<ApiResponse<CategoryItem[]>>;
   restoreArticle(id: string): Promise<ApiResponse<ArticleDetail>>;
@@ -45,13 +44,12 @@ function operationError(reason: unknown): RecycleBinOperationError {
   };
 }
 
-export function useArticleRecycleBin(
-  api: ArticleRecycleBinApi = defaultApi
-) {
+export function useArticleRecycleBin(api: ArticleRecycleBinApi = defaultApi) {
   const items = ref<DeletedArticleListItem[]>([]);
   const categories = ref<CategoryItem[]>([]);
   const page = ref(1);
   const size = ref(20);
+  const sortDirection = ref<ArticleSortDirection>("desc");
   const total = ref(0);
   const loading = ref(false);
   const error = ref<Error | null>(null);
@@ -64,7 +62,11 @@ export function useArticleRecycleBin(
     loading.value = true;
     error.value = null;
     try {
-      const response = await api.listDeletedArticles(page.value, size.value);
+      const response = await api.listDeletedArticles(
+        page.value,
+        size.value,
+        sortDirection.value
+      );
       if (version !== requestVersion) return;
       items.value = response.data.records;
       total.value = response.data.total;
@@ -102,6 +104,12 @@ export function useArticleRecycleBin(
     await load();
   }
 
+  async function changeSort(direction: ArticleSortDirection): Promise<void> {
+    sortDirection.value = direction;
+    page.value = 1;
+    await load();
+  }
+
   async function restore(id: string): Promise<boolean> {
     operationErrorState.value = null;
     restoringId.value = id;
@@ -131,6 +139,7 @@ export function useArticleRecycleBin(
     categories,
     page,
     size,
+    sortDirection,
     total,
     loading,
     error,
@@ -140,6 +149,7 @@ export function useArticleRecycleBin(
     retry,
     refresh,
     changePage,
+    changeSort,
     restore
   };
 }
