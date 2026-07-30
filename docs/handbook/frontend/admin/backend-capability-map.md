@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：`frontend/apps/admin/` 与管理端后端接口的消费边界
-> 最后校准：2026-07-28
+> 最后校准：2026-07-30
 > 对应代码：`frontend/apps/admin/src/`、`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/`
 > 权威程度：前后端能力映射
 
@@ -28,13 +28,13 @@
 | 站点配置 | 完整读取、完整更新 | 页面完整提交 14 个字段 |
 | 当前账号 | 当前用户、资料部分更新、改密 | ADMIN 可修改；DEMO 只读 |
 | 认证会话 | 登录、刷新、全端退出 | 由会话服务统一消费 |
-| 统计 | `GET /api/admin/stats/dashboard?from&to` | 仪表盘支持合法日期区间和快捷范围 |
+| 统计 | `GET /api/admin/stats/dashboard?from&to` | 仪表盘支持合法日期区间和快捷范围；区间与今日指标分组展示，趋势、热门文章和语言分布使用各自空态；热门文章标题可进入文章编辑页 |
 
 ## 查询约束
 
 - 文章列表支持 `status`、`categoryId`、`tagId`、`titleKeyword`、`createdFrom/To`、`publishFrom/To` 和分页；可选参数只在填写后发送，反向时间范围在请求前阻止。
 - 统计自定义范围必须同时提供两端，开始不晚于结束且最多 366 天；缺省使用最近 30 个 JST 自然日。
-- `todayPv`、`todayUv` 始终表示 JST 当天；顶部文章 `dailyUvSum` 是区间内逐日 UV 之和，不是跨日唯一访客。
+- `todayPv`、`todayUv` 始终表示 JST 当天；`todayUv` 和趋势 `uv` 是页面与语言分组后的页面日 UV 合计，不是站点级独立访客；顶部文章 `dailyUvSum` 是区间内逐日 UV 之和，不是跨日唯一访客。
 - 友链不得恢复关键字/状态控件或当前页本地过滤。确有全局筛选需求时，单独设计后端查询、索引和分页契约。
 
 ## 表单与操作语义
