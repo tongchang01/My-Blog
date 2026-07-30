@@ -2,9 +2,11 @@ package com.tyb.myblog.v2.system.infrastructure.persistence.repository;
 
 import com.tyb.myblog.v2.common.storage.StorageType;
 import com.tyb.myblog.v2.system.domain.attachment.Attachment;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentAdminSort;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentLookup;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentPage;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentRepository;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentSortDirection;
 import com.tyb.myblog.v2.system.domain.attachment.NewAttachment;
 import com.tyb.myblog.v2.system.infrastructure.persistence.entity.AttachmentEntity;
 import com.tyb.myblog.v2.system.infrastructure.persistence.mapper.AttachmentMapper;
@@ -57,10 +59,19 @@ public class MyBatisAttachmentRepository implements AttachmentRepository {
     }
 
     @Override
-    public AttachmentPage findActivePage(int page, int size) {
+    public AttachmentPage findActivePage(
+            int page,
+            int size,
+            AttachmentAdminSort sortBy,
+            AttachmentSortDirection sortDirection) {
         long offset = Math.multiplyExact((long) page - 1L, size);
         return new AttachmentPage(
-                mapper.selectActivePage(offset, size).stream()
+                mapper.selectActivePage(
+                                offset,
+                                size,
+                                sortBy,
+                                sortDirection)
+                        .stream()
                         .map(this::toDomain)
                         .toList(),
                 mapper.countActive(),

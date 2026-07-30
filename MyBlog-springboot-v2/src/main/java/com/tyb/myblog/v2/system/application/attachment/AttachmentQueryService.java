@@ -3,8 +3,10 @@ package com.tyb.myblog.v2.system.application.attachment;
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
 import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentAdminSort;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentPage;
 import com.tyb.myblog.v2.system.domain.attachment.AttachmentRepository;
+import com.tyb.myblog.v2.system.domain.attachment.AttachmentSortDirection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,10 +27,16 @@ public class AttachmentQueryService {
     public AttachmentPageResult page(
             AuthenticatedPrincipal principal,
             int page,
-            int size) {
+            int size,
+            String sortBy,
+            String sortDirection) {
         requireReadableRole(principal);
         validatePage(page, size);
-        AttachmentPage result = repository.findActivePage(page, size);
+        AttachmentPage result = repository.findActivePage(
+                page,
+                size,
+                parseSortBy(sortBy),
+                parseSortDirection(sortDirection));
         return new AttachmentPageResult(
                 result.records().stream()
                         .map(AttachmentResult::from)
@@ -96,5 +104,34 @@ public class AttachmentQueryService {
                     ApiErrorCode.VALIDATION_ERROR,
                     "每页数量必须在 1 到 100 之间");
         }
+    }
+
+    private AttachmentAdminSort parseSortBy(String value) {
+        if (value == null) {
+            throw invalidSort("sortBy");
+        }
+        return switch (value) {
+            case "createdAt" -> AttachmentAdminSort.CREATED_AT;
+            case "fileSize" -> AttachmentAdminSort.FILE_SIZE;
+            case "originalFilename" -> AttachmentAdminSort.ORIGINAL_FILENAME;
+            default -> throw invalidSort("sortBy");
+        };
+    }
+
+    private AttachmentSortDirection parseSortDirection(String value) {
+        if (value == null) {
+            throw invalidSort("sortDirection");
+        }
+        return switch (value) {
+            case "asc" -> AttachmentSortDirection.ASC;
+            case "desc" -> AttachmentSortDirection.DESC;
+            default -> throw invalidSort("sortDirection");
+        };
+    }
+
+    private ApiException invalidSort(String parameter) {
+        return new ApiException(
+                ApiErrorCode.VALIDATION_ERROR,
+                "排序参数非法: " + parameter);
     }
 }

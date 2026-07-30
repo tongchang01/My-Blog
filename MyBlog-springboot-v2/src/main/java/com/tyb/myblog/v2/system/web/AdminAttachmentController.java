@@ -11,6 +11,7 @@ import com.tyb.myblog.v2.system.application.attachment.AttachmentResult;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentUploadCommand;
 import com.tyb.myblog.v2.system.application.attachment.AttachmentUploadService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,9 +50,30 @@ public class AdminAttachmentController {
     public ApiResponse<PageResponse<AttachmentVO>> page(
             @CurrentUser AuthenticatedPrincipal principal,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @Parameter(
+                    description = "主排序字段",
+                    schema = @Schema(
+                            defaultValue = "createdAt",
+                            allowableValues = {
+                                "createdAt",
+                                "fileSize",
+                                "originalFilename"
+                            }))
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @Parameter(
+                    description = "排序方向",
+                    schema = @Schema(
+                            defaultValue = "desc",
+                            allowableValues = {"asc", "desc"}))
+            @RequestParam(defaultValue = "desc") String sortDirection) {
         AttachmentPageResult result =
-                queryService.page(principal, page, size);
+                queryService.page(
+                        principal,
+                        page,
+                        size,
+                        sortBy,
+                        sortDirection);
         return ApiResponse.ok(new PageResponse<>(
                 result.records().stream()
                         .map(AttachmentVO::from)

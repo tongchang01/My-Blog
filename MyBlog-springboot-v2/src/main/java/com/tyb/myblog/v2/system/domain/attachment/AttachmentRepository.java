@@ -17,7 +17,11 @@ public interface AttachmentRepository {
 
     Optional<AttachmentLookup> findByHashIncludingDeleted(String hashSha256);
 
-    AttachmentPage findActivePage(int page, int size);
+    AttachmentPage findActivePage(
+            int page,
+            int size,
+            AttachmentAdminSort sortBy,
+            AttachmentSortDirection sortDirection);
 
     AttachmentPage findDeletedPage(int page, int size);
 
