@@ -159,7 +159,8 @@ jobs:
           Invoke-InitializeSuccessfully @("-Reset")
 
           $repeatOutput = pwsh -NoProfile -File $initialize 2>&1
-          if ($LASTEXITCODE -eq 0 -or $repeatOutput -notmatch "active") {
+          $repeatText = $repeatOutput -join [Environment]::NewLine
+          if ($LASTEXITCODE -eq 0 -or $repeatText -notmatch "active") {
             throw "Repeated initialization must refuse active seed data"
           }
 
