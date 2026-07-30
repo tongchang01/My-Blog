@@ -172,9 +172,12 @@ try {
     $healthy = $false
     while ([DateTime]::UtcNow -lt $deadline) {
         if ($backendProcess.HasExited) {
+            $outputTail = Get-Content $standardOutputLog -Tail 30 `
+                -ErrorAction SilentlyContinue
             $errorTail = Get-Content $standardErrorLog -Tail 30 `
                 -ErrorAction SilentlyContinue
-            throw "Spring Boot exited before health check: $($errorTail -join [Environment]::NewLine)"
+            $logTail = @($outputTail) + @($errorTail)
+            throw "Spring Boot exited before health check: $($logTail -join [Environment]::NewLine)"
         }
 
         try {
