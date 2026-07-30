@@ -11,8 +11,8 @@ import java.util.List;
 public record StatsDashboardVO(
         @Schema(description = "查询区间内总 PV") long periodPv,
         @Schema(description = "JST 今天 PV") long todayPv,
-        @Schema(description = "JST 今天日 UV") long todayUv,
-        @Schema(description = "按完整区间天数计算的平均日 UV")
+        @Schema(description = "JST 今日页面日 UV 合计") long todayUv,
+        @Schema(description = "按完整区间天数计算的页面日 UV 合计平均值")
         BigDecimal averageDailyUv,
         List<TrendPoint> trend,
         List<TopArticle> topArticles,
@@ -45,7 +45,10 @@ public record StatsDashboardVO(
     }
 
     /** 连续自然日趋势。 */
-    public record TrendPoint(LocalDate date, long pv, long uv) {
+    public record TrendPoint(
+            LocalDate date,
+            long pv,
+            @Schema(description = "该 JST 日期的页面日 UV 合计") long uv) {
     }
 
     /** TOP 文章访问数据；标题不存在时保留统计行并返回 null。 */
