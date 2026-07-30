@@ -122,6 +122,9 @@ function Stop-ProcessTree {
 }
 
 $originalMysqlPassword = [Environment]::GetEnvironmentVariable("MYSQL_PWD", "Process")
+$originalBootstrapAdminEnabled = [Environment]::GetEnvironmentVariable(
+    "MYBLOG_BOOTSTRAP_ADMIN_ENABLED",
+    "Process")
 $backendProcess = $null
 $standardOutputLog = Join-Path ([System.IO.Path]::GetTempPath()) "myblog-v2-local-mysql.out.log"
 $standardErrorLog = Join-Path ([System.IO.Path]::GetTempPath()) "myblog-v2-local-mysql.err.log"
@@ -149,7 +152,8 @@ try {
         FilePath = $mavenExecutable
         ArgumentList = @(
             "spring-boot:run",
-            "-Dspring-boot.run.profiles=local"
+            "-Dspring-boot.run.profiles=local",
+            "-Dspring-boot.run.jvmArguments=-Duser.timezone=Asia/Tokyo"
         )
         WorkingDirectory = $projectDirectory
         RedirectStandardOutput = $standardOutputLog
@@ -159,35 +163,53 @@ try {
     if ($IsWindows) {
         $startProcessParameters.WindowStyle = "Hidden"
     }
+    [Environment]::SetEnvironmentVariable(
+        "MYBLOG_BOOTSTRAP_ADMIN_ENABLED",
+        "false",
+        "Process")
     $backendProcess = Start-Process @startProcessParameters
 
     $deadline = [DateTime]::UtcNow.AddSeconds(120)
     $healthy = $false
+    $lastHealthError = $null
     while ([DateTime]::UtcNow -lt $deadline) {
         if ($backendProcess.HasExited) {
+            $outputTail = Get-Content $standardOutputLog -Tail 30 `
+                -ErrorAction SilentlyContinue
             $errorTail = Get-Content $standardErrorLog -Tail 30 `
                 -ErrorAction SilentlyContinue
-            throw "Spring Boot exited before health check: $($errorTail -join [Environment]::NewLine)"
+            $logTail = @($outputTail) + @($errorTail)
+            throw "Spring Boot exited before health check: $($logTail -join [Environment]::NewLine)"
         }
 
         try {
             $response = Invoke-WebRequest -UseBasicParsing `
                 -Uri "http://localhost:8080/actuator/health" `
                 -TimeoutSec 2
-            if ($response.StatusCode -eq 200 -and $response.Content -match '"status"\s*:\s*"UP"') {
+            if ($response.StatusCode -eq 200) {
                 $healthy = $true
                 break
             }
         } catch {
+            $lastHealthError = $_.Exception.Message
             Start-Sleep -Milliseconds 500
         }
     }
 
     if (-not $healthy) {
-        throw "Spring Boot health check timed out after 120 seconds"
+        $outputTail = Get-Content $standardOutputLog -Tail 30 `
+            -ErrorAction SilentlyContinue
+        $errorTail = Get-Content $standardErrorLog -Tail 30 `
+            -ErrorAction SilentlyContinue
+        $logTail = @($outputTail) + @($errorTail)
+        throw "Spring Boot health check timed out after 120 seconds ($lastHealthError): $($logTail -join [Environment]::NewLine)"
     }
 } finally {
     Stop-ProcessTree $backendProcess
+    [Environment]::SetEnvironmentVariable(
+        "MYBLOG_BOOTSTRAP_ADMIN_ENABLED",
+        $originalBootstrapAdminEnabled,
+        "Process")
     [Environment]::SetEnvironmentVariable(
         "MYSQL_PWD",
         $originalMysqlPassword,
