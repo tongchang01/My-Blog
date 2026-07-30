@@ -10,6 +10,8 @@ describe("comment list query", () => {
         auditStatus: "PENDING",
         keyword: "  hello  ",
         includeDeleted: true,
+        sortBy: "createdAt",
+        sortDirection: "asc",
         page: 2,
         size: 50
       })
@@ -19,6 +21,8 @@ describe("comment list query", () => {
       auditStatus: "PENDING",
       keyword: "hello",
       includeDeleted: true,
+      sortBy: "createdAt",
+      sortDirection: "asc",
       page: 2,
       size: 50
     });
@@ -32,11 +36,15 @@ describe("comment list query", () => {
         auditStatus: "ALL",
         keyword: "   ",
         includeDeleted: false,
+        sortBy: "createdAt",
+        sortDirection: "desc",
         page: 1,
         size: 20
       })
     ).toEqual({
       includeDeleted: false,
+      sortBy: "createdAt",
+      sortDirection: "desc",
       page: 1,
       size: 20
     });

@@ -13,6 +13,8 @@ export function buildCommentListParams(
       : { auditStatus: filters.auditStatus }),
     ...(keyword ? { keyword } : {}),
     includeDeleted: filters.includeDeleted,
+    sortBy: filters.sortBy,
+    sortDirection: filters.sortDirection,
     page: filters.page,
     size: filters.size
   };
