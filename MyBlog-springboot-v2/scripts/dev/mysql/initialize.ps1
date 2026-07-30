@@ -195,7 +195,12 @@ try {
     }
 
     if (-not $healthy) {
-        throw "Spring Boot health check timed out after 120 seconds"
+        $outputTail = Get-Content $standardOutputLog -Tail 30 `
+            -ErrorAction SilentlyContinue
+        $errorTail = Get-Content $standardErrorLog -Tail 30 `
+            -ErrorAction SilentlyContinue
+        $logTail = @($outputTail) + @($errorTail)
+        throw "Spring Boot health check timed out after 120 seconds: $($logTail -join [Environment]::NewLine)"
     }
 } finally {
     Stop-ProcessTree $backendProcess
