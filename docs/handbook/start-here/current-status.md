@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 开发与发布准备
-> 最后校准：2026-07-28
+> 最后校准：2026-07-30
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：当前进度权威源
 
@@ -29,18 +29,17 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 
 - 管理端 access/refresh token 存在 localStorage，安全性依赖严格控制 XSS 面。
 - 登录、评论重复检查和访问打点限流使用进程内 Caffeine，不适用于无协调的多实例部署。
-- 本地 MySQL 自动初始化脚本与 local 默认管理员初始化存在账号冲突；修复前使用手工回退流程，见 ISSUE-022。
 
 ## 最近验证
 
-2026-07-28 当前修复分支已完成：
+2026-07-30 当前修复分支已完成：
 
 - 后端 `mvn clean test`：705 项测试，0 failures / 0 errors；本机无 Docker，8 项 Testcontainers 条件测试跳过，真实 MySQL 结果继续以 CI 专项为准。
 - 博客端：148 项测试、lint、typecheck 与 production build 通过。
 - 管理端：测试、typecheck、production build 与首屏预算检查通过；入口 JS 338.44 KiB、CSS 63.18 KiB、合计 401.62 KiB，低于 350 / 70 / 420 KiB 预算。
 - 部署工作流合约通过，持续校验镜像发布、OIDC、临时 SSH、同 SHA 部署、三域名公网冒烟和规则撤销。
-- 本地 MySQL PowerShell 合约继续覆盖输入与安全边界，但真实 local 启动和种子串联存在 ISSUE-022，不再把替身合约写成端到端通过。
-- [`CI`](https://github.com/tongchang01/My-Blog/actions/workflows/ci.yml) 在 `main` 的 PR、push 与手动触发定义六项检查，包含真实 MySQL 8.4 并发与迁移测试；实时结论和提交 SHA 以工作流页面为准。
+- 本地 MySQL 初始化会显式关闭迁移子进程的默认管理员创建，并固定 JVM 时区；PowerShell 合约覆盖输入与安全边界，`Linux MySQL initialization` 在真实 MySQL 8.4 上覆盖基础初始化、重置、跳过种子、重复执行拒绝和最终种子凭据。
+- [`CI`](https://github.com/tongchang01/My-Blog/actions/workflows/ci.yml) 在 `main` 的 PR、push 与手动触发定义六项检查，包含真实 MySQL 8.4 集成测试与本地初始化链路；修复提交 `ec2e562d` 的[手动运行](https://github.com/tongchang01/My-Blog/actions/runs/30533970363)六项全部通过。
 - [`Publish container images`](https://github.com/tongchang01/My-Blog/actions/workflows/images.yml) 使用同一提交 SHA 构建镜像并部署；远端发布会等待容器健康并检查 API Actuator，公网冒烟还要求三个 `/healthz` 返回固定正文 `ok`，最后始终撤销临时 SSH 入站。
 
 未解决事项见 `open-issues.md`，实施顺序见 `roadmap.md`。

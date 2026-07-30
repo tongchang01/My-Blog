@@ -2,7 +2,7 @@
 
 > 状态：当前有效；自动部署已于 2026-07-12 完成首次真实演练
 > 适用范围：`.github/workflows/ci.yml`、`.github/workflows/images.yml`
-> 最后校准：2026-07-28
+> 最后校准：2026-07-30
 > 对应代码：`.github/workflows/`、`deploy/cd/test/workflow-contract-test.sh`
 > 权威程度：CI 说明
 
@@ -12,7 +12,7 @@ CI 在 main 的 pull request、push 和手动 workflow dispatch 时运行，仓�
 | --- | --- |
 | Backend tests | Java 17，JST 时区：H2 快测及随机端口运行中 API 契约；排除五个真实 MySQL 专项 |
 | Backend MySQL integration tests | MySQL 8.4 Testcontainers：Flyway、改密、登录失败、评论审核和首页槽位并发 |
-| Linux PowerShell initialization contract | Ubuntu `pwsh`：本地 MySQL 初始化脚本的凭据、数据库名和非空库安全边界 |
+| Linux MySQL initialization | Ubuntu `pwsh` + MySQL 8.4：脚本安全边界，以及基础初始化、重置、跳过种子、重复执行拒绝和最终种子 |
 | Deployment workflow contract | Ubuntu `bash`：镜像发布、OIDC、临时 SSH 放行、同 SHA 部署和公网冒烟工作流合约 |
 | Admin frontend tests | pnpm 9.15.9、Node 24：typecheck、test、build |
 | Blog frontend tests | pnpm 9.15.9、Node 24：lint、typecheck、test、build |
