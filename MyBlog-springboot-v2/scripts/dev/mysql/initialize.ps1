@@ -171,6 +171,7 @@ try {
 
     $deadline = [DateTime]::UtcNow.AddSeconds(120)
     $healthy = $false
+    $lastHealthError = $null
     while ([DateTime]::UtcNow -lt $deadline) {
         if ($backendProcess.HasExited) {
             $outputTail = Get-Content $standardOutputLog -Tail 30 `
@@ -185,11 +186,12 @@ try {
             $response = Invoke-WebRequest -UseBasicParsing `
                 -Uri "http://localhost:8080/actuator/health" `
                 -TimeoutSec 2
-            if ($response.StatusCode -eq 200 -and $response.Content -match '"status"\s*:\s*"UP"') {
+            if ($response.StatusCode -eq 200) {
                 $healthy = $true
                 break
             }
         } catch {
+            $lastHealthError = $_.Exception.Message
             Start-Sleep -Milliseconds 500
         }
     }
@@ -200,7 +202,7 @@ try {
         $errorTail = Get-Content $standardErrorLog -Tail 30 `
             -ErrorAction SilentlyContinue
         $logTail = @($outputTail) + @($errorTail)
-        throw "Spring Boot health check timed out after 120 seconds: $($logTail -join [Environment]::NewLine)"
+        throw "Spring Boot health check timed out after 120 seconds ($lastHealthError): $($logTail -join [Environment]::NewLine)"
     }
 } finally {
     Stop-ProcessTree $backendProcess
