@@ -12,6 +12,8 @@ import com.tyb.myblog.v2.common.auth.CurrentUser;
 import com.tyb.myblog.v2.common.web.ApiResponse;
 import com.tyb.myblog.v2.common.web.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -41,7 +43,19 @@ public class AdminCommentController {
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "false") boolean includeDeleted,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @Parameter(
+                    description = "主排序字段",
+                    schema = @Schema(
+                            defaultValue = "createdAt",
+                            allowableValues = {"createdAt"}))
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @Parameter(
+                    description = "排序方向",
+                    schema = @Schema(
+                            defaultValue = "desc",
+                            allowableValues = {"asc", "desc"}))
+            @RequestParam(defaultValue = "desc") String sortDirection) {
         AdminCommentPageResult result = queryService.page(
                 principal,
                 new AdminCommentPageQuery(
@@ -51,7 +65,9 @@ public class AdminCommentController {
                         keyword,
                         includeDeleted,
                         page,
-                        size));
+                        size,
+                        sortBy,
+                        sortDirection));
         return ApiResponse.ok(new PageResponse<>(
                 result.records().stream()
                         .map(AdminCommentPageItemVO::from)

@@ -51,6 +51,21 @@ class CommentOpenApiTest {
         assertMethods(root,
                 "/paths/~1api~1admin~1comments~1{id}",
                 "delete");
+
+        JsonNode sortBy = queryParameter(
+                root,
+                "/paths/~1api~1admin~1comments/get/parameters",
+                "sortBy");
+        JsonNode sortDirection = queryParameter(
+                root,
+                "/paths/~1api~1admin~1comments/get/parameters",
+                "sortDirection");
+        assertThat(sortBy.at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly("createdAt");
+        assertThat(sortDirection.at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly("asc", "desc");
     }
 
     @Test
@@ -95,6 +110,18 @@ class CommentOpenApiTest {
                         + "/properties/" + field);
         assertThat(property.path("type").asText()).isEqualTo("string");
         assertThat(property.path("format").asText()).isEqualTo("int64");
+    }
+
+    private JsonNode queryParameter(
+            JsonNode root,
+            String pointer,
+            String name) {
+        for (JsonNode parameter : root.at(pointer)) {
+            if (name.equals(parameter.path("name").asText())) {
+                return parameter;
+            }
+        }
+        throw new AssertionError("缺少查询参数: " + name);
     }
 
     private JsonNode apiDocument() throws Exception {

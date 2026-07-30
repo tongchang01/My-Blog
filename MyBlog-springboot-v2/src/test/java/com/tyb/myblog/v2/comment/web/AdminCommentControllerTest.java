@@ -1,6 +1,7 @@
 package com.tyb.myblog.v2.comment.web;
 
 import com.tyb.myblog.v2.comment.application.AdminCommentCommandService;
+import com.tyb.myblog.v2.comment.application.AdminCommentPageQuery;
 import com.tyb.myblog.v2.comment.application.AdminCommentReplyCommand;
 import com.tyb.myblog.v2.comment.application.AdminCommentReplyResult;
 import com.tyb.myblog.v2.comment.application.AdminCommentPageResult;
@@ -74,7 +75,9 @@ class AdminCommentControllerTest {
 
         mockMvc.perform(get("/api/admin/comments")
                         .param("targetType", "ARTICLE")
-                        .param("auditStatus", "PENDING"))
+                        .param("auditStatus", "PENDING")
+                        .param("sortBy", "createdAt")
+                        .param("sortDirection", "asc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records[0].authorEmail")
                         .value("tyb@example.com"))
@@ -83,6 +86,18 @@ class AdminCommentControllerTest {
                 .andExpect(content().string(containsString("\"id\":\"9007199254740993\"")))
                 .andExpect(content().string(containsString("\"targetId\":\"9007199254740995\"")))
                 .andExpect(content().string(containsString("\"deleted\":false")));
+        verify(queryService).page(
+                principal,
+                new AdminCommentPageQuery(
+                        CommentTargetType.ARTICLE,
+                        null,
+                        CommentAuditStatus.PENDING,
+                        null,
+                        false,
+                        1,
+                        20,
+                        "createdAt",
+                        "asc"));
     }
 
     @Test
@@ -104,6 +119,18 @@ class AdminCommentControllerTest {
                         .doesNotExist())
                 .andExpect(jsonPath("$.data.records[0].authorUserAgent")
                         .doesNotExist());
+        verify(queryService).page(
+                principal,
+                new AdminCommentPageQuery(
+                        CommentTargetType.ARTICLE,
+                        null,
+                        CommentAuditStatus.PENDING,
+                        null,
+                        false,
+                        1,
+                        20,
+                        "createdAt",
+                        "desc"));
     }
 
     @Test

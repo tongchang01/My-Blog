@@ -4,7 +4,10 @@ import com.tyb.myblog.v2.comment.domain.AdminCommentPage;
 import com.tyb.myblog.v2.comment.domain.AdminCommentPageItem;
 import com.tyb.myblog.v2.comment.domain.AdminCommentQueryCriteria;
 import com.tyb.myblog.v2.comment.domain.AdminCommentQueryRepository;
+import com.tyb.myblog.v2.comment.domain.CommentSortDirection;
 import com.tyb.myblog.v2.common.auth.AuthenticatedPrincipal;
+import com.tyb.myblog.v2.common.error.ApiErrorCode;
+import com.tyb.myblog.v2.common.error.ApiException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +42,30 @@ public class AdminCommentQueryService {
                 query.keyword(),
                 query.includeDeleted(),
                 query.page(),
-                query.size());
+                query.size(),
+                parseSort(query.sortBy(), query.sortDirection()));
+    }
+
+    private static CommentSortDirection parseSort(
+            String sortBy,
+            String sortDirection) {
+        if (!"createdAt".equals(sortBy)) {
+            throw invalidSort("sortBy");
+        }
+        if (sortDirection == null) {
+            throw invalidSort("sortDirection");
+        }
+        return switch (sortDirection) {
+            case "asc" -> CommentSortDirection.ASC;
+            case "desc" -> CommentSortDirection.DESC;
+            default -> throw invalidSort("sortDirection");
+        };
+    }
+
+    private static ApiException invalidSort(String parameter) {
+        return new ApiException(
+                ApiErrorCode.VALIDATION_ERROR,
+                "排序参数非法: " + parameter);
     }
 
     private static AdminCommentPageResult.Item toItem(
