@@ -6,6 +6,7 @@ import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.common.error.GlobalExceptionHandler;
 import com.tyb.myblog.v2.content.application.article.AdminArticleDetailResult;
 import com.tyb.myblog.v2.content.application.article.AdminArticlePageResult;
+import com.tyb.myblog.v2.content.application.article.AdminArticleQuery;
 import com.tyb.myblog.v2.content.application.article.ArticleCreateService;
 import com.tyb.myblog.v2.content.application.article.ArticleDeleteService;
 import com.tyb.myblog.v2.content.application.article.ArticleQueryService;
@@ -17,6 +18,8 @@ import com.tyb.myblog.v2.content.application.article.DeletedArticlePageResult;
 import com.tyb.myblog.v2.content.application.article.DeletedArticleQueryService;
 import com.tyb.myblog.v2.content.application.article.UpdateArticleCommand;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.ArticleAdminSort;
+import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -103,7 +106,9 @@ class AdminArticleControllerTest {
         mockMvc.perform(get("/api/admin/articles")
                         .queryParam("status", "PUBLISHED")
                         .queryParam("page", "1")
-                        .queryParam("size", "20"))
+                        .queryParam("size", "20")
+                        .queryParam("sortBy", "createdAt")
+                        .queryParam("sortDirection", "asc"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.records[0].id")
                         .value(Long.toString(UNSAFE_BROWSER_ID)))
@@ -125,6 +130,21 @@ class AdminArticleControllerTest {
                         .value("https://cdn.example.com/c.png"))
                 .andExpect(jsonPath("$.data.records[0].accessPassword")
                         .doesNotExist());
+        verify(queryService).adminPage(
+                principal,
+                new AdminArticleQuery(
+                        1,
+                        20,
+                        ArticleStatus.PUBLISHED,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        ArticleAdminSort.CREATED_AT,
+                        ArticleSortDirection.ASC));
 
         mockMvc.perform(get("/api/admin/articles/100"))
                 .andExpect(status().isOk())
@@ -147,6 +167,44 @@ class AdminArticleControllerTest {
                 .andExpect(jsonPath("$.data.body").value("正文"))
                 .andExpect(jsonPath("$.data.password").doesNotExist())
                 .andExpect(jsonPath("$.data.accessPassword").doesNotExist());
+    }
+
+    @Test
+    void rejectsUnknownArticleSortParameters() throws Exception {
+        mockMvc.perform(get("/api/admin/articles")
+                        .queryParam("sortBy", "title"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
+        mockMvc.perform(get("/api/admin/articles")
+                        .queryParam("sortDirection", "sideways"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("90001"));
+    }
+
+    @Test
+    void usesDefaultArticleSortParameters() throws Exception {
+        when(queryService.adminPage(any(), any()))
+                .thenReturn(new AdminArticlePageResult(
+                        List.of(), 0, 1, 20));
+
+        mockMvc.perform(get("/api/admin/articles"))
+                .andExpect(status().isOk());
+
+        verify(queryService).adminPage(
+                principal,
+                new AdminArticleQuery(
+                        1,
+                        20,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        null,
+                        ArticleAdminSort.UPDATED_AT,
+                        ArticleSortDirection.DESC));
     }
 
     @Test

@@ -15,5 +15,7 @@ public record AdminArticleCriteria(
         LocalDateTime createdFrom,
         LocalDateTime createdTo,
         LocalDateTime publishFrom,
-        LocalDateTime publishTo) {
+        LocalDateTime publishTo,
+        ArticleAdminSort sortBy,
+        ArticleSortDirection sortDirection) {
 }

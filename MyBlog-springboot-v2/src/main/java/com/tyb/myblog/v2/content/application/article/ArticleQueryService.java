@@ -89,6 +89,11 @@ public class ArticleQueryService {
                     ApiErrorCode.VALIDATION_ERROR,
                     "每页数量必须在 1 到 100 之间");
         }
+        if (query.sortBy() == null || query.sortDirection() == null) {
+            throw new ApiException(
+                    ApiErrorCode.VALIDATION_ERROR,
+                    "排序参数不能为空");
+        }
         validateRange(query.createdFrom(), query.createdTo());
         validateRange(query.publishFrom(), query.publishTo());
     }
@@ -104,7 +109,9 @@ public class ArticleQueryService {
                 query.createdFrom(),
                 query.createdTo(),
                 query.publishFrom(),
-                query.publishTo());
+                query.publishTo(),
+                query.sortBy(),
+                query.sortDirection());
     }
 
     private void validateRange(

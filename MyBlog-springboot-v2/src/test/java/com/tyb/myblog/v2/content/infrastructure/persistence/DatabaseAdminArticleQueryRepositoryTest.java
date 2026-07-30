@@ -2,6 +2,8 @@ package com.tyb.myblog.v2.content.infrastructure.persistence;
 
 import com.tyb.myblog.v2.content.domain.article.AdminArticleCriteria;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
+import com.tyb.myblog.v2.content.domain.article.ArticleAdminSort;
+import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
 import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import org.junit.jupiter.api.BeforeEach;
@@ -90,6 +92,43 @@ class DatabaseAdminArticleQueryRepositoryTest {
                 });
     }
 
+    @Test
+    void sortsActiveArticlesByWhitelistedFieldsWithStableIds() {
+        insertCategory(10L, "后端");
+        insertArticle(100L, "Article 100", 2, 10L,
+                "2026-06-15 12:00:00", false);
+        insertArticle(101L, "Article 101", 2, 10L,
+                "2026-06-15 12:00:00", false);
+        insertArticle(102L, "Article 102", 2, 10L,
+                "2026-06-15 13:00:00", false);
+        jdbcTemplate.update("""
+                UPDATE t_article
+                SET created_at = CASE id
+                        WHEN 100 THEN '2026-06-15 08:00:00'
+                        WHEN 101 THEN '2026-06-15 09:00:00'
+                        ELSE '2026-06-15 10:00:00'
+                    END,
+                    publish_at = CASE id
+                        WHEN 100 THEN '2026-06-15 10:00:00'
+                        WHEN 101 THEN NULL
+                        ELSE '2026-06-15 11:00:00'
+                    END,
+                    comment_count = CASE id
+                        WHEN 102 THEN 2
+                        ELSE 5
+                    END
+                """);
+
+        assertOrder(ArticleAdminSort.CREATED_AT,
+                ArticleSortDirection.ASC, 100L, 101L, 102L);
+        assertOrder(ArticleAdminSort.COMMENT_COUNT,
+                ArticleSortDirection.DESC, 101L, 100L, 102L);
+        assertOrder(ArticleAdminSort.PUBLISH_AT,
+                ArticleSortDirection.ASC, 100L, 102L, 101L);
+        assertOrder(ArticleAdminSort.PUBLISH_AT,
+                ArticleSortDirection.DESC, 102L, 100L, 101L);
+    }
+
     private AdminArticleCriteria query(
             ArticleStatus status,
             Long categoryId,
@@ -105,7 +144,31 @@ class DatabaseAdminArticleQueryRepositoryTest {
                 null,
                 null,
                 null,
-                null);
+                null,
+                ArticleAdminSort.UPDATED_AT,
+                ArticleSortDirection.DESC);
+    }
+
+    private void assertOrder(
+            ArticleAdminSort sortBy,
+            ArticleSortDirection direction,
+            Long... ids) {
+        AdminArticleCriteria criteria = new AdminArticleCriteria(
+                1,
+                20,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                sortBy,
+                direction);
+        assertThat(repository.findActivePage(criteria).records())
+                .extracting("id")
+                .containsExactlyElementsOf(java.util.List.of(ids));
     }
 
     private void insertCategory(long id, String name) {
