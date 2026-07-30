@@ -310,7 +310,12 @@ class AdminArticleControllerTest {
     @Test
     void deletesRestoresAndReadsRecycleBin() throws Exception {
         doNothing().when(deleteService).delete(principal, 100L);
-        when(deletedQueryService.page(principal, 1, 20))
+        when(deletedQueryService.page(
+                principal,
+                1,
+                20,
+                "deletedAt",
+                "desc"))
                 .thenReturn(new DeletedArticlePageResult(
                         List.of(new DeletedArticlePageResult.Item(
                                 UNSAFE_BROWSER_ID,
@@ -346,6 +351,33 @@ class AdminArticleControllerTest {
 
         verify(deleteService).delete(principal, 100L);
         verify(restoreService).restore(principal, 100L);
+        verify(deletedQueryService).page(
+                principal,
+                1,
+                20,
+                "deletedAt",
+                "desc");
+    }
+
+    @Test
+    void forwardsRecycleBinSortParameters() throws Exception {
+        when(deletedQueryService.page(
+                principal,
+                2,
+                50,
+                "deletedAt",
+                "asc"))
+                .thenReturn(new DeletedArticlePageResult(
+                        List.of(), 0, 2, 50));
+
+        mockMvc.perform(get("/api/admin/articles/recycle-bin")
+                        .queryParam("page", "2")
+                        .queryParam("size", "50")
+                        .queryParam("sortBy", "deletedAt")
+                        .queryParam("sortDirection", "asc"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.page").value(2))
+                .andExpect(jsonPath("$.data.size").value(50));
     }
 
     private String writeBody() {

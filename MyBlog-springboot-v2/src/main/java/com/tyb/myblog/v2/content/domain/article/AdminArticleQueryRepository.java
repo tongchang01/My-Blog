@@ -11,5 +11,8 @@ public interface AdminArticleQueryRepository {
 
     Optional<AdminArticleDetail> findActiveDetail(long id);
 
-    DeletedArticlePage findDeletedPage(int page, int size);
+    DeletedArticlePage findDeletedPage(
+            int page,
+            int size,
+            ArticleSortDirection sortDirection);
 }

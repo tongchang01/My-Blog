@@ -12,6 +12,7 @@ import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
 import com.tyb.myblog.v2.content.domain.article.Article;
 import com.tyb.myblog.v2.content.domain.article.ArticleRepository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.DeletedArticlePage;
 import com.tyb.myblog.v2.content.domain.article.DeletedArticlePageItem;
 import org.junit.jupiter.api.BeforeEach;
@@ -114,7 +115,10 @@ class ArticleDeleteRestoreServiceTest {
 
     @Test
     void pagesRecycleBinForAdminAndDemo() {
-        when(queryRepository.findDeletedPage(1, 20))
+        when(queryRepository.findDeletedPage(
+                1,
+                20,
+                ArticleSortDirection.DESC))
                 .thenReturn(new DeletedArticlePage(
                         List.of(new DeletedArticlePageItem(
                                 10L,
@@ -129,9 +133,52 @@ class ArticleDeleteRestoreServiceTest {
                         1,
                         20));
 
-        assertThat(queryService.page(principal("DEMO"), 1, 20).records())
+        assertThat(queryService.page(
+                        principal("DEMO"),
+                        1,
+                        20,
+                        "deletedAt",
+                        "desc")
+                .records())
                 .singleElement()
                 .satisfies(item -> assertThat(item.id()).isEqualTo(10L));
+    }
+
+    @Test
+    void validatesAndMapsRecycleBinSortParameters() {
+        when(queryRepository.findDeletedPage(
+                1,
+                20,
+                ArticleSortDirection.ASC))
+                .thenReturn(new DeletedArticlePage(List.of(), 0, 1, 20));
+
+        queryService.page(
+                principal("ADMIN"),
+                1,
+                20,
+                "deletedAt",
+                "asc");
+
+        verify(queryRepository).findDeletedPage(
+                1,
+                20,
+                ArticleSortDirection.ASC);
+        assertError(
+                () -> queryService.page(
+                        principal("ADMIN"),
+                        1,
+                        20,
+                        "updatedAt",
+                        "desc"),
+                ApiErrorCode.VALIDATION_ERROR);
+        assertError(
+                () -> queryService.page(
+                        principal("ADMIN"),
+                        1,
+                        20,
+                        "deletedAt",
+                        "sideways"),
+                ApiErrorCode.VALIDATION_ERROR);
     }
 
     private Article article(long id, List<Long> tags) {

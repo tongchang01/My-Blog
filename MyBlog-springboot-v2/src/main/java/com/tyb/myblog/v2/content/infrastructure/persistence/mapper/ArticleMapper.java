@@ -3,6 +3,7 @@ package com.tyb.myblog.v2.content.infrastructure.persistence.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleCriteria;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
 import com.tyb.myblog.v2.content.domain.article.PublicArticleCriteria;
 import com.tyb.myblog.v2.content.infrastructure.persistence.entity.ArticleEntity;
@@ -91,7 +92,9 @@ public interface ArticleMapper extends BaseMapper<ArticleEntity> {
 
     List<DeletedArticlePageRow> selectDeletedPage(
             @Param("offset") long offset,
-            @Param("size") int size);
+            @Param("size") int size,
+            @Param("sortDirection")
+            ArticleSortDirection sortDirection);
 
     long countDeletedPage();
 

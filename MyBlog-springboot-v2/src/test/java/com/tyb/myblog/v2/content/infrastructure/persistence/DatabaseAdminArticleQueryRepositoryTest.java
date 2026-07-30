@@ -129,6 +129,39 @@ class DatabaseAdminArticleQueryRepositoryTest {
                 ArticleSortDirection.DESC, 102L, 100L, 101L);
     }
 
+    @Test
+    void sortsDeletedArticlesByDeletedAtWithStableIds() {
+        insertCategory(10L, "后端");
+        insertArticle(100L, "Deleted 100", 2, 10L,
+                "2026-06-15 12:00:00", true);
+        insertArticle(101L, "Deleted 101", 2, 10L,
+                "2026-06-15 12:00:00", true);
+        insertArticle(102L, "Deleted 102", 2, 10L,
+                "2026-06-15 12:00:00", true);
+        jdbcTemplate.update("""
+                UPDATE t_article
+                SET deleted_at = CASE id
+                        WHEN 100 THEN '2026-06-15 12:00:00'
+                        ELSE '2026-06-15 13:00:00'
+                    END
+                """);
+
+        assertThat(repository.findDeletedPage(
+                        1,
+                        20,
+                        ArticleSortDirection.DESC)
+                .records())
+                .extracting("id")
+                .containsExactly(102L, 101L, 100L);
+        assertThat(repository.findDeletedPage(
+                        1,
+                        20,
+                        ArticleSortDirection.ASC)
+                .records())
+                .extracting("id")
+                .containsExactly(100L, 101L, 102L);
+    }
+
     private AdminArticleCriteria query(
             ArticleStatus status,
             Long categoryId,

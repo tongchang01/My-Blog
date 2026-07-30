@@ -132,6 +132,22 @@ class ArticleOpenApiTest {
                 .containsExactly("asc", "desc");
     }
 
+    @Test
+    void documentsRecycleBinSortParameters() throws Exception {
+        JsonNode root = apiDocument();
+        String pointer =
+                "/paths/~1api~1admin~1articles~1recycle-bin/get/parameters";
+
+        assertThat(queryParameter(root, pointer, "sortBy")
+                        .at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly("deletedAt");
+        assertThat(queryParameter(root, pointer, "sortDirection")
+                        .at("/schema/enum"))
+                .extracting(JsonNode::asText)
+                .containsExactly("asc", "desc");
+    }
+
     private void assertMethods(
             JsonNode root,
             String pointer,

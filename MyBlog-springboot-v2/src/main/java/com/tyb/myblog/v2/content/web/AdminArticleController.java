@@ -122,9 +122,26 @@ public class AdminArticleController {
     public ApiResponse<PageResponse<DeletedArticlePageItemVO>> recycleBin(
             @CurrentUser AuthenticatedPrincipal principal,
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20") int size,
+            @Parameter(
+                    description = "主排序字段",
+                    schema = @Schema(
+                            defaultValue = "deletedAt",
+                            allowableValues = {"deletedAt"}))
+            @RequestParam(defaultValue = "deletedAt") String sortBy,
+            @Parameter(
+                    description = "排序方向",
+                    schema = @Schema(
+                            defaultValue = "desc",
+                            allowableValues = {"asc", "desc"}))
+            @RequestParam(defaultValue = "desc") String sortDirection) {
         DeletedArticlePageResult result =
-                deletedQueryService.page(principal, page, size);
+                deletedQueryService.page(
+                        principal,
+                        page,
+                        size,
+                        sortBy,
+                        sortDirection);
         return ApiResponse.ok(mapping.toDeletedPage(result));
     }
 

@@ -453,7 +453,7 @@
         ORDER BY at.article_id ASC, t.id ASC
     </select>
 
-    <!-- 回收站只读查询，固定按删除时间倒序保证分页稳定。 -->
+    <!-- 回收站只读查询，按删除时间与同方向 ID 次排序保证分页稳定。 -->
     <select id="selectDeletedPage"
             resultType="com.tyb.myblog.v2.content.infrastructure.persistence.projection.DeletedArticlePageRow">
         SELECT
@@ -467,7 +467,16 @@
             deleted_by
         FROM t_article
         WHERE deleted = 1
-        ORDER BY deleted_at DESC, id DESC
+        ORDER BY deleted_at
+        <choose>
+            <when test='sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>,
+        id
+        <choose>
+            <when test='sortDirection.name() == "ASC"'>ASC</when>
+            <otherwise>DESC</otherwise>
+        </choose>
         LIMIT #{size} OFFSET #{offset}
     </select>
 

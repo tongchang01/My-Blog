@@ -6,6 +6,7 @@ import com.tyb.myblog.v2.content.domain.article.AdminArticlePage;
 import com.tyb.myblog.v2.content.domain.article.AdminArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
 import com.tyb.myblog.v2.content.domain.article.ArticleStatus;
+import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import com.tyb.myblog.v2.content.domain.article.DeletedArticlePage;
 import com.tyb.myblog.v2.content.domain.article.DeletedArticlePageItem;
 import com.tyb.myblog.v2.content.domain.article.HomepageSlot;
@@ -59,10 +60,13 @@ public class MyBatisAdminArticleQueryRepository
     }
 
     @Override
-    public DeletedArticlePage findDeletedPage(int page, int size) {
+    public DeletedArticlePage findDeletedPage(
+            int page,
+            int size,
+            ArticleSortDirection sortDirection) {
         long offset = (long) (page - 1) * size;
         return new DeletedArticlePage(
-                mapper.selectDeletedPage(offset, size)
+                mapper.selectDeletedPage(offset, size, sortDirection)
                         .stream()
                         .map(this::toDeletedItem)
                         .toList(),

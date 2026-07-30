@@ -5,6 +5,7 @@ import com.tyb.myblog.v2.common.error.ApiErrorCode;
 import com.tyb.myblog.v2.common.error.ApiException;
 import com.tyb.myblog.v2.content.application.ContentAuthorization;
 import com.tyb.myblog.v2.content.domain.article.AdminArticleQueryRepository;
+import com.tyb.myblog.v2.content.domain.article.ArticleSortDirection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,9 @@ public class DeletedArticleQueryService {
     public DeletedArticlePageResult page(
             AuthenticatedPrincipal principal,
             int page,
-            int size) {
+            int size,
+            String sortBy,
+            String sortDirection) {
         authorization.requireReadable(principal);
         if (page < 1) {
             throw new ApiException(
@@ -33,6 +36,31 @@ public class DeletedArticleQueryService {
                     "每页数量必须在 1 到 100 之间");
         }
         return DeletedArticlePageResult.from(
-                repository.findDeletedPage(page, size));
+                repository.findDeletedPage(
+                        page,
+                        size,
+                        parseSort(sortBy, sortDirection)));
+    }
+
+    private ArticleSortDirection parseSort(
+            String sortBy,
+            String sortDirection) {
+        if (!"deletedAt".equals(sortBy)) {
+            throw invalidSort("sortBy");
+        }
+        if (sortDirection == null) {
+            throw invalidSort("sortDirection");
+        }
+        return switch (sortDirection) {
+            case "asc" -> ArticleSortDirection.ASC;
+            case "desc" -> ArticleSortDirection.DESC;
+            default -> throw invalidSort("sortDirection");
+        };
+    }
+
+    private ApiException invalidSort(String parameter) {
+        return new ApiException(
+                ApiErrorCode.VALIDATION_ERROR,
+                "排序参数非法: " + parameter);
     }
 }
