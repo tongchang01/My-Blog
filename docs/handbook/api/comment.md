@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 后端 comment 模块、前台 blog、后台 admin
-> 最后校准：2026-07-28
+> 最后校准：2026-07-30
 > 对应代码：`MyBlog-springboot-v2/src/main/java/com/tyb/myblog/v2/comment/web/`
 > 权威程度：API 契约
 
@@ -172,8 +172,12 @@ Query：
 | `includeDeleted` | boolean | false | 是否包含软删除评论 |
 | `page` | number | 1 | 页码 |
 | `size` | number | 20 | 每页数量 |
+| `sortBy` | string | `createdAt` | 首批只允许 `createdAt` |
+| `sortDirection` | string | `desc` | `asc` 或 `desc` |
 
 成功响应：HTTP 200，`data` 为 `PageResponse<AdminCommentPageItemVO>`。
+
+结果按创建时间排序，并始终追加同方向的 `id` 次排序，保证跨页顺序稳定。非法排序字段或方向返回 `400 + 90001`；审核状态和目标类型继续使用筛选，不提供排序。
 
 ```json
 {
