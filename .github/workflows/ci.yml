@@ -110,7 +110,7 @@ jobs:
       MYBLOG_DATASOURCE_PASSWORD: contract-password
       MYBLOG_JWT_SECRET: local-mysql-contract-jwt-secret-1234567890
       MYBLOG_STATS_HASH_SECRET: local-mysql-contract-stats-secret
-      MYBLOG_STORAGE_LOCAL_ROOT: ${{ runner.temp }}/myblog-v2-uploads
+      MYBLOG_STORAGE_LOCAL_ROOT: /tmp/myblog-v2-uploads
 
     steps:
       - name: Checkout
