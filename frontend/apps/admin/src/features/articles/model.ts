@@ -1,9 +1,3 @@
-import type {
-  CategoryItem,
-  LocalizedNames,
-  TagItem
-} from "@/features/taxonomy/model";
-
 export type {
   CategoryItem,
   LocalizedNames,
@@ -20,6 +14,12 @@ export type ArticleStatus =
 export type ArticleStatusFilter = ArticleStatus | "ALL";
 export type ArticleHomepageSlot = "NONE" | "PINNED" | "FEATURED";
 export type AdminLocale = "zh" | "ja" | "en";
+export type ArticleSortBy =
+  | "updatedAt"
+  | "createdAt"
+  | "publishAt"
+  | "commentCount";
+export type ArticleSortDirection = "asc" | "desc";
 
 export interface ArticleListFilters {
   titleKeyword: string;
@@ -30,6 +30,8 @@ export interface ArticleListFilters {
   createdTo: string;
   publishFrom: string;
   publishTo: string;
+  sortBy: ArticleSortBy;
+  sortDirection: ArticleSortDirection;
   page: number;
   size: number;
 }
@@ -43,6 +45,8 @@ export interface ArticleListParams {
   createdTo?: string;
   publishFrom?: string;
   publishTo?: string;
+  sortBy: ArticleSortBy;
+  sortDirection: ArticleSortDirection;
   page: number;
   size: number;
 }

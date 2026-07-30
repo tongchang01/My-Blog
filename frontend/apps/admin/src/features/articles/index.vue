@@ -5,7 +5,12 @@ import { useRouter } from "vue-router";
 import { i18n, transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
 import { message } from "@/utils/message";
-import type { AdminLocale, ArticleListItem, TagItem } from "./model";
+import type {
+  AdminLocale,
+  ArticleListItem,
+  ArticleSortBy,
+  TagItem
+} from "./model";
 import {
   formatJstDateTime,
   homepageSlotTranslationKey,
@@ -36,7 +41,8 @@ const {
   search,
   reset,
   refresh,
-  changePage
+  changePage,
+  changeSort
 } = state;
 
 const locale = computed(
@@ -116,6 +122,30 @@ function createArticle(): void {
 
 function editArticle(id: string): void {
   router.push(`/articles/${id}/edit`);
+}
+
+function handleSortChange({
+  prop,
+  order
+}: {
+  prop: string;
+  order: "ascending" | "descending" | null;
+}): void {
+  if (
+    order === null ||
+    !(
+      prop === "updatedAt" ||
+      prop === "createdAt" ||
+      prop === "publishAt" ||
+      prop === "commentCount"
+    )
+  ) {
+    return;
+  }
+  void changeSort(
+    prop as ArticleSortBy,
+    order === "ascending" ? "asc" : "desc"
+  );
 }
 
 async function confirmRemove(item: ArticleListItem): Promise<void> {
@@ -355,7 +385,18 @@ onMounted(initialize);
 
       <template v-else>
         <div class="table-scroll">
-          <el-table :data="items" row-key="id" class="article-table">
+          <el-table
+            data-testid="article-table"
+            :data="items"
+            row-key="id"
+            class="article-table"
+            :default-sort="{
+              prop: filters.sortBy,
+              order:
+                filters.sortDirection === 'asc' ? 'ascending' : 'descending'
+            }"
+            @sort-change="handleSortChange"
+          >
             <el-table-column
               :label="transformI18n('articles.columns.title')"
               min-width="340"
@@ -431,18 +472,37 @@ onMounted(initialize);
               prop="commentCount"
               :label="transformI18n('articles.columns.comments')"
               width="90"
+              sortable="custom"
+              :sort-orders="['descending', 'ascending']"
             />
             <el-table-column
+              prop="createdAt"
+              :label="transformI18n('articles.columns.createdAt')"
+              width="155"
+              sortable="custom"
+              :sort-orders="['descending', 'ascending']"
+            >
+              <template #default="{ row }">{{
+                formatJstDateTime(row.createdAt)
+              }}</template>
+            </el-table-column>
+            <el-table-column
+              prop="publishAt"
               :label="transformI18n('articles.columns.publishAt')"
               width="155"
+              sortable="custom"
+              :sort-orders="['descending', 'ascending']"
             >
               <template #default="{ row }">{{
                 formatJstDateTime(row.publishAt)
               }}</template>
             </el-table-column>
             <el-table-column
+              prop="updatedAt"
               :label="transformI18n('articles.columns.updatedAt')"
               width="155"
+              sortable="custom"
+              :sort-orders="['descending', 'ascending']"
             >
               <template #default="{ row }">{{
                 formatJstDateTime(row.updatedAt)

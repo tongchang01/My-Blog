@@ -24,6 +24,8 @@ describe("article API", () => {
       expect(config.params).toEqual({
         titleKeyword: "Vue",
         status: "PUBLISHED",
+        sortBy: "updatedAt",
+        sortDirection: "desc",
         page: 1,
         size: 20
       });
@@ -47,6 +49,8 @@ describe("article API", () => {
         createdTo: "",
         publishFrom: "",
         publishTo: "",
+        sortBy: "updatedAt",
+        sortDirection: "desc",
         page: 1,
         size: 20
       })

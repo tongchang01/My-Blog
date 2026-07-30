@@ -9,6 +9,8 @@ import {
 import type {
   ArticleListFilters,
   ArticleListItem,
+  ArticleSortBy,
+  ArticleSortDirection,
   CategoryItem,
   PageResponse,
   TagItem
@@ -39,6 +41,8 @@ const DEFAULT_FILTERS: ArticleListFilters = {
   createdTo: "",
   publishFrom: "",
   publishTo: "",
+  sortBy: "updatedAt",
+  sortDirection: "desc",
   page: 1,
   size: 20
 };
@@ -134,6 +138,16 @@ export function useArticleList(api: ArticleListApi = defaultApi) {
     await loadArticles();
   }
 
+  async function changeSort(
+    sortBy: ArticleSortBy,
+    sortDirection: ArticleSortDirection
+  ): Promise<void> {
+    filters.sortBy = sortBy;
+    filters.sortDirection = sortDirection;
+    filters.page = 1;
+    await loadArticles();
+  }
+
   async function remove(id: string): Promise<boolean> {
     operationError.value = null;
     deletingId.value = id;
@@ -174,6 +188,7 @@ export function useArticleList(api: ArticleListApi = defaultApi) {
     reset,
     refresh,
     changePage,
+    changeSort,
     remove
   };
 }

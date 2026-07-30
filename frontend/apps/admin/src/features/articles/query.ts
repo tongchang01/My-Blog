@@ -1,7 +1,4 @@
-import type {
-  ArticleListFilters,
-  ArticleListParams
-} from "./model";
+import type { ArticleListFilters, ArticleListParams } from "./model";
 
 export function buildArticleListParams(
   filters: ArticleListFilters
@@ -16,6 +13,8 @@ export function buildArticleListParams(
     ...(filters.createdTo ? { createdTo: filters.createdTo } : {}),
     ...(filters.publishFrom ? { publishFrom: filters.publishFrom } : {}),
     ...(filters.publishTo ? { publishTo: filters.publishTo } : {}),
+    sortBy: filters.sortBy,
+    sortDirection: filters.sortDirection,
     page: filters.page,
     size: filters.size
   };

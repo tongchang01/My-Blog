@@ -13,6 +13,8 @@ describe("article list query", () => {
         createdTo: "2026-07-02T23:59:59",
         publishFrom: "2026-07-03T00:00:00",
         publishTo: "2026-07-04T23:59:59",
+        sortBy: "commentCount",
+        sortDirection: "asc",
         page: 2,
         size: 20
       })
@@ -25,6 +27,8 @@ describe("article list query", () => {
       createdTo: "2026-07-02T23:59:59",
       publishFrom: "2026-07-03T00:00:00",
       publishTo: "2026-07-04T23:59:59",
+      sortBy: "commentCount",
+      sortDirection: "asc",
       page: 2,
       size: 20
     });
@@ -41,9 +45,16 @@ describe("article list query", () => {
         createdTo: "",
         publishFrom: "",
         publishTo: "",
+        sortBy: "updatedAt",
+        sortDirection: "desc",
         page: 1,
         size: 10
       })
-    ).toEqual({ page: 1, size: 10 });
+    ).toEqual({
+      sortBy: "updatedAt",
+      sortDirection: "desc",
+      page: 1,
+      size: 10
+    });
   });
 });
