@@ -101,11 +101,17 @@ dashboard:
   backendStatus: Backend connection
   connected: Connected
   loadError: Failed to load stats. Please retry.
-  empty: No stats data yet
+  empty:
+    trend: No visits in this period
+    topArticles: No top articles in this period
+    languageDistribution: No language distribution in this period
   trend: Traffic trend
   topArticles: Top articles
   languageDistribution: Language distribution
   dailyUvSum: Sum of daily UVs in period
+  sections:
+    period: Selected period
+    today: Today overview
   filter:
     last7: Last 7 days
     last30: Last 30 days
@@ -117,7 +123,8 @@ dashboard:
   metrics:
     periodPv: Period PV
     todayPv: Today PV (JST)
-    todayUv: Today UV (JST)
+    todayUv: Today's page daily UV sum (JST)
+    pageDailyUvSum: Page daily UV sum
     averageDailyUv: Average daily UV
   languages:
     zh: Chinese

@@ -7,6 +7,8 @@ import {
   ref,
   watch
 } from "vue";
+import { useResizeObserver } from "@vueuse/core";
+import { useRouter } from "vue-router";
 import type { ECharts } from "echarts/core";
 import echarts from "@/plugins/echarts";
 import { transformI18n } from "@/plugins/i18n";
@@ -16,9 +18,20 @@ import { useStatsDashboard } from "./useStatsDashboard";
 
 defineOptions({ name: "Dashboard" });
 
+const router = useRouter();
 const userStore = useUserStoreHook();
-const { filters, dashboard, loading, error, filterError, isEmpty, refresh, load } =
+const { filters, dashboard, loading, error, filterError, refresh, load } =
   useStatsDashboard();
+const hasTrendTraffic = computed(
+  () =>
+    dashboard.value?.trend.some(point => point.pv > 0 || point.uv > 0) ?? false
+);
+const hasTopArticles = computed(
+  () => (dashboard.value?.topArticles.length ?? 0) > 0
+);
+const hasLanguageDistribution = computed(
+  () => (dashboard.value?.languageDistribution.length ?? 0) > 0
+);
 const dateRange = computed({
   get: () =>
     filters.value.from && filters.value.to
@@ -53,6 +66,10 @@ function resetFilters(): void {
   void load();
 }
 
+function editArticle(articleId: string): void {
+  void router.push(`/articles/${articleId}/edit`);
+}
+
 function chartFor(element: HTMLElement): ECharts {
   const existing = echarts.getInstanceByDom(element);
   if (existing) return existing;
@@ -67,7 +84,7 @@ function canRenderChart(element: HTMLElement): boolean {
 
 async function renderCharts(): Promise<void> {
   const current = dashboard.value;
-  if (!current) return;
+  if (!current || !hasTrendTraffic.value) return;
   await nextTick();
 
   if (trendChartRef.value && canRenderChart(trendChartRef.value)) {
@@ -79,12 +96,20 @@ async function renderCharts(): Promise<void> {
       yAxis: { type: "value" },
       series: [
         { name: "PV", type: "line", data: current.trend.map(item => item.pv) },
-        { name: "UV", type: "line", data: current.trend.map(item => item.uv) }
+        {
+          name: transformI18n("dashboard.metrics.pageDailyUvSum"),
+          type: "line",
+          data: current.trend.map(item => item.uv)
+        }
       ]
     });
   }
-
 }
+
+useResizeObserver(trendChartRef, () => {
+  const element = trendChartRef.value;
+  if (element) echarts.getInstanceByDom(element)?.resize();
+});
 
 watch(dashboard, () => {
   void renderCharts();
@@ -175,63 +200,86 @@ onBeforeUnmount(() => {
       </el-button>
     </el-alert>
 
-    <el-empty
-      v-else-if="isEmpty"
-      data-testid="dashboard-empty"
-      class="mt-4"
-      :description="transformI18n('dashboard.empty')"
-    />
-
     <template v-else-if="dashboard">
-      <section class="metric-grid">
-        <el-card
-          data-testid="dashboard-metric-period-pv"
-          class="metric-card"
-          shadow="never"
-        >
-          <el-statistic :value="dashboard.periodPv">
-            <template #title>{{ transformI18n("dashboard.metrics.periodPv") }}</template>
-          </el-statistic>
-        </el-card>
-        <el-card
-          data-testid="dashboard-metric-today-pv"
-          class="metric-card"
-          shadow="never"
-        >
-          <el-statistic :value="dashboard.todayPv">
-            <template #title>{{ transformI18n("dashboard.metrics.todayPv") }}</template>
-          </el-statistic>
-        </el-card>
-        <el-card
-          data-testid="dashboard-metric-today-uv"
-          class="metric-card"
-          shadow="never"
-        >
-          <el-statistic :value="dashboard.todayUv">
-            <template #title>{{ transformI18n("dashboard.metrics.todayUv") }}</template>
-          </el-statistic>
-        </el-card>
+      <section data-testid="dashboard-period-metrics" class="metric-section">
+        <h2>{{ transformI18n("dashboard.sections.period") }}</h2>
+        <div class="metric-grid">
+          <el-card
+            data-testid="dashboard-metric-period-pv"
+            class="metric-card"
+            shadow="never"
+          >
+            <el-statistic :value="dashboard.periodPv">
+              <template #title>
+                {{ transformI18n("dashboard.metrics.periodPv") }}
+              </template>
+            </el-statistic>
+          </el-card>
+        </div>
+      </section>
+
+      <section data-testid="dashboard-today-metrics" class="metric-section">
+        <h2>{{ transformI18n("dashboard.sections.today") }}</h2>
+        <div class="metric-grid">
+          <el-card
+            data-testid="dashboard-metric-today-pv"
+            class="metric-card"
+            shadow="never"
+          >
+            <el-statistic :value="dashboard.todayPv">
+              <template #title>
+                {{ transformI18n("dashboard.metrics.todayPv") }}
+              </template>
+            </el-statistic>
+          </el-card>
+          <el-card
+            data-testid="dashboard-metric-today-uv"
+            class="metric-card"
+            shadow="never"
+          >
+            <el-statistic :value="dashboard.todayUv">
+              <template #title>
+                {{ transformI18n("dashboard.metrics.todayUv") }}
+              </template>
+            </el-statistic>
+          </el-card>
+        </div>
       </section>
 
       <section class="dashboard-main-grid">
         <el-card class="dashboard-card" shadow="never">
           <template #header>{{ transformI18n("dashboard.trend") }}</template>
           <div
+            v-show="hasTrendTraffic"
             ref="trendChartRef"
             data-testid="dashboard-trend-chart"
             class="dashboard-chart"
           />
+          <el-empty
+            v-if="!hasTrendTraffic"
+            data-testid="dashboard-trend-empty"
+            :description="transformI18n('dashboard.empty.trend')"
+          />
         </el-card>
 
         <el-card class="dashboard-card" shadow="never">
-          <template #header>{{ transformI18n("dashboard.topArticles") }}</template>
-          <ol class="article-ranking">
+          <template #header>{{
+            transformI18n("dashboard.topArticles")
+          }}</template>
+          <ol v-if="hasTopArticles" class="article-ranking">
             <li
               v-for="article in dashboard.topArticles"
               :key="article.articleId"
               :data-testid="`dashboard-top-article-${article.articleId}`"
             >
-              <span>{{ article.title || article.articleId }}</span>
+              <button
+                type="button"
+                class="article-ranking__link"
+                :data-testid="`dashboard-top-article-link-${article.articleId}`"
+                @click="editArticle(article.articleId)"
+              >
+                {{ article.title || article.articleId }}
+              </button>
               <span>
                 PV {{ article.pv }} /
                 {{ transformI18n("dashboard.dailyUvSum") }}
@@ -239,26 +287,38 @@ onBeforeUnmount(() => {
               </span>
             </li>
           </ol>
+          <el-empty
+            v-else
+            data-testid="dashboard-top-articles-empty"
+            :description="transformI18n('dashboard.empty.topArticles')"
+          />
         </el-card>
       </section>
 
       <el-card class="dashboard-card language-card" shadow="never">
-        <template #header>{{ transformI18n("dashboard.languageDistribution") }}</template>
-        <ul class="language-list">
-            <li
-              v-for="item in dashboard.languageDistribution"
-              :key="item.language"
-              :data-testid="`dashboard-language-${item.language}`"
-            >
-              <div class="language-list__heading">
-                <span>{{ languageLabel(item.language) }}</span>
-                <span>{{ item.pv }} / {{ ratioLabel(item.ratio) }}</span>
-              </div>
-              <div class="language-list__bar" aria-hidden="true">
-                <span :style="{ width: ratioLabel(item.ratio) }" />
-              </div>
-            </li>
+        <template #header>{{
+          transformI18n("dashboard.languageDistribution")
+        }}</template>
+        <ul v-if="hasLanguageDistribution" class="language-list">
+          <li
+            v-for="item in dashboard.languageDistribution"
+            :key="item.language"
+            :data-testid="`dashboard-language-${item.language}`"
+          >
+            <div class="language-list__heading">
+              <span>{{ languageLabel(item.language) }}</span>
+              <span>{{ item.pv }} / {{ ratioLabel(item.ratio) }}</span>
+            </div>
+            <div class="language-list__bar" aria-hidden="true">
+              <span :style="{ width: ratioLabel(item.ratio) }" />
+            </div>
+          </li>
         </ul>
+        <el-empty
+          v-else
+          data-testid="dashboard-language-empty"
+          :description="transformI18n('dashboard.empty.languageDistribution')"
+        />
       </el-card>
     </template>
   </section>
@@ -276,8 +336,8 @@ onBeforeUnmount(() => {
 }
 
 .dashboard-heading {
-  justify-content: space-between;
   gap: 20px;
+  justify-content: space-between;
   padding-bottom: 20px;
   border-bottom: 1px solid var(--el-border-color-lighter);
 
@@ -299,30 +359,36 @@ onBeforeUnmount(() => {
 }
 
 .dashboard-filter {
-  justify-content: flex-end;
-  gap: 12px;
   flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
 }
 
 .dashboard-filter__actions {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
+  gap: 8px;
 }
 
 .dashboard-filter-error {
   margin-top: 16px;
 }
 
-.metric-grid,
-.dashboard-main-grid {
-  display: grid;
-  gap: 16px;
+.metric-section {
+  margin-top: 20px;
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--el-text-color-regular);
+  }
 }
 
 .metric-grid {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
 
   .metric-card {
     border-color: var(--el-border-color-lighter);
@@ -342,7 +408,9 @@ onBeforeUnmount(() => {
 }
 
 .dashboard-main-grid {
+  display: grid;
   grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 16px;
   margin-top: 16px;
 }
 
@@ -381,7 +449,7 @@ onBeforeUnmount(() => {
       counter-increment: article-rank;
     }
 
-    > span:first-of-type {
+    > .article-ranking__link {
       flex: 1;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -393,6 +461,19 @@ onBeforeUnmount(() => {
       color: var(--el-text-color-secondary);
       white-space: nowrap;
     }
+  }
+}
+
+.article-ranking__link {
+  padding: 0;
+  color: var(--el-color-primary);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+
+  &:hover {
+    text-decoration: underline;
   }
 }
 
@@ -457,8 +538,8 @@ onBeforeUnmount(() => {
   }
 
   .dashboard-heading {
-    align-items: flex-start;
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .dashboard-filter {
