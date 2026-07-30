@@ -146,21 +146,30 @@ jobs:
           )
           $initialize = "MyBlog-springboot-v2/scripts/dev/mysql/initialize.ps1"
 
-          pwsh -NoProfile -File $initialize
-          pwsh -NoProfile -File $initialize -Reset
+          function Invoke-InitializeSuccessfully {
+            param([string[]]$Arguments = @())
+
+            pwsh -NoProfile -File $initialize @Arguments
+            if ($LASTEXITCODE -ne 0) {
+              throw "Initialization failed: $($Arguments -join ' ')"
+            }
+          }
+
+          Invoke-InitializeSuccessfully
+          Invoke-InitializeSuccessfully @("-Reset")
 
           $repeatOutput = pwsh -NoProfile -File $initialize 2>&1
           if ($LASTEXITCODE -eq 0 -or $repeatOutput -notmatch "active") {
             throw "Repeated initialization must refuse active seed data"
           }
 
-          pwsh -NoProfile -File $initialize -Reset -SkipSeed
+          Invoke-InitializeSuccessfully @("-Reset", "-SkipSeed")
           $emptyCount = mysql @mysql myblog_v2_dev --execute="SELECT (SELECT COUNT(*) FROM t_user_auth WHERE deleted = 0) + (SELECT COUNT(*) FROM t_article WHERE deleted = 0)"
           if ($emptyCount -ne "0") {
             throw "SkipSeed must leave migrated tables without active seed rows"
           }
 
-          pwsh -NoProfile -File $initialize
+          Invoke-InitializeSuccessfully
 
   # ===========================================================================
   # 部署工作流合约：防止镜像发布、OIDC、临时 SSH 放行和公网冒烟配置漂移。
