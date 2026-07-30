@@ -83,20 +83,84 @@ jobs:
         run: mvn -f MyBlog-springboot-v2/pom.xml test "-Dtest=MySqlFlywayMigrationTest,MySqlChangePasswordConcurrencyTest,MySqlLoginFailureConcurrencyTest,MySqlCommentModerationConcurrencyTest,MySqlHomepageSlotConcurrencyTest"
 
   # ===========================================================================
-  # Linux PowerShell 合约 job：验证本地 MySQL 初始化脚本能在 Ubuntu 的 pwsh 下运行。
-  # 不启动真实 MySQL；数据库安全边界由 initialize.contract-test.ps1 的替身验证。
+  # Linux PowerShell 初始化 job：先跑进程替身合约，再在 MySQL 8.4 上跑完整链路。
   # ===========================================================================
   mysql-initialization-contract:
-    name: Linux PowerShell initialization contract
+    name: Linux MySQL initialization
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: contract-password
+          MYSQL_DATABASE: myblog_v2_dev
+          MYSQL_USER: myblog
+          MYSQL_PASSWORD: contract-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      MYBLOG_DATASOURCE_URL: jdbc:mysql://127.0.0.1:3306/myblog_v2_dev?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&connectionTimeZone=Asia/Tokyo&forceConnectionTimeToSession=true&sessionVariables=time_zone='%2B09:00'
+      MYBLOG_DATASOURCE_USERNAME: myblog
+      MYBLOG_DATASOURCE_PASSWORD: contract-password
+      MYBLOG_JWT_SECRET: local-mysql-contract-jwt-secret-1234567890
+      MYBLOG_STATS_HASH_SECRET: local-mysql-contract-stats-secret
+      MYBLOG_STORAGE_LOCAL_ROOT: ${{ runner.temp }}/myblog-v2-uploads
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: maven
+
+      - name: Install MySQL client
+        run: sudo apt-get update && sudo apt-get install -y mysql-client
+
       - name: Run initialization contract
         shell: pwsh
         run: pwsh -NoProfile -File MyBlog-springboot-v2/scripts/dev/mysql/initialize.contract-test.ps1
+
+      - name: Run initialization against MySQL 8.4
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $env:MYSQL_PWD = $env:MYBLOG_DATASOURCE_PASSWORD
+          $mysql = @(
+            "--protocol=TCP",
+            "--host=127.0.0.1",
+            "--port=3306",
+            "--user=myblog",
+            "--batch",
+            "--raw",
+            "--skip-column-names"
+          )
+          $initialize = "MyBlog-springboot-v2/scripts/dev/mysql/initialize.ps1"
+
+          pwsh -NoProfile -File $initialize
+          pwsh -NoProfile -File $initialize -Reset
+
+          $repeatOutput = pwsh -NoProfile -File $initialize 2>&1
+          if ($LASTEXITCODE -eq 0 -or $repeatOutput -notmatch "active") {
+            throw "Repeated initialization must refuse active seed data"
+          }
+
+          pwsh -NoProfile -File $initialize -Reset -SkipSeed
+          $emptyCount = mysql @mysql myblog_v2_dev --execute="SELECT (SELECT COUNT(*) FROM t_user_auth WHERE deleted = 0) + (SELECT COUNT(*) FROM t_article WHERE deleted = 0)"
+          if ($emptyCount -ne "0") {
+            throw "SkipSeed must leave migrated tables without active seed rows"
+          }
+
+          pwsh -NoProfile -File $initialize
 
   # ===========================================================================
   # 部署工作流合约：防止镜像发布、OIDC、临时 SSH 放行和公网冒烟配置漂移。
