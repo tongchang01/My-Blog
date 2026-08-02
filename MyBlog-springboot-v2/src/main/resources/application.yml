@@ -28,6 +28,10 @@ management:
       exposure:
         include: health
 
+logging:
+  pattern:
+    level: "%5p [%X{requestId:-}]"
+
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   configuration:
