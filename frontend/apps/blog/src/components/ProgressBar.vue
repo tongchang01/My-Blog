@@ -7,18 +7,12 @@
 </template>
 
 <script setup lang="ts">
-/**
- * Lodash package is imported through CDN.
- *
- * For version 4.17.21
- */
-declare const _: any
-
+import { throttle } from 'lodash-es'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 
 const progress = ref(0)
 
-const scrollHandler = _.throttle(
+const scrollHandler = throttle(
   () => {
     progress.value =
       (window.scrollY /
