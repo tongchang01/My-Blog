@@ -21,9 +21,10 @@
 
         <p
           v-if="authorData.description"
-          class="pt-6 px-2 w-full text-sm text-center text-ob-normal"
-          v-html="authorData.description"
-        />
+          class="pt-6 px-2 w-full text-sm text-center text-ob-normal whitespace-pre-line"
+        >
+          {{ authorData.description }}
+        </p>
         <p
           v-else
           class="pt-6 px-10 w-full text-sm text-center flex flex-col gap-2"
