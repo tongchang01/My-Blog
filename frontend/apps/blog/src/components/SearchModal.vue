@@ -307,13 +307,7 @@ import { useSearchStore } from '@/stores/search'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-
-/**
- * Lodash package is imported through CDN.
- *
- * For version 4.17.21
- */
-declare const _: any
+import { debounce } from 'lodash-es'
 
 const searchStore = useSearchStore()
 const searchInput = ref<HTMLInputElement>()
@@ -431,7 +425,7 @@ const handleEnterDown = () => {
  * for user to finish typing. Prevent uncessary searches
  * between typing of a keyword.
  */
-const searchKeyword = _.debounce(async (event: Event) => {
+const searchKeyword = debounce(async (event: Event) => {
   const target = event.target as HTMLInputElement | null
   const query = target?.value.trim() ?? ''
   if (query !== '') {

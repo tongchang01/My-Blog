@@ -24,4 +24,9 @@ describe('Profile.vue', () => {
     expect(locationBlock).toContain('text-base')
     expect(locationBlock).not.toMatch(/text-(?:black|ob-bright)/)
   })
+
+  it('renders the author description as escaped text instead of raw HTML', () => {
+    expect(source).not.toContain('v-html="authorData.description"')
+    expect(source).toContain('{{ authorData.description }}')
+  })
 })

@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 开发与发布准备
-> 最后校准：2026-07-30
+> 最后校准：2026-08-02
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：当前进度权威源
 
@@ -18,6 +18,16 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 | 文档   | 当前事实由入口、handbook、governance 与 showcase 维护；任务计划和评审材料完成迁移后删除，由 Git 历史追溯                                        |
 | 部署   | AWS EC2、Route 53、S3、Docker Compose 与 Caddy 已运行；`main` 使用 GHCR、GitHub OIDC 和受限 SSH 部署同一 SHA，部署后检查三条 HTTPS 健康端点 |
 
+## 已验证、待合并的修复
+
+`fix/review-validated-migration` 已完成一组独立的审查修复并推送到远端：
+
+- 博客端不再从 unpkg 运行时加载 lodash/md5，改由 Vite 打包本地 `lodash-es`；未使用的 md5 脚本已删除。
+- 作者三语简介按纯文本渲染并保留换行，评论 HTML 在后端白名单清洗后再经 DOMPurify 输出兜底。
+- 删除未被引用的旧认证/HTTP 工具文件；后端日志加入请求关联 ID，并通过响应头回传。
+
+该分支已通过完整 CI，但尚未创建 PR、合并 `main` 或部署生产；当前线上状态仍以 `main` 为准。令牌 Cookie 化、CSP、安全响应头、自动回滚和管理端模板瘦身等审查建议尚未实现，不因本分支而视为完成。
+
 ## 已知产品缺口
 
 - 博客端核心导航、文章卡片、搜索结果和 404 恢复入口已使用原生链接/按钮语义；标题层级仍待单独确认：首页文章卡片重复使用 `h1`，文章详情存在两个 `h1`，留言板没有页面级 `h1`。
@@ -32,14 +42,11 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 
 ## 最近验证
 
-2026-07-30 当前修复分支已完成：
+2026-08-02 `fix/review-validated-migration` 已完成：
 
-- 后端 `mvn clean test`：705 项测试，0 failures / 0 errors；本机无 Docker，8 项 Testcontainers 条件测试跳过，真实 MySQL 结果继续以 CI 专项为准。
-- 博客端：148 项测试、lint、typecheck 与 production build 通过。
-- 管理端：测试、typecheck、production build 与首屏预算检查通过；入口 JS 338.44 KiB、CSS 63.18 KiB、合计 401.62 KiB，低于 350 / 70 / 420 KiB 预算。
-- 部署工作流合约通过，持续校验镜像发布、OIDC、临时 SSH、同 SHA 部署、三域名公网冒烟和规则撤销。
-- 本地 MySQL 初始化会显式关闭迁移子进程的默认管理员创建，并固定 JVM 时区；PowerShell 合约覆盖输入与安全边界，`Linux MySQL initialization` 在真实 MySQL 8.4 上覆盖基础初始化、重置、跳过种子、重复执行拒绝和最终种子凭据。
-- [`CI`](https://github.com/tongchang01/My-Blog/actions/workflows/ci.yml) 在 `main` 的 PR、push 与手动触发定义六项检查，包含真实 MySQL 8.4 集成测试与本地初始化链路；修复提交 `ec2e562d` 的[手动运行](https://github.com/tongchang01/My-Blog/actions/runs/30533970363)六项全部通过。
-- [`Publish container images`](https://github.com/tongchang01/My-Blog/actions/workflows/images.yml) 使用同一提交 SHA 构建镜像并部署；远端发布会等待容器健康并检查 API Actuator，公网冒烟还要求三个 `/healthz` 返回固定正文 `ok`，最后始终撤销临时 SSH 入站。
+- 本地后端 `mvn clean test` 通过（721 项测试，0 failures / 0 errors）；本机无 Docker，8 项 Testcontainers 条件测试跳过。
+- 博客端 lint、typecheck、测试与 production build 通过；管理端未修改，但 CI 仍执行其 typecheck、测试、构建和入口预算检查。
+- [`CI`](https://github.com/tongchang01/My-Blog/actions/workflows/ci.yml) 的[手动运行 30728818544](https://github.com/tongchang01/My-Blog/actions/runs/30728818544)对提交 `59131e0a` 的六项检查全部通过：后端测试、真实 MySQL 8.4 集成测试、Linux MySQL 初始化、blog 前端、admin 前端和部署工作流合约。
+- 本次为分支验证，不触发镜像发布或生产部署；生产验证仍须在合并 `main` 后按发布流程重新执行。
 
 未解决事项见 `open-issues.md`，实施顺序见 `roadmap.md`。

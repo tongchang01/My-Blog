@@ -13,12 +13,7 @@
 </template>
 
 <script setup lang="ts">
-/**
- * Lodash package is imported through CDN.
- *
- * For version 4.17.21
- */
-declare const _: any
+import { throttle } from 'lodash-es'
 
 import { useNavigatorStore } from '@/stores/navigator'
 import {
@@ -201,7 +196,7 @@ const handleScroll = () => {
    * positioning effect. This may not work well
    * with asynchronous panning; " (On FireFox)
    */
-  _.throttle(updateScroll, 100, { trailing: true, leading: true })()
+  throttle(updateScroll, 100, { trailing: true, leading: true })()
 }
 
 const handleResize = () => {

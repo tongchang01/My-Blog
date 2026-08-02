@@ -102,7 +102,10 @@
                 <span v-else>{{ comment.authorNickname }}</span>
                 <time>{{ comment.createdAt }}</time>
               </div>
-              <div class="comment-content" v-html="comment.contentHtml"></div>
+              <div
+                class="comment-content"
+                v-html="sanitizeCommentHtml(comment.contentHtml)"
+              ></div>
               <button
                 class="comment-reply-button"
                 type="button"
@@ -145,7 +148,10 @@
                     })
                   }}
                 </p>
-                <div class="comment-content" v-html="reply.contentHtml"></div>
+                <div
+                  class="comment-content"
+                  v-html="sanitizeCommentHtml(reply.contentHtml)"
+                ></div>
                 <button
                   class="comment-reply-button"
                   type="button"
@@ -189,6 +195,7 @@ import { MainTitle } from '@/components/Title'
 import { useAppStore } from '@/stores/app'
 import { useCommentStore } from '@/features/comments/store'
 import { isPublicHttpUrl } from '@/shared/url/publicUrl'
+import { sanitizeCommentHtml } from '@/shared/html/sanitize'
 import type {
   CommentFormState,
   CommentViewModel
