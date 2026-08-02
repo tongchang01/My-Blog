@@ -23,6 +23,7 @@
     "@mdit/plugin-tasklist": "1.0.1",
     "@panzoom/panzoom": "4.6.2",
     "axios": "^1.7.9",
+    "dompurify": "^3.2.0",
     "highlight.js": "11.11.1",
     "js-cookie": "^3.0.5",
     "katex": "0.17.0",

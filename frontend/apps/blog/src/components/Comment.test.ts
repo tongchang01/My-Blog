@@ -47,4 +47,11 @@ describe('Comment.vue', () => {
       expect(Object.keys(messages.comments)).toEqual(commentKeys)
     }
   })
+
+  it('sanitizes comment html before rendering with v-html', () => {
+    expect(source).not.toContain('v-html="comment.contentHtml"')
+    expect(source).not.toContain('v-html="reply.contentHtml"')
+    expect(source).toContain('sanitizeCommentHtml(comment.contentHtml)')
+    expect(source).toContain('sanitizeCommentHtml(reply.contentHtml)')
+  })
 })
