@@ -18,15 +18,15 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 | 文档   | 当前事实由入口、handbook、governance 与 showcase 维护；任务计划和评审材料完成迁移后删除，由 Git 历史追溯                                        |
 | 部署   | AWS EC2、Route 53、S3、Docker Compose 与 Caddy 已运行；`main` 使用 GHCR、GitHub OIDC 和受限 SSH 部署同一 SHA，部署后检查三条 HTTPS 健康端点 |
 
-## 已验证、待合并的修复
+## 已合并并部署的审查修复
 
-`fix/review-validated-migration` 已完成一组独立的审查修复并推送到远端：
+`fix/review-validated-migration` 的修复已通过 [PR #61](https://github.com/tongchang01/My-Blog/pull/61) 合并到 `main`，合并提交为 `2334655e`：
 
 - 博客端不再从 unpkg 运行时加载 lodash/md5，改由 Vite 打包本地 `lodash-es`；未使用的 md5 脚本已删除。
 - 作者三语简介按纯文本渲染并保留换行，评论 HTML 在后端白名单清洗后再经 DOMPurify 输出兜底。
 - 删除未被引用的旧认证/HTTP 工具文件；后端日志加入请求关联 ID，并通过响应头回传。
 
-该分支已通过完整 CI，但尚未创建 PR、合并 `main` 或部署生产；当前线上状态仍以 `main` 为准。令牌 Cookie 化、CSP、安全响应头、自动回滚和管理端模板瘦身等审查建议尚未实现，不因本分支而视为完成。
+该批修复已通过完整 CI、发布 GHCR 镜像并部署生产，三条公开 HTTPS 健康端点均返回 `ok`。令牌 Cookie 化、CSP、安全响应头、自动回滚和管理端模板瘦身等审查建议尚未实现，不因本次修复而视为完成。
 
 ## 已知产品缺口
 
@@ -42,11 +42,11 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 
 ## 最近验证
 
-2026-08-02 `fix/review-validated-migration` 已完成：
+2026-08-02 `fix/review-validated-migration` 已完成并合并：
 
 - 本地后端 `mvn clean test` 通过（721 项测试，0 failures / 0 errors）；本机无 Docker，8 项 Testcontainers 条件测试跳过。
 - 博客端 lint、typecheck、测试与 production build 通过；管理端未修改，但 CI 仍执行其 typecheck、测试、构建和入口预算检查。
-- [`CI`](https://github.com/tongchang01/My-Blog/actions/workflows/ci.yml) 的[手动运行 30728818544](https://github.com/tongchang01/My-Blog/actions/runs/30728818544)对提交 `59131e0a` 的六项检查全部通过：后端测试、真实 MySQL 8.4 集成测试、Linux MySQL 初始化、blog 前端、admin 前端和部署工作流合约。
-- 本次为分支验证，不触发镜像发布或生产部署；生产验证仍须在合并 `main` 后按发布流程重新执行。
+- [`CI`](https://github.com/tongchang01/My-Blog/actions/workflows/ci.yml) 的 [main 运行 30729121845](https://github.com/tongchang01/My-Blog/actions/runs/30729121845) 对合并提交 `2334655e` 的六项检查全部通过：后端测试、真实 MySQL 8.4 集成测试、Linux MySQL 初始化、blog 前端、admin 前端和部署工作流合约。
+- [发布运行 30729121840](https://github.com/tongchang01/My-Blog/actions/runs/30729121840) 已构建同 SHA 的 GHCR 镜像、完成生产部署与三条公开 HTTPS 健康检查，并回收临时 SSH 入站规则。
 
 未解决事项见 `open-issues.md`，实施顺序见 `roadmap.md`。
