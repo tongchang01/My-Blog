@@ -62,14 +62,20 @@ describe('article mapper', () => {
       {
         pinnedArticle: article,
         featuredArticles: [{ ...article, id: '2', slug: 'featured' }],
-        articles: [{ ...article, id: '3', slug: 'ordinary' }]
+        articles: {
+          records: [{ ...article, id: '3', slug: 'ordinary' }],
+          total: 13,
+          page: 2,
+          size: 12
+        }
       },
       'en'
     )
 
     expect(mapped.pinnedArticle?.id).toBe('1')
     expect(mapped.featuredArticles).toHaveLength(1)
-    expect(mapped.articles[0].slug).toBe('ordinary')
+    expect(mapped.articles.records[0].slug).toBe('ordinary')
+    expect(mapped.articles.pages).toBe(2)
   })
 })
 

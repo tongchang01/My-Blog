@@ -156,15 +156,21 @@ class DatabasePublicArticleQueryRepositoryTest {
         setHomepageSlot(104L, "FEATURED");
         setHomepageSlot(105L, "PINNED");
 
-        var home = repository.findPublicHome(NOW, 2);
+        var home = repository.findPublicHome(NOW, 1, 1);
 
         assertThat(home.pinnedArticle().id()).isEqualTo(100L);
         assertThat(home.featuredArticles())
                 .extracting("id")
                 .containsExactly(102L, 101L);
-        assertThat(home.articles())
+        assertThat(home.articles().records())
                 .extracting("id")
-                .containsExactly(103L, 106L);
+                .containsExactly(103L);
+        assertThat(home.articles().total()).isEqualTo(2);
+
+        assertThat(repository.findPublicHome(NOW, 2, 1)
+                .articles().records())
+                .extracting("id")
+                .containsExactly(106L);
     }
 
     private PublicArticleCriteria criteria(

@@ -28,7 +28,7 @@ export interface ArticlePageViewModel {
 export interface ArticleHomeViewModel {
   pinnedArticle: ArticleCardViewModel | null
   featuredArticles: ArticleCardViewModel[]
-  articles: ArticleCardViewModel[]
+  articles: ArticlePageViewModel
 }
 
 export interface ArchiveArticleViewModel {

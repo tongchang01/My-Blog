@@ -4,6 +4,7 @@ import { ApiError } from '@/shared/http/error'
 import {
   loadPublicArticle,
   loadPublicArchives,
+  loadPublicHomeArticles,
   loadPublicArticles,
   unlockPublicArticle
 } from './api'
@@ -77,6 +78,23 @@ describe('article api', () => {
         tagSlug: undefined,
         keyword: 'Spring'
       },
+      signal: undefined
+    })
+  })
+
+  it('loads the requested homepage page', async () => {
+    mockedRequestApi.mockResolvedValueOnce({
+      pinnedArticle: null,
+      featuredArticles: [],
+      articles: { records: [], total: 0, page: 2, size: 12 }
+    })
+
+    await loadPublicHomeArticles({ page: 2, lang: 'zh' })
+
+    expect(mockedRequestApi).toHaveBeenCalledWith({
+      method: 'GET',
+      url: '/public/articles/home',
+      params: { page: 2, lang: 'zh' },
       signal: undefined
     })
   })

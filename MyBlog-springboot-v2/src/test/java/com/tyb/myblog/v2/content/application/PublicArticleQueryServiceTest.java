@@ -171,17 +171,18 @@ class PublicArticleQueryServiceTest {
                 102L,
                 ArticleStatus.PUBLISHED,
                 301L);
-        when(repository.findPublicHome(NOW, 10))
+        when(repository.findPublicHome(NOW, 2, 12))
                 .thenReturn(new PublicArticleHome(
                         pinned,
                         List.of(featured),
-                        List.of(ordinary)));
+                        new PublicArticlePage(
+                                List.of(ordinary), 13, 2, 12)));
         when(attachmentService.resolvePublicUrls(Set.of(300L, 301L)))
                 .thenReturn(Map.of(
                         300L, "https://cdn.example.com/pinned.png",
                         301L, "https://cdn.example.com/article.png"));
 
-        PublicArticleHomeResult result = service.home("zh", 10);
+        PublicArticleHomeResult result = service.home("zh", 2);
 
         assertThat(result.pinnedArticle()).isNotNull();
         assertThat(result.pinnedArticle().coverUrl())
@@ -190,19 +191,16 @@ class PublicArticleQueryServiceTest {
                 .singleElement()
                 .extracting("id")
                 .isEqualTo(101L);
-        assertThat(result.articles())
+        assertThat(result.articles().records())
                 .singleElement()
                 .extracting("coverUrl")
                 .isEqualTo("https://cdn.example.com/article.png");
     }
 
     @Test
-    void validatesHomepageSize() {
+    void validatesHomepagePage() {
         assertError(
                 () -> service.home("zh", 0),
-                ApiErrorCode.VALIDATION_ERROR);
-        assertError(
-                () -> service.home("zh", 51),
                 ApiErrorCode.VALIDATION_ERROR);
     }
 
