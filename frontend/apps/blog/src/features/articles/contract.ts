@@ -32,7 +32,7 @@ export interface PublicArticleUnlockDto {
 export interface PublicArticleHomeDto {
   pinnedArticle: PublicArticleListItemDto | null
   featuredArticles: PublicArticleListItemDto[]
-  articles: PublicArticleListItemDto[]
+  articles: PageResponse<PublicArticleListItemDto>
 }
 
 export interface PublicArchiveArticleDto {
@@ -49,3 +49,4 @@ export interface PublicArchiveGroupDto {
   month: number
   articles: PublicArchiveArticleDto[]
 }
+import type { PageResponse } from '@/shared/http/contract'

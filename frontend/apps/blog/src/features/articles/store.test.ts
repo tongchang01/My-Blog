@@ -164,7 +164,7 @@ describe('article store', () => {
     mockedLoadHome.mockResolvedValueOnce({
       pinnedArticle: null,
       featuredArticles: [],
-      articles: [
+      articles: page([
         {
           id: '1',
           title: 'A',
@@ -179,14 +179,14 @@ describe('article store', () => {
           createdAt: '2026-06-15T10:00:00',
           locked: false
         }
-      ]
+      ])
     })
     const store = useArticleStore()
 
-    await store.loadHome({ size: 12, lang: 'en' })
+    await store.loadHome({ page: 1, lang: 'en' })
 
     expect(store.homeStatus).toBe('ready')
-    expect(store.home.articles[0].id).toBe('1')
+    expect(store.home.articles.records[0].id).toBe('1')
     expect(store.page.records).toEqual([])
   })
 
@@ -196,11 +196,11 @@ describe('article store', () => {
       .mockResolvedValueOnce({
         pinnedArticle: null,
         featuredArticles: [],
-        articles: []
+        articles: page([])
       })
     const store = useArticleStore()
 
-    await store.loadHome({ size: 12, lang: 'zh' })
+    await store.loadHome({ page: 1, lang: 'zh' })
     expect(store.homeStatus).toBe('error')
     await store.retryHome()
 

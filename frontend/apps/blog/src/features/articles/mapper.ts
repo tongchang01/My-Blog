@@ -57,7 +57,7 @@ export const mapArticleHome = (
   featuredArticles: dto.featuredArticles.map(article =>
     mapArticle(article, locale)
   ),
-  articles: dto.articles.map(article => mapArticle(article, locale))
+  articles: mapArticlePage(dto.articles, locale)
 })
 
 export const mapArchivePage = (

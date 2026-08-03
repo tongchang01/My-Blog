@@ -44,7 +44,7 @@ const emptyPage = (): ArticlePageViewModel => ({
 const emptyHome = (): ArticleHomeViewModel => ({
   pinnedArticle: null,
   featuredArticles: [],
-  articles: []
+  articles: emptyPage()
 })
 
 const emptyArchive = (): ArchivePageViewModel => ({
@@ -126,7 +126,7 @@ export const useArticleStore = defineStore('public-articles', () => {
       homeStatus.value =
         home.value.pinnedArticle ||
         home.value.featuredArticles.length > 0 ||
-        home.value.articles.length > 0
+        home.value.articles.records.length > 0
           ? 'ready'
           : 'empty'
     } catch (cause) {

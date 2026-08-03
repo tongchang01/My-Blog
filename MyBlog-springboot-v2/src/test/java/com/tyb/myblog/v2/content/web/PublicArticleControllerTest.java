@@ -114,22 +114,23 @@ class PublicArticleControllerTest {
 
     @Test
     void returnsPublicHomeArticles() throws Exception {
-        when(queryService.home("en", 10))
+        when(queryService.home("en", 1))
                 .thenReturn(new PublicArticleHomeResult(
                         pageItem(),
                         List.of(pageItem()),
-                        List.of(pageItem())));
+                        new PublicArticlePageResult(
+                                List.of(pageItem()), 1, 1, 12)));
 
         mockMvc.perform(get("/api/public/articles/home")
-                        .queryParam("lang", "en")
-                        .queryParam("size", "10"))
+                        .queryParam("lang", "en"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.pinnedArticle.id")
                         .value(Long.toString(ARTICLE_ID)))
                 .andExpect(jsonPath("$.data.featuredArticles[0].id")
                         .value(Long.toString(ARTICLE_ID)))
-                .andExpect(jsonPath("$.data.articles[0].id")
+                .andExpect(jsonPath("$.data.articles.records[0].id")
                         .value(Long.toString(ARTICLE_ID)))
+                .andExpect(jsonPath("$.data.articles.total").value(1))
                 .andExpect(jsonPath("$.data.pinnedArticle.body")
                         .doesNotExist());
     }

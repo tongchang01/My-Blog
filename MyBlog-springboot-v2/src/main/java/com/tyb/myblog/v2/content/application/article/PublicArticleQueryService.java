@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 public class PublicArticleQueryService {
 
     private static final int MAX_PAGE_SIZE = 100;
-    private static final int MAX_HOME_SIZE = 50;
+    private static final int HOME_PAGE_SIZE = 12;
 
     private final PublicArticleQueryRepository repository;
     private final PublicArticleAccessService accessService;
@@ -97,15 +97,16 @@ public class PublicArticleQueryService {
                 page.size());
     }
 
-    public PublicArticleHomeResult home(String lang, int size) {
-        if (size < 1 || size > MAX_HOME_SIZE) {
+    public PublicArticleHomeResult home(String lang, int page) {
+        if (page < 1) {
             throw new ApiException(
                     ApiErrorCode.VALIDATION_ERROR,
-                    "首页文章数量必须在 1 到 50 之间");
+                    "页码必须大于 0");
         }
         PublicArticleHome home = repository.findPublicHome(
                 LocalDateTime.now(clock),
-                size);
+                page,
+                HOME_PAGE_SIZE);
         Map<Long, String> coverUrls = resolveCoverUrls(home);
         String normalizedLang = normalizeLang(lang);
         return new PublicArticleHomeResult(
@@ -115,9 +116,14 @@ public class PublicArticleQueryService {
                 home.featuredArticles().stream()
                         .map(item -> toItem(item, normalizedLang, coverUrls))
                         .toList(),
-                home.articles().stream()
-                        .map(item -> toItem(item, normalizedLang, coverUrls))
-                        .toList());
+                new PublicArticlePageResult(
+                        home.articles().records().stream()
+                                .map(item -> toItem(
+                                        item, normalizedLang, coverUrls))
+                                .toList(),
+                        home.articles().total(),
+                        home.articles().page(),
+                        home.articles().size()));
     }
 
     public PublicArticleDetailResult detail(long id, String lang) {
@@ -283,7 +289,7 @@ public class PublicArticleQueryService {
                         java.util.stream.Stream.of(home.pinnedArticle()),
                         java.util.stream.Stream.concat(
                                 home.featuredArticles().stream(),
-                                home.articles().stream()))
+                                home.articles().records().stream()))
                 .filter(Objects::nonNull)
                 .map(PublicArticlePageItem::coverAttachmentId)
                 .filter(Objects::nonNull)

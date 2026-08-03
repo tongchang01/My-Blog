@@ -53,7 +53,8 @@ public class MyBatisPublicArticleQueryRepository
     }
 
     @Override
-    public PublicArticleHome findPublicHome(LocalDateTime now, int size) {
+    public PublicArticleHome findPublicHome(
+            LocalDateTime now, int page, int size) {
         List<PublicArticlePageRow> pinnedRows =
                 mapper.selectPublicHomepageSlot(
                         HomepageSlot.PINNED,
@@ -65,7 +66,8 @@ public class MyBatisPublicArticleQueryRepository
                         now,
                         2);
         List<PublicArticlePageRow> articleRows =
-                mapper.selectPublicHomeArticles(now, size);
+                mapper.selectPublicHomeArticles(
+                        now, (long) (page - 1) * size, size);
         List<PublicArticlePageRow> rows =
                 java.util.stream.Stream.of(
                                 pinnedRows,
@@ -87,11 +89,16 @@ public class MyBatisPublicArticleQueryRepository
                                 row,
                                 tags.getOrDefault(row.getId(), List.of())))
                         .toList(),
-                articleRows.stream()
-                        .map(row -> toPageItem(
-                                row,
-                                tags.getOrDefault(row.getId(), List.of())))
-                        .toList());
+                new PublicArticlePage(
+                        articleRows.stream()
+                                .map(row -> toPageItem(
+                                        row,
+                                        tags.getOrDefault(
+                                                row.getId(), List.of())))
+                                .toList(),
+                        mapper.countPublicHomeArticles(now),
+                        page,
+                        size));
     }
 
     @Override

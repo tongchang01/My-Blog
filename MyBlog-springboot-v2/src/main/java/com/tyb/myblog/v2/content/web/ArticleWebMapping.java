@@ -87,9 +87,7 @@ public class ArticleWebMapping {
                 result.featuredArticles().stream()
                         .map(this::toPublicPageItem)
                         .toList(),
-                result.articles().stream()
-                        .map(this::toPublicPageItem)
-                        .toList());
+                toPublicPage(result.articles()));
     }
 
     public PublicArticleDetailVO toPublicDetail(

@@ -61,9 +61,9 @@ public class PublicArticleController {
     @GetMapping("/home")
     public ApiResponse<PublicArticleHomeVO> home(
             @RequestParam(defaultValue = "zh") String lang,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "1") int page) {
         return ApiResponse.ok(mapping.toPublicHome(
-                queryService.home(lang, size)));
+                queryService.home(lang, page)));
     }
 
     @Operation(summary = "查询公开文章详情")

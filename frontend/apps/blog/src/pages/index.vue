@@ -41,6 +41,13 @@
             <ArticleCard :data="article" />
           </li>
         </ul>
+        <Paginator
+          v-if="articleStore.home.articles.pages > 1"
+          :pageSize="articleStore.home.articles.size"
+          :pageTotal="articleStore.home.articles.total"
+          :page="currentPage"
+          @pageChange="changePage"
+        />
       </div>
       <Sidebar>
         <Profile author="blog-author" />
@@ -50,11 +57,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRoute } from 'vue-router'
 import { Feature, FeatureList } from '@/components/Feature'
 import { ArticleCard, HorizontalArticle } from '@/components/ArticleCard'
+import Paginator from '@/components/Paginator.vue'
 import { Profile, Sidebar } from '@/components/Sidebar'
 import { useArticleStore } from '@/features/articles/store'
 import { isSupportedLocale } from '@/shared/i18n/locale'
@@ -66,32 +74,38 @@ const route = useRoute()
 const appStore = useAppStore()
 const articleStore = useArticleStore()
 const { t } = useI18n()
-const DEFAULT_PAGE_SIZE = 12
+const currentPage = ref(1)
 
 const currentLocale = computed(() =>
   isSupportedLocale(route.params.lang) ? route.params.lang : appStore.locale
 )
 const showFeature = computed(() => appStore.themeConfig.theme.feature)
 const hasPinnedArticle = computed(
-  () => articleStore.home.pinnedArticle !== null
+  () => currentPage.value === 1 && articleStore.home.pinnedArticle !== null
 )
 const hasFeaturedArticles = computed(
-  () => articleStore.home.featuredArticles.length > 0
+  () => currentPage.value === 1 && articleStore.home.featuredArticles.length > 0
 )
 const mainArticle = computed(
-  () => articleStore.home.pinnedArticle ?? articleStore.home.articles[0] ?? null
+  () =>
+    currentPage.value === 1
+      ? articleStore.home.pinnedArticle ??
+        articleStore.home.articles.records[0] ??
+        null
+      : null
 )
 const ordinaryConsumedByMain = computed(() => (hasPinnedArticle.value ? 0 : 1))
 const featureCards = computed(() => {
   if (hasFeaturedArticles.value) return articleStore.home.featuredArticles
   if (!showFeature.value) return []
-  return articleStore.home.articles.slice(
+  return articleStore.home.articles.records.slice(
     ordinaryConsumedByMain.value,
     ordinaryConsumedByMain.value + 2
   )
 })
 const listArticles = computed(() => {
-  const articles = articleStore.home.articles
+  const articles = articleStore.home.articles.records
+  if (currentPage.value !== 1) return articles
   const consumed = showFeature.value
     ? ordinaryConsumedByMain.value +
       (hasFeaturedArticles.value ? 0 : featureCards.value.length)
@@ -102,9 +116,15 @@ const listArticles = computed(() => {
 })
 const loadHome = async () => {
   await articleStore.loadHome({
-    size: DEFAULT_PAGE_SIZE,
+    page: currentPage.value,
     lang: currentLocale.value
   })
+}
+
+const changePage = async (page: number) => {
+  currentPage.value = page
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+  await loadHome()
 }
 
 onMounted(async () => {
@@ -115,6 +135,7 @@ watch(
   () => route.params.lang,
   async (next, previous) => {
     if (next !== previous && isSupportedLocale(next)) {
+      currentPage.value = 1
       await loadHome()
     }
   }

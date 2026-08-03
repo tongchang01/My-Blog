@@ -21,7 +21,7 @@ export interface LoadPublicArticlesParams {
 }
 
 export interface LoadPublicHomeArticlesParams {
-  size: number
+  page: number
   lang: SupportedLocale
   signal?: AbortSignal
 }
@@ -55,14 +55,14 @@ export const loadPublicArticles = async ({
 }
 
 export const loadPublicHomeArticles = async ({
-  size,
+  page,
   lang,
   signal
 }: LoadPublicHomeArticlesParams): Promise<PublicArticleHomeDto> => {
   const data = await requestApi<PublicArticleHomeDto>({
     method: 'GET',
     url: '/public/articles/home',
-    params: { size, lang },
+    params: { page, lang },
     signal
   })
   if (data === null) throw new ApiError('Article home response is empty')

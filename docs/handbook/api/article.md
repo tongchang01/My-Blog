@@ -342,7 +342,7 @@ Query：
 ## 11. 公开首页文章
 
 ```http
-GET /api/public/articles/home?lang=zh&size=10
+GET /api/public/articles/home?lang=zh&page=1
 ```
 
 鉴权：匿名。
@@ -352,7 +352,7 @@ Query：
 | 参数 | 类型 | 默认 | 说明 |
 |------|------|------|------|
 | `lang` | string | `zh` | 支持 `zh`、`ja`、`en`；缺失或非法时按服务端规则回退 `zh` |
-| `size` | number | 10 | 普通文章数量，最大 50 |
+| `page` | number | 1 | 普通文章页码，从 1 开始；每页固定 12 篇 |
 
 成功响应：HTTP 200。
 
@@ -363,7 +363,12 @@ Query：
   "data": {
     "pinnedArticle": null,
     "featuredArticles": [],
-    "articles": []
+    "articles": {
+      "records": [],
+      "total": 0,
+      "page": 1,
+      "size": 12
+    }
   }
 }
 ```
@@ -372,9 +377,9 @@ Query：
 
 - `pinnedArticle`：`PublicArticlePageItemVO` 或 `null`，最多 1 篇。
 - `featuredArticles`：`PublicArticlePageItemVO[]`，最多 2 篇。
-- `articles`：`PublicArticlePageItemVO[]`，排除已进入 `PINNED` / `FEATURED` 槽位的文章。
+- `articles`：排除已进入 `PINNED` / `FEATURED` 槽位文章的 `PageResponse<PublicArticlePageItemVO>`；`total` 只统计该普通文章集合。
 
-公开首页只返回 `PUBLISHED` 文章。PASSWORD 文章继续只进入普通公开列表，不进入首页置顶或推荐槽位。
+公开首页只返回 `PUBLISHED` 文章。PASSWORD 文章继续只进入普通公开列表，不进入首页置顶或推荐槽位。置顶和推荐项随每一页响应返回，博客首页仅在普通文章第 1 页渲染它们。
 
 ## 12. 公开归档时间线
 
