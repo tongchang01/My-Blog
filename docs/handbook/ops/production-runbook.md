@@ -2,7 +2,7 @@
 
 > 状态：当前有效；V2 已上线，日常发布由 GitHub Actions 自动部署
 > 适用范围：生产运行核对、故障恢复与受控手工操作
-> 最后校准：2026-07-28
+> 最后校准：2026-08-03
 > 对应代码：`compose.yaml`、`.github/workflows/images.yml`、`deploy/cd/`
 > 权威程度：生产操作顺序
 
@@ -185,20 +185,17 @@ df -h
 
 ### V2 镜像或配置问题
 
-从私有台账取上一条已验证提交 SHA，恢复对应代码和镜像变量，然后执行：
+从私有台账取上一条已验证提交 SHA，并调用已安装的受控发布脚本。该脚本会校验 SHA 属于 `origin/main`、同步 Git 工作树与 `runtime.env` 的 `IMAGE_TAG`、拉取镜像并等待容器健康；只切换 Git SHA 而不更新 `IMAGE_TAG` 不能回退镜像。
 
 ```bash
-cd /opt/myblog-v2
 PREVIOUS_RELEASE_SHA='' # 从私有台账填写完整提交 SHA
 : "${PREVIOUS_RELEASE_SHA:?}"
-git checkout --detach "$PREVIOUS_RELEASE_SHA"
-test "$(git rev-parse HEAD)" = "$PREVIOUS_RELEASE_SHA"
-sudo docker compose --env-file /etc/myblog-v2/runtime.env config --quiet
-sudo docker compose --env-file /etc/myblog-v2/runtime.env pull
-sudo docker compose --env-file /etc/myblog-v2/runtime.env up -d --wait --wait-timeout 180
+sudo /usr/local/sbin/myblog-release "$PREVIOUS_RELEASE_SHA"
+sudo -u deploy git -C /opt/myblog-v2 rev-parse HEAD
+sudo grep '^IMAGE_TAG=' /etc/myblog-v2/runtime.env
 ```
 
-重新执行最低生产验收。不要运行 `docker compose down -v`。
+确认两项输出均为目标 SHA 后，重新执行最低生产验收。不要运行 `docker compose down -v`。
 
 ### 数据库迁移问题
 
