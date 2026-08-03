@@ -86,13 +86,12 @@ const hasPinnedArticle = computed(
 const hasFeaturedArticles = computed(
   () => currentPage.value === 1 && articleStore.home.featuredArticles.length > 0
 )
-const mainArticle = computed(
-  () =>
-    currentPage.value === 1
-      ? articleStore.home.pinnedArticle ??
-        articleStore.home.articles.records[0] ??
-        null
-      : null
+const mainArticle = computed(() =>
+  currentPage.value === 1
+    ? (articleStore.home.pinnedArticle ??
+      articleStore.home.articles.records[0] ??
+      null)
+    : null
 )
 const ordinaryConsumedByMain = computed(() => (hasPinnedArticle.value ? 0 : 1))
 const featureCards = computed(() => {
