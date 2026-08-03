@@ -49,7 +49,7 @@
           @pageChange="changePage"
         />
       </div>
-      <Sidebar>
+      <Sidebar class="lg:sticky lg:top-24 lg:self-start">
         <Profile author="blog-author" />
       </Sidebar>
     </div>
