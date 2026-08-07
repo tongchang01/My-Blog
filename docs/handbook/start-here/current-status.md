@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 开发与发布准备
-> 最后校准：2026-08-02
+> 最后校准：2026-08-07
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：当前进度权威源
 
@@ -16,7 +16,7 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 | 博客端 | 首页、文章、分类、标签、归档、搜索、关于、友链、留言板、文章评论、PASSWORD 解锁、作者资料和统计已接入 V2；公开页面统一使用三语前缀        |
 | 管理端 | 登录会话、仪表盘、文章、首页槽位、分类标签、评论、友链、附件、配置和资料已实现                                                            |
 | 文档   | 当前事实由入口、handbook、governance 与 showcase 维护；任务计划和评审材料完成迁移后删除，由 Git 历史追溯                                        |
-| 部署   | AWS EC2、Route 53、S3、Docker Compose 与 Caddy 已运行；`main` 使用 GHCR、GitHub OIDC 和受限 SSH 部署同一 SHA，部署后检查三条 HTTPS 健康端点 |
+| 部署   | AWS EC2、Route 53、S3、Docker Compose 与 Caddy 已运行；`main` 使用 GHCR、GitHub OIDC 和受限 SSH 部署同一 SHA，部署后检查三条 HTTPS 健康端点；MySQL 每周逻辑备份写入私有 S3 前缀并保留 30 天 |
 
 ## 已合并并部署的审查修复
 
@@ -41,6 +41,12 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 - 登录、评论重复检查和访问打点限流使用进程内 Caffeine，不适用于无协调的多实例部署。
 
 ## 最近验证
+
+2026-08-07 已启用最小 MySQL 数据备份：
+
+- `myblog-mysql-backup` 通过 systemd timer 每周日 03:30（JST）执行；首次手工运行及脚本更新后的复验均成功。
+- 备份对象及 SHA-256 校验文件写入私有 `recovery/mysql/` 前缀，S3 默认服务端加密；匿名读取返回拒绝，本地临时文件已清理。
+- 个人博客不实施自动回滚或生产应用回退演练；数据库迁移前或真实恢复时才另行验证隔离环境恢复。
 
 2026-08-02 `fix/review-validated-migration` 已完成并合并：
 

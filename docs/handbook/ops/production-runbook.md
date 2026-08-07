@@ -2,7 +2,7 @@
 
 > 状态：当前有效；V2 已上线，日常发布由 GitHub Actions 自动部署
 > 适用范围：生产运行核对、故障恢复与受控手工操作
-> 最后校准：2026-08-03
+> 最后校准：2026-08-07
 > 对应代码：`compose.yaml`、`.github/workflows/images.yml`、`deploy/cd/`
 > 权威程度：生产操作顺序
 
@@ -59,6 +59,21 @@ swapon --show
 将输出与私有台账逐项核对：确认目标实例、当前 Compose 服务、80/443 的占用、磁盘、内存与 swap 都符合预期。3306 和 8080 不应暴露到公网。
 
 维护前必须已有可用的数据库备份和恢复路径；如果本次会改变基础设施或数据，再创建并验证 AMI/EBS 快照。具体证据要求以 [`release-checklist.md`](release-checklist.md) 为准。
+
+## 定期 MySQL 备份
+
+个人博客采用最小数据保护：不实现自动回滚，也不安排生产应用回退演练。`/usr/local/sbin/myblog-mysql-backup` 每周日 03:30（JST）从现有 MySQL 容器导出逻辑备份、生成 SHA-256 校验文件，并通过 EC2 IAM Role 写入同一 S3 桶的私有 `recovery/mysql/` 前缀；对象生命周期为 30 天。脚本上传成功或失败后都会清理本地临时文件。
+
+首次安装或脚本更新后，在部署目录执行：
+
+```bash
+sudo ./deploy/ops/install-mysql-backup.sh
+sudo systemctl start myblog-mysql-backup.service
+sudo systemctl list-timers myblog-mysql-backup.timer
+sudo journalctl -u myblog-mysql-backup.service -n 20 --no-pager
+```
+
+验收仅记录对象键、时间、文件大小、SHA-256、timer 结果和匿名访问被拒绝；不要记录存储桶策略中的敏感资源标识、环境变量或数据库内容。数据库恢复不作为日常演练，只有数据库迁移前或真实故障时才在隔离环境另行验证。
 
 ## 手工恢复或全新重建
 
@@ -213,7 +228,7 @@ sudo grep '^IMAGE_TAG=' /etc/myblog-v2/runtime.env
 ## 发布后收尾
 
 - [ ] 记录实际发布 SHA、执行日期、异常和最终资源状态。
-- [ ] 更新数据库备份、恢复演练与 S3 验证证据。
+- [ ] 更新数据库备份、S3 生命周期和 timer 成功记录；数据库迁移前或真实恢复时单独补充隔离环境恢复证据。
 - [ ] 将确认后的非敏感事实同步回仓库文档；敏感事实继续只更新私有生产台账。
 
 删除动作必须逐项执行；任何未在私有台账中同时记录“对象 ID、用途、替代对象和清理日期”的资源，都不得删除。

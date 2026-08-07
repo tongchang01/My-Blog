@@ -1,0 +1,10 @@
+[Unit]
+Description=MyBlog MySQL logical backup
+Requires=docker.service
+Wants=network-online.target
+After=docker.service network-online.target
+ConditionPathExists=/etc/myblog-v2/runtime.env
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/myblog-mysql-backup
