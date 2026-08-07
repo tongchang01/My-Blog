@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+readonly RUNTIME_ENV="${MYBLOG_RUNTIME_ENV:-/etc/myblog-v2/runtime.env}"
+readonly BACKUP_ROOT="${MYBLOG_BACKUP_ROOT:-/var/backups/myblog}"
+readonly MYSQL_CONTAINER="${MYBLOG_MYSQL_CONTAINER:-myblog-v2-mysql-1}"
+readonly S3_PREFIX="${MYBLOG_BACKUP_S3_PREFIX:-recovery/mysql}"
+
+fail() {
+  printf 'myblog-mysql-backup: %s\n' "$*" >&2
+  exit 64
+}
+
+require_root() {
+  [[ "$(id -u)" -eq 0 ]] || fail 'must run as root'
+}
+
+require_command() {
+  command -v "$1" >/dev/null 2>&1 || fail "required command is missing: $1"
+}
+
+require_runtime_env() {
+  [[ -f "$RUNTIME_ENV" ]] || fail 'runtime.env is missing'
+  [[ "$(stat -c '%a' "$RUNTIME_ENV")" == 600 ]] || fail 'runtime.env must have mode 600'
+}
+
+runtime_value() {
+  local key="$1"
+  local value
+  value="$(awk -v key="$key" '
+    index($0, key "=") == 1 { count += 1; value = substr($0, length(key) + 2) }
+    END { if (count != 1 || value == "") exit 1; print value }
+  ' "$RUNTIME_ENV")" || fail "runtime.env must contain exactly one non-empty $key line"
+  printf '%s' "$value"
+}
+
+require_root
+require_command aws
+require_command docker
+require_command gzip
+require_command sha256sum
+require_runtime_env
+
+bucket="$(runtime_value MYBLOG_STORAGE_S3_BUCKET)"
+[[ "$bucket" =~ ^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$ ]] || fail 'S3 bucket name is invalid'
+[[ "$S3_PREFIX" =~ ^[a-z0-9][a-z0-9./-]*[a-z0-9]$ ]] || fail 'S3 prefix is invalid'
+
+umask 077
+install -d -m 700 "$BACKUP_ROOT"
+timestamp="$(date -u +%Y%m%dT%H%M%SZ)"
+month="$(date -u +%Y/%m)"
+filename="myblog-v2-$timestamp.sql.gz"
+archive="$(mktemp "$BACKUP_ROOT/.myblog-v2-XXXXXX.sql.gz")"
+checksum="$archive.sha256"
+object_key="$S3_PREFIX/$month/$filename"
+
+cleanup() {
+  rm -f -- "$archive" "$checksum"
+}
+trap cleanup EXIT
+
+docker exec "$MYSQL_CONTAINER" sh -c \
+  'exec mysqldump --protocol=socket --user=root --password="$MYSQL_ROOT_PASSWORD" --single-transaction --routines --events --databases "$MYSQL_DATABASE"' \
+  | gzip -c >"$archive"
+
+(cd "$BACKUP_ROOT" && sha256sum "$(basename "$archive")") >"$checksum"
+aws s3 cp --only-show-errors "$archive" "s3://$bucket/$object_key"
+aws s3 cp --only-show-errors "$checksum" "s3://$bucket/$object_key.sha256"
+
+printf 'myblog-mysql-backup: uploaded %s\n' "$object_key" >&2
