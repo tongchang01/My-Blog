@@ -98,7 +98,7 @@ run_backup_contract() {
   assert_status 64 env PATH="$fakebin:$PATH" MYBLOG_RUNTIME_ENV="$bad_runtime" MYBLOG_BACKUP_ROOT="$backup_root" "$BACKUP"
   env PATH="$fakebin:$PATH" CALLS="$calls" MYBLOG_RUNTIME_ENV="$runtime" MYBLOG_BACKUP_ROOT="$backup_root" "$BACKUP"
 
-  grep -Fqx 'docker exec myblog-v2-mysql-1 sh -c exec mysqldump --protocol=socket --user=root --password="$MYSQL_ROOT_PASSWORD" --single-transaction --routines --events --databases "$MYSQL_DATABASE"' "$calls" \
+  grep -Fqx 'docker exec myblog-v2-mysql-1 sh -c export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; exec mysqldump --protocol=socket --user=root --single-transaction --routines --events --databases "$MYSQL_DATABASE"' "$calls" \
     || fail 'mysqldump command is missing'
   grep -F 'aws s3 cp --only-show-errors ' "$calls" | grep -F 's3://tyb-blog-s3/recovery/mysql/2026/08/myblog-v2-20260807T033000Z.sql.gz' >/dev/null \
     || fail 'archive upload target is wrong'

@@ -60,7 +60,7 @@ cleanup() {
 trap cleanup EXIT
 
 docker exec "$MYSQL_CONTAINER" sh -c \
-  'exec mysqldump --protocol=socket --user=root --password="$MYSQL_ROOT_PASSWORD" --single-transaction --routines --events --databases "$MYSQL_DATABASE"' \
+  'export MYSQL_PWD="$MYSQL_ROOT_PASSWORD"; exec mysqldump --protocol=socket --user=root --single-transaction --routines --events --databases "$MYSQL_DATABASE"' \
   | gzip -c >"$archive"
 
 (cd "$BACKUP_ROOT" && sha256sum "$(basename "$archive")") >"$checksum"
