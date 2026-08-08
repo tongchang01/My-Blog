@@ -34,6 +34,8 @@ class DatabaseAttachmentRepositoryTest {
 
     @BeforeEach
     void clearAttachments() {
+        jdbcTemplate.update("DELETE FROM t_article_tag");
+        jdbcTemplate.update("DELETE FROM t_article");
         jdbcTemplate.update("DELETE FROM t_attachment");
     }
 
@@ -54,6 +56,15 @@ class DatabaseAttachmentRepositoryTest {
                 .get()
                 .extracting(AttachmentLookup::deleted)
                 .isEqualTo(true);
+    }
+
+    @Test
+    void findsArticleCoverReferencesIncludingDeletedArticles() {
+        insert(101L, ACTIVE_HASH, false, "2026-06-14 10:00:00");
+        insertArticle(201L, 101L, true);
+
+        assertThat(repository.isReferencedByArticleCover(101L)).isTrue();
+        assertThat(repository.isReferencedByArticleCover(102L)).isFalse();
     }
 
     @Test
@@ -229,6 +240,24 @@ class DatabaseAttachmentRepositoryTest {
                 createdAt,
                 deleted ? 1 : 0,
                 deleted ? createdAt : null,
+                deleted ? 1001L : null);
+    }
+
+    private void insertArticle(long id, long coverAttachmentId, boolean deleted) {
+        jdbcTemplate.update("""
+                INSERT INTO t_article (
+                    id, author_id, status, cover_attachment_id,
+                    created_at, created_by, updated_at, updated_by,
+                    deleted, deleted_at, deleted_by
+                ) VALUES (?, 1001, 1, ?,
+                    '2026-06-14 10:00:00', 1001,
+                    '2026-06-14 10:00:00', 1001,
+                    ?, ?, ?)
+                """,
+                id,
+                coverAttachmentId,
+                deleted ? 1 : 0,
+                deleted ? "2026-06-14 11:00:00" : null,
                 deleted ? 1001L : null);
     }
 }

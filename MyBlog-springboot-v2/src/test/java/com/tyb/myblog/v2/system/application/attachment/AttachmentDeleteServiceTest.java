@@ -18,6 +18,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -37,6 +38,7 @@ class AttachmentDeleteServiceTest {
     void softDeletesActiveAttachmentForAdmin() {
         when(repository.findActiveByIdForUpdate(10L))
                 .thenReturn(Optional.of(attachment()));
+        when(repository.isReferencedByArticleCover(10L)).thenReturn(false);
         when(repository.softDelete(
                 10L,
                 LocalDateTime.of(2026, 6, 28, 11, 0),
@@ -49,6 +51,22 @@ class AttachmentDeleteServiceTest {
                 10L,
                 LocalDateTime.of(2026, 6, 28, 11, 0),
                 1001L);
+    }
+
+    @Test
+    void rejectsDeletionWhenArticleCoverReferencesAttachment() {
+        when(repository.findActiveByIdForUpdate(10L))
+                .thenReturn(Optional.of(attachment()));
+        when(repository.isReferencedByArticleCover(10L)).thenReturn(true);
+
+        assertError(
+                () -> service.delete(principal("1001", "ADMIN"), 10L),
+                ApiErrorCode.CONFLICT);
+
+        verify(repository, never()).softDelete(
+                org.mockito.ArgumentMatchers.anyLong(),
+                org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.anyLong());
     }
 
     @Test

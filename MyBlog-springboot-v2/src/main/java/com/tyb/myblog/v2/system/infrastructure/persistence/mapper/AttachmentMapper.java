@@ -25,6 +25,8 @@ public interface AttachmentMapper extends BaseMapper<AttachmentEntity> {
 
     AttachmentEntity selectByHashIncludingDeleted(@Param("hash") String hash);
 
+    boolean existsArticleCoverReference(@Param("id") long id);
+
     List<AttachmentEntity> selectActivePage(
             @Param("offset") long offset,
             @Param("size") int size,

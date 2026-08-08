@@ -3,6 +3,7 @@ import { computed, onMounted } from "vue";
 import { ElMessageBox } from "element-plus";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
+import { ApiClientError } from "@/utils/http/error";
 import { message } from "@/utils/message";
 import { formatJstDateTime } from "@/features/articles/presentation";
 import type { AttachmentItem, AttachmentSortBy } from "./model";
@@ -89,6 +90,16 @@ async function restoreAttachment(id: string): Promise<void> {
       type: "success"
     });
   }
+}
+
+function operationErrorMessage(): string {
+  if (
+    operationError.value instanceof ApiClientError &&
+    operationError.value.code === "90004"
+  ) {
+    return transformI18n("attachments.errors.referencedByArticleCover");
+  }
+  return transformI18n("attachments.errors.operation");
 }
 
 onMounted(initialize);
@@ -225,7 +236,7 @@ onMounted(initialize);
         class="upload-error"
         type="error"
         :closable="false"
-        :title="transformI18n('attachments.errors.operation')"
+        :title="operationErrorMessage()"
         show-icon
       />
 

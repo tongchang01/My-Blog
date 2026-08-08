@@ -522,7 +522,7 @@ attachments:
     recycleBin: Recycle bin
     activeList: Attachment library
     confirmTitle: Attachment confirmation
-    deleteConfirm: The attachment will move to the recycle bin without deleting the physical file. Covers, logos, or avatars that reference it will fail on their next save. Continue?
+    deleteConfirm: The attachment will move to the recycle bin without deleting the physical file. The server refuses deletion while an article uses it as a cover. Continue?
   picker:
     title: Choose attachment
     description: Choose an image from the attachment library for this field
@@ -532,6 +532,7 @@ attachments:
     upload: Unable to upload attachment. Please check the file and retry.
     tooLarge: Images must not exceed 10 MiB
     operation: Unable to complete attachment operation. Please retry.
+    referencedByArticleCover: This attachment is used as an article cover and cannot be deleted. Change or remove the cover in the article editor first.
   feedback:
     uploaded: Upload complete; identical content reuses the existing attachment.
     copied: Attachment URL copied
