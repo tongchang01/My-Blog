@@ -20,7 +20,7 @@ const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
 
 const stubs = {
-  "el-alert": true,
+  "el-alert": { props: ["title"], template: "<div>{{ title }}</div>" },
   "el-button": { template: "<button><slot /></button>" },
   "el-card": { template: "<div><slot name='header' /><slot /></div>" },
   "el-empty": true,
@@ -217,13 +217,31 @@ describe("attachment management page", () => {
     await flushPromises();
 
     expect(confirm).toHaveBeenCalledOnce();
-    expect(confirm.mock.calls[0][0]).toContain("Covers");
+    expect(confirm.mock.calls[0][0]).toContain("article uses it as a cover");
     expect(mock.history.delete[0].url).toBe(
       "/api/admin/attachments/9007199254743001"
     );
     expect(showMessage).toHaveBeenCalledWith(expect.any(String), {
       type: "success"
     });
+  });
+
+  it("explains when an article cover prevents deletion", async () => {
+    setUser("ADMIN");
+    mock
+      .onGet("/api/admin/attachments")
+      .reply(200, ok(page()))
+      .onDelete("/api/admin/attachments/9007199254743001")
+      .reply(409, { code: "90004", msg: "conflict", data: null });
+    const wrapper = mount(AttachmentManagement, { global: { stubs } });
+    await flushPromises();
+
+    await wrapper
+      .get('[data-testid="attachment-delete-9007199254743001"]')
+      .trigger("click");
+    await flushPromises();
+
+    expect(wrapper.text()).toContain("article cover");
   });
 
   it("switches to the deleted attachment list", async () => {

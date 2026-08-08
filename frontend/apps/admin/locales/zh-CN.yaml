@@ -522,7 +522,7 @@ attachments:
     recycleBin: 回收站
     activeList: 附件库
     confirmTitle: 附件操作确认
-    deleteConfirm: 删除后附件将进入回收站，不会立刻删除物理文件；引用它的封面、Logo 或头像在后续保存时会失败，确认继续吗
+    deleteConfirm: 删除后附件将进入回收站，不会立刻删除物理文件；若正被文章用作封面，服务器会拒绝删除，确认继续吗
   picker:
     title: 选择附件
     description: 从附件库中选择一张图片作为当前字段的引用
@@ -532,6 +532,7 @@ attachments:
     upload: 附件上传失败，请检查文件后重试
     tooLarge: 图片不能超过 10 MiB
     operation: 附件操作失败，请重试
+    referencedByArticleCover: 该附件正被文章封面引用，不能删除。请先在文章编辑页更换或移除封面。
   feedback:
     uploaded: 上传完成；内容相同的文件会复用已有附件
     copied: 附件地址已复制
