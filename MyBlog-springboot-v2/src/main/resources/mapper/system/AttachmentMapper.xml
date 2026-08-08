@@ -70,6 +70,15 @@
         LIMIT 1
     </select>
 
+    <!-- 只检查数据库中明确保存的文章封面附件 ID，不扫描 Markdown 或 URL 文本。 -->
+    <select id="existsArticleCoverReference" resultType="boolean">
+        SELECT EXISTS(
+            SELECT 1
+            FROM t_article
+            WHERE cover_attachment_id = #{id}
+        )
+    </select>
+
     <!-- 后台附件库只展示 active 记录，并使用同方向 ID 次排序保证分页稳定。 -->
     <select id="selectActivePage"
             resultType="com.tyb.myblog.v2.system.infrastructure.persistence.entity.AttachmentEntity">

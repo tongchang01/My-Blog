@@ -40,6 +40,11 @@ public class AttachmentDeleteService {
                 .orElseThrow(() -> new ApiException(
                         ApiErrorCode.NOT_FOUND,
                         "附件不存在"));
+        if (repository.isReferencedByArticleCover(id)) {
+            throw new ApiException(
+                    ApiErrorCode.CONFLICT,
+                    "附件正被文章封面引用，不能删除");
+        }
         LocalDateTime now = LocalDateTime.now(clock);
         if (!repository.softDelete(id, now, actorId)) {
             log.error("附件软删除行数异常，attachmentId={}", id);

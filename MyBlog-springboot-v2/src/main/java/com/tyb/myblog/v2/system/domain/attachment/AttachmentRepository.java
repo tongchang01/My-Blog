@@ -17,6 +17,8 @@ public interface AttachmentRepository {
 
     Optional<AttachmentLookup> findByHashIncludingDeleted(String hashSha256);
 
+    boolean isReferencedByArticleCover(long id);
+
     AttachmentPage findActivePage(
             int page,
             int size,

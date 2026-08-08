@@ -59,6 +59,11 @@ public class MyBatisAttachmentRepository implements AttachmentRepository {
     }
 
     @Override
+    public boolean isReferencedByArticleCover(long id) {
+        return mapper.existsArticleCoverReference(id);
+    }
+
+    @Override
     public AttachmentPage findActivePage(
             int page,
             int size,
