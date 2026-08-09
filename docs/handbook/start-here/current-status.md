@@ -26,7 +26,7 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 - 作者三语简介按纯文本渲染并保留换行，评论 HTML 在后端白名单清洗后再经 DOMPurify 输出兜底。
 - 删除未被引用的旧认证/HTTP 工具文件；后端日志加入请求关联 ID，并通过响应头回传。
 
-该批修复已通过完整 CI、发布 GHCR 镜像并部署生产，三条公开 HTTPS 健康端点均返回 `ok`。基础安全响应头已完成仓库侧实现，但尚未取得对应 `main` SHA 的生产证据；令牌 Cookie 化、CSP、自动回滚和管理端模板瘦身等审查建议尚未实现，不因本次修复而视为完成。
+该批修复已通过完整 CI、发布 GHCR 镜像并部署生产，三条公开 HTTPS 健康端点均返回 `ok`。基础安全响应头随后由 `main` 合并提交 `30d75ee1` 完成同 SHA 部署和独立生产验收；令牌 Cookie 化、CSP、自动回滚和管理端模板瘦身等审查建议尚未实现，不因本次修复而视为完成。
 
 ## 已知产品缺口
 
@@ -42,12 +42,12 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 
 ## 最近验证
 
-2026-08-09 已完成仓库侧 Caddy 基础安全响应头收口：
+2026-08-09 已完成 Caddy 基础安全响应头的仓库与生产收口：
 
 - Caddy 对三个站点的 HTTPS 应用响应统一设置一年期 HSTS；静态博客、`www` 和管理端直接设置 `nosniff`、Referrer Policy、`X-Frame-Options: DENY` 和未使用浏览器能力限制。HSTS 不扩大到 `includeSubDomains` 或 `preload`。
 - `/api` 不再由 Caddy 补齐页面策略，Spring Security 负责 API 的 `nosniff` 等安全默认值；后端测试固定 `nosniff` 契约。
 - Caddy 2.11.4 配置语法以及真实静态/反向代理行为已在本地验证；CI 会以仓库固定的同版本镜像、三域静态夹具和模拟上游复验，而不是只匹配配置文本。
-- 以上仅是仓库侧证据；生产生效只以对应 `main` SHA 的 CD 对三个站点及公开 API 的检查为准，本次本地实现不声明线上已经更新。CSP Report-Only 与强制策略仍未实现。
+- `main` 合并提交 `30d75ee1` 已由同 SHA CD 部署；独立生产检查确认三个站点从 HTTP 精确跳转到 HTTPS、`/healthz` 返回 `ok`，五项基础响应头各出现一次；公开 API 返回有效 JSON，保留 Spring Security 的 `nosniff` 和 `X-Frame-Options: DENY`，且未被 Caddy 叠加页面策略。CSP Report-Only 与强制策略仍未实现。
 
 2026-08-07 已启用最小 MySQL 数据备份：
 
