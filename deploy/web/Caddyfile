@@ -1,35 +1,47 @@
+(security_headers) {
+	header {
+		# 只补缺失值，保留 Spring Security 等上游提供的更严格响应头。
+		?X-Content-Type-Options "nosniff"
+		?Referrer-Policy "strict-origin-when-cross-origin"
+		?X-Frame-Options "SAMEORIGIN"
+		?Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+}
+
 {$BLOG_HOST}, {$WWW_HOST} {
-    root * /srv/blog
-    encode gzip
+	root * /srv/blog
+	encode gzip
+	import security_headers
 
-    handle /healthz {
-        respond "ok" 200
-    }
+	handle /healthz {
+		respond "ok" 200
+	}
 
-    handle /api/* {
-        reverse_proxy api:8080
-    }
+	handle /api/* {
+		reverse_proxy api:8080
+	}
 
-    handle {
-        try_files {path} /index.html
-        file_server
-    }
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
 }
 
 {$ADMIN_HOST} {
-    root * /srv/admin
-    encode gzip
+	root * /srv/admin
+	encode gzip
+	import security_headers
 
-    handle /healthz {
-        respond "ok" 200
-    }
+	handle /healthz {
+		respond "ok" 200
+	}
 
-    handle /api/* {
-        reverse_proxy api:8080
-    }
+	handle /api/* {
+		reverse_proxy api:8080
+	}
 
-    handle {
-        try_files {path} /index.html
-        file_server
-    }
+	handle {
+		try_files {path} /index.html
+		file_server
+	}
 }
