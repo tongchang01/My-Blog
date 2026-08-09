@@ -2,8 +2,8 @@
 
 > 状态：当前有效；V2 已上线，日常发布由 GitHub Actions 自动部署
 > 适用范围：生产运行核对、故障恢复与受控手工操作
-> 最后校准：2026-08-07
-> 对应代码：`compose.yaml`、`.github/workflows/images.yml`、`deploy/cd/`
+> 最后校准：2026-08-09
+> 对应代码：`compose.yaml`、`.github/workflows/images.yml`、`deploy/cd/`、`deploy/web/`
 > 权威程度：生产操作顺序
 
 ## 私有信息说明
@@ -188,7 +188,7 @@ df -h
 
 ### 外部与产品冒烟
 
-每次手工恢复后至少检查主域名、`www` 和管理端 HTTPS、`/api` 代理、登录与后台权限、Flyway、S3、可信代理、端口边界及资源状态。完整逐项门槛见 [`release-checklist.md`](release-checklist.md)。
+每次手工恢复后至少检查主域名、`www` 和管理端 HTTPS、`/api` 代理、基础安全响应头、登录与后台权限、Flyway、S3、可信代理、端口边界及资源状态。静态站点应返回 `nosniff`、Referrer Policy、同源 frame 限制和最小 Permissions Policy；公开 API 应保留 Spring Security 的 `X-Frame-Options: DENY`。完整逐项门槛见 [`release-checklist.md`](release-checklist.md)。
 
 全部通过后，把发布 SHA、时间和结果写入私有台账，再结束维护窗口。
 
