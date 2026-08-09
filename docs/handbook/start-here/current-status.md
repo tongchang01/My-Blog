@@ -47,7 +47,7 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 - Caddy 对三个站点的 HTTPS 应用响应统一设置一年期 HSTS；静态博客、`www` 和管理端直接设置 `nosniff`、Referrer Policy、`X-Frame-Options: DENY` 和未使用浏览器能力限制。HSTS 不扩大到 `includeSubDomains` 或 `preload`。
 - `/api` 不再由 Caddy 补齐页面策略，Spring Security 负责 API 的 `nosniff` 等安全默认值；后端测试固定 `nosniff` 契约。
 - Caddy 2.11.4 配置语法以及真实静态/反向代理行为已在本地验证；CI 会以仓库固定的同版本镜像、三域静态夹具和模拟上游复验，而不是只匹配配置文本。
-- `main` 合并提交 `30d75ee1` 已由同 SHA CD 部署；独立生产检查确认三个站点从 HTTP 精确跳转到 HTTPS、`/healthz` 返回 `ok`，五项基础响应头各出现一次；公开 API 返回有效 JSON，保留 Spring Security 的 `nosniff` 和 `X-Frame-Options: DENY`，且未被 Caddy 叠加页面策略。CSP Report-Only 与强制策略仍未实现。
+- `main` 合并提交 `30d75ee1` 已由同 SHA CD 部署；独立生产检查确认三个站点从 HTTP 精确跳转到 HTTPS、`/healthz` 返回 `ok`，三个站点的页面响应均包含五项基础响应头，且每项只出现一次；公开 API 返回有效 JSON，保留 Spring Security 的 `nosniff` 和 `X-Frame-Options: DENY`，且未被 Caddy 叠加页面策略。CSP Report-Only 与强制策略仍未实现。
 
 2026-08-07 已启用最小 MySQL 数据备份：
 
