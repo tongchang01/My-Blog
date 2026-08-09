@@ -186,9 +186,6 @@ jobs:
       - name: Verify deployment workflow
         run: bash deploy/cd/test/workflow-contract-test.sh .github/workflows/images.yml
 
-      - name: Verify Caddy security headers
-        run: bash deploy/web/test/security-headers-contract-test.sh deploy/web/Caddyfile
-
       - name: Validate Caddy configuration
         run: |
           CADDY_IMAGE="$(awk '/^FROM caddy:/ { print $2 }' deploy/web/Dockerfile)"
@@ -199,6 +196,9 @@ jobs:
             --volume "$PWD/deploy/web/Caddyfile:/etc/caddy/Caddyfile:ro" \
             "$CADDY_IMAGE" \
             validate --config /etc/caddy/Caddyfile --adapter caddyfile
+
+      - name: Verify Caddy security header behavior
+        run: bash deploy/web/test/security-headers-integration-test.sh
 
   # 后台 admin 前端 job：TypeScript 类型检查 + Vitest。
   # admin 的 package.json 里 "test" 已配成 vitest run，CI 可直接用。

@@ -1,17 +1,24 @@
-(security_headers) {
+(transport_security_headers) {
 	header {
-		# 只补缺失值，保留 Spring Security 等上游提供的更严格响应头。
-		?X-Content-Type-Options "nosniff"
-		?Referrer-Policy "strict-origin-when-cross-origin"
-		?X-Frame-Options "SAMEORIGIN"
-		?Permissions-Policy "camera=(), microphone=(), geolocation=()"
+		# 三个站点均独立提供 HTTPS；暂不扩大到 includeSubDomains 或 preload。
+		Strict-Transport-Security "max-age=31536000"
+		defer
+	}
+}
+
+(document_security_headers) {
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 	}
 }
 
 {$BLOG_HOST}, {$WWW_HOST} {
 	root * /srv/blog
 	encode gzip
-	import security_headers
+	import transport_security_headers
 
 	handle /healthz {
 		respond "ok" 200
@@ -22,6 +29,7 @@
 	}
 
 	handle {
+		import document_security_headers
 		try_files {path} /index.html
 		file_server
 	}
@@ -30,7 +38,7 @@
 {$ADMIN_HOST} {
 	root * /srv/admin
 	encode gzip
-	import security_headers
+	import transport_security_headers
 
 	handle /healthz {
 		respond "ok" 200
@@ -41,6 +49,7 @@
 	}
 
 	handle {
+		import document_security_headers
 		try_files {path} /index.html
 		file_server
 	}

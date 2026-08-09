@@ -139,18 +139,16 @@ jobs:
             https://www.tong-yibin.com/ \
             https://admin.tong-yibin.com/; do
             headers="$(curl --fail --silent --show-error --head --max-time 20 "$url" | tr -d '\r')"
+            require_header "$headers" 'Strict-Transport-Security: max-age=31536000'
             require_header "$headers" 'X-Content-Type-Options: nosniff'
             require_header "$headers" 'Referrer-Policy: strict-origin-when-cross-origin'
-            require_header "$headers" 'X-Frame-Options: SAMEORIGIN'
+            require_header "$headers" 'X-Frame-Options: DENY'
             require_header "$headers" 'Permissions-Policy: camera=(), microphone=(), geolocation=()'
           done
 
           api_headers="$(curl --fail --silent --show-error --dump-header - --output /dev/null --max-time 20 \
             'https://tong-yibin.com/api/public/site-config?lang=zh' | tr -d '\r')"
           require_header "$api_headers" 'X-Content-Type-Options: nosniff'
-          require_header "$api_headers" 'Referrer-Policy: strict-origin-when-cross-origin'
-          require_header "$api_headers" 'X-Frame-Options: DENY'
-          require_header "$api_headers" 'Permissions-Policy: camera=(), microphone=(), geolocation=()'
 
       - name: Revoke temporary SSH ingress
         if: always() && steps.ssh-ingress.outcome == 'success'
