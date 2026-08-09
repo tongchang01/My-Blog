@@ -1,35 +1,56 @@
+(transport_security_headers) {
+	header {
+		# 三个站点均独立提供 HTTPS；暂不扩大到 includeSubDomains 或 preload。
+		Strict-Transport-Security "max-age=31536000"
+		defer
+	}
+}
+
+(document_security_headers) {
+	header {
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	}
+}
+
 {$BLOG_HOST}, {$WWW_HOST} {
-    root * /srv/blog
-    encode gzip
+	root * /srv/blog
+	encode gzip
+	import transport_security_headers
 
-    handle /healthz {
-        respond "ok" 200
-    }
+	handle /healthz {
+		respond "ok" 200
+	}
 
-    handle /api/* {
-        reverse_proxy api:8080
-    }
+	handle /api/* {
+		reverse_proxy api:8080
+	}
 
-    handle {
-        try_files {path} /index.html
-        file_server
-    }
+	handle {
+		import document_security_headers
+		try_files {path} /index.html
+		file_server
+	}
 }
 
 {$ADMIN_HOST} {
-    root * /srv/admin
-    encode gzip
+	root * /srv/admin
+	encode gzip
+	import transport_security_headers
 
-    handle /healthz {
-        respond "ok" 200
-    }
+	handle /healthz {
+		respond "ok" 200
+	}
 
-    handle /api/* {
-        reverse_proxy api:8080
-    }
+	handle /api/* {
+		reverse_proxy api:8080
+	}
 
-    handle {
-        try_files {path} /index.html
-        file_server
-    }
+	handle {
+		import document_security_headers
+		try_files {path} /index.html
+		file_server
+	}
 }

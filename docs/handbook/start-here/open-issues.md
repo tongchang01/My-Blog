@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 尚未解决的产品与工程事项
-> 最后校准：2026-08-07
+> 最后校准：2026-08-09
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：未解决事项权威源
 
@@ -76,10 +76,11 @@
 ## ISSUE-024：生产安全响应头与 CSP 未收口
 
 - 优先级：P1，前端信任边界。
-- 现状：博客外链脚本、作者简介和评论渲染已分别完成本地化、纯文本与清洗兜底，但 Caddy 尚未设置统一的安全响应头或 CSP。
+- 现状：博客外链脚本、作者简介和评论渲染已分别完成本地化、纯文本与清洗兜底。仓库中的 Caddy 已明确负责三个站点 HTTPS 应用响应的一年期 HSTS，以及静态路由的 `X-Content-Type-Options`、`Referrer-Policy`、`X-Frame-Options: DENY` 和最小 `Permissions-Policy`；Spring Security 负责 `/api` 的 `nosniff` 等安全默认值。CI 使用真实 Caddy 和模拟上游验证静态/代理行为，CD 在发布后检查三个站点和公开 API。仓库配置不能代替对应 `main` SHA 的生产检查，CSP 也仍未配置。
+- 已完成边界：HSTS 不启用 `includeSubDomains` 或 `preload`；不加入跨源隔离头或旧式 XSS 过滤器；不把页面策略扩散到 JSON API，也不把基础响应头误记为 CSP 或 Cookie 化完成。
 - 已确认方向：先增加低兼容风险的响应头，再以 CSP Report-Only 采集真实违规；确认主站、`www`、管理端、`/api` 代理、图片、编辑器与三语页面无误后，才收紧为强制 CSP。
 - 范围约束：不新增前端安全框架，不将 CSP 写成未经浏览器回归的静态猜测规则；Cookie 化由 ISSUE-005 单独处理。
-- 完成条件：Caddy 配置与回归测试覆盖三域、代理和静态资源；浏览器回归确认关键流程可用，Report-Only 无需允许的违规后再启用强制策略。
+- 完成条件：合入 `main` 后取得三域、代理和静态资源的生产响应头证据；为 Report-Only 配置真实可用的报告端点并完成浏览器回归，确认关键流程可用且没有需要放行的违规后再启用强制策略。
 
 ## ISSUE-025：管理端模板外壳与 strict 治理
 

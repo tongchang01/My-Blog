@@ -2,8 +2,8 @@
 
 > 状态：当前有效；V2 已上线，日常发布由 GitHub Actions 自动部署
 > 适用范围：生产运行核对、故障恢复与受控手工操作
-> 最后校准：2026-08-07
-> 对应代码：`compose.yaml`、`.github/workflows/images.yml`、`deploy/cd/`
+> 最后校准：2026-08-09
+> 对应代码：`compose.yaml`、`.github/workflows/images.yml`、`deploy/cd/`、`deploy/web/`
 > 权威程度：生产操作顺序
 
 ## 私有信息说明
@@ -188,7 +188,9 @@ df -h
 
 ### 外部与产品冒烟
 
-每次手工恢复后至少检查主域名、`www` 和管理端 HTTPS、`/api` 代理、登录与后台权限、Flyway、S3、可信代理、端口边界及资源状态。完整逐项门槛见 [`release-checklist.md`](release-checklist.md)。
+每次手工恢复后至少检查主域名、`www` 和管理端 HTTPS、`/api` 代理、基础安全响应头、登录与后台权限、Flyway、S3、可信代理、端口边界及资源状态。三个静态站点应返回一年期 HSTS、`nosniff`、Referrer Policy、`X-Frame-Options: DENY` 和最小 Permissions Policy；公开 API 应正常返回业务响应并保留 Spring Security 的 `nosniff`。HSTS 由三个明确主机分别发送，不启用 `includeSubDomains` 或 `preload`。完整逐项门槛见 [`release-checklist.md`](release-checklist.md)。
+
+若必须撤销 HSTS，不得只删除配置：先继续保持 HTTPS 可达，通过 Caddy 发送 `Strict-Transport-Security: max-age=0`，确认客户端取得清除指令后再评估后续域名或证书调整。仓库与公开日志只记录操作步骤和验收结果，不记录证书私钥或生产资源标识。
 
 全部通过后，把发布 SHA、时间和结果写入私有台账，再结束维护窗口。
 
