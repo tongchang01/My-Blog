@@ -42,11 +42,13 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 
 ## 最近验证
 
-2026-08-10 已完成管理端命令面板的本地清理与验证：
+2026-08-10 已完成管理端命令面板的仓库与生产收口：
 
 - 三种布局的页头菜单搜索入口以及对应组件、配置、三语文案和专属图标已删除；`pinyin-pro`、`sortablejs`、`@types/sortablejs` 已从依赖与锁文件移除。
 - 残留扫描确认源码、配置和锁文件不再引用上述入口、资源或依赖；iframe、布局、多标签页、动态菜单、业务页面和列表筛选没有纳入本次变更。
-- 管理端 `pnpm test` 通过（52 个测试文件、227 项测试），`pnpm typecheck`、`pnpm build` 和 `pnpm check:bundle-budget` 均通过；首屏 gzip 总计 401.63 KiB（JS 338.52 KiB、CSS 63.11 KiB）。本记录仅代表本地验证，不替代后续 CI、合并、部署或登录后页面回归。
+- 管理端 `pnpm test` 通过（52 个测试文件、227 项测试），`pnpm typecheck`、`pnpm build` 和 `pnpm check:bundle-budget` 均通过；首屏 gzip 总计 401.63 KiB（JS 338.52 KiB、CSS 63.11 KiB）。[PR #70](https://github.com/tongchang01/My-Blog/pull/70) 的检查及合并提交 `a915c60e` 的 [main CI 运行 31345078059](https://github.com/tongchang01/My-Blog/actions/runs/31345078059) 均全部通过。
+- [发布运行 31345078062](https://github.com/tongchang01/My-Blog/actions/runs/31345078062) 已构建并部署 `a915c60e` 的同 SHA GHCR 镜像，完成公开 HTTPS 健康检查和基础安全响应头检查，并回收临时 SSH 入站规则。
+- 独立生产检查确认三个公开 `/healthz` 端点返回 `ok`；管理端入口资源与 main CI 的 Linux 构建产物一致，且不含命令面板组件、历史记录、拼音搜索或拖拽排序残留。登录后的仪表盘、页头既有控件及整体布局已回归，未见命令面板移除造成的空洞或错位。
 
 2026-08-09 已完成 Caddy 基础安全响应头的仓库与生产收口：
 

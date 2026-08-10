@@ -86,7 +86,7 @@
 
 - 优先级：P2，可维护性专项。
 - 现状：admin 已移除命令面板入口、实现、配置、三语文案、专属图标以及 `pinyin-pro`、`sortablejs`、`@types/sortablejs`；iframe、多个布局、多标签页和动态菜单等 vue-pure-admin 外壳仍保留，`strict` 仍关闭。
-- 已完成切片：命令面板在独立 `refactor/*` 分支中删除；管理端 test、typecheck、production build 和首屏预算检查均通过。用户可见变化仅是三种布局的页头不再显示菜单搜索入口，业务页面、路由和列表筛选未改变。
+- 已完成切片：[PR #70](https://github.com/tongchang01/My-Blog/pull/70) 已将命令面板清理合并为 main 提交 `a915c60e`；管理端 test、typecheck、production build、首屏预算、主线 CI、同 SHA 生产部署和登录后页面回归均通过。用户可见变化仅是三种布局的页头不再显示菜单搜索入口，业务页面、路由和列表筛选未改变。
 - 首批下一项：单独移除 iframe 外壳及相关路由处理，完成后执行同范围自动验证与登录后页面回归；不得把 iframe、布局、多标签页或 strict 整改混回命令面板提交。
 - 后续决策：三套布局、多标签页和动态菜单必须逐项确认保留语义后再删；不得为了分类拖拽重新保留将被命令面板移除的 `sortablejs`。
 - 完成条件：iframe 首批切片完成并通过自动验证与人工页面回归后，重新统计 strict 错误、依赖和入口预算；后续仅在保留范围明确后开启 strict 并收紧 `no-explicit-any`。
