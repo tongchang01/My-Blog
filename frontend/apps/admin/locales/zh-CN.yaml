@@ -18,13 +18,6 @@ buttons:
   pureBackTop: 回到顶部
   pureOpenText: 开
   pureCloseText: 关
-search:
-  pureTotal: 共
-  pureHistory: 搜索历史
-  pureCollect: 收藏
-  pureDragSort: （可拖拽排序）
-  pureEmpty: 暂无搜索结果
-  purePlaceholder: 搜索菜单（支持拼音搜索）
 panel:
   pureSystemSet: 系统配置
   pureCloseSystemSet: 关闭配置
