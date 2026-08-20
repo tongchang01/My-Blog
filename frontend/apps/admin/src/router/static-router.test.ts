@@ -12,6 +12,7 @@ describe("static admin routes", () => {
     expect(text).toContain("Dashboard");
     expect(text).not.toContain("PermissionPage");
     expect(text).not.toContain("PermissionButton");
+    expect(text).not.toContain("frameSrc");
     expect(errorRoutes?.meta?.showLink).toBe(false);
     expect(routerArrays[0]).toMatchObject({
       path: "/dashboard",
