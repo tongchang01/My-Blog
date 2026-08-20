@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 开发与发布准备
-> 最后校准：2026-08-10
+> 最后校准：2026-08-20
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：当前进度权威源
 
@@ -26,7 +26,7 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 - 作者三语简介按纯文本渲染并保留换行，评论 HTML 在后端白名单清洗后再经 DOMPurify 输出兜底。
 - 删除未被引用的旧认证/HTTP 工具文件；后端日志加入请求关联 ID，并通过响应头回传。
 
-该批修复已通过完整 CI、发布 GHCR 镜像并部署生产，三条公开 HTTPS 健康端点均返回 `ok`。基础安全响应头随后由 `main` 合并提交 `30d75ee1` 完成同 SHA 部署和独立生产验收；令牌 Cookie 化、CSP 和自动回滚尚未实现。管理端模板治理仅完成命令面板清理，iframe、布局、多标签页、动态菜单和 strict 仍是独立后续事项，不因前述安全发布而视为完成。
+该批修复已通过完整 CI、发布 GHCR 镜像并部署生产，三条公开 HTTPS 健康端点均返回 `ok`。基础安全响应头随后由 `main` 合并提交 `30d75ee1` 完成同 SHA 部署和独立生产验收；令牌 Cookie 化、CSP 和自动回滚尚未实现。管理端模板治理已完成命令面板和无业务使用的 iframe 外壳清理；布局、多标签页、动态菜单和 strict 仍是独立后续事项，不因前述安全发布而视为完成。
 
 ## 已知产品缺口
 
@@ -41,6 +41,13 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 - 登录、评论重复检查和访问打点限流使用进程内 Caffeine，不适用于无协调的多实例部署。
 
 ## 最近验证
+
+2026-08-20 已完成管理端 iframe 外壳的仓库与生产收口：
+
+- [PR #73](https://github.com/tongchang01/My-Blog/pull/73) 删除仅服务于外部 iframe 页面的 `LayFrame`、`useMultiFrame`、路由类型字段和无业务使用的外壳；业务页直接由现有 `RouterView`、过渡、缓存和页脚承载。打印功能创建的临时 iframe 及通用样式规则不在删除范围。
+- 生产回归发现直接交接路由组件会在扁平化路由间复用上一个主体实例；[PR #74](https://github.com/tongchang01/My-Blog/pull/74) 以无状态的响应式路由组件交接层恢复内容切换，并新增对应单元测试，没有恢复 iframe、多页缓存或外部页面能力。
+- 管理端本地 test 通过（53 个测试文件、228 项测试），typecheck、production build 和首屏预算检查均通过；首屏 gzip 总计 401.65 KiB（JS 338.54 KiB、CSS 63.11 KiB）。[PR #74 的检查](https://github.com/tongchang01/My-Blog/actions/runs/32322025853)、合并提交 `4511680e` 的 [main CI](https://github.com/tongchang01/My-Blog/actions/runs/32322177600) 和 [发布运行](https://github.com/tongchang01/My-Blog/actions/runs/32322177606) 均全部通过。
+- 独立生产检查确认三个公开 `/healthz` 端点返回 `ok`，管理端入口返回 200 且不含 `frameSrc`、`LayFrame`、`useMultiFrame` 或 `lay-frame` 残留；已登录回归确认仪表盘、文章列表、评论管理、附件管理与站点配置五页均实际切换主体内容且页面 iframe 数为 0。
 
 2026-08-10 已完成管理端命令面板的仓库与生产收口：
 

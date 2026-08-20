@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 尚未解决的产品与工程事项
-> 最后校准：2026-08-10
+> 最后校准：2026-08-20
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：未解决事项权威源
 
@@ -83,14 +83,14 @@
 - 范围约束：不新增前端安全框架，不将 CSP 写成未经浏览器回归的静态猜测规则；Cookie 化由 ISSUE-005 单独处理。
 - 完成条件：基础响应头的生产证据已经取得；剩余工作是为 Report-Only 配置真实可用的报告端点并完成浏览器回归，确认关键流程可用且没有需要放行的违规后再启用强制策略。
 
-## ISSUE-025：管理端模板外壳与 strict 治理
+## ISSUE-025：管理端模板余项与 strict 治理
 
 - 优先级：P2，可维护性专项。
-- 现状：admin 已移除命令面板入口、实现、配置、三语文案、专属图标以及 `pinyin-pro`、`sortablejs`、`@types/sortablejs`；iframe、多个布局、多标签页和动态菜单等 vue-pure-admin 外壳仍保留，`strict` 仍关闭。
-- 已完成切片：[PR #70](https://github.com/tongchang01/My-Blog/pull/70) 已将命令面板清理合并为 main 提交 `a915c60e`；管理端 test、typecheck、production build、首屏预算、主线 CI、同 SHA 生产部署和登录后页面回归均通过。用户可见变化仅是三种布局的页头不再显示菜单搜索入口，业务页面、路由和列表筛选未改变。
-- 首批下一项：单独移除 iframe 外壳及相关路由处理，完成后执行同范围自动验证与登录后页面回归；不得把 iframe、布局、多标签页或 strict 整改混回命令面板提交。
+- 现状：admin 已移除命令面板以及无业务使用的 iframe 外壳；多个布局、多标签页和动态菜单等 vue-pure-admin 外壳仍保留，`strict` 仍关闭。
+- 已完成切片：[PR #70](https://github.com/tongchang01/My-Blog/pull/70) 的命令面板清理与 [PR #73](https://github.com/tongchang01/My-Blog/pull/73)、[PR #74](https://github.com/tongchang01/My-Blog/pull/74) 的 iframe 外壳清理及路由内容切换修复，均已完成自动验证、主线 CI、同 SHA 生产部署和登录后页面回归。iframe 切片不改变业务页面、路由或列表筛选；打印功能的临时 iframe 保留。
+- 下一项：先确认三套布局、多标签页和动态菜单各自必须保留的交互，再单独选择一项实施；不得把它们或 strict 整改混入 iframe 切片。
 - 后续决策：三套布局、多标签页和动态菜单必须逐项确认保留语义后再删；不得为了分类拖拽重新保留将被命令面板移除的 `sortablejs`。
-- 完成条件：iframe 首批切片完成并通过自动验证与人工页面回归后，重新统计 strict 错误、依赖和入口预算；后续仅在保留范围明确后开启 strict 并收紧 `no-explicit-any`。
+- 完成条件：iframe 首批切片已完成。后续在保留范围明确后重新统计 strict 错误、依赖和入口预算，再逐项启用 strict 并收紧 `no-explicit-any`。
 
 ## 可选扩展
 
