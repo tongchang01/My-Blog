@@ -6,6 +6,7 @@ import { useGlobal, isNumber } from "@pureadmin/utils";
 import BackTopIcon from "@/assets/svg/back_top.svg?component";
 import { h, computed, Transition, defineComponent } from "vue";
 import { usePermissionStoreHook } from "@/store/modules/permission";
+import LayRouteView from "../lay-route-view/index.vue";
 
 const props = defineProps({
   fixedHeader: Boolean
@@ -113,70 +114,74 @@ const transitionMain = defineComponent({
   >
     <router-view>
       <template #default="{ Component, route }">
-        <el-scrollbar
-          v-if="fixedHeader"
-          :wrap-style="{
-            display: 'flex',
-            'flex-wrap': 'wrap',
-            'max-width': getMainWidth,
-            margin: '0 auto',
-            transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)'
-          }"
-          :view-style="{
-            display: 'flex',
-            flex: 'auto',
-            overflow: 'hidden',
-            'flex-direction': 'column'
-          }"
-        >
-          <el-backtop
-            :title="t('buttons.pureBackTop')"
-            target=".app-main .el-scrollbar__wrap"
-          >
-            <BackTopIcon />
-          </el-backtop>
-          <div class="grow">
-            <transitionMain :route="route">
-              <keep-alive
-                v-if="isKeepAlive"
-                :include="usePermissionStoreHook().cachePageList"
+        <LayRouteView :component="Component" :route="route">
+          <template #default="{ component, fullPath }">
+            <el-scrollbar
+              v-if="fixedHeader"
+              :wrap-style="{
+                display: 'flex',
+                'flex-wrap': 'wrap',
+                'max-width': getMainWidth,
+                margin: '0 auto',
+                transition: 'all 300ms cubic-bezier(0.4, 0, 0.2, 1)'
+              }"
+              :view-style="{
+                display: 'flex',
+                flex: 'auto',
+                overflow: 'hidden',
+                'flex-direction': 'column'
+              }"
+            >
+              <el-backtop
+                :title="t('buttons.pureBackTop')"
+                target=".app-main .el-scrollbar__wrap"
               >
+                <BackTopIcon />
+              </el-backtop>
+              <div class="grow">
+                <transitionMain :route="route">
+                  <keep-alive
+                    v-if="isKeepAlive"
+                    :include="usePermissionStoreHook().cachePageList"
+                  >
+                    <component
+                      :is="component"
+                      :key="fullPath"
+                      class="main-content"
+                    />
+                  </keep-alive>
+                  <component
+                    :is="component"
+                    v-else
+                    :key="fullPath"
+                    class="main-content"
+                  />
+                </transitionMain>
+              </div>
+              <LayFooter v-if="!hideFooter" />
+            </el-scrollbar>
+            <div v-else class="grow">
+              <transitionMain :route="route">
+                <keep-alive
+                  v-if="isKeepAlive"
+                  :include="usePermissionStoreHook().cachePageList"
+                >
+                  <component
+                    :is="component"
+                    :key="fullPath"
+                    class="main-content"
+                  />
+                </keep-alive>
                 <component
-                  :is="Component"
-                  :key="route.fullPath"
+                  :is="component"
+                  v-else
+                  :key="fullPath"
                   class="main-content"
                 />
-              </keep-alive>
-              <component
-                :is="Component"
-                v-else
-                :key="route.fullPath"
-                class="main-content"
-              />
-            </transitionMain>
-          </div>
-          <LayFooter v-if="!hideFooter" />
-        </el-scrollbar>
-        <div v-else class="grow">
-          <transitionMain :route="route">
-            <keep-alive
-              v-if="isKeepAlive"
-              :include="usePermissionStoreHook().cachePageList"
-            >
-              <component
-                :is="Component"
-                :key="route.fullPath"
-                class="main-content"
-              />
-            </keep-alive>
-            <component
-              :is="Component"
-              v-else
-              :key="route.fullPath"
-              class="main-content"
-            />
-          </transitionMain>
-        </div>
+              </transitionMain>
+            </div>
+          </template>
+        </LayRouteView>
       </template>
     </router-view>
 
