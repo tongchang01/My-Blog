@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { emitter } from "@/utils/mitt";
 import { useNav } from "@/layout/hooks/useNav";
-import LaySearch from "../lay-search/index.vue";
 import { responsiveStorageNameSpace } from "@/config";
 import { ref, nextTick, computed, onMounted } from "vue";
 import { storageLocal, isAllEmpty } from "@pureadmin/utils";
@@ -76,8 +75,6 @@ onMounted(() => {
       />
     </el-menu>
     <div class="horizontal-header-right">
-      <!-- 菜单搜索 -->
-      <LaySearch id="header-search" />
       <!-- 国际化 -->
       <el-dropdown id="header-translation" trigger="click">
         <GlobalizationIcon

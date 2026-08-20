@@ -22,6 +22,5 @@
   "MenuArrowIconNoTransition": false,
   "CachingAsyncRoutes": false,
   "TooltipEffect": "light",
-  "ResponsiveStorageNameSpace": "responsive-",
-  "MenuSearchHistory": 6
+  "ResponsiveStorageNameSpace": "responsive-"
 }

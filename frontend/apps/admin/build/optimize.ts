@@ -13,8 +13,6 @@ const include = [
   "vue-i18n",
   "vue-types",
   "vue-tippy",
-  "pinyin-pro",
-  "sortablejs",
   "@vueuse/core",
   "@pureadmin/utils",
   "responsive-storage"
