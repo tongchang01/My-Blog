@@ -1,4 +1,8 @@
 {
+  "music": {
+    "entry": "音楽 · 開く/折りたたむ",
+    "player-title": "Spotify プレイリストプレーヤー"
+  },
   "menu": {
     "home": "ホーム",
     "about": "プロフィール",

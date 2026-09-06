@@ -1,4 +1,8 @@
 {
+  "music": {
+    "entry": "音乐 · 展开/收起",
+    "player-title": "Spotify 歌单播放器"
+  },
   "menu": {
     "home": "首页",
     "about": "关于",

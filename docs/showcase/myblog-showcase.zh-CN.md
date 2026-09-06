@@ -18,7 +18,7 @@ MyBlog V2 是一个由公开博客、管理后台和 Spring Boot API 组成的�
 
 ## 当前边界
 
-PASSWORD 文章可通过独立解锁接口换取短期访问令牌；令牌只保存在当前标签页，用于读取正文和使用文章评论，不具备后台账号权限。完整 SEO/feed、Spotify Embed 和多实例协调均属于按实际需求触发的后续扩展。
+PASSWORD 文章可通过独立解锁接口换取短期访问令牌；令牌只保存在当前标签页，用于读取正文和使用文章评论，不具备后台账号权限。Spotify 官方 Embed 已复用歌单配置接入顶部入口，按需加载，收起保留实例；完整播放受 Spotify 账户与浏览器限制。完整 SEO/feed 和多实例协调仍属于按实际需求触发的后续扩展。
 
 生产环境运行在 AWS EC2：Docker Compose 承载 MySQL、API 和 Caddy，S3 承载附件；GitHub Actions 构建 GHCR 镜像，并通过 GitHub OIDC 与受限 SSH 自动部署同一提交 SHA。公开 HTTPS 健康端点已纳入部署后的公网冒烟；数据库恢复、S3 全链路和回滚演练仍需持续验证。
 

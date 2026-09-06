@@ -1,4 +1,8 @@
 {
+  "music": {
+    "entry": "Music · Expand/collapse",
+    "player-title": "Spotify playlist player"
+  },
   "menu": {
     "home": "Home",
     "about": "About",
