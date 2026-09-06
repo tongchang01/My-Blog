@@ -20,6 +20,7 @@
       </div>
     </div>
     <div id="loading-bar-wrapper" :class="loadingBarClass"></div>
+    <SpotifyPlayer />
   </div>
   <FooterContainer :style="cssVariables" />
   <template v-if="isMobile">
@@ -61,6 +62,7 @@ import HeaderMain from '@/components/Header/src/Header.vue'
 import FooterContainer from '@/components/Footer/FooterContainer.vue'
 import MobileMenu from '@/components/MobileMenu.vue'
 import defaultCover from '@/assets/default-cover.jpg'
+import SpotifyPlayer from '@/features/music/SpotifyPlayer.vue'
 
 const SearchModal = defineAsyncComponent(
   () => import('@/components/SearchModal.vue')

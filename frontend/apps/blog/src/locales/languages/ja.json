@@ -1,4 +1,13 @@
 {
+  "music": {
+    "entry": "音楽 · 開く/折りたたむ",
+    "player-title": "Spotify プレイリストプレーヤー",
+    "playback-note": "Spotify 内のボタンで再生してください。折りたたんでも再生は停止しません。フル再生の可否は Spotify アカウントとブラウザーによって異なります。",
+    "unavailable-help": "読み込みや再生ができない場合は、再読み込みするか Spotify で開いてください。",
+    "open-spotify": "Spotify で開く",
+    "reload": "プレーヤーを再読み込み",
+    "stop": "停止して閉じる"
+  },
   "menu": {
     "home": "ホーム",
     "about": "プロフィール",
