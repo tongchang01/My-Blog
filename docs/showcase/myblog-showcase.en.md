@@ -18,7 +18,7 @@ Both frontends use Vue 3, TypeScript, Pinia, Vite, and Vitest. The blog evolved 
 
 ## Current boundaries
 
-PASSWORD articles use a dedicated unlock endpoint to issue a short-lived access token. The token stays in the current browser tab, permits article-body and comment access, and grants no admin-account privileges. Full SEO/feed support, Spotify Embed, and multi-instance coordination are demand-triggered extensions rather than current capabilities.
+PASSWORD articles use a dedicated unlock endpoint to issue a short-lived access token. The token stays in the current browser tab, permits article-body and comment access, and grants no admin-account privileges. The official Spotify Embed uses the existing playlist configuration and loads on demand from the header; collapsing it preserves the player instance. Full playback depends on Spotify account and browser restrictions. Full SEO/feed support and multi-instance coordination remain demand-triggered extensions.
 
 Production runs on AWS EC2: Docker Compose hosts MySQL, the API, and Caddy, while S3 stores attachments. GitHub Actions builds GHCR images and uses GitHub OIDC plus restricted SSH to deploy the same commit SHA. Public HTTPS health checks run after deployment; database recovery, the full S3 path, and rollback drills still require ongoing validation.
 
