@@ -1,12 +1,7 @@
 {
   "music": {
     "entry": "音乐 · 展开/收起",
-    "player-title": "Spotify 歌单播放器",
-    "playback-note": "使用 Spotify 内的按钮播放。收起面板不会主动停止播放；完整播放取决于 Spotify 账户和浏览器。",
-    "unavailable-help": "若播放器无法加载或播放，可重新加载或在 Spotify 打开。",
-    "open-spotify": "在 Spotify 打开",
-    "reload": "重新加载播放器",
-    "stop": "停止并关闭"
+    "player-title": "Spotify 歌单播放器"
   },
   "menu": {
     "home": "首页",

@@ -20,48 +20,8 @@
       />
     </summary>
     <div class="spotify-player-content">
-      <div class="spotify-player-actions">
-        <a
-          :href="playlistUrl"
-          target="_blank"
-          rel="noopener noreferrer"
-          :title="t('music.open-spotify')"
-          :aria-label="t('music.open-spotify')"
-          >Spotify</a
-        >
-        <button
-          v-if="activated"
-          type="button"
-          :title="t('music.reload')"
-          :aria-label="t('music.reload')"
-          @click="frameKey++"
-        >
-          <SvgIcon
-            icon-class="reload"
-            fill="currentColor"
-            stroke="none"
-            width="0.875rem"
-            height="0.875rem"
-          />
-        </button>
-        <button
-          type="button"
-          :title="t('music.stop')"
-          :aria-label="t('music.stop')"
-          @click="handleStop"
-        >
-          <SvgIcon
-            icon-class="close"
-            fill="currentColor"
-            stroke="none"
-            width="0.75rem"
-            height="0.75rem"
-          />
-        </button>
-      </div>
       <iframe
         v-if="activated"
-        :key="frameKey"
         :src="embedUrl"
         :title="t('music.player-title')"
         width="100%"
@@ -92,11 +52,6 @@ const settings = useSiteSettingsStore()
 const panel = ref<HTMLDetailsElement>()
 const playlistId = ref<string | null>(null)
 const activated = ref(false)
-const frameKey = ref(0)
-const playlistUrl = computed(
-  () =>
-    `https://open.spotify.com/playlist/${encodeURIComponent(playlistId.value ?? '')}`
-)
 const embedUrl = computed(
   () =>
     `https://open.spotify.com/embed/playlist/${encodeURIComponent(playlistId.value ?? '')}?utm_source=generator`
@@ -111,22 +66,15 @@ watch(
   { immediate: true }
 )
 
-const stop = () => {
+watch(playlistId, () => {
   activated.value = false
   collapse()
-}
-
-watch(playlistId, stop)
+})
 
 const collapse = (restoreFocus = false) => {
   if (!panel.value) return
   panel.value.open = false
   if (restoreFocus) panel.value.querySelector('summary')?.focus()
-}
-
-const handleStop = () => {
-  stop()
-  panel.value?.querySelector('summary')?.focus()
 }
 
 const handleOutsidePointer = (event: PointerEvent) => {
@@ -144,7 +92,7 @@ onUnmounted(() =>
 )
 
 const handleToggle = () => {
-  // 折叠只隐藏面板，停止操作才销毁播放器；不接管 Spotify 的播放状态。
+  // 折叠只隐藏面板；暂停等播放操作由 Spotify 自身提供。
   if (panel.value?.open) activated.value = true
 }
 </script>
@@ -175,9 +123,7 @@ summary:hover {
   background: var(--background-trans);
 }
 
-summary:focus-visible,
-button:focus-visible,
-a:focus-visible {
+summary:focus-visible {
   outline: 2px solid currentColor;
   outline-offset: 3px;
 }
@@ -191,8 +137,6 @@ a:focus-visible {
   max-height: calc(100dvh - 6rem);
   overflow: auto;
   border-radius: 12px;
-  background: var(--background-primary);
-  color: var(--text-normal);
   box-shadow: 0 12px 40px rgb(0 0 0 / 20%);
 }
 
@@ -200,41 +144,6 @@ iframe {
   display: block;
   border: 0;
   border-radius: 12px;
-}
-
-.spotify-player-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.25rem;
-  padding: 0.25rem 0.5rem;
-}
-
-.spotify-player-actions a {
-  margin-right: auto;
-  padding: 0.25rem 0.375rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.spotify-player-actions button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border: 0;
-  border-radius: 0.375rem;
-  background: transparent;
-  cursor: pointer;
-}
-
-button,
-a {
-  color: inherit;
-}
-
-.spotify-player-actions button:hover {
-  background: var(--background-trans);
 }
 
 @media (max-width: 639px) {

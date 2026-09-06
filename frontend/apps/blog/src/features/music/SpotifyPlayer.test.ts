@@ -70,15 +70,6 @@ const togglePanel = async (open: boolean) => {
   return details
 }
 
-const clickButton = async (label: string) => {
-  const button = [...container.querySelectorAll('button')].find(
-    item => item.getAttribute('aria-label') === label
-  )!
-  expect(button).toBeDefined()
-  button.click()
-  await nextTick()
-}
-
 describe('Spotify official player lifecycle', () => {
   it('mounts once outside the route view in the real application', () => {
     const template = appSource.split('</template>')[0]
@@ -117,7 +108,6 @@ describe('Spotify official player lifecycle', () => {
     expect(frame.hasAttribute('allowfullscreen')).toBe(true)
     expect(frame.getAttribute('height')).toBe('352')
     expect(frame.src).not.toContain('autoplay=')
-    expect(container.querySelector('a')?.rel).toContain('noopener')
   })
 
   it('keeps the same iframe when collapsing, reopening and navigating', async () => {
@@ -153,30 +143,25 @@ describe('Spotify official player lifecycle', () => {
     expect(container.querySelector('iframe')).toBeNull()
   })
 
-  it('destroys playback only when the reader explicitly stops it', async () => {
+  it('removes the iframe when the application unmounts', async () => {
     await mountPlayer()
     await togglePanel(true)
     const frame = container.querySelector('iframe')
-    await clickButton(zh.music.stop)
-    expect(container.querySelector('details')?.open).toBe(false)
+    app?.unmount()
+    app = undefined
     expect(container.querySelector('iframe')).toBeNull()
-    expect(document.activeElement).toBe(container.querySelector('summary'))
-    await togglePanel(true)
-    expect(container.querySelector('iframe')).not.toBe(frame)
+    expect(frame?.isConnected).toBe(false)
   })
 
-  it('allows an explicit reload without pretending iframe load means successful playback', async () => {
+  it('renders only the official player without a custom toolbar or playback claims', async () => {
     await mountPlayer()
     await togglePanel(true)
     const frame = container.querySelector('iframe')!
     frame.dispatchEvent(new Event('load'))
-    expect(container.querySelector('a')?.getAttribute('aria-label')).toBe(
-      zh.music['open-spotify']
-    )
-    expect(container.textContent).not.toContain(zh.music['unavailable-help'])
-    await clickButton(zh.music.reload)
-    expect(container.querySelector('iframe')).not.toBe(frame)
-    expect(container.querySelector('iframe')?.src).toBe(frame.src)
+    const content = container.querySelector('.spotify-player-content')!
+    expect([...content.children]).toEqual([frame])
+    expect(content.textContent?.trim()).toBe('')
+    expect(container.querySelector('button, a')).toBeNull()
   })
 
   it('hides an unconfigured entry and requires a new user action after changing playlists', async () => {
@@ -226,7 +211,7 @@ describe('Spotify official player lifecycle', () => {
     expect(container.querySelector('iframe')).toBe(frame)
     await togglePanel(true)
     container
-      .querySelector('button')
+      .querySelector('summary')
       ?.dispatchEvent(
         new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
       )

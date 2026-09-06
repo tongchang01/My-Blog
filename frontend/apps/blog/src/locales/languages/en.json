@@ -1,12 +1,7 @@
 {
   "music": {
     "entry": "Music · Expand/collapse",
-    "player-title": "Spotify playlist player",
-    "playback-note": "Use Spotify's controls to play. Collapsing does not stop playback. Full playback depends on your Spotify account and browser.",
-    "unavailable-help": "If the player cannot load or play, reload it or open Spotify.",
-    "open-spotify": "Open in Spotify",
-    "reload": "Reload player",
-    "stop": "Stop and close"
+    "player-title": "Spotify playlist player"
   },
   "menu": {
     "home": "Home",
