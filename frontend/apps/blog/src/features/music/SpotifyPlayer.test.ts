@@ -71,6 +71,15 @@ const togglePanel = async (open: boolean) => {
 }
 
 describe('Spotify official player lifecycle', () => {
+  it('keeps header backdrop blur off the fixed player ancestor', () => {
+    const activeStyle = headerSource.split('&.header-active {')[1]
+    expect(activeStyle).toBeDefined()
+    const [ancestorStyle, backdropStyle] = activeStyle.split('&::before {')
+    expect(ancestorStyle).not.toMatch(/backdrop-blur|backdrop-filter|transform/)
+    expect(backdropStyle.split('}')[0]).toContain('@apply backdrop-blur')
+    expect(backdropStyle.split('}')[0]).toContain('pointer-events: none')
+  })
+
   it('mounts once outside the route view in the real application', () => {
     const template = appSource.split('</template>')[0]
     expect(template.indexOf('<HeaderMain />')).toBeLessThan(

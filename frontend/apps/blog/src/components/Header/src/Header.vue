@@ -42,8 +42,18 @@ const progress = computed(() => navigatorStore.progress)
 
 <style lang="scss">
 .header-container {
+  position: relative;
+
   &.header-active {
-    @apply bg-ob-backdrop backdrop-blur shadow-xl text-ob-bright;
+    @apply bg-ob-backdrop shadow-xl text-ob-bright;
+    // 模糊只作用于背景层，避免为内部 fixed 播放器建立定位包含块。
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      @apply backdrop-blur;
+    }
     .site-header {
       @apply py-2;
     }

@@ -45,7 +45,7 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 2026-09-06 Spotify 官方播放器第一版发布范围：
 
 - 本地通过既有 Vite 代理读取远端公开配置并核对歌单 ID；使用者在已登录 Spotify 的 Chrome 中确认播放、进度调整和最终布局。单一账户的播放结果不代表所有访客均可完整播放。
-- 博客端 52 个测试文件、161 项测试以及 lint、typecheck、production build 通过；生命周期测试覆盖首次按需加载、收起、路由与语言切换、配置变化、卸载、面板外点击与 Escape 焦点恢复。
+- 博客端 52 个测试文件、162 项测试通过；生命周期测试覆盖首次按需加载、收起、路由与语言切换、配置变化、卸载、面板外点击与 Escape 焦点恢复。发布回归发现吸顶导航的背景模糊会改变手机固定面板的定位基准，已将模糊效果隔离到背景伪元素并增加契约测试；桌面 Chrome 已确认切页后播放进度继续，手机宽度模拟不替代真实设备验收。
 - 发布跟踪为 [PR #76](https://github.com/tongchang01/My-Blog/pull/76)。功能提交的 [完整 CI](https://github.com/tongchang01/My-Blog/actions/runs/34032052463) 六项检查全部通过。合并后的实际生产版本以该 PR 合并 SHA 对应的 [main CI](https://github.com/tongchang01/My-Blog/actions/workflows/ci.yml) 与[镜像及部署运行](https://github.com/tongchang01/My-Blog/actions/workflows/images.yml)为准；本地检查不替代生产验收。
 
 2026-08-20 已完成管理端 iframe 外壳的仓库与生产收口：
