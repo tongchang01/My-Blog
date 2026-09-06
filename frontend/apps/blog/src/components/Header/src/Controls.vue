@@ -2,6 +2,7 @@
   <div
     class="header-controls ml-auto top-0 right-0 flex flex-row items-center text-white"
   >
+    <SpotifyPlayer />
     <div :class="leftControlClasses">
       <Dropdown
         v-if="enableMultiLanguage"
@@ -108,6 +109,7 @@ import { Dropdown, DropdownMenu, DropdownItem } from '@/components/Dropdown'
 import { useAppStore } from '@/stores/app'
 import ThemeToggle from '@/components/ToggleSwitch/ThemeToggle.vue'
 import SvgIcon from '@/components/SvgIcon/index.vue'
+import SpotifyPlayer from '@/features/music/SpotifyPlayer.vue'
 import { useNavigatorStore } from '@/stores/navigator'
 import { useRoute, useRouter } from 'vue-router'
 import { isSupportedLocale } from '@/shared/i18n/locale'

@@ -2,6 +2,8 @@
 // @vitest-environment-options {"settings":{"disableIframePageLoading":true}}
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import appSource from '@/App.vue?raw'
+import headerSource from '@/components/Header/src/Header.vue?raw'
+import controlsSource from '@/components/Header/src/Controls.vue?raw'
 import { createApp, h, nextTick, type App } from 'vue'
 import { createPinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
@@ -70,7 +72,7 @@ const togglePanel = async (open: boolean) => {
 
 const clickButton = async (label: string) => {
   const button = [...container.querySelectorAll('button')].find(
-    item => item.textContent === label
+    item => item.getAttribute('aria-label') === label
   )!
   expect(button).toBeDefined()
   button.click()
@@ -80,10 +82,15 @@ const clickButton = async (label: string) => {
 describe('Spotify official player lifecycle', () => {
   it('mounts once outside the route view in the real application', () => {
     const template = appSource.split('</template>')[0]
-    expect(template.indexOf('<SpotifyPlayer />')).toBeGreaterThan(
-      template.indexOf('</router-view>')
+    expect(template.indexOf('<HeaderMain />')).toBeLessThan(
+      template.indexOf('<router-view')
     )
-    expect(template.match(/<SpotifyPlayer \/>/g)).toHaveLength(1)
+    expect(template).not.toContain('<SpotifyPlayer />')
+    expect(headerSource).toContain('<Controls :scroll-progress="progress" />')
+    expect(controlsSource.match(/<SpotifyPlayer \/>/g)).toHaveLength(1)
+    expect(controlsSource.indexOf('<SpotifyPlayer />')).toBeLessThan(
+      controlsSource.indexOf('<Dropdown')
+    )
   })
   it('does not load Spotify until the reader opens the panel', async () => {
     await mountPlayer()
@@ -153,6 +160,7 @@ describe('Spotify official player lifecycle', () => {
     await clickButton(zh.music.stop)
     expect(container.querySelector('details')?.open).toBe(false)
     expect(container.querySelector('iframe')).toBeNull()
+    expect(document.activeElement).toBe(container.querySelector('summary'))
     await togglePanel(true)
     expect(container.querySelector('iframe')).not.toBe(frame)
   })
@@ -162,7 +170,10 @@ describe('Spotify official player lifecycle', () => {
     await togglePanel(true)
     const frame = container.querySelector('iframe')!
     frame.dispatchEvent(new Event('load'))
-    expect(container.textContent).toContain(zh.music['unavailable-help'])
+    expect(container.querySelector('a')?.getAttribute('aria-label')).toBe(
+      zh.music['open-spotify']
+    )
+    expect(container.textContent).not.toContain(zh.music['unavailable-help'])
     await clickButton(zh.music.reload)
     expect(container.querySelector('iframe')).not.toBe(frame)
     expect(container.querySelector('iframe')?.src).toBe(frame.src)
@@ -201,5 +212,27 @@ describe('Spotify official player lifecycle', () => {
         true
       )
     }
+  })
+
+  it('collapses on outside clicks or Escape without destroying the iframe', async () => {
+    await mountPlayer()
+    await togglePanel(true)
+    const frame = container.querySelector('iframe')
+    document.body.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true })
+    )
+    await nextTick()
+    expect(container.querySelector('details')?.open).toBe(false)
+    expect(container.querySelector('iframe')).toBe(frame)
+    await togglePanel(true)
+    container
+      .querySelector('button')
+      ?.dispatchEvent(
+        new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })
+      )
+    await nextTick()
+    expect(container.querySelector('details')?.open).toBe(false)
+    expect(container.querySelector('iframe')).toBe(frame)
+    expect(document.activeElement).toBe(container.querySelector('summary'))
   })
 })
