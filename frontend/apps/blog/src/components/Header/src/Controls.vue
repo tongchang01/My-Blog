@@ -171,6 +171,10 @@ const enableMultiLanguage = computed(
 </script>
 
 <style lang="scss" scoped>
+.header-active .header-controls {
+  @apply text-ob-bright;
+}
+
 .header-controls {
   .control-button {
     @apply appearance-none border-0 bg-transparent text-inherit cursor-pointer;
