@@ -1,5 +1,7 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref, shallowRef } from "vue";
+import { isAxiosError } from "axios";
+import UploadIcon from "~icons/ri/upload-2-line";
 import { ElMessageBox } from "element-plus";
 import { transformI18n } from "@/plugins/i18n";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -21,6 +23,7 @@ const {
   total,
   loading,
   uploading,
+  uploadCompleted,
   error,
   uploadError,
   operationError,
@@ -35,6 +38,39 @@ const {
   remove,
   restore
 } = state;
+
+const fileInput = ref<HTMLInputElement>();
+const selectedFile = shallowRef<File>();
+const uploadStatus = computed(() => {
+  if (uploading.value)
+    return uploadCompleted.value ? "refreshing" : "uploading";
+  return uploadCompleted.value ? "complete" : "";
+});
+const uploadErrorKey = computed(() => {
+  const reason = uploadError.value;
+  if (reason?.message === "FILE_TOO_LARGE") return "tooLarge";
+  if (reason instanceof ApiClientError && reason.kind === "validation")
+    return "invalidImage";
+  if (isAxiosError(reason)) {
+    if (reason.code === "ECONNABORTED") return "uploadTimeout";
+    if (!reason.response) return "uploadNetwork";
+  }
+  return "upload";
+});
+
+async function uploadSelectedFile(): Promise<void> {
+  if (!isAdmin.value || uploading.value || !selectedFile.value) return;
+  if (await upload(selectedFile.value)) {
+    message(
+      transformI18n(
+        error.value
+          ? "attachments.feedback.uploadedRefreshFailed"
+          : "attachments.feedback.uploaded"
+      ),
+      { type: error.value ? "warning" : "success" }
+    );
+  }
+}
 
 function dimensions(item: AttachmentItem): string {
   return `${item.width} × ${item.height}`;
@@ -54,13 +90,10 @@ function toggleSortDirection(): void {
 async function handleFileChange(event: Event): Promise<void> {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
-  if (!file) return;
-  if (await upload(file)) {
-    message(transformI18n("attachments.feedback.uploaded"), {
-      type: "success"
-    });
-  }
+  if (!file || uploading.value || !isAdmin.value) return;
+  selectedFile.value = file;
   input.value = "";
+  await uploadSelectedFile();
 }
 
 async function copyUrl(item: AttachmentItem): Promise<void> {
@@ -120,13 +153,46 @@ onMounted(initialize);
 
       <div v-if="isAdmin" class="upload-panel">
         <input
+          ref="fileInput"
           data-testid="attachment-file-input"
           type="file"
+          hidden
           accept="image/jpeg,image/png,image/webp,image/gif"
           :disabled="uploading"
           @change="handleFileChange"
         />
-        <p>{{ transformI18n("attachments.upload.description") }}</p>
+        <div class="upload-actions">
+          <el-button
+            data-testid="attachment-upload-button"
+            type="primary"
+            :icon="UploadIcon"
+            :loading="uploading"
+            :disabled="uploading"
+            aria-describedby="attachment-upload-description"
+            @click="fileInput?.click()"
+          >
+            {{ transformI18n("attachments.upload.choose") }}
+          </el-button>
+          <span v-if="selectedFile" class="upload-filename">
+            {{ selectedFile.name }}
+          </span>
+          <span
+            data-testid="attachment-upload-status"
+            class="upload-status"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {{
+              uploadStatus
+                ? transformI18n(`attachments.upload.${uploadStatus}`)
+                : ""
+            }}
+          </span>
+        </div>
+        <p id="attachment-upload-description">
+          {{ transformI18n("attachments.upload.description") }}
+        </p>
       </div>
       <el-alert
         v-else
@@ -143,15 +209,24 @@ onMounted(initialize);
         class="upload-error"
         type="error"
         :closable="false"
-        :title="
-          transformI18n(
-            uploadError.message === 'FILE_TOO_LARGE'
-              ? 'attachments.errors.tooLarge'
-              : 'attachments.errors.upload'
-          )
-        "
+        :title="transformI18n(`attachments.errors.${uploadErrorKey}`)"
         show-icon
-      />
+      >
+        <el-button
+          v-if="
+            isAdmin &&
+            selectedFile &&
+            !['tooLarge', 'invalidImage'].includes(uploadErrorKey)
+          "
+          data-testid="attachment-upload-retry"
+          type="primary"
+          link
+          :disabled="uploading"
+          @click="uploadSelectedFile"
+        >
+          {{ transformI18n("articles.actions.retry") }}
+        </el-button>
+      </el-alert>
     </el-card>
 
     <el-card
@@ -400,6 +475,23 @@ onMounted(initialize);
 
 .upload-error {
   margin-top: 12px;
+}
+
+.upload-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.upload-filename {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.upload-status {
+  font-size: 14px;
+  color: var(--el-text-color-secondary);
 }
 
 .result-count {

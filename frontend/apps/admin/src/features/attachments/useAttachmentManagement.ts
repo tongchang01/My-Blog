@@ -55,6 +55,7 @@ export function useAttachmentManagement(
   const total = ref(0);
   const loading = ref(false);
   const uploading = ref(false);
+  const uploadCompleted = ref(false);
   const error = ref<Error | null>(null);
   const uploadError = ref<Error | null>(null);
   const operationError = ref<Error | null>(null);
@@ -111,7 +112,9 @@ export function useAttachmentManagement(
   }
 
   async function upload(file: File): Promise<boolean> {
+    if (uploading.value) return false;
     uploading.value = true;
+    uploadCompleted.value = false;
     uploadError.value = null;
     if (file.size > MAX_ATTACHMENT_UPLOAD_BYTES) {
       uploadError.value = new Error("FILE_TOO_LARGE");
@@ -120,6 +123,7 @@ export function useAttachmentManagement(
     }
     try {
       await api.uploadAttachment(file);
+      uploadCompleted.value = true;
       pagination.page = 1;
       await loadAttachments();
       return true;
@@ -173,6 +177,7 @@ export function useAttachmentManagement(
     total,
     loading,
     uploading,
+    uploadCompleted,
     error,
     uploadError,
     operationError,

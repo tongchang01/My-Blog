@@ -496,7 +496,11 @@ attachments:
   readonlyDemo: The current demo account is read-only and cannot upload attachments
   upload:
     title: Upload image attachment
-    description: Supports JPEG, PNG, WebP, and GIF up to 10 MiB. The server validates actual content and SHA-256 deduplicates, so it may reuse or restore an existing attachment.
+    description: JPG, PNG, WebP, or GIF, up to 10 MiB per image.
+    choose: Upload image
+    uploading: Uploading…
+    refreshing: Uploaded. Refreshing the list…
+    complete: Upload complete
   result:
     total: Total attachments
     deletedTotal: Deleted attachments
@@ -524,10 +528,14 @@ attachments:
     load: Unable to load attachments. Please retry.
     upload: Unable to upload attachment. Please check the file and retry.
     tooLarge: Images must not exceed 10 MiB
+    invalidImage: Invalid image format or content. Choose a JPG, PNG, WebP, or GIF image.
+    uploadNetwork: Network connection failed. Check your connection and retry.
+    uploadTimeout: Upload timed out and the result is unknown. Refresh the list before retrying.
     operation: Unable to complete attachment operation. Please retry.
     referencedByArticleCover: This attachment is used as an article cover and cannot be deleted. Change or remove the cover in the article editor first.
   feedback:
     uploaded: Upload complete; identical content reuses the existing attachment.
+    uploadedRefreshFailed: Image uploaded, but the list could not refresh. Refresh the list; no need to upload again.
     copied: Attachment URL copied
     deleted: Attachment deleted
     restored: Attachment restored

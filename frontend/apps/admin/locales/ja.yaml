@@ -496,7 +496,11 @@ attachments:
   readonlyDemo: 現在のデモアカウントは読み取り専用のため、添付ファイルをアップロードできません
   upload:
     title: 画像添付をアップロード
-    description: JPEG、PNG、WebP、GIF に対応し、最大 10 MiB です。サーバーは実データを検証し、SHA-256 で重複排除するため既存添付を再利用または復元することがあります。
+    description: JPG、PNG、WebP、GIF に対応。1 枚あたり最大 10 MiB。
+    choose: 画像をアップロード
+    uploading: アップロード中…
+    refreshing: アップロード済み。一覧を更新中…
+    complete: アップロード完了
   result:
     total: 添付ファイル数
     deletedTotal: 回収済み添付ファイル数
@@ -524,10 +528,14 @@ attachments:
     load: 添付ファイル一覧を読み込めませんでした。再試行してください
     upload: 添付ファイルをアップロードできませんでした。ファイルを確認して再試行してください
     tooLarge: 画像は 10 MiB 以下にしてください
+    invalidImage: 画像の形式または内容が不正です。JPG、PNG、WebP、GIF の画像を選び直してください。
+    uploadNetwork: ネットワーク接続に失敗しました。接続を確認して再試行してください。
+    uploadTimeout: アップロードがタイムアウトし、結果を確認できません。一覧を更新して確認してから再試行してください。
     operation: 添付ファイル操作に失敗しました。再試行してください
     referencedByArticleCover: この添付ファイルは記事のカバーから参照されているため削除できません。記事編集画面でカバーを変更または解除してください。
   feedback:
     uploaded: アップロードが完了しました。同じ内容のファイルは既存の添付を再利用します。
+    uploadedRefreshFailed: 画像はアップロード済みですが、一覧の更新に失敗しました。再アップロードせず、一覧を更新してください。
     copied: 添付ファイルのURLをコピーしました
     deleted: 添付ファイルを削除しました
     restored: 添付ファイルを復元しました

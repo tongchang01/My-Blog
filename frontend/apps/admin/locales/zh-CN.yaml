@@ -496,7 +496,11 @@ attachments:
   readonlyDemo: 当前演示账号为只读模式，不能上传附件
   upload:
     title: 上传图片附件
-    description: 支持 JPEG、PNG、WebP、GIF；最大 10 MiB。服务端按真实内容校验并按 SHA-256 去重，可能复用或恢复已有附件。
+    description: 支持 JPG、PNG、WebP、GIF，单张最大 10 MiB。
+    choose: 上传图片
+    uploading: 正在上传…
+    refreshing: 上传成功，正在刷新列表…
+    complete: 上传完成
   result:
     total: 附件总数
     deletedTotal: 回收站附件总数
@@ -524,10 +528,14 @@ attachments:
     load: 附件列表加载失败，请重试
     upload: 附件上传失败，请检查文件后重试
     tooLarge: 图片不能超过 10 MiB
+    invalidImage: 图片格式或内容不符合要求，请重新选择 JPG、PNG、WebP 或 GIF 图片
+    uploadNetwork: 网络连接失败，请检查连接后重试
+    uploadTimeout: 上传请求超时，结果尚未确认；请先刷新列表检查，未找到图片时再重试
     operation: 附件操作失败，请重试
     referencedByArticleCover: 该附件正被文章封面引用，不能删除。请先在文章编辑页更换或移除封面。
   feedback:
     uploaded: 上传完成；内容相同的文件会复用已有附件
+    uploadedRefreshFailed: 图片已上传，但列表刷新失败；请刷新列表，无需重新上传
     copied: 附件地址已复制
     deleted: 附件已删除
     restored: 附件已恢复
