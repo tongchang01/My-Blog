@@ -1,4 +1,5 @@
 import MockAdapter from "axios-mock-adapter";
+import { ElButton } from "element-plus";
 import { config, flushPromises, mount } from "@vue/test-utils";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { useUserStoreHook } from "@/store/modules/user";
@@ -20,8 +21,8 @@ const mock = new MockAdapter(http.instance);
 config.global.renderStubDefaultSlot = true;
 
 const stubs = {
-  "el-alert": { props: ["title"], template: "<div>{{ title }}</div>" },
-  "el-button": { template: "<button><slot /></button>" },
+  "el-alert": { props: ["title"], template: "<div>{{ title }}<slot /></div>" },
+  "el-button": ElButton,
   "el-card": { template: "<div><slot name='header' /><slot /></div>" },
   "el-empty": true,
   "el-image": true,
@@ -92,6 +93,137 @@ afterEach(() => {
 });
 
 describe("attachment management page", () => {
+  it("shows pending upload and refresh states, and never suggests reupload after a refresh failure", async () => {
+    setUser("ADMIN");
+    let finishUpload!: (value: [number, unknown]) => void;
+    let finishRefresh!: (value: [number, unknown]) => void;
+    mock.onGet("/api/admin/attachments").replyOnce(200, ok(page()));
+    mock.onGet("/api/admin/attachments").reply(
+      () =>
+        new Promise(resolve => {
+          finishRefresh = resolve;
+        })
+    );
+    mock.onPost("/api/admin/attachments").reply(
+      () =>
+        new Promise(resolve => {
+          finishUpload = resolve;
+        })
+    );
+    const wrapper = mount(AttachmentManagement, { global: { stubs } });
+    await flushPromises();
+    const input = wrapper.get<HTMLInputElement>(
+      '[data-testid="attachment-file-input"]'
+    );
+    const choose = wrapper.get<HTMLButtonElement>(
+      '[data-testid="attachment-upload-button"]'
+    );
+    const click = vi.spyOn(input.element, "click");
+    await choose.trigger("click");
+    expect(click).toHaveBeenCalledOnce();
+    Object.defineProperty(input.element, "files", {
+      value: [new File(["png"], "new-image.png", { type: "image/png" })]
+    });
+    await input.trigger("change");
+    await flushPromises();
+    expect(choose.element.disabled).toBe(true);
+    expect(choose.classes()).toContain("is-loading");
+    expect(wrapper.get('[role="status"]').text()).toBe("Uploading…");
+    expect(wrapper.text()).toContain("new-image.png");
+    await input.trigger("change");
+    expect(mock.history.post).toHaveLength(1);
+    finishUpload([200, ok(page().records[0])]);
+    await flushPromises();
+    expect(wrapper.get('[role="status"]').text()).toBe(
+      "Uploaded. Refreshing the list…"
+    );
+    finishRefresh([500, { code: "99999", data: null }]);
+    await flushPromises();
+    expect(choose.element.disabled).toBe(false);
+    expect(wrapper.get('[role="status"]').text()).toBe("Upload complete");
+    expect(
+      wrapper.find('[data-testid="attachment-upload-retry"]').exists()
+    ).toBe(false);
+    expect(wrapper.find('[data-testid="attachment-error"]').exists()).toBe(
+      true
+    );
+    expect(showMessage).toHaveBeenCalledWith(
+      expect.stringContaining("no need to upload again"),
+      { type: "warning" }
+    );
+    mock.onGet("/api/admin/attachments").reply(200, ok(page()));
+    await wrapper.get('[data-testid="attachment-retry"]').trigger("click");
+    await flushPromises();
+    expect(mock.history.post).toHaveLength(1);
+    expect(wrapper.find('[data-testid="attachment-error"]').exists()).toBe(
+      false
+    );
+    wrapper.unmount();
+  });
+
+  it("retains the failed file for retry and handles cancelling or selecting it again", async () => {
+    setUser("ADMIN");
+    mock.onGet("/api/admin/attachments").reply(200, ok(page()));
+    mock.onPost("/api/admin/attachments").networkErrorOnce();
+    mock.onPost("/api/admin/attachments").reply(200, ok(page().records[0]));
+    const wrapper = mount(AttachmentManagement, { global: { stubs } });
+    await flushPromises();
+    const input = wrapper.get<HTMLInputElement>(
+      '[data-testid="attachment-file-input"]'
+    );
+    await input.trigger("change");
+    expect(mock.history.post).toHaveLength(0);
+    const file = new File(["png"], "retry.png", { type: "image/png" });
+    Object.defineProperty(input.element, "files", {
+      value: [file],
+      configurable: true
+    });
+    await input.trigger("change");
+    await flushPromises();
+    expect(wrapper.text()).toContain("retry.png");
+    expect(wrapper.text()).toContain("Network connection failed");
+    expect(input.element.value).toBe("");
+    await wrapper
+      .get('[data-testid="attachment-upload-retry"]')
+      .trigger("click");
+    await flushPromises();
+    expect(mock.history.post).toHaveLength(2);
+    expect((mock.history.post[1].data as FormData).get("file")).toBe(file);
+    expect(
+      wrapper.find('[data-testid="attachment-upload-error"]').exists()
+    ).toBe(false);
+    await input.trigger("change");
+    await flushPromises();
+    expect(mock.history.post).toHaveLength(3);
+    wrapper.unmount();
+  });
+
+  it("explains oversized files without offering a futile retry", async () => {
+    setUser("ADMIN");
+    mock.onGet("/api/admin/attachments").reply(200, ok(page()));
+    const wrapper = mount(AttachmentManagement, { global: { stubs } });
+    await flushPromises();
+    const input = wrapper.get<HTMLInputElement>(
+      '[data-testid="attachment-file-input"]'
+    );
+    const file = new File(["png"], "large.png", { type: "image/png" });
+    Object.defineProperty(file, "size", { value: 10 * 1024 * 1024 + 1 });
+    Object.defineProperty(input.element, "files", { value: [file] });
+    await input.trigger("change");
+    await flushPromises();
+    expect(mock.history.post).toHaveLength(0);
+    expect(wrapper.text()).toContain("10 MiB");
+    expect(wrapper.text()).toContain("large.png");
+    expect(
+      wrapper.find('[data-testid="attachment-upload-retry"]').exists()
+    ).toBe(false);
+    expect(
+      wrapper.get<HTMLButtonElement>('[data-testid="attachment-upload-button"]')
+        .element.disabled
+    ).toBe(false);
+    wrapper.unmount();
+  });
+
   it("renders upload controls and attachment cards for admin users", async () => {
     setUser("ADMIN");
     mock.onGet("/api/admin/attachments").reply(200, ok(page()));

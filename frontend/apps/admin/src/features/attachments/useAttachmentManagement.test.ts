@@ -49,6 +49,32 @@ function api(
 }
 
 describe("attachment management state", () => {
+  it("rejects concurrent uploads and distinguishes upload success from list failure", async () => {
+    let finish!: (response: ApiResponse<AttachmentItem>) => void;
+    const source = api({
+      uploadAttachment: vi.fn().mockImplementation(
+        () =>
+          new Promise(resolve => {
+            finish = resolve;
+          })
+      ),
+      listAttachments: vi.fn().mockRejectedValue(new Error("list unavailable"))
+    });
+    const state = useAttachmentManagement(source);
+    const file = new File(["png"], "a.png");
+    const pending = state.upload(file);
+    expect(state.uploading.value).toBe(true);
+    expect(state.uploadCompleted.value).toBe(false);
+    await expect(state.upload(file)).resolves.toBe(false);
+    expect(source.uploadAttachment).toHaveBeenCalledOnce();
+    finish(ok(attachment("1")));
+    await expect(pending).resolves.toBe(true);
+    expect(state.uploading.value).toBe(false);
+    expect(state.uploadCompleted.value).toBe(true);
+    expect(state.uploadError.value).toBeNull();
+    expect(state.error.value?.message).toBe("list unavailable");
+  });
+
   it("loads the first attachment page", async () => {
     const source = api();
     const state = useAttachmentManagement(source);
