@@ -1,4 +1,18 @@
-FROM maven:3.9.9-eclipse-temurin-17 AS build
+FROM maven:3.9.9-eclipse-temurin-17 AS build-trust
+
+COPY scripts/security/CheckCerts.java scripts/security/distrust-emudhra.sh /opt/java-trust/
+RUN javac /opt/java-trust/CheckCerts.java \
+    && bash /opt/java-trust/distrust-emudhra.sh \
+    && java -cp /opt/java-trust CheckCerts
+
+FROM eclipse-temurin:17-jre-jammy AS runtime-trust
+
+COPY --from=build-trust /opt/java-trust/ /opt/java-trust/
+RUN bash /opt/java-trust/distrust-emudhra.sh \
+    && java -cp /opt/java-trust CheckCerts \
+    && rm -r /opt/java-trust
+
+FROM build-trust AS build
 
 WORKDIR /build
 COPY pom.xml .
@@ -6,7 +20,7 @@ RUN mvn -B -DskipTests dependency:go-offline
 COPY src src
 RUN mvn -B -DskipTests package
 
-FROM eclipse-temurin:17-jre-jammy
+FROM runtime-trust AS runtime
 
 RUN apt-get update \
     && apt-get install --no-install-recommends --yes curl \

@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：MyBlog V2 开发与发布准备
-> 最后校准：2026-09-06
+> 最后校准：2026-10-26
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/blog/`、`frontend/apps/admin/`
 > 权威程度：当前进度权威源
 
@@ -37,6 +37,7 @@ V2 的后端、公开博客主阅读链路和管理后台主要业务闭环已�
 
 ## 已知工程风险
 
+- Java 证书撤信维护须覆盖构建、运行和 CI，并在部署后核对实际 JRE；实现与回退边界见 [Java 证书信任库维护](../ops/java-certificate-trust.md)。Caddy/Go 与宿主机 CA 是独立维护范围，不因 Java 修复而视为完成。
 - 管理端 access/refresh token 存在 localStorage，安全性依赖严格控制 XSS 面。
 - 登录、评论重复检查和访问打点限流使用进程内 Caffeine，不适用于无协调的多实例部署。
 
