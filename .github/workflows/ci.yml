@@ -40,9 +40,14 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "17.0.21+9"
           # 缓存 Maven 依赖，加速后续 job；缓存 key 由 setup-java 内部按 pom.xml 生成。
           cache: maven
+
+      - name: Verify Java trust-store mitigation
+        run: |
+          bash MyBlog-springboot-v2/scripts/security/distrust-emudhra-test.sh
+          bash MyBlog-springboot-v2/scripts/security/distrust-emudhra.sh
 
       # -Dtest=!... 排除五个真实 MySQL 集成测试，避免主 job 依赖 Docker。
       # 用双引号包住整个参数是为了防止 shell 把 ! 当历史扩展。
@@ -71,8 +76,13 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "17.0.21+9"
           cache: maven
+
+      - name: Secure Java trust store
+        run: |
+          javac MyBlog-springboot-v2/scripts/security/CheckCerts.java
+          bash MyBlog-springboot-v2/scripts/security/distrust-emudhra.sh
 
       # 提前拉镜像，把网络失败与测试失败分离：这一步挂了就一眼看出是镜像/网络问题。
       # runner 自带 Docker，无需额外安装。
@@ -120,8 +130,13 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: temurin
-          java-version: "17"
+          java-version: "17.0.21+9"
           cache: maven
+
+      - name: Secure Java trust store
+        run: |
+          javac MyBlog-springboot-v2/scripts/security/CheckCerts.java
+          bash MyBlog-springboot-v2/scripts/security/distrust-emudhra.sh
 
       - name: Install MySQL client
         run: sudo apt-get update && sudo apt-get install -y mysql-client
@@ -185,6 +200,11 @@ jobs:
 
       - name: Verify deployment workflow
         run: bash deploy/cd/test/workflow-contract-test.sh .github/workflows/images.yml
+
+      - name: Verify API image and Java trust stores
+        run: |
+          docker build --pull -t myblog-api-trust:test MyBlog-springboot-v2
+          docker run --rm --network none --entrypoint java myblog-api-trust:test -version
 
       - name: Validate Caddy configuration
         run: |
