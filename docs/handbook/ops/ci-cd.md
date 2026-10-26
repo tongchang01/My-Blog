@@ -2,7 +2,7 @@
 
 > 状态：当前有效；自动部署已于 2026-07-12 完成首次真实演练
 > 适用范围：`.github/workflows/ci.yml`、`.github/workflows/images.yml`
-> 最后校准：2026-08-09
+> 最后校准：2026-10-26
 > 对应代码：`.github/workflows/`、`deploy/cd/test/workflow-contract-test.sh`、`deploy/web/Caddyfile`、`deploy/web/test/security-headers-integration-test.sh`
 > 权威程度：CI 说明
 
@@ -20,6 +20,8 @@ CI 在 main 的 pull request、push 和手动 workflow dispatch 时运行，仓�
 | Deploy production | 仅 main、依赖 publish：临时放行当前 Runner 的 SSH /32，调用受限 deploy 用户部署同 SHA，校验三个公网 `/healthz`、三域静态响应头和公开 API 的 `nosniff`，并始终撤销规则 |
 
 后端 MySQL job 预拉镜像并设置 15 分钟上限。只有镜像拉取或容器启动这类基础设施失败可以直接 rerun；迁移、SQL 或断言失败必须先诊断代码。
+
+三个后端 job 使用 Temurin `17.0.21+9`，在 Maven 调用前执行 Java 证书检查/处置；主测试 job 额外运行离线信任库合约。部署合约 job 构建完整 API 镜像，包含 `build-trust` 和 `runtime-trust` 两层根证书撤信验证，并检查最终 JRE 可执行；API 发布构建显式拉取基础镜像。方案来源、临时措施移除条件与部署后检查见 [Java 证书信任库维护](java-certificate-trust.md)。这些配置不代表生产已更新，实际结果须以发布 SHA 和容器检查为准。
 
 运行中 API 契约由 `RunningApiContractTest` 在随机端口启动后端，按独立测试方法覆盖登录/refresh/DEMO、文章完整写入、multipart 附件和站点配置完整 PUT；它不依赖生产账号或外部服务。新增检查必须能在干净 runner 稳定复现，不依赖生产密钥或个人本机状态，并对失败提供可操作反馈。CI 通过不替代真实环境的 CORS、反向代理、客户端 IP、S3、数据库备份和冒烟验证。
 

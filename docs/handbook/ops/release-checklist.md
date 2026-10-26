@@ -2,7 +2,7 @@
 
 > 状态：当前有效
 > 适用范围：V2 生产发布与回滚
-> 最后校准：2026-08-09
+> 最后校准：2026-10-26
 > 对应代码：`MyBlog-springboot-v2/`、`frontend/apps/`
 > 权威程度：发布门槛
 
@@ -11,6 +11,7 @@
 复选框表示**本次发布或恢复**必须重新核对的证据，不表示站点从未上线。日常 `main` 发布由 CD 完成；涉及数据、存储、网络或手工恢复时必须执行与风险匹配的项目。
 
 - [ ] 后端 `mvn clean test` 与真实 MySQL 专项通过。
+- [ ] Java 构建/运行镜像与 CI 信任库检查通过；部署后实际 API JRE 的根证书检查及正常 HTTPS 外连通过，见 [Java 信任库维护](java-certificate-trust.md)。
 - [ ] blog/admin 的 test、typecheck、lint、production build 通过。
 - [ ] 发布提交 SHA、构建产物和数据库迁移版本已记录。
 - [ ] prod profile 显式启用，JVM 时区为 `Asia/Tokyo`。
